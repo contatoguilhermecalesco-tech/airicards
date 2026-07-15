@@ -79,10 +79,10 @@ function DeckDetail() {
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setAddOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent sm:flex-none"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             Nova carta
@@ -94,7 +94,7 @@ function DeckDetail() {
             onClick={(e) => {
               if (due === 0) e.preventDefault();
             }}
-            className={`inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 ${
+            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 sm:flex-none ${
               due === 0 ? "pointer-events-none opacity-40" : ""
             }`}
           >
