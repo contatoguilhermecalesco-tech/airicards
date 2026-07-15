@@ -20,14 +20,14 @@ function Home() {
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:pt-16">
       <section className="text-center">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary/80">
-          Today
+          Hoje
         </p>
         <h1 className="mt-3 text-4xl font-semibold text-balance sm:text-5xl">
-          {due > 0 ? "You have cards to review." : "You're all caught up."}
+          {due > 0 ? "Você tem cartas para revisar." : "Tudo em dia por aqui."}
         </h1>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground text-balance">
-          A calm space to grow your English vocabulary — one card at a time,
-          spaced just right.
+          Um espaço tranquilo para expandir seu vocabulário em inglês — uma
+          carta por vez, no ritmo certo.
         </p>
       </section>
 
