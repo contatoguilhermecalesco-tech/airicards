@@ -141,6 +141,22 @@ export function deleteCard(id: string) {
 
 export type Grade = "again" | "hard" | "good" | "easy";
 
+// Classifica dificuldade automaticamente com base no histórico de erros/acertos.
+export function autoClassify(card: Card): "hard" | "good" | "easy" {
+  const lapses = card.lapses ?? 0;
+  const successes = card.successes ?? 0;
+  if (lapses >= 3 || (lapses > 0 && successes < lapses)) return "hard";
+  if (successes >= 3 && lapses === 0) return "easy";
+  return "good";
+}
+
+// Score de dificuldade: quanto maior, mais o usuário erra — prioriza na fila.
+export function difficultyScore(card: Card): number {
+  const lapses = card.lapses ?? 0;
+  const successes = card.successes ?? 0;
+  return lapses * 2 - successes * 0.5;
+}
+
 export function reviewCard(id: string, grade: Grade) {
   ensureHydrated();
   const now = Date.now();
@@ -150,12 +166,22 @@ export function reviewCard(id: string, grade: Grade) {
     cards: state.cards.map((c) => {
       if (c.id !== id) return c;
       let { ease, interval, reps } = c;
+      const lapses = c.lapses ?? 0;
+      const successes = c.successes ?? 0;
 
       if (grade === "again") {
         reps = 0;
         interval = 0;
         ease = Math.max(1.3, ease - 0.2);
-        return { ...c, ease, interval, reps, dueAt: now + 60_000 }; // 1 min
+        return {
+          ...c,
+          ease,
+          interval,
+          reps,
+          dueAt: now + 60_000,
+          lapses: lapses + 1,
+          successes,
+        };
       }
 
       const q = grade === "hard" ? 3 : grade === "good" ? 4 : 5;
@@ -166,7 +192,15 @@ export function reviewCard(id: string, grade: Grade) {
       else if (reps === 2) interval = grade === "easy" ? 6 : 3;
       else interval = Math.round(interval * ease * (grade === "hard" ? 0.8 : 1));
 
-      return { ...c, ease, interval, reps, dueAt: now + interval * dayMs };
+      return {
+        ...c,
+        ease,
+        interval,
+        reps,
+        dueAt: now + interval * dayMs,
+        lapses,
+        successes: successes + 1,
+      };
     }),
   };
   emit();
