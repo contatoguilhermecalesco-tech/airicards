@@ -5,7 +5,8 @@ import {
   useStore,
   getDueCards,
   reviewCard,
-  type Grade,
+  autoClassify,
+  difficultyScore,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
@@ -38,9 +39,14 @@ function Review() {
 
   useEffect(() => {
     const due = getDueCards(deckId, Date.now());
-    const shuffled = [...due].sort(() => Math.random() - 0.5);
-    setQueue(shuffled.map((c) => c.id));
-    setSessionCount(shuffled.length);
+    // Prioriza cartas mais difíceis (mais erradas) no topo da fila,
+    // com um pouco de aleatoriedade para não ficar sempre igual.
+    const ordered = [...due].sort(
+      (a, b) =>
+        difficultyScore(b) - difficultyScore(a) + (Math.random() - 0.5) * 0.6,
+    );
+    setQueue(ordered.map((c) => c.id));
+    setSessionCount(ordered.length);
     setIndex(0);
     setShowBack(false);
     setReviewed(0);
@@ -58,14 +64,22 @@ function Review() {
 
   const finished = queue.length > 0 && index >= queue.length;
 
-  function grade(g: Grade) {
+  function handleWrong() {
     if (!current) return;
+    reviewCard(current.id, "again");
+    setReviewed((n) => n + 1);
+    // Errou → volta pro fim da fila para revisar de novo
+    setQueue((q) => [...q, current.id]);
+    setIndex((i) => i + 1);
+    setShowBack(false);
+  }
+
+  function handleRight() {
+    if (!current) return;
+    // Sistema classifica automaticamente com base no histórico
+    const g = autoClassify(current);
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
-    // If "again", requeue to the end of the session
-    if (g === "again") {
-      setQueue((q) => [...q, current.id]);
-    }
     setIndex((i) => i + 1);
     setShowBack(false);
   }
@@ -155,31 +169,32 @@ function Review() {
                   Mostrar resposta
                 </button>
               ) : (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <GradeButton
-                    label="De novo"
-                    hint="< 1 min"
-                    tone="destructive"
-                    onClick={() => grade("again")}
-                  />
-                  <GradeButton
-                    label="Difícil"
-                    hint="em breve"
-                    tone="warning"
-                    onClick={() => grade("hard")}
-                  />
-                  <GradeButton
-                    label="Bom"
-                    hint="dias"
-                    tone="primary"
-                    onClick={() => grade("good")}
-                  />
-                  <GradeButton
-                    label="Fácil"
-                    hint="semanas"
-                    tone="success"
-                    onClick={() => grade("easy")}
-                  />
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <GradeButton
+                      label="Errei"
+                      hint="revisar de novo"
+                      tone="destructive"
+                      onClick={handleWrong}
+                    />
+                    <GradeButton
+                      label="Acertei"
+                      hint={
+                        current
+                          ? autoClassify(current) === "hard"
+                            ? "difícil"
+                            : autoClassify(current) === "easy"
+                              ? "fácil"
+                              : "médio"
+                          : ""
+                      }
+                      tone="success"
+                      onClick={handleRight}
+                    />
+                  </div>
+                  <p className="text-center text-[11px] text-muted-foreground">
+                    O sistema classifica a dificuldade automaticamente pelo seu histórico.
+                  </p>
                 </div>
               )}
             </div>
