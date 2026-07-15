@@ -150,3 +150,8 @@
 @utility text-balance {
   text-wrap: balance;
 }
+
+#lovable-badge {
+  display: none !important;
+}
+
