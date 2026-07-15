@@ -120,9 +120,9 @@ function Library() {
       {open && <NewDeckSheet onClose={() => setOpen(false)} />}
       {confirmId && (
         <ConfirmDialog
-          title="Delete deck?"
-          description="This removes the deck and all its cards. This cannot be undone."
-          confirmLabel="Delete"
+          title="Excluir deck?"
+          description="Isso remove o deck e todas as suas cartas. Não pode ser desfeito."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteDeck(confirmId);
             setConfirmId(null);
