@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
-import { X, Check } from "lucide-react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { X, Check, Swords, Trophy } from "lucide-react";
 import {
   useStore,
   getDueCards,
   reviewCard,
   difficultyScore,
+  isEnemy,
+  ENEMY_THRESHOLD,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
@@ -64,26 +66,53 @@ function Review() {
   const finished = queue.length > 0 && index >= queue.length;
 
   const [askDifficulty, setAskDifficulty] = useState(false);
+  const [notice, setNotice] = useState<
+    | { kind: "enemy-born" | "enemy-defeated"; text: string }
+    | null
+  >(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function flashNotice(n: NonNullable<typeof notice>) {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+    setNotice(n);
+    noticeTimer.current = setTimeout(() => setNotice(null), 1800);
+  }
 
   function handleWrong() {
     if (!current) return;
+    const wasEnemy = isEnemy(current);
+    const willBecomeEnemy =
+      !wasEnemy && (current.lapses ?? 0) + 1 >= ENEMY_THRESHOLD;
     reviewCard(current.id, "again");
     setReviewed((n) => n + 1);
-    // Erro é computado (lapses++) e a carta volta mais cedo nas próximas sessões.
+    if (willBecomeEnemy) {
+      flashNotice({
+        kind: "enemy-born",
+        text: "Um inimigo apareceu! Essa carta virou um chefe do seu baralho.",
+      });
+    }
     setIndex((i) => i + 1);
     setShowBack(false);
     setAskDifficulty(false);
   }
 
   function handleRight() {
-    // Abre pergunta de dificuldade
     setAskDifficulty(true);
   }
 
   function handleDifficulty(g: "hard" | "good" | "easy") {
     if (!current) return;
+    const wasEnemy = isEnemy(current);
+    const willDefeat =
+      wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
+    if (willDefeat) {
+      flashNotice({
+        kind: "enemy-defeated",
+        text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
+      });
+    }
     setIndex((i) => i + 1);
     setShowBack(false);
     setAskDifficulty(false);
@@ -141,7 +170,19 @@ function Review() {
             </p>
 
             <div className="mt-6 flex flex-1 items-center justify-center">
-              <div className="ios-card relative w-full min-h-[280px] rounded-3xl px-6 py-10 sm:min-h-[340px]">
+              <div
+                className={`ios-card relative w-full min-h-[280px] rounded-3xl px-6 py-10 sm:min-h-[340px] ${
+                  isEnemy(current)
+                    ? "ring-2 ring-destructive/40 shadow-[0_0_40px_-10px_hsl(var(--destructive)/0.6)]"
+                    : ""
+                }`}
+              >
+                {isEnemy(current) && (
+                  <div className="absolute -top-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-destructive/30 bg-destructive/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-destructive backdrop-blur">
+                    <Swords className="h-3 w-3" strokeWidth={2.5} />
+                    Carta inimiga · nv {current.lapses ?? 0}
+                  </div>
+                )}
                 <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
                   <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary/80">
                     Inglês
@@ -164,6 +205,23 @@ function Review() {
                 </div>
               </div>
             </div>
+
+            {notice && (
+              <div
+                className={`pointer-events-none fixed inset-x-0 top-6 z-40 mx-auto flex max-w-sm items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium shadow-lg backdrop-blur ${
+                  notice.kind === "enemy-born"
+                    ? "border-destructive/30 bg-destructive/15 text-destructive"
+                    : "border-success/30 bg-success/15 text-success"
+                }`}
+              >
+                {notice.kind === "enemy-born" ? (
+                  <Swords className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                ) : (
+                  <Trophy className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                )}
+                <span>{notice.text}</span>
+              </div>
+            )}
 
             <div className="mt-8">
               {!showBack ? (

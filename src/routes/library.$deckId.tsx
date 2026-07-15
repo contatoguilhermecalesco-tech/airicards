@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Play, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Play, Plus, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
   deleteCard,
   deleteDeck,
+  isEnemy,
 } from "@/lib/flashcards-store";
 import { Field, ConfirmDialog } from "./library.index";
 
@@ -48,6 +49,7 @@ function DeckDetail() {
   }
 
   const due = cards.filter((c) => c.dueAt <= Date.now()).length;
+  const enemies = cards.filter(isEnemy).length;
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-6 pb-24">
@@ -70,6 +72,9 @@ function DeckDetail() {
           <p className="mt-2 text-xs text-muted-foreground">
             {cards.length} carta{cards.length === 1 ? "" : "s"}
             {due > 0 && <> · <span className="text-primary">{due} para revisar</span></>}
+            {enemies > 0 && (
+              <> · <span className="inline-flex items-center gap-1 text-destructive"><Swords className="h-3 w-3" strokeWidth={2.5} />{enemies} inimiga{enemies === 1 ? "" : "s"}</span></>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -120,10 +125,20 @@ function DeckDetail() {
             {cards.map((c) => (
               <li
                 key={c.id}
-                className="ios-card group flex items-center justify-between gap-4 rounded-2xl px-5 py-4"
+                className={`ios-card group flex items-center justify-between gap-4 rounded-2xl px-5 py-4 ${
+                  isEnemy(c) ? "ring-1 ring-destructive/30" : ""
+                }`}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{c.front}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="truncate font-medium">{c.front}</p>
+                    {isEnemy(c) && (
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
+                        <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
+                        inimiga
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-0.5 truncate text-sm text-muted-foreground">
                     {c.back}
                   </p>
