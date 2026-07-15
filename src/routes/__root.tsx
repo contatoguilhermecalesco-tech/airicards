@@ -8,12 +8,14 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Home, Library } from "lucide-react";
+import { useEffect, useState, useRef, type ReactNode } from "react";
+import { Home, Library, LogOut } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { ProfileGate } from "../components/ProfileGate";
+import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
 function NotFoundComponent() {
   return (
