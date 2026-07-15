@@ -6,7 +6,6 @@ import {
   createCard,
   deleteCard,
   deleteDeck,
-  cardsForDeck,
 } from "@/lib/flashcards-store";
 import { Field, ConfirmDialog } from "./library.index";
 
