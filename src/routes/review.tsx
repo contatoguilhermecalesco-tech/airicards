@@ -125,7 +125,7 @@ function Review() {
               <div className="ios-card relative w-full min-h-[280px] rounded-3xl px-6 py-10 sm:min-h-[340px]">
                 <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
                   <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary/80">
-                    English
+                    Inglês
                   </p>
                   <p className="text-3xl font-semibold text-balance sm:text-4xl">
                     {current.front}
