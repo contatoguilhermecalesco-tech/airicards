@@ -229,15 +229,15 @@ function EmptyState() {
       <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
         <Check className="h-6 w-6" strokeWidth={2.5} />
       </div>
-      <h2 className="mt-5 text-xl font-semibold">Nothing due right now</h2>
+      <h2 className="mt-5 text-xl font-semibold">Nada para revisar agora</h2>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-        Come back later — your next reviews will show up when they're ready.
+        Volte mais tarde — as próximas revisões aparecerão quando estiverem prontas.
       </p>
       <Link
         to="/"
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
       >
-        Back home
+        Voltar ao início
       </Link>
     </div>
   );
