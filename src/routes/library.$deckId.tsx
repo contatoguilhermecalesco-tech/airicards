@@ -24,7 +24,11 @@ function DeckDetail() {
   const { deckId } = Route.useParams();
   const router = useRouter();
   const deck = useStore((s) => s.decks.find((d) => d.id === deckId));
-  const cards = useStore(() => cardsForDeck(deckId));
+  const allCards = useStore((s) => s.cards);
+  const cards = useMemo(
+    () => allCards.filter((c) => c.deckId === deckId),
+    [allCards, deckId],
+  );
 
   const [addOpen, setAddOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
