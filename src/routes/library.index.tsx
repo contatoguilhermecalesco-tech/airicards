@@ -271,7 +271,7 @@ export function ConfirmDialog({
               onClick={onCancel}
               className="flex-1 rounded-full border border-border bg-surface py-2.5 text-sm font-medium hover:bg-accent"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               onClick={onConfirm}
