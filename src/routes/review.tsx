@@ -39,9 +39,14 @@ function Review() {
 
   useEffect(() => {
     const due = getDueCards(deckId, Date.now());
-    const shuffled = [...due].sort(() => Math.random() - 0.5);
-    setQueue(shuffled.map((c) => c.id));
-    setSessionCount(shuffled.length);
+    // Prioriza cartas mais difíceis (mais erradas) no topo da fila,
+    // com um pouco de aleatoriedade para não ficar sempre igual.
+    const ordered = [...due].sort(
+      (a, b) =>
+        difficultyScore(b) - difficultyScore(a) + (Math.random() - 0.5) * 0.6,
+    );
+    setQueue(ordered.map((c) => c.id));
+    setSessionCount(ordered.length);
     setIndex(0);
     setShowBack(false);
     setReviewed(0);
@@ -59,14 +64,22 @@ function Review() {
 
   const finished = queue.length > 0 && index >= queue.length;
 
-  function grade(g: Grade) {
+  function handleWrong() {
     if (!current) return;
+    reviewCard(current.id, "again");
+    setReviewed((n) => n + 1);
+    // Errou → volta pro fim da fila para revisar de novo
+    setQueue((q) => [...q, current.id]);
+    setIndex((i) => i + 1);
+    setShowBack(false);
+  }
+
+  function handleRight() {
+    if (!current) return;
+    // Sistema classifica automaticamente com base no histórico
+    const g = autoClassify(current);
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
-    // If "again", requeue to the end of the session
-    if (g === "again") {
-      setQueue((q) => [...q, current.id]);
-    }
     setIndex((i) => i + 1);
     setShowBack(false);
   }
