@@ -207,6 +207,26 @@ function AddCardSheet({
 }) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState<string | null>(null);
+  const [alternatives, setAlternatives] = useState<string[]>([]);
+  const translate = useServerFn(translateEnToPt);
+
+  async function handleTranslate() {
+    if (!front.trim() || translating) return;
+    setTranslating(true);
+    setTranslateError(null);
+    setAlternatives([]);
+    try {
+      const result = await translate({ data: { text: front.trim() } });
+      setBack(result.translation);
+      if (result.alternatives?.length) setAlternatives(result.alternatives);
+    } catch (err) {
+      setTranslateError(err instanceof Error ? err.message : "Falha ao traduzir");
+    } finally {
+      setTranslating(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
@@ -215,7 +235,10 @@ function AddCardSheet({
         onClick={onClose}
       />
       <div className="relative w-full sm:max-w-md">
-        <div className="ios-card m-3 rounded-3xl p-6">
+        <div
+          className="ios-card m-3 rounded-3xl p-6"
+          style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+        >
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Nova carta</h3>
             <button
@@ -238,15 +261,48 @@ function AddCardSheet({
               label="Inglês"
               autoFocus
               value={front}
-              onChange={setFront}
+              onChange={(v) => {
+                setFront(v);
+                setAlternatives([]);
+                setTranslateError(null);
+              }}
               placeholder="Serendipity"
             />
+            <button
+              type="button"
+              onClick={handleTranslate}
+              disabled={!front.trim() || translating}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/20 disabled:opacity-40"
+            >
+              <Sparkles className={`h-4 w-4 ${translating ? "animate-pulse" : ""}`} strokeWidth={2.5} />
+              {translating ? "Traduzindo…" : "Traduzir com IA"}
+            </button>
+            {translateError && (
+              <p className="text-xs text-destructive">{translateError}</p>
+            )}
             <Field
               label="Tradução"
               value={back}
               onChange={setBack}
               placeholder="Serendipidade"
             />
+            {alternatives.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Alternativas:
+                </span>
+                {alternatives.map((alt) => (
+                  <button
+                    key={alt}
+                    type="button"
+                    onClick={() => setBack(alt)}
+                    className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs text-foreground hover:bg-accent"
+                  >
+                    {alt}
+                  </button>
+                ))}
+              </div>
+            )}
             <button
               type="submit"
               disabled={!front.trim() || !back.trim()}
