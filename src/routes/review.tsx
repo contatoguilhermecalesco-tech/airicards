@@ -66,26 +66,53 @@ function Review() {
   const finished = queue.length > 0 && index >= queue.length;
 
   const [askDifficulty, setAskDifficulty] = useState(false);
+  const [notice, setNotice] = useState<
+    | { kind: "enemy-born" | "enemy-defeated"; text: string }
+    | null
+  >(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function flashNotice(n: NonNullable<typeof notice>) {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+    setNotice(n);
+    noticeTimer.current = setTimeout(() => setNotice(null), 1800);
+  }
 
   function handleWrong() {
     if (!current) return;
+    const wasEnemy = isEnemy(current);
+    const willBecomeEnemy =
+      !wasEnemy && (current.lapses ?? 0) + 1 >= ENEMY_THRESHOLD;
     reviewCard(current.id, "again");
     setReviewed((n) => n + 1);
-    // Erro é computado (lapses++) e a carta volta mais cedo nas próximas sessões.
+    if (willBecomeEnemy) {
+      flashNotice({
+        kind: "enemy-born",
+        text: "Um inimigo apareceu! Essa carta virou um chefe do seu baralho.",
+      });
+    }
     setIndex((i) => i + 1);
     setShowBack(false);
     setAskDifficulty(false);
   }
 
   function handleRight() {
-    // Abre pergunta de dificuldade
     setAskDifficulty(true);
   }
 
   function handleDifficulty(g: "hard" | "good" | "easy") {
     if (!current) return;
+    const wasEnemy = isEnemy(current);
+    const willDefeat =
+      wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
+    if (willDefeat) {
+      flashNotice({
+        kind: "enemy-defeated",
+        text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
+      });
+    }
     setIndex((i) => i + 1);
     setShowBack(false);
     setAskDifficulty(false);
