@@ -68,8 +68,8 @@ function DeckDetail() {
             </p>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
-            {cards.length} card{cards.length === 1 ? "" : "s"}
-            {due > 0 && <> · <span className="text-primary">{due} due</span></>}
+            {cards.length} carta{cards.length === 1 ? "" : "s"}
+            {due > 0 && <> · <span className="text-primary">{due} para revisar</span></>}
           </p>
         </div>
         <div className="flex gap-2">
@@ -78,7 +78,7 @@ function DeckDetail() {
             className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
-            Add card
+            Nova carta
           </button>
           <Link
             to="/review"
@@ -92,7 +92,7 @@ function DeckDetail() {
             }`}
           >
             <Play className="h-4 w-4" strokeWidth={2.5} />
-            Review
+            Revisar
           </Link>
         </div>
       </div>
