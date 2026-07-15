@@ -27,11 +27,11 @@ function Library() {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary/80">
-            Library
+            Biblioteca
           </p>
-          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Your decks</h1>
+          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Seus decks</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Organize vocabulary into decks and review them daily.
+            Organize seu vocabulário em decks e revise todos os dias.
           </p>
         </div>
         <button
@@ -39,7 +39,7 @@ function Library() {
           className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
-          New deck
+          Novo deck
         </button>
       </div>
 
