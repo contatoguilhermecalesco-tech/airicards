@@ -14,11 +14,14 @@ export const Route = createFileRoute("/")({
 function Home() {
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
+  const sessionsToday = useHomeSessionsToday();
+  const sessionsLeft = Math.max(0, HOME_DAILY_LIMIT - sessionsToday);
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
     [cards, now],
   );
+  const canStart = due > 0 && sessionsLeft > 0;
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:pt-16">
