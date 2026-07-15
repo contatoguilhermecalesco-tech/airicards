@@ -85,23 +85,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#231e2c" },
-      { title: "Lume — Flashcards de inglês com repetição espaçada" },
+      { title: "airi" },
       {
         name: "description",
         content:
-          "Um app tranquilo, inspirado no iOS, para dominar o inglês com revisões diárias por repetição espaçada.",
+          "Aprenda inglês com repetição!!!",
       },
       {
         property: "og:title",
-        content: "Lume — Flashcards de inglês com repetição espaçada",
+        content: "airi",
       },
       {
         property: "og:description",
         content:
-          "Crie decks, revise cartas e memorize palavras em inglês de vez.",
+          "Aprenda inglês com repetição!!!",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "airi" },
+      { name: "twitter:description", content: "Aprenda inglês com repetição!!!" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/fSE9nIncamQ6thBvnCyu3ZzOV1N2/social-images/social-1784155934586-72e471ee-7eec-482a-853f-99c18d7552c9.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/fSE9nIncamQ6thBvnCyu3ZzOV1N2/social-images/social-1784155934586-72e471ee-7eec-482a-853f-99c18d7552c9.webp" },
     ],
     links: [
       {
@@ -118,7 +122,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
