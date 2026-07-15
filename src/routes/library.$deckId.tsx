@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Play, Plus, Swords, Trash2, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Play, Plus, Sparkles, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -8,6 +9,7 @@ import {
   deleteDeck,
   isEnemy,
 } from "@/lib/flashcards-store";
+import { translateEnToPt } from "@/lib/translate.functions";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
