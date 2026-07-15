@@ -157,6 +157,16 @@ export function difficultyScore(card: Card): number {
   return lapses * 2 - successes * 0.5;
 }
 
+// Carta inimiga: 3+ erros. Vira um "chefe" do baralho que o jogador precisa derrotar.
+export const ENEMY_THRESHOLD = 3;
+export function isEnemy(card: Card): boolean {
+  return (card.lapses ?? 0) >= ENEMY_THRESHOLD;
+}
+export function isDefeated(card: Card): boolean {
+  // Uma inimiga é "derrotada" quando o jogador acerta mais vezes que errou.
+  return isEnemy(card) && (card.successes ?? 0) > (card.lapses ?? 0);
+}
+
 export function reviewCard(id: string, grade: Grade) {
   ensureHydrated();
   const now = Date.now();
