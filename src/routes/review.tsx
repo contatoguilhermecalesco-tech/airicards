@@ -5,7 +5,8 @@ import {
   useStore,
   getDueCards,
   reviewCard,
-  type Grade,
+  autoClassify,
+  difficultyScore,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
