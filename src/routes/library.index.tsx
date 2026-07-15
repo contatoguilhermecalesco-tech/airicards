@@ -24,8 +24,8 @@ function Library() {
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24">
-      <div className="flex items-end justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary/80">
             Biblioteca
           </p>
@@ -36,7 +36,7 @@ function Library() {
         </div>
         <button
           onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
+          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 sm:self-auto"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
           Novo deck
@@ -96,7 +96,7 @@ function Library() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setConfirmId(d.id)}
-                      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
+                      className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                       aria-label={`Excluir ${d.name}`}
                     >
                       <Trash2 className="h-4 w-4" />

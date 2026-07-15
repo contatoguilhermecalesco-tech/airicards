@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Play, Plus, Swords, Trash2, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Play, Plus, Sparkles, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -8,6 +9,7 @@ import {
   deleteDeck,
   isEnemy,
 } from "@/lib/flashcards-store";
+import { translateEnToPt } from "@/lib/translate.functions";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
@@ -77,10 +79,10 @@ function DeckDetail() {
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setAddOpen(true)}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent sm:flex-none"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             Nova carta
@@ -92,7 +94,7 @@ function DeckDetail() {
             onClick={(e) => {
               if (due === 0) e.preventDefault();
             }}
-            className={`inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 ${
+            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 sm:flex-none ${
               due === 0 ? "pointer-events-none opacity-40" : ""
             }`}
           >
@@ -145,7 +147,7 @@ function DeckDetail() {
                 </div>
                 <button
                   onClick={() => setConfirmDelete(c.id)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                   aria-label="Excluir carta"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -205,6 +207,26 @@ function AddCardSheet({
 }) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState<string | null>(null);
+  const [alternatives, setAlternatives] = useState<string[]>([]);
+  const translate = useServerFn(translateEnToPt);
+
+  async function handleTranslate() {
+    if (!front.trim() || translating) return;
+    setTranslating(true);
+    setTranslateError(null);
+    setAlternatives([]);
+    try {
+      const result = await translate({ data: { text: front.trim() } });
+      setBack(result.translation);
+      if (result.alternatives?.length) setAlternatives(result.alternatives);
+    } catch (err) {
+      setTranslateError(err instanceof Error ? err.message : "Falha ao traduzir");
+    } finally {
+      setTranslating(false);
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
@@ -213,7 +235,10 @@ function AddCardSheet({
         onClick={onClose}
       />
       <div className="relative w-full sm:max-w-md">
-        <div className="ios-card m-3 rounded-3xl p-6">
+        <div
+          className="ios-card m-3 rounded-3xl p-6"
+          style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+        >
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">Nova carta</h3>
             <button
@@ -236,15 +261,48 @@ function AddCardSheet({
               label="Inglês"
               autoFocus
               value={front}
-              onChange={setFront}
+              onChange={(v) => {
+                setFront(v);
+                setAlternatives([]);
+                setTranslateError(null);
+              }}
               placeholder="Serendipity"
             />
+            <button
+              type="button"
+              onClick={handleTranslate}
+              disabled={!front.trim() || translating}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/10 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/20 disabled:opacity-40"
+            >
+              <Sparkles className={`h-4 w-4 ${translating ? "animate-pulse" : ""}`} strokeWidth={2.5} />
+              {translating ? "Traduzindo…" : "Traduzir com IA"}
+            </button>
+            {translateError && (
+              <p className="text-xs text-destructive">{translateError}</p>
+            )}
             <Field
               label="Tradução"
               value={back}
               onChange={setBack}
               placeholder="Serendipidade"
             />
+            {alternatives.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Alternativas:
+                </span>
+                {alternatives.map((alt) => (
+                  <button
+                    key={alt}
+                    type="button"
+                    onClick={() => setBack(alt)}
+                    className="rounded-full border border-border bg-surface px-2.5 py-1 text-xs text-foreground hover:bg-accent"
+                  >
+                    {alt}
+                  </button>
+                ))}
+              </div>
+            )}
             <button
               type="submit"
               disabled={!front.trim() || !back.trim()}
