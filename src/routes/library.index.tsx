@@ -50,17 +50,17 @@ function Library() {
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
                 <Plus className="h-6 w-6" strokeWidth={2.25} />
               </div>
-              <h2 className="mt-5 text-lg font-semibold">Create your first deck</h2>
+              <h2 className="mt-5 text-lg font-semibold">Crie seu primeiro deck</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                A deck is a themed collection of cards — verbs, travel words,
-                phrasal verbs, whatever you want to learn.
+                Um deck é uma coleção temática de cartas — verbos, palavras de
+                viagem, phrasal verbs, o que você quiser aprender.
               </p>
               <button
                 onClick={() => setOpen(true)}
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
-                New deck
+                Novo deck
               </button>
             </div>
           </div>
