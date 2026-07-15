@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { Home, Library, Sparkles } from "lucide-react";
+import { Home, Library } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
