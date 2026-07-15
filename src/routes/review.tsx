@@ -152,31 +152,31 @@ function Review() {
                   onClick={() => setShowBack(true)}
                   className="w-full rounded-full bg-primary py-4 text-[15px] font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
                 >
-                  Show answer
+                  Mostrar resposta
                 </button>
               ) : (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <GradeButton
-                    label="Again"
-                    hint="< 1m"
+                    label="De novo"
+                    hint="< 1 min"
                     tone="destructive"
                     onClick={() => grade("again")}
                   />
                   <GradeButton
-                    label="Hard"
-                    hint="soon"
+                    label="Difícil"
+                    hint="em breve"
                     tone="warning"
                     onClick={() => grade("hard")}
                   />
                   <GradeButton
-                    label="Good"
-                    hint="days"
+                    label="Bom"
+                    hint="dias"
                     tone="primary"
                     onClick={() => grade("good")}
                   />
                   <GradeButton
-                    label="Easy"
-                    hint="weeks"
+                    label="Fácil"
+                    hint="semanas"
                     tone="success"
                     onClick={() => grade("easy")}
                   />
