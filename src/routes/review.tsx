@@ -5,7 +5,6 @@ import {
   useStore,
   getDueCards,
   reviewCard,
-  autoClassify,
   difficultyScore,
 } from "@/lib/flashcards-store";
 
