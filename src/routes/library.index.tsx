@@ -6,7 +6,7 @@ import { useStore, createDeck, deleteDeck } from "@/lib/flashcards-store";
 export const Route = createFileRoute("/library/")({
   head: () => ({
     meta: [
-      { title: "Biblioteca — Lume" },
+      { title: "Biblioteca — Airi" },
       {
         name: "description",
         content: "Gerencie seus decks de flashcards de inglês.",
