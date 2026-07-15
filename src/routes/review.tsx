@@ -169,31 +169,32 @@ function Review() {
                   Mostrar resposta
                 </button>
               ) : (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <GradeButton
-                    label="De novo"
-                    hint="< 1 min"
-                    tone="destructive"
-                    onClick={() => grade("again")}
-                  />
-                  <GradeButton
-                    label="Difícil"
-                    hint="em breve"
-                    tone="warning"
-                    onClick={() => grade("hard")}
-                  />
-                  <GradeButton
-                    label="Bom"
-                    hint="dias"
-                    tone="primary"
-                    onClick={() => grade("good")}
-                  />
-                  <GradeButton
-                    label="Fácil"
-                    hint="semanas"
-                    tone="success"
-                    onClick={() => grade("easy")}
-                  />
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <GradeButton
+                      label="Errei"
+                      hint="revisar de novo"
+                      tone="destructive"
+                      onClick={handleWrong}
+                    />
+                    <GradeButton
+                      label="Acertei"
+                      hint={
+                        current
+                          ? autoClassify(current) === "hard"
+                            ? "difícil"
+                            : autoClassify(current) === "easy"
+                              ? "fácil"
+                              : "médio"
+                          : ""
+                      }
+                      tone="success"
+                      onClick={handleRight}
+                    />
+                  </div>
+                  <p className="text-center text-[11px] text-muted-foreground">
+                    O sistema classifica a dificuldade automaticamente pelo seu histórico.
+                  </p>
                 </div>
               )}
             </div>
