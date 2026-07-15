@@ -159,10 +159,17 @@ export function setActiveProfileId(profileId: string | null) {
     .subscribe();
 }
 
-// Boot: hydrate for whoever is already selected in localStorage.
+// Boot: hydrate for whoever is already selected in localStorage, and
+// re-hydrate whenever the current profile changes (Netflix-style switch).
 if (isBrowser()) {
-  const initial = getCurrentProfile();
-  if (initial) setActiveProfileId(initial.id);
+  const applyCurrent = () => {
+    const p = getCurrentProfile();
+    setActiveProfileId(p?.id ?? null);
+  };
+  applyCurrent();
+  void import("@/lib/profile").then(({ subscribeProfile }) => {
+    subscribeProfile(applyCurrent);
+  });
 }
 
 // --- React hooks ------------------------------------------------------
