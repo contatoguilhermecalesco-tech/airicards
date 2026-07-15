@@ -167,9 +167,9 @@ function DeckDetail() {
       )}
       {deleteDeckOpen && (
         <ConfirmDialog
-          title="Delete deck?"
-          description="This removes the deck and all its cards."
-          confirmLabel="Delete"
+          title="Excluir deck?"
+          description="Isso remove o deck e todas as suas cartas."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteDeck(deckId);
             router.navigate({ to: "/library" });
