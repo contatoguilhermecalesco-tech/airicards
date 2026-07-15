@@ -42,9 +42,16 @@ function Review() {
   const allCards = useStore((s) => s.cards);
 
   useEffect(() => {
+    // Limite diário só se aplica à sessão global (sem deckId).
+    if (!deckId && !canStartHomeSession()) {
+      setLimitReached(true);
+      setQueue([]);
+      setSessionCount(0);
+      return;
+    }
+    if (!deckId) registerHomeSession();
+    setLimitReached(false);
     const due = getDueCards(deckId, Date.now());
-    // Prioriza cartas mais difíceis (mais erradas) no topo da fila,
-    // com um pouco de aleatoriedade para não ficar sempre igual.
     const ordered = [...due].sort(
       (a, b) =>
         difficultyScore(b) - difficultyScore(a) + (Math.random() - 0.5) * 0.6,
