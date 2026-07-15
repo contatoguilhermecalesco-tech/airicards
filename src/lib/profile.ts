@@ -61,6 +61,10 @@ function subscribe(cb: () => void) {
   };
 }
 
+export function subscribeProfile(cb: () => void) {
+  return subscribe(cb);
+}
+
 export function useCurrentProfile(): Profile | null {
   return useSyncExternalStore(
     subscribe,
