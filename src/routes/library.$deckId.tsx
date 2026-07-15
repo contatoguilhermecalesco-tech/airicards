@@ -125,10 +125,20 @@ function DeckDetail() {
             {cards.map((c) => (
               <li
                 key={c.id}
-                className="ios-card group flex items-center justify-between gap-4 rounded-2xl px-5 py-4"
+                className={`ios-card group flex items-center justify-between gap-4 rounded-2xl px-5 py-4 ${
+                  isEnemy(c) ? "ring-1 ring-destructive/30" : ""
+                }`}
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">{c.front}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="truncate font-medium">{c.front}</p>
+                    {isEnemy(c) && (
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
+                        <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
+                        inimiga
+                      </span>
+                    )}
+                  </div>
                   <p className="mt-0.5 truncate text-sm text-muted-foreground">
                     {c.back}
                   </p>
