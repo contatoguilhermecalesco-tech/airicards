@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy } from "lucide-react";
+import { X, Check, Swords, Trophy, Moon } from "lucide-react";
 import {
   useStore,
   getDueCards,
