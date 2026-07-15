@@ -131,7 +131,7 @@ function DeckDetail() {
                 <button
                   onClick={() => setConfirmDelete(c.id)}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
-                  aria-label="Delete card"
+                  aria-label="Excluir carta"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
