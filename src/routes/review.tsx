@@ -37,6 +37,7 @@ function Review() {
   const [showBack, setShowBack] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
 
   const allCards = useStore((s) => s.cards);
 
