@@ -83,18 +83,18 @@ function Home() {
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat icon={<Layers className="h-4 w-4" />} label="Decks" value={decks.length} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="Cards" value={cards.length} />
-        <Stat icon={<Flame className="h-4 w-4" />} label="Due" value={due} accent />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label="Cartas" value={cards.length} />
+        <Stat icon={<Flame className="h-4 w-4" />} label="Para revisar" value={due} accent />
       </section>
 
       {decks.length > 0 && (
         <section className="mt-10">
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Your decks
+              Seus decks
             </h3>
             <Link to="/library" className="text-sm text-primary hover:opacity-80">
-              See all
+              Ver todos
             </Link>
           </div>
           <ul className="space-y-2">
@@ -113,8 +113,8 @@ function Home() {
                     <div>
                       <p className="font-medium">{d.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {total} card{total === 1 ? "" : "s"}
-                        {dueInDeck > 0 && ` · ${dueInDeck} due`}
+                        {total} carta{total === 1 ? "" : "s"}
+                        {dueInDeck > 0 && ` · ${dueInDeck} para revisar`}
                       </p>
                     </div>
                     <ArrowRight
