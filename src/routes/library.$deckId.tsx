@@ -80,12 +80,13 @@ function DeckDetail() {
           <Link
             to="/review"
             search={{ deck: deckId }}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:opacity-40"
-            disabled={due === 0}
             aria-disabled={due === 0}
             onClick={(e) => {
               if (due === 0) e.preventDefault();
             }}
+            className={`inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 ${
+              due === 0 ? "pointer-events-none opacity-40" : ""
+            }`}
           >
             <Play className="h-4 w-4" strokeWidth={2.5} />
             Review
