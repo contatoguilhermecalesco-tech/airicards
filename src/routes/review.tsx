@@ -135,7 +135,7 @@ function Review() {
                     <>
                       <div className="h-px w-16 bg-border" />
                       <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                        Translation
+                        Tradução
                       </p>
                       <p className="text-2xl font-medium text-muted-foreground text-balance sm:text-3xl">
                         {current.back}
