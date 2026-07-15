@@ -82,20 +82,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#231e2c" },
-      { title: "Lume — English flashcards with spaced repetition" },
+      { title: "Lume — Flashcards de inglês com repetição espaçada" },
       {
         name: "description",
         content:
-          "A calm, iOS-inspired flashcard app to master English through daily spaced repetition.",
+          "Um app tranquilo, inspirado no iOS, para dominar o inglês com revisões diárias por repetição espaçada.",
       },
       {
         property: "og:title",
-        content: "Lume — English flashcards with spaced repetition",
+        content: "Lume — Flashcards de inglês com repetição espaçada",
       },
       {
         property: "og:description",
         content:
-          "Build decks, review cards, and remember English words for good.",
+          "Crie decks, revise cartas e memorize palavras em inglês de vez.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
