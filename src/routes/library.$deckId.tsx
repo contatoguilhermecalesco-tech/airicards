@@ -56,7 +56,7 @@ function DeckDetail() {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Library
+        Biblioteca
       </Link>
 
       <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
