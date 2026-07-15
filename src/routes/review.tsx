@@ -174,33 +174,46 @@ function Review() {
                 >
                   Mostrar resposta
                 </button>
-              ) : (
+              ) : askDifficulty ? (
                 <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-2">
+                  <p className="text-center text-[13px] font-medium text-foreground">
+                    Quão fácil foi acertar?
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
                     <GradeButton
-                      label="Errei"
-                      hint="revisar de novo"
-                      tone="destructive"
-                      onClick={handleWrong}
+                      label="Difícil"
+                      hint="em breve"
+                      tone="warning"
+                      onClick={() => handleDifficulty("hard")}
                     />
                     <GradeButton
-                      label="Acertei"
-                      hint={
-                        current
-                          ? autoClassify(current) === "hard"
-                            ? "difícil"
-                            : autoClassify(current) === "easy"
-                              ? "fácil"
-                              : "médio"
-                          : ""
-                      }
+                      label="Médio"
+                      hint="dias"
+                      tone="primary"
+                      onClick={() => handleDifficulty("good")}
+                    />
+                    <GradeButton
+                      label="Fácil"
+                      hint="semanas"
                       tone="success"
-                      onClick={handleRight}
+                      onClick={() => handleDifficulty("easy")}
                     />
                   </div>
-                  <p className="text-center text-[11px] text-muted-foreground">
-                    O sistema classifica a dificuldade automaticamente pelo seu histórico.
-                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <GradeButton
+                    label="Errei"
+                    hint="revisar mais vezes"
+                    tone="destructive"
+                    onClick={handleWrong}
+                  />
+                  <GradeButton
+                    label="Acertei"
+                    hint="classificar"
+                    tone="success"
+                    onClick={handleRight}
+                  />
                 </div>
               )}
             </div>
