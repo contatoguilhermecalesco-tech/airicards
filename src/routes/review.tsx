@@ -64,24 +64,30 @@ function Review() {
 
   const finished = queue.length > 0 && index >= queue.length;
 
+  const [askDifficulty, setAskDifficulty] = useState(false);
+
   function handleWrong() {
     if (!current) return;
     reviewCard(current.id, "again");
     setReviewed((n) => n + 1);
-    // Errou → volta pro fim da fila para revisar de novo
-    setQueue((q) => [...q, current.id]);
+    // Erro é computado (lapses++) e a carta volta mais cedo nas próximas sessões.
     setIndex((i) => i + 1);
     setShowBack(false);
+    setAskDifficulty(false);
   }
 
   function handleRight() {
+    // Abre pergunta de dificuldade
+    setAskDifficulty(true);
+  }
+
+  function handleDifficulty(g: "hard" | "good" | "easy") {
     if (!current) return;
-    // Sistema classifica automaticamente com base no histórico
-    const g = autoClassify(current);
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
     setIndex((i) => i + 1);
     setShowBack(false);
+    setAskDifficulty(false);
   }
 
   return (
