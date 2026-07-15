@@ -1,18 +1,22 @@
-// Simple SM-2 inspired spaced repetition + localStorage store
+// Spaced repetition store synced to Lovable Cloud per profile.
+// Every mutation writes to Cloud (debounced) and Realtime pushes updates
+// back to other devices, so PC/celular ficam sempre em sincronia por perfil.
 import { useSyncExternalStore } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { getCurrentProfile } from "@/lib/profile";
 
 export type Card = {
   id: string;
   deckId: string;
-  front: string; // English
-  back: string; // Translation
-  ease: number; // SM-2 ease factor
-  interval: number; // days
+  front: string;
+  back: string;
+  ease: number;
+  interval: number;
   reps: number;
-  dueAt: number; // ms epoch
+  dueAt: number;
   createdAt: number;
-  lapses?: number; // vezes que errou
-  successes?: number; // vezes que acertou
+  lapses?: number;
+  successes?: number;
 };
 
 export type Deck = {
@@ -22,48 +26,153 @@ export type Deck = {
   createdAt: number;
 };
 
-type State = {
-  decks: Deck[];
-  cards: Card[];
-};
-
-const STORAGE_KEY = "flashcards.v1";
+type State = { decks: Deck[]; cards: Card[] };
+type HomeSessions = { day: string; count: number };
 
 function isBrowser() {
   return typeof window !== "undefined";
 }
 
-function load(): State {
-  if (!isBrowser()) return { decks: [], cards: [] };
+function todayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+// --- Local cache keyed per profile so first paint is instant ---------
+function cacheKey(profileId: string) {
+  return `airi.cache.${profileId}.v1`;
+}
+function loadCache(profileId: string): {
+  state: State;
+  home: HomeSessions;
+} {
+  if (!isBrowser()) return { state: { decks: [], cards: [] }, home: { day: todayKey(), count: 0 } };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { decks: [], cards: [] };
-    return JSON.parse(raw) as State;
+    const raw = localStorage.getItem(cacheKey(profileId));
+    if (!raw) return { state: { decks: [], cards: [] }, home: { day: todayKey(), count: 0 } };
+    return JSON.parse(raw);
   } catch {
-    return { decks: [], cards: [] };
+    return { state: { decks: [], cards: [] }, home: { day: todayKey(), count: 0 } };
+  }
+}
+function saveCache(profileId: string, state: State, home: HomeSessions) {
+  if (!isBrowser()) return;
+  localStorage.setItem(cacheKey(profileId), JSON.stringify({ state, home }));
+}
+
+// --- In-memory active state ------------------------------------------
+let activeProfile: string | null = null;
+let state: State = { decks: [], cards: [] };
+let home: HomeSessions = { day: todayKey(), count: 0 };
+
+const listeners = new Set<() => void>();
+const homeListeners = new Set<() => void>();
+function emit() {
+  listeners.forEach((l) => l());
+}
+function emitHome() {
+  homeListeners.forEach((l) => l());
+}
+
+// --- Cloud sync -------------------------------------------------------
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+async function pullFromCloud(profileId: string) {
+  const { data, error } = await supabase
+    .from("profile_data")
+    .select("data, home_sessions")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  if (error) {
+    console.error("[airi] pull failed", error);
+    return;
+  }
+  if (data) {
+    const remote = (data.data ?? { decks: [], cards: [] }) as State;
+    const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
+    if (activeProfile !== profileId) return; // profile switched meanwhile
+    state = remote;
+    home = remoteHome.day === todayKey() ? remoteHome : { day: todayKey(), count: 0 };
+    saveCache(profileId, state, home);
+    emit();
+    emitHome();
   }
 }
 
-let state: State = { decks: [], cards: [] };
-let hydrated = false;
-const listeners = new Set<() => void>();
-
-function ensureHydrated() {
-  if (hydrated || !isBrowser()) return;
-  state = load();
-  hydrated = true;
+function scheduleSave() {
+  if (!activeProfile || !isBrowser()) return;
+  const profileId = activeProfile;
+  saveCache(profileId, state, home);
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const { error } = await supabase
+      .from("profile_data")
+      .upsert(
+        {
+          profile_id: profileId,
+          data: state as never,
+          home_sessions: home as never,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "profile_id" },
+      );
+    if (error) console.error("[airi] save failed", error);
+  }, 400);
 }
 
-function persist() {
-  if (!isBrowser()) return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+export function setActiveProfileId(profileId: string | null) {
+  if (activeProfile === profileId) return;
+  activeProfile = profileId;
+
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+
+  if (!profileId) {
+    state = { decks: [], cards: [] };
+    home = { day: todayKey(), count: 0 };
+    emit();
+    emitHome();
+    return;
+  }
+
+  // Instant paint from local cache.
+  const cached = loadCache(profileId);
+  state = cached.state;
+  home = cached.home.day === todayKey() ? cached.home : { day: todayKey(), count: 0 };
+  emit();
+  emitHome();
+
+  // Refresh from Cloud, then subscribe to Realtime updates from other devices.
+  void pullFromCloud(profileId);
+  realtimeChannel = supabase
+    .channel(`profile_data:${profileId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "profile_data", filter: `profile_id=eq.${profileId}` },
+      () => {
+        void pullFromCloud(profileId);
+      },
+    )
+    .subscribe();
 }
 
-function emit() {
-  persist();
-  listeners.forEach((l) => l());
+// Boot: hydrate for whoever is already selected in localStorage, and
+// re-hydrate whenever the current profile changes (Netflix-style switch).
+if (isBrowser()) {
+  const applyCurrent = () => {
+    const p = getCurrentProfile();
+    setActiveProfileId(p?.id ?? null);
+  };
+  applyCurrent();
+  void import("@/lib/profile").then(({ subscribeProfile }) => {
+    subscribeProfile(applyCurrent);
+  });
 }
 
+// --- React hooks ------------------------------------------------------
 function subscribe(l: () => void) {
   listeners.add(l);
   return () => listeners.delete(l);
@@ -72,20 +181,17 @@ function subscribe(l: () => void) {
 export function useStore<T>(selector: (s: State) => T): T {
   return useSyncExternalStore(
     subscribe,
-    () => {
-      ensureHydrated();
-      return selector(state);
-    },
+    () => selector(state),
     () => selector({ decks: [], cards: [] }),
   );
 }
 
+// --- Mutations --------------------------------------------------------
 function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
 export function createDeck(name: string, description?: string): Deck {
-  ensureHydrated();
   const deck: Deck = {
     id: uid(),
     name: name.trim(),
@@ -94,29 +200,29 @@ export function createDeck(name: string, description?: string): Deck {
   };
   state = { ...state, decks: [deck, ...state.decks] };
   emit();
+  scheduleSave();
   return deck;
 }
 
 export function deleteDeck(id: string) {
-  ensureHydrated();
   state = {
     decks: state.decks.filter((d) => d.id !== id),
     cards: state.cards.filter((c) => c.deckId !== id),
   };
   emit();
+  scheduleSave();
 }
 
 export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "description">>) {
-  ensureHydrated();
   state = {
     ...state,
     decks: state.decks.map((d) => (d.id === id ? { ...d, ...patch } : d)),
   };
   emit();
+  scheduleSave();
 }
 
 export function createCard(deckId: string, front: string, back: string): Card {
-  ensureHydrated();
   const card: Card = {
     id: uid(),
     deckId,
@@ -130,18 +236,18 @@ export function createCard(deckId: string, front: string, back: string): Card {
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
+  scheduleSave();
   return card;
 }
 
 export function deleteCard(id: string) {
-  ensureHydrated();
   state = { ...state, cards: state.cards.filter((c) => c.id !== id) };
   emit();
+  scheduleSave();
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
 
-// Classifica dificuldade automaticamente com base no histórico de erros/acertos.
 export function autoClassify(card: Card): "hard" | "good" | "easy" {
   const lapses = card.lapses ?? 0;
   const successes = card.successes ?? 0;
@@ -150,25 +256,21 @@ export function autoClassify(card: Card): "hard" | "good" | "easy" {
   return "good";
 }
 
-// Score de dificuldade: quanto maior, mais o usuário erra — prioriza na fila.
 export function difficultyScore(card: Card): number {
   const lapses = card.lapses ?? 0;
   const successes = card.successes ?? 0;
   return lapses * 2 - successes * 0.5;
 }
 
-// Carta inimiga: 3+ erros. Vira um "chefe" do baralho que o jogador precisa derrotar.
 export const ENEMY_THRESHOLD = 3;
 export function isEnemy(card: Card): boolean {
   return (card.lapses ?? 0) >= ENEMY_THRESHOLD;
 }
 export function isDefeated(card: Card): boolean {
-  // Uma inimiga é "derrotada" quando o jogador acerta mais vezes que errou.
   return isEnemy(card) && (card.successes ?? 0) > (card.lapses ?? 0);
 }
 
 export function reviewCard(id: string, grade: Grade) {
-  ensureHydrated();
   const now = Date.now();
   const dayMs = 86_400_000;
   state = {
@@ -183,15 +285,7 @@ export function reviewCard(id: string, grade: Grade) {
         reps = 0;
         interval = 0;
         ease = Math.max(1.3, ease - 0.2);
-        return {
-          ...c,
-          ease,
-          interval,
-          reps,
-          dueAt: now + 60_000,
-          lapses: lapses + 1,
-          successes,
-        };
+        return { ...c, ease, interval, reps, dueAt: now + 60_000, lapses: lapses + 1, successes };
       }
 
       const q = grade === "hard" ? 3 : grade === "good" ? 4 : 5;
@@ -202,65 +296,36 @@ export function reviewCard(id: string, grade: Grade) {
       else if (reps === 2) interval = grade === "easy" ? 6 : 3;
       else interval = Math.round(interval * ease * (grade === "hard" ? 0.8 : 1));
 
-      return {
-        ...c,
-        ease,
-        interval,
-        reps,
-        dueAt: now + interval * dayMs,
-        lapses,
-        successes: successes + 1,
-      };
+      return { ...c, ease, interval, reps, dueAt: now + interval * dayMs, lapses, successes: successes + 1 };
     }),
   };
   emit();
+  scheduleSave();
 }
 
 export function getDueCards(deckId?: string, at: number = Date.now()): Card[] {
-  ensureHydrated();
-  return state.cards.filter(
-    (c) => c.dueAt <= at && (deckId ? c.deckId === deckId : true),
-  );
+  return state.cards.filter((c) => c.dueAt <= at && (deckId ? c.deckId === deckId : true));
 }
 
 export function cardsForDeck(deckId: string): Card[] {
-  ensureHydrated();
-    return state.cards.filter((c) => c.deckId === deckId);
+  return state.cards.filter((c) => c.deckId === deckId);
 }
 
-// ---- Limite diário de sessões "revisar tudo" (a partir da home) ----
-// 3 sessões/dia é o sweet spot da repetição espaçada (manhã/tarde/noite):
-// reforça a curva de esquecimento sem virar grind.
+// --- Daily "review everything" limit ---------------------------------
 export const HOME_DAILY_LIMIT = 3;
-const HOME_SESSIONS_KEY = "flashcards.homeSessions.v1";
 
-function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-}
-
-type HomeSessions = { day: string; count: number };
-
-function readHomeSessions(): HomeSessions {
-  if (!isBrowser()) return { day: todayKey(), count: 0 };
-  try {
-    const raw = localStorage.getItem(HOME_SESSIONS_KEY);
-    if (!raw) return { day: todayKey(), count: 0 };
-    const parsed = JSON.parse(raw) as HomeSessions;
-    if (parsed.day !== todayKey()) return { day: todayKey(), count: 0 };
-    return parsed;
-  } catch {
-    return { day: todayKey(), count: 0 };
+function refreshHomeDay() {
+  const today = todayKey();
+  if (home.day !== today) {
+    home = { day: today, count: 0 };
+    scheduleSave();
+    emitHome();
   }
 }
 
-const homeListeners = new Set<() => void>();
-function emitHome() {
-  homeListeners.forEach((l) => l());
-}
-
 export function getHomeSessionsToday(): number {
-  return readHomeSessions().count;
+  refreshHomeDay();
+  return home.count;
 }
 
 export function canStartHomeSession(): boolean {
@@ -268,11 +333,10 @@ export function canStartHomeSession(): boolean {
 }
 
 export function registerHomeSession() {
-  if (!isBrowser()) return;
-  const current = readHomeSessions();
-  const next: HomeSessions = { day: todayKey(), count: current.count + 1 };
-  localStorage.setItem(HOME_SESSIONS_KEY, JSON.stringify(next));
+  refreshHomeDay();
+  home = { day: todayKey(), count: home.count + 1 };
   emitHome();
+  scheduleSave();
 }
 
 export function useHomeSessionsToday(): number {
