@@ -72,6 +72,9 @@ function DeckDetail() {
           <p className="mt-2 text-xs text-muted-foreground">
             {cards.length} carta{cards.length === 1 ? "" : "s"}
             {due > 0 && <> · <span className="text-primary">{due} para revisar</span></>}
+            {enemies > 0 && (
+              <> · <span className="inline-flex items-center gap-1 text-destructive"><Swords className="h-3 w-3" strokeWidth={2.5} />{enemies} inimiga{enemies === 1 ? "" : "s"}</span></>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
