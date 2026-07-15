@@ -49,10 +49,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Something went wrong
+          Algo deu errado
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Try again or head back home.
+          Tente novamente ou volte ao início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -62,13 +62,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
           >
-            Try again
+            Tentar de novo
           </button>
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground transition hover:bg-accent"
           >
-            Home
+            Início
           </Link>
         </div>
       </div>
