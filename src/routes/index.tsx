@@ -45,13 +45,13 @@ function Home() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 <Flame className="h-3.5 w-3.5" strokeWidth={2.5} />
-                {due} due now
+                {due} para revisar
               </div>
-              <h2 className="mt-3 text-2xl font-semibold">Start reviewing</h2>
+              <h2 className="mt-3 text-2xl font-semibold">Começar revisão</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {cards.length === 0
-                  ? "Create your first deck to begin."
-                  : "Short sessions, long memory."}
+                  ? "Crie seu primeiro deck para começar."
+                  : "Sessões curtas, memória duradoura."}
               </p>
             </div>
             {cards.length === 0 ? (
@@ -59,7 +59,7 @@ function Home() {
                 to="/library"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
               >
-                Go to library
+                Ir para a biblioteca
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
             ) : (
@@ -73,7 +73,7 @@ function Home() {
                   due === 0 ? "pointer-events-none opacity-40" : ""
                 }`}
               >
-                {due > 0 ? "Start session" : "Nothing due"}
+                {due > 0 ? "Iniciar sessão" : "Nada para revisar"}
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
             )}
