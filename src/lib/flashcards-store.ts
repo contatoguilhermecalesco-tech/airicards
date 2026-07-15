@@ -11,6 +11,8 @@ export type Card = {
   reps: number;
   dueAt: number; // ms epoch
   createdAt: number;
+  lapses?: number; // vezes que errou
+  successes?: number; // vezes que acertou
 };
 
 export type Deck = {
