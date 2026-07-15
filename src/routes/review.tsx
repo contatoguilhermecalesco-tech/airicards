@@ -79,7 +79,7 @@ function Review() {
               to="/library/$deckId"
               params={{ deckId }}
               className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label="Exit session"
+              aria-label="Sair da sessão"
             >
               <X className="h-5 w-5" />
             </Link>
@@ -87,13 +87,13 @@ function Review() {
             <Link
               to="/"
               className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label="Exit session"
+              aria-label="Sair da sessão"
             >
               <X className="h-5 w-5" />
             </Link>
           )}
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {deckName ? deckName : "All decks"}
+            {deckName ? deckName : "Todos os decks"}
           </div>
           <div className="w-10" />
         </div>
