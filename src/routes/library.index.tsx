@@ -165,25 +165,25 @@ function NewDeckSheet({ onClose }: { onClose: () => void }) {
             className="mt-4 space-y-3"
           >
             <Field
-              label="Name"
+              label="Nome"
               autoFocus
               value={name}
               onChange={setName}
-              placeholder="Travel essentials"
+              placeholder="Essenciais de viagem"
             />
             <Field
-              label="Description"
+              label="Descrição"
               optional
               value={desc}
               onChange={setDesc}
-              placeholder="Words I need at the airport"
+              placeholder="Palavras que preciso no aeroporto"
             />
             <button
               type="submit"
               disabled={!name.trim()}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
-              Create deck
+              Criar deck
             </button>
           </form>
         </div>
