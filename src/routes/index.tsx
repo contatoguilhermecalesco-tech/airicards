@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowRight, BookOpen, Flame, Layers } from "lucide-react";
-import { useStore } from "@/lib/flashcards-store";
+import { ArrowRight, BookOpen, Flame, Layers, Moon } from "lucide-react";
+import {
+  useStore,
+  useHomeSessionsToday,
+  HOME_DAILY_LIMIT,
+} from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/")({
   component: Home,
