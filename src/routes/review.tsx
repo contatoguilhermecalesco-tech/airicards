@@ -25,7 +25,7 @@ export const Route = createFileRoute("/review")({
 
 function Review() {
   const { deck: deckId } = Route.useSearch();
-  const router = useRouter();
+  
 
   // Session queue: freeze IDs at start so re-render doesn't reshuffle.
   const [queue, setQueue] = useState<string[]>([]);
