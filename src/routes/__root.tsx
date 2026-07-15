@@ -8,12 +8,14 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { Home, Library } from "lucide-react";
+import { useEffect, useState, useRef, type ReactNode } from "react";
+import { Home, Library, LogOut } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { ProfileGate } from "../components/ProfileGate";
+import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
 function NotFoundComponent() {
   return (
@@ -155,14 +157,14 @@ function TopBar() {
     <header className="sticky top-0 z-40 w-full">
       <div className="glass-panel border-b">
         <nav className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2.5">
             <img
               src={airiLogo.url}
-              alt="Airi"
-              className="h-8 w-8 rounded-xl object-contain"
+              alt="airi"
+              className="h-11 w-11 rounded-2xl object-contain"
             />
-            <span className="text-[15px] font-semibold tracking-tight">
-              Airi
+            <span className="text-[17px] font-semibold lowercase tracking-tight">
+              airi
             </span>
           </Link>
           <div className="flex items-center gap-1">
@@ -177,10 +179,60 @@ function TopBar() {
               <Library className="h-4 w-4" strokeWidth={2.25} />
               <span className="hidden sm:inline">Biblioteca</span>
             </Link>
+            <ProfileMenu />
           </div>
         </nav>
       </div>
     </header>
+  );
+}
+
+function ProfileMenu() {
+  const profile = useCurrentProfile();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, [open]);
+
+  if (!profile) return null;
+
+  return (
+    <div ref={ref} className="relative ml-1">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white ring-1 ring-white/10 transition hover:ring-white/25"
+        style={{ backgroundImage: profile.gradient }}
+        aria-label={`Perfil de ${profile.name}`}
+      >
+        {profile.initial}
+      </button>
+      {open && (
+        <div className="glass-panel absolute right-0 mt-2 w-56 rounded-2xl p-1.5 shadow-card">
+          <div className="px-3 py-2">
+            <p className="text-xs text-muted-foreground">Conectado como</p>
+            <p className="text-sm font-medium">{profile.name}</p>
+          </div>
+          <div className="my-1 h-px bg-border" />
+          <button
+            onClick={() => {
+              setOpen(false);
+              signOutProfile();
+            }}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+          >
+            <LogOut className="h-4 w-4" strokeWidth={2.25} />
+            Trocar de perfil
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -189,10 +241,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen">
-        <TopBar />
-        <Outlet />
-      </div>
+      <ProfileGate>
+        <div className="min-h-screen">
+          <TopBar />
+          <Outlet />
+        </div>
+      </ProfileGate>
     </QueryClientProvider>
   );
 }
