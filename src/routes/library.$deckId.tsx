@@ -224,14 +224,14 @@ function AddCardSheet({
             className="mt-4 space-y-3"
           >
             <Field
-              label="English"
+              label="Inglês"
               autoFocus
               value={front}
               onChange={setFront}
               placeholder="Serendipity"
             />
             <Field
-              label="Translation"
+              label="Tradução"
               value={back}
               onChange={setBack}
               placeholder="Serendipidade"
@@ -243,14 +243,14 @@ function AddCardSheet({
                 onChange={(e) => setKeepOpen(e.target.checked)}
                 className="h-4 w-4 accent-primary"
               />
-              Keep adding more cards
+              Continuar adicionando cartas
             </label>
             <button
               type="submit"
               disabled={!front.trim() || !back.trim()}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
-              Add card
+              Adicionar carta
             </button>
           </form>
         </div>
