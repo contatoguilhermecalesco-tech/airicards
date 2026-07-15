@@ -74,14 +74,24 @@ function Review() {
     <main className="min-h-screen">
       <div className="mx-auto flex max-w-2xl flex-col px-5 pt-6 pb-10">
         <div className="flex items-center justify-between">
-          <Link
-            to={deckId ? "/library/$deckId" : "/"}
-            params={deckId ? { deckId } : undefined}
-            className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-            aria-label="Exit session"
-          >
-            <X className="h-5 w-5" />
-          </Link>
+          {deckId ? (
+            <Link
+              to="/library/$deckId"
+              params={{ deckId }}
+              className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label="Exit session"
+            >
+              <X className="h-5 w-5" />
+            </Link>
+          ) : (
+            <Link
+              to="/"
+              className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label="Exit session"
+            >
+              <X className="h-5 w-5" />
+            </Link>
+          )}
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             {deckName ? deckName : "All decks"}
           </div>
