@@ -165,14 +165,14 @@ function TopBar() {
           <div className="flex items-center gap-1">
             <Link to="/" className={linkClass(pathname === "/")}>
               <Home className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden sm:inline">Início</span>
             </Link>
             <Link
               to="/library"
               className={linkClass(pathname.startsWith("/library"))}
             >
               <Library className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Library</span>
+              <span className="hidden sm:inline">Biblioteca</span>
             </Link>
           </div>
         </nav>
