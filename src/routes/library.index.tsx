@@ -217,7 +217,7 @@ export function Field({
         {label}
         {optional && (
           <span className="text-[10px] font-normal normal-case tracking-normal text-muted-foreground/60">
-            optional
+            opcional
           </span>
         )}
       </span>
