@@ -83,11 +83,11 @@ function Library() {
                   >
                     <p className="font-medium">{d.name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {total} card{total === 1 ? "" : "s"}
+                      {total} carta{total === 1 ? "" : "s"}
                       {due > 0 && (
                         <>
                           {" · "}
-                          <span className="text-primary">{due} due</span>
+                          <span className="text-primary">{due} para revisar</span>
                         </>
                       )}
                       {d.description && ` · ${d.description}`}
@@ -97,7 +97,7 @@ function Library() {
                     <button
                       onClick={() => setConfirmId(d.id)}
                       className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
-                      aria-label={`Delete ${d.name}`}
+                      aria-label={`Excluir ${d.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -105,7 +105,7 @@ function Library() {
                       to="/library/$deckId"
                       params={{ deckId: d.id }}
                       className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                      aria-label="Open deck"
+                      aria-label="Abrir deck"
                     >
                       <ArrowRight className="h-4 w-4" />
                     </Link>
