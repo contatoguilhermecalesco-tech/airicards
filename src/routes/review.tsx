@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
-import { X, Check } from "lucide-react";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { X, Check, Swords, Trophy } from "lucide-react";
 import {
   useStore,
   getDueCards,
   reviewCard,
   difficultyScore,
+  isEnemy,
+  ENEMY_THRESHOLD,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
