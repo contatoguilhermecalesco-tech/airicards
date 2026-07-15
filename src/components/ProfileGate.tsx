@@ -58,21 +58,31 @@ function ProfilePicker({ onSelect }: { onSelect: (p: Profile) => void }) {
         </h1>
       </div>
 
-      <ul className="mt-14 flex flex-wrap items-start justify-center gap-8 sm:gap-12">
+      <ul className="mt-14 flex w-full max-w-md flex-col gap-3">
         {PROFILES.map((p) => (
           <li key={p.id}>
             <button
               onClick={() => onSelect(p)}
-              className="group flex flex-col items-center gap-3 focus:outline-none"
+              className="group ios-card relative flex w-full items-center gap-4 overflow-hidden rounded-2xl px-4 py-3.5 text-left transition duration-300 hover:-translate-y-0.5 hover:bg-accent/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <span
-                className="flex h-24 w-24 items-center justify-center rounded-3xl text-3xl font-semibold text-white shadow-card ring-1 ring-white/10 transition duration-300 group-hover:scale-[1.04] group-hover:ring-white/25 group-focus-visible:ring-2 group-focus-visible:ring-primary sm:h-28 sm:w-28"
+                aria-hidden
+                className="h-11 w-16 shrink-0 rounded-xl ring-1 ring-white/10"
                 style={{ backgroundImage: p.gradient }}
-              >
-                {p.initial}
+              />
+              <span className="flex flex-col">
+                <span className="text-[15px] font-semibold tracking-tight text-foreground">
+                  {p.name}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Entrar na conta
+                </span>
               </span>
-              <span className="text-sm font-medium text-muted-foreground transition group-hover:text-foreground">
-                {p.name}
+              <span
+                aria-hidden
+                className="ml-auto text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground"
+              >
+                →
               </span>
             </button>
           </li>
@@ -85,26 +95,22 @@ function ProfilePicker({ onSelect }: { onSelect: (p: Profile) => void }) {
 function ProfileLoading({ profile }: { profile: Profile }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="relative">
-        <span
-          className="flex h-28 w-28 items-center justify-center rounded-3xl text-4xl font-semibold text-white shadow-card ring-1 ring-white/15"
+      <div className="flex w-full max-w-sm flex-col items-center">
+        <div
+          className="h-14 w-full rounded-2xl ring-1 ring-white/15 shadow-card"
           style={{ backgroundImage: profile.gradient }}
-        >
-          {profile.initial}
-        </span>
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -inset-3 rounded-[2rem] border border-white/10"
         />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -inset-3 rounded-[2rem] border-t border-white/60 animate-spin"
-          style={{ animationDuration: "1.4s" }}
-        />
+        <div className="mt-6 h-[2px] w-40 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full w-1/3 rounded-full bg-white/70"
+            style={{ animation: "airi-slide 1.2s ease-in-out infinite" }}
+          />
+        </div>
+        <p className="mt-5 text-sm font-medium tracking-wide text-muted-foreground">
+          Preparando sua sessão, {profile.name}…
+        </p>
       </div>
-      <p className="mt-8 text-sm font-medium tracking-wide text-muted-foreground">
-        Preparando sua sessão, {profile.name}…
-      </p>
+      <style>{`@keyframes airi-slide{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}`}</style>
     </main>
   );
 }
