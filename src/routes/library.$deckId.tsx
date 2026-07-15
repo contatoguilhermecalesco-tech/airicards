@@ -146,7 +146,7 @@ function DeckDetail() {
           onClick={() => setDeleteDeckOpen(true)}
           className="text-xs text-muted-foreground hover:text-destructive"
         >
-          Delete this deck
+          Excluir este deck
         </button>
       </div>
 
