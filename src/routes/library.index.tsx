@@ -147,7 +147,7 @@ function NewDeckSheet({ onClose }: { onClose: () => void }) {
       <div className="relative w-full sm:max-w-md">
         <div className="ios-card m-3 rounded-3xl p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">New deck</h3>
+            <h3 className="text-lg font-semibold">Novo deck</h3>
             <button
               onClick={onClose}
               className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
