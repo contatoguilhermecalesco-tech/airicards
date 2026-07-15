@@ -20,17 +20,17 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-semibold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
-          Page not found
+          Página não encontrada
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist.
+          A página que você procura não existe.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
           >
-            Back home
+            Voltar ao início
           </Link>
         </div>
       </div>
@@ -49,10 +49,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Something went wrong
+          Algo deu errado
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Try again or head back home.
+          Tente novamente ou volte ao início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -62,13 +62,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
           >
-            Try again
+            Tentar de novo
           </button>
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium text-foreground transition hover:bg-accent"
           >
-            Home
+            Início
           </Link>
         </div>
       </div>
@@ -82,20 +82,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#231e2c" },
-      { title: "Lume — English flashcards with spaced repetition" },
+      { title: "Lume — Flashcards de inglês com repetição espaçada" },
       {
         name: "description",
         content:
-          "A calm, iOS-inspired flashcard app to master English through daily spaced repetition.",
+          "Um app tranquilo, inspirado no iOS, para dominar o inglês com revisões diárias por repetição espaçada.",
       },
       {
         property: "og:title",
-        content: "Lume — English flashcards with spaced repetition",
+        content: "Lume — Flashcards de inglês com repetição espaçada",
       },
       {
         property: "og:description",
         content:
-          "Build decks, review cards, and remember English words for good.",
+          "Crie decks, revise cartas e memorize palavras em inglês de vez.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -126,7 +126,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="pt-BR" className="dark">
       <head>
         <HeadContent />
       </head>
@@ -165,14 +165,14 @@ function TopBar() {
           <div className="flex items-center gap-1">
             <Link to="/" className={linkClass(pathname === "/")}>
               <Home className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden sm:inline">Início</span>
             </Link>
             <Link
               to="/library"
               className={linkClass(pathname.startsWith("/library"))}
             >
               <Library className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Library</span>
+              <span className="hidden sm:inline">Biblioteca</span>
             </Link>
           </div>
         </nav>

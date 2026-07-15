@@ -6,10 +6,10 @@ import { useStore, createDeck, deleteDeck } from "@/lib/flashcards-store";
 export const Route = createFileRoute("/library/")({
   head: () => ({
     meta: [
-      { title: "Library — Lume" },
+      { title: "Biblioteca — Lume" },
       {
         name: "description",
-        content: "Manage your English flashcard decks.",
+        content: "Gerencie seus decks de flashcards de inglês.",
       },
     ],
   }),
@@ -27,11 +27,11 @@ function Library() {
       <div className="flex items-end justify-between">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary/80">
-            Library
+            Biblioteca
           </p>
-          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Your decks</h1>
+          <h1 className="mt-2 text-3xl font-semibold sm:text-4xl">Seus decks</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Organize vocabulary into decks and review them daily.
+            Organize seu vocabulário em decks e revise todos os dias.
           </p>
         </div>
         <button
@@ -39,7 +39,7 @@ function Library() {
           className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
         >
           <Plus className="h-4 w-4" strokeWidth={2.5} />
-          New deck
+          Novo deck
         </button>
       </div>
 
@@ -50,17 +50,17 @@ function Library() {
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
                 <Plus className="h-6 w-6" strokeWidth={2.25} />
               </div>
-              <h2 className="mt-5 text-lg font-semibold">Create your first deck</h2>
+              <h2 className="mt-5 text-lg font-semibold">Crie seu primeiro deck</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                A deck is a themed collection of cards — verbs, travel words,
-                phrasal verbs, whatever you want to learn.
+                Um deck é uma coleção temática de cartas — verbos, palavras de
+                viagem, phrasal verbs, o que você quiser aprender.
               </p>
               <button
                 onClick={() => setOpen(true)}
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
-                New deck
+                Novo deck
               </button>
             </div>
           </div>
@@ -83,11 +83,11 @@ function Library() {
                   >
                     <p className="font-medium">{d.name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {total} card{total === 1 ? "" : "s"}
+                      {total} carta{total === 1 ? "" : "s"}
                       {due > 0 && (
                         <>
                           {" · "}
-                          <span className="text-primary">{due} due</span>
+                          <span className="text-primary">{due} para revisar</span>
                         </>
                       )}
                       {d.description && ` · ${d.description}`}
@@ -97,7 +97,7 @@ function Library() {
                     <button
                       onClick={() => setConfirmId(d.id)}
                       className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
-                      aria-label={`Delete ${d.name}`}
+                      aria-label={`Excluir ${d.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -105,7 +105,7 @@ function Library() {
                       to="/library/$deckId"
                       params={{ deckId: d.id }}
                       className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-                      aria-label="Open deck"
+                      aria-label="Abrir deck"
                     >
                       <ArrowRight className="h-4 w-4" />
                     </Link>
@@ -120,9 +120,9 @@ function Library() {
       {open && <NewDeckSheet onClose={() => setOpen(false)} />}
       {confirmId && (
         <ConfirmDialog
-          title="Delete deck?"
-          description="This removes the deck and all its cards. This cannot be undone."
-          confirmLabel="Delete"
+          title="Excluir deck?"
+          description="Isso remove o deck e todas as suas cartas. Não pode ser desfeito."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteDeck(confirmId);
             setConfirmId(null);
@@ -147,7 +147,7 @@ function NewDeckSheet({ onClose }: { onClose: () => void }) {
       <div className="relative w-full sm:max-w-md">
         <div className="ios-card m-3 rounded-3xl p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">New deck</h3>
+            <h3 className="text-lg font-semibold">Novo deck</h3>
             <button
               onClick={onClose}
               className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -165,25 +165,25 @@ function NewDeckSheet({ onClose }: { onClose: () => void }) {
             className="mt-4 space-y-3"
           >
             <Field
-              label="Name"
+              label="Nome"
               autoFocus
               value={name}
               onChange={setName}
-              placeholder="Travel essentials"
+              placeholder="Essenciais de viagem"
             />
             <Field
-              label="Description"
+              label="Descrição"
               optional
               value={desc}
               onChange={setDesc}
-              placeholder="Words I need at the airport"
+              placeholder="Palavras que preciso no aeroporto"
             />
             <button
               type="submit"
               disabled={!name.trim()}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
-              Create deck
+              Criar deck
             </button>
           </form>
         </div>
@@ -217,7 +217,7 @@ export function Field({
         {label}
         {optional && (
           <span className="text-[10px] font-normal normal-case tracking-normal text-muted-foreground/60">
-            optional
+            opcional
           </span>
         )}
       </span>
@@ -271,7 +271,7 @@ export function ConfirmDialog({
               onClick={onCancel}
               className="flex-1 rounded-full border border-border bg-surface py-2.5 text-sm font-medium hover:bg-accent"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               onClick={onConfirm}

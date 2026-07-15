@@ -20,14 +20,14 @@ function Home() {
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:pt-16">
       <section className="text-center">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary/80">
-          Today
+          Hoje
         </p>
         <h1 className="mt-3 text-4xl font-semibold text-balance sm:text-5xl">
-          {due > 0 ? "You have cards to review." : "You're all caught up."}
+          {due > 0 ? "Você tem cartas para revisar." : "Tudo em dia por aqui."}
         </h1>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground text-balance">
-          A calm space to grow your English vocabulary — one card at a time,
-          spaced just right.
+          Um espaço tranquilo para expandir seu vocabulário em inglês — uma
+          carta por vez, no ritmo certo.
         </p>
       </section>
 
@@ -45,13 +45,13 @@ function Home() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 <Flame className="h-3.5 w-3.5" strokeWidth={2.5} />
-                {due} due now
+                {due} para revisar
               </div>
-              <h2 className="mt-3 text-2xl font-semibold">Start reviewing</h2>
+              <h2 className="mt-3 text-2xl font-semibold">Começar revisão</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {cards.length === 0
-                  ? "Create your first deck to begin."
-                  : "Short sessions, long memory."}
+                  ? "Crie seu primeiro deck para começar."
+                  : "Sessões curtas, memória duradoura."}
               </p>
             </div>
             {cards.length === 0 ? (
@@ -59,7 +59,7 @@ function Home() {
                 to="/library"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
               >
-                Go to library
+                Ir para a biblioteca
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
             ) : (
@@ -73,7 +73,7 @@ function Home() {
                   due === 0 ? "pointer-events-none opacity-40" : ""
                 }`}
               >
-                {due > 0 ? "Start session" : "Nothing due"}
+                {due > 0 ? "Iniciar sessão" : "Nada para revisar"}
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
             )}
@@ -83,18 +83,18 @@ function Home() {
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Stat icon={<Layers className="h-4 w-4" />} label="Decks" value={decks.length} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="Cards" value={cards.length} />
-        <Stat icon={<Flame className="h-4 w-4" />} label="Due" value={due} accent />
+        <Stat icon={<BookOpen className="h-4 w-4" />} label="Cartas" value={cards.length} />
+        <Stat icon={<Flame className="h-4 w-4" />} label="Para revisar" value={due} accent />
       </section>
 
       {decks.length > 0 && (
         <section className="mt-10">
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Your decks
+              Seus decks
             </h3>
             <Link to="/library" className="text-sm text-primary hover:opacity-80">
-              See all
+              Ver todos
             </Link>
           </div>
           <ul className="space-y-2">
@@ -113,8 +113,8 @@ function Home() {
                     <div>
                       <p className="font-medium">{d.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {total} card{total === 1 ? "" : "s"}
-                        {dueInDeck > 0 && ` · ${dueInDeck} due`}
+                        {total} carta{total === 1 ? "" : "s"}
+                        {dueInDeck > 0 && ` · ${dueInDeck} para revisar`}
                       </p>
                     </div>
                     <ArrowRight

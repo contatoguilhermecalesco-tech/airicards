@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import {
@@ -13,7 +13,7 @@ type Search = { deck?: string };
 export const Route = createFileRoute("/review")({
   head: () => ({
     meta: [
-      { title: "Review — Lume" },
+      { title: "Revisão — Lume" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/review")({
 
 function Review() {
   const { deck: deckId } = Route.useSearch();
-  const router = useRouter();
+  
 
   // Session queue: freeze IDs at start so re-render doesn't reshuffle.
   const [queue, setQueue] = useState<string[]>([]);
@@ -79,7 +79,7 @@ function Review() {
               to="/library/$deckId"
               params={{ deckId }}
               className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label="Exit session"
+              aria-label="Sair da sessão"
             >
               <X className="h-5 w-5" />
             </Link>
@@ -87,13 +87,13 @@ function Review() {
             <Link
               to="/"
               className="grid h-10 w-10 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
-              aria-label="Exit session"
+              aria-label="Sair da sessão"
             >
               <X className="h-5 w-5" />
             </Link>
           )}
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            {deckName ? deckName : "All decks"}
+            {deckName ? deckName : "Todos os decks"}
           </div>
           <div className="w-10" />
         </div>
@@ -118,14 +118,14 @@ function Review() {
         ) : (
           <div className="mt-10 flex flex-1 flex-col">
             <p className="text-center text-xs font-medium text-muted-foreground">
-              Card {Math.min(index + 1, sessionCount)} of {sessionCount}
+              Carta {Math.min(index + 1, sessionCount)} de {sessionCount}
             </p>
 
             <div className="mt-6 flex flex-1 items-center justify-center">
               <div className="ios-card relative w-full min-h-[280px] rounded-3xl px-6 py-10 sm:min-h-[340px]">
                 <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
                   <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary/80">
-                    English
+                    Inglês
                   </p>
                   <p className="text-3xl font-semibold text-balance sm:text-4xl">
                     {current.front}
@@ -135,7 +135,7 @@ function Review() {
                     <>
                       <div className="h-px w-16 bg-border" />
                       <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-                        Translation
+                        Tradução
                       </p>
                       <p className="text-2xl font-medium text-muted-foreground text-balance sm:text-3xl">
                         {current.back}
@@ -152,31 +152,31 @@ function Review() {
                   onClick={() => setShowBack(true)}
                   className="w-full rounded-full bg-primary py-4 text-[15px] font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
                 >
-                  Show answer
+                  Mostrar resposta
                 </button>
               ) : (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   <GradeButton
-                    label="Again"
-                    hint="< 1m"
+                    label="De novo"
+                    hint="< 1 min"
                     tone="destructive"
                     onClick={() => grade("again")}
                   />
                   <GradeButton
-                    label="Hard"
-                    hint="soon"
+                    label="Difícil"
+                    hint="em breve"
                     tone="warning"
                     onClick={() => grade("hard")}
                   />
                   <GradeButton
-                    label="Good"
-                    hint="days"
+                    label="Bom"
+                    hint="dias"
                     tone="primary"
                     onClick={() => grade("good")}
                   />
                   <GradeButton
-                    label="Easy"
-                    hint="weeks"
+                    label="Fácil"
+                    hint="semanas"
                     tone="success"
                     onClick={() => grade("easy")}
                   />
@@ -229,15 +229,15 @@ function EmptyState() {
       <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
         <Check className="h-6 w-6" strokeWidth={2.5} />
       </div>
-      <h2 className="mt-5 text-xl font-semibold">Nothing due right now</h2>
+      <h2 className="mt-5 text-xl font-semibold">Nada para revisar agora</h2>
       <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-        Come back later — your next reviews will show up when they're ready.
+        Volte mais tarde — as próximas revisões aparecerão quando estiverem prontas.
       </p>
       <Link
         to="/"
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
       >
-        Back home
+        Voltar ao início
       </Link>
     </div>
   );
@@ -255,16 +255,16 @@ function FinishedState({
       <div className="grid h-14 w-14 place-items-center rounded-2xl bg-success/15 text-success">
         <Check className="h-6 w-6" strokeWidth={2.5} />
       </div>
-      <h2 className="mt-5 text-2xl font-semibold">Session complete</h2>
+      <h2 className="mt-5 text-2xl font-semibold">Sessão concluída</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        You reviewed {reviewed} card{reviewed === 1 ? "" : "s"}. Nicely done.
+        Você revisou {reviewed} carta{reviewed === 1 ? "" : "s"}. Muito bem!
       </p>
       <div className="mt-6 flex gap-2">
         <Link
           to="/"
           className="rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium hover:bg-accent"
         >
-          Home
+          Início
         </Link>
         {deckId && (
           <Link
@@ -272,7 +272,7 @@ function FinishedState({
             params={{ deckId }}
             className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-95"
           >
-            Back to deck
+            Voltar ao deck
           </Link>
         )}
       </div>

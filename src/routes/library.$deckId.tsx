@@ -36,12 +36,12 @@ function DeckDetail() {
   if (!deck) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-16 text-center">
-        <h1 className="text-2xl font-semibold">Deck not found</h1>
+        <h1 className="text-2xl font-semibold">Deck não encontrado</h1>
         <Link
           to="/library"
           className="mt-4 inline-flex text-sm text-primary hover:opacity-80"
         >
-          Back to library
+          Voltar à biblioteca
         </Link>
       </main>
     );
@@ -56,7 +56,7 @@ function DeckDetail() {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Library
+        Biblioteca
       </Link>
 
       <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -68,8 +68,8 @@ function DeckDetail() {
             </p>
           )}
           <p className="mt-2 text-xs text-muted-foreground">
-            {cards.length} card{cards.length === 1 ? "" : "s"}
-            {due > 0 && <> · <span className="text-primary">{due} due</span></>}
+            {cards.length} carta{cards.length === 1 ? "" : "s"}
+            {due > 0 && <> · <span className="text-primary">{due} para revisar</span></>}
           </p>
         </div>
         <div className="flex gap-2">
@@ -78,7 +78,7 @@ function DeckDetail() {
             className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent"
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
-            Add card
+            Nova carta
           </button>
           <Link
             to="/review"
@@ -92,7 +92,7 @@ function DeckDetail() {
             }`}
           >
             <Play className="h-4 w-4" strokeWidth={2.5} />
-            Review
+            Revisar
           </Link>
         </div>
       </div>
@@ -101,17 +101,17 @@ function DeckDetail() {
         {cards.length === 0 ? (
           <div className="ios-card grid place-items-center rounded-3xl px-6 py-16 text-center">
             <div>
-              <h2 className="text-lg font-semibold">No cards yet</h2>
+              <h2 className="text-lg font-semibold">Nenhuma carta ainda</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Add English words with their translation. You'll see them in
-                your next review session.
+                Adicione palavras em inglês com sua tradução. Elas vão aparecer
+                na sua próxima sessão de revisão.
               </p>
               <button
                 onClick={() => setAddOpen(true)}
                 className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Add first card
+                Adicionar primeira carta
               </button>
             </div>
           </div>
@@ -131,7 +131,7 @@ function DeckDetail() {
                 <button
                   onClick={() => setConfirmDelete(c.id)}
                   className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/15 hover:text-destructive group-hover:opacity-100"
-                  aria-label="Delete card"
+                  aria-label="Excluir carta"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -146,7 +146,7 @@ function DeckDetail() {
           onClick={() => setDeleteDeckOpen(true)}
           className="text-xs text-muted-foreground hover:text-destructive"
         >
-          Delete this deck
+          Excluir este deck
         </button>
       </div>
 
@@ -155,9 +155,9 @@ function DeckDetail() {
       )}
       {confirmDelete && (
         <ConfirmDialog
-          title="Delete card?"
-          description="This card will be permanently removed."
-          confirmLabel="Delete"
+          title="Excluir carta?"
+          description="Esta carta será removida permanentemente."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteCard(confirmDelete);
             setConfirmDelete(null);
@@ -167,9 +167,9 @@ function DeckDetail() {
       )}
       {deleteDeckOpen && (
         <ConfirmDialog
-          title="Delete deck?"
-          description="This removes the deck and all its cards."
-          confirmLabel="Delete"
+          title="Excluir deck?"
+          description="Isso remove o deck e todas as suas cartas."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteDeck(deckId);
             router.navigate({ to: "/library" });
@@ -201,7 +201,7 @@ function AddCardSheet({
       <div className="relative w-full sm:max-w-md">
         <div className="ios-card m-3 rounded-3xl p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">New card</h3>
+            <h3 className="text-lg font-semibold">Nova carta</h3>
             <button
               onClick={onClose}
               className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -224,14 +224,14 @@ function AddCardSheet({
             className="mt-4 space-y-3"
           >
             <Field
-              label="English"
+              label="Inglês"
               autoFocus
               value={front}
               onChange={setFront}
               placeholder="Serendipity"
             />
             <Field
-              label="Translation"
+              label="Tradução"
               value={back}
               onChange={setBack}
               placeholder="Serendipidade"
@@ -243,14 +243,14 @@ function AddCardSheet({
                 onChange={(e) => setKeepOpen(e.target.checked)}
                 className="h-4 w-4 accent-primary"
               />
-              Keep adding more cards
+              Continuar adicionando cartas
             </label>
             <button
               type="submit"
               disabled={!front.trim() || !back.trim()}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
-              Add card
+              Adicionar carta
             </button>
           </form>
         </div>
