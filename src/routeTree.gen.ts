@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReviewRouteImport } from './routes/review'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,36 +37,47 @@ const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/review': typeof ReviewRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/review': typeof ReviewRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library': typeof LibraryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/review': typeof ReviewRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/library/$deckId' | '/library/'
+  fullPaths: '/' | '/review' | '/library/$deckId' | '/library/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/library/$deckId' | '/library'
-  id: '__root__' | '/' | '/library/$deckId' | '/library/'
+  to: '/' | '/review' | '/library/$deckId' | '/library'
+  id: '__root__' | '/' | '/review' | '/library/$deckId' | '/library/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReviewRoute: typeof ReviewRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReviewRoute: ReviewRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
 }

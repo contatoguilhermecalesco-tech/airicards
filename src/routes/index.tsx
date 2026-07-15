@@ -60,12 +60,13 @@ function Home() {
             ) : (
               <Link
                 to="/review"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:opacity-40"
-                disabled={due === 0}
                 aria-disabled={due === 0}
                 onClick={(e) => {
                   if (due === 0) e.preventDefault();
                 }}
+                className={`inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 ${
+                  due === 0 ? "pointer-events-none opacity-40" : ""
+                }`}
               >
                 {due > 0 ? "Start session" : "Nothing due"}
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
