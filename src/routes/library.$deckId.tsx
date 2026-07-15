@@ -36,12 +36,12 @@ function DeckDetail() {
   if (!deck) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-16 text-center">
-        <h1 className="text-2xl font-semibold">Deck not found</h1>
+        <h1 className="text-2xl font-semibold">Deck não encontrado</h1>
         <Link
           to="/library"
           className="mt-4 inline-flex text-sm text-primary hover:opacity-80"
         >
-          Back to library
+          Voltar à biblioteca
         </Link>
       </main>
     );
