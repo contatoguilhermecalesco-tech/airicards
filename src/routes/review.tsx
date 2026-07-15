@@ -255,16 +255,16 @@ function FinishedState({
       <div className="grid h-14 w-14 place-items-center rounded-2xl bg-success/15 text-success">
         <Check className="h-6 w-6" strokeWidth={2.5} />
       </div>
-      <h2 className="mt-5 text-2xl font-semibold">Session complete</h2>
+      <h2 className="mt-5 text-2xl font-semibold">Sessão concluída</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        You reviewed {reviewed} card{reviewed === 1 ? "" : "s"}. Nicely done.
+        Você revisou {reviewed} carta{reviewed === 1 ? "" : "s"}. Muito bem!
       </p>
       <div className="mt-6 flex gap-2">
         <Link
           to="/"
           className="rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium hover:bg-accent"
         >
-          Home
+          Início
         </Link>
         {deckId && (
           <Link
@@ -272,7 +272,7 @@ function FinishedState({
             params={{ deckId }}
             className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-95"
           >
-            Back to deck
+            Voltar ao deck
           </Link>
         )}
       </div>
