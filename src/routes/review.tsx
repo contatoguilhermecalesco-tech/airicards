@@ -8,6 +8,8 @@ import {
   difficultyScore,
   isEnemy,
   ENEMY_THRESHOLD,
+  canStartHomeSession,
+  registerHomeSession,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
