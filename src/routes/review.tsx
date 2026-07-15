@@ -225,12 +225,11 @@ function Review() {
 
 function GradeButton({
   label,
-  hint,
   tone,
   onClick,
 }: {
   label: string;
-  hint: string;
+  hint?: string;
   tone: "destructive" | "warning" | "primary" | "success";
   onClick: () => void;
 }) {
@@ -246,12 +245,9 @@ function GradeButton({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center gap-0.5 rounded-2xl border py-4 text-sm font-semibold transition ${toneClass}`}
+      className={`rounded-2xl border py-4 text-sm font-semibold transition ${toneClass}`}
     >
-      <span>{label}</span>
-      <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">
-        {hint}
-      </span>
+      {label}
     </button>
   );
 }
