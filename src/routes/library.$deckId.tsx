@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Play, Plus, Trash2, X } from "lucide-react";
+import { ArrowLeft, Play, Plus, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
   deleteCard,
   deleteDeck,
+  isEnemy,
 } from "@/lib/flashcards-store";
 import { Field, ConfirmDialog } from "./library.index";
 
