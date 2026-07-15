@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { ArrowRight, BookOpen, Flame, Layers } from "lucide-react";
-import { useStore, getDueCards } from "@/lib/flashcards-store";
+import { useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -9,7 +10,11 @@ export const Route = createFileRoute("/")({
 function Home() {
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
-  const due = useStore((s) => getDueCards(undefined, Date.now()).length);
+  const now = useMemo(() => Date.now(), [cards]);
+  const due = useMemo(
+    () => cards.filter((c) => c.dueAt <= now).length,
+    [cards, now],
+  );
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:pt-16">
