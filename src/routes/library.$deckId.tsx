@@ -101,17 +101,17 @@ function DeckDetail() {
         {cards.length === 0 ? (
           <div className="ios-card grid place-items-center rounded-3xl px-6 py-16 text-center">
             <div>
-              <h2 className="text-lg font-semibold">No cards yet</h2>
+              <h2 className="text-lg font-semibold">Nenhuma carta ainda</h2>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Add English words with their translation. You'll see them in
-                your next review session.
+                Adicione palavras em inglês com sua tradução. Elas vão aparecer
+                na sua próxima sessão de revisão.
               </p>
               <button
                 onClick={() => setAddOpen(true)}
                 className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
               >
                 <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Add first card
+                Adicionar primeira carta
               </button>
             </div>
           </div>
