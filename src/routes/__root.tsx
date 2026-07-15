@@ -207,11 +207,15 @@ function ProfileMenu() {
     <div ref={ref} className="relative ml-1">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white ring-1 ring-white/10 transition hover:ring-white/25"
-        style={{ backgroundImage: profile.gradient }}
+        className="flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3 text-sm font-medium text-foreground transition hover:bg-accent"
         aria-label={`Perfil de ${profile.name}`}
       >
-        {profile.initial}
+        <span
+          aria-hidden
+          className="h-6 w-10 rounded-full ring-1 ring-white/10"
+          style={{ backgroundImage: profile.gradient }}
+        />
+        <span className="hidden sm:inline">{profile.name}</span>
       </button>
       {open && (
         <div className="glass-panel absolute right-0 mt-2 w-56 rounded-2xl p-1.5 shadow-card">
