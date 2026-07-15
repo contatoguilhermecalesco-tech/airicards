@@ -49,6 +49,7 @@ function DeckDetail() {
   }
 
   const due = cards.filter((c) => c.dueAt <= Date.now()).length;
+  const enemies = cards.filter(isEnemy).length;
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-6 pb-24">
