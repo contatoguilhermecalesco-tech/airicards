@@ -155,9 +155,9 @@ function DeckDetail() {
       )}
       {confirmDelete && (
         <ConfirmDialog
-          title="Delete card?"
-          description="This card will be permanently removed."
-          confirmLabel="Delete"
+          title="Excluir carta?"
+          description="Esta carta será removida permanentemente."
+          confirmLabel="Excluir"
           onConfirm={() => {
             deleteCard(confirmDelete);
             setConfirmDelete(null);
