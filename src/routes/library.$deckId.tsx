@@ -190,7 +190,6 @@ function AddCardSheet({
 }) {
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
-  const [keepOpen, setKeepOpen] = useState(true);
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
@@ -214,12 +213,7 @@ function AddCardSheet({
               e.preventDefault();
               if (!front.trim() || !back.trim()) return;
               createCard(deckId, front, back);
-              if (keepOpen) {
-                setFront("");
-                setBack("");
-              } else {
-                onClose();
-              }
+              onClose();
             }}
             className="mt-4 space-y-3"
           >
@@ -236,15 +230,6 @@ function AddCardSheet({
               onChange={setBack}
               placeholder="Serendipidade"
             />
-            <label className="flex items-center gap-2 pt-1 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={keepOpen}
-                onChange={(e) => setKeepOpen(e.target.checked)}
-                className="h-4 w-4 accent-primary"
-              />
-              Continuar adicionando cartas
-            </label>
             <button
               type="submit"
               disabled={!front.trim() || !back.trim()}
