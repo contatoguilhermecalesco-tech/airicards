@@ -118,7 +118,7 @@ function Review() {
         ) : (
           <div className="mt-10 flex flex-1 flex-col">
             <p className="text-center text-xs font-medium text-muted-foreground">
-              Card {Math.min(index + 1, sessionCount)} of {sessionCount}
+              Carta {Math.min(index + 1, sessionCount)} de {sessionCount}
             </p>
 
             <div className="mt-6 flex flex-1 items-center justify-center">
