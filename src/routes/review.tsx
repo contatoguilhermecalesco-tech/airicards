@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy } from "lucide-react";
+import { X, Check, Swords, Trophy, Moon } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -8,6 +8,8 @@ import {
   difficultyScore,
   isEnemy,
   ENEMY_THRESHOLD,
+  canStartHomeSession,
+  registerHomeSession,
 } from "@/lib/flashcards-store";
 
 type Search = { deck?: string };
@@ -35,13 +37,21 @@ function Review() {
   const [showBack, setShowBack] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
 
   const allCards = useStore((s) => s.cards);
 
   useEffect(() => {
+    // Limite diário só se aplica à sessão global (sem deckId).
+    if (!deckId && !canStartHomeSession()) {
+      setLimitReached(true);
+      setQueue([]);
+      setSessionCount(0);
+      return;
+    }
+    if (!deckId) registerHomeSession();
+    setLimitReached(false);
     const due = getDueCards(deckId, Date.now());
-    // Prioriza cartas mais difíceis (mais erradas) no topo da fila,
-    // com um pouco de aleatoriedade para não ficar sempre igual.
     const ordered = [...due].sort(
       (a, b) =>
         difficultyScore(b) - difficultyScore(a) + (Math.random() - 0.5) * 0.6,
@@ -159,7 +169,9 @@ function Review() {
           />
         </div>
 
-        {queue.length === 0 && !current ? (
+        {limitReached ? (
+          <LimitReachedState />
+        ) : queue.length === 0 && !current ? (
           <EmptyState />
         ) : finished || !current ? (
           <FinishedState reviewed={reviewed} deckId={deckId} />
@@ -325,6 +337,28 @@ function EmptyState() {
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
       >
         Voltar ao início
+      </Link>
+    </div>
+  );
+}
+
+function LimitReachedState() {
+  return (
+    <div className="mt-20 grid place-items-center text-center">
+      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
+        <Moon className="h-6 w-6" strokeWidth={2.5} />
+      </div>
+      <h2 className="mt-5 text-xl font-semibold">Limite diário atingido</h2>
+      <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+        Você já fez suas 3 sessões globais de hoje. O descanso ajuda a fixar
+        o que aprendeu — volte amanhã. Você ainda pode revisar decks
+        individuais sempre que quiser.
+      </p>
+      <Link
+        to="/library"
+        className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
+      >
+        Ir para a biblioteca
       </Link>
     </div>
   );

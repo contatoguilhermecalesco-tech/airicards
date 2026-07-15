@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowRight, BookOpen, Flame, Layers } from "lucide-react";
-import { useStore } from "@/lib/flashcards-store";
+import { ArrowRight, BookOpen, Flame, Layers, Moon } from "lucide-react";
+import {
+  useStore,
+  useHomeSessionsToday,
+  HOME_DAILY_LIMIT,
+} from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -10,11 +14,14 @@ export const Route = createFileRoute("/")({
 function Home() {
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
+  const sessionsToday = useHomeSessionsToday();
+  const sessionsLeft = Math.max(0, HOME_DAILY_LIMIT - sessionsToday);
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
     [cards, now],
   );
+  const canStart = due > 0 && sessionsLeft > 0;
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-10 pb-24 sm:pt-16">
@@ -51,7 +58,9 @@ function Home() {
               <p className="mt-1 text-sm text-muted-foreground">
                 {cards.length === 0
                   ? "Crie seu primeiro deck para começar."
-                  : "Sessões curtas, memória duradoura."}
+                  : sessionsLeft === 0
+                    ? "Você já concluiu suas sessões de hoje. Volte amanhã — o descanso faz parte do aprendizado."
+                    : `Sessões curtas, memória duradoura. ${sessionsLeft} de ${HOME_DAILY_LIMIT} disponíveis hoje.`}
               </p>
             </div>
             {cards.length === 0 ? (
@@ -62,15 +71,20 @@ function Home() {
                 Ir para a biblioteca
                 <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
               </Link>
+            ) : sessionsLeft === 0 ? (
+              <div className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-medium text-muted-foreground">
+                <Moon className="h-4 w-4" strokeWidth={2.5} />
+                Volte amanhã
+              </div>
             ) : (
               <Link
                 to="/review"
-                aria-disabled={due === 0}
+                aria-disabled={!canStart}
                 onClick={(e) => {
-                  if (due === 0) e.preventDefault();
+                  if (!canStart) e.preventDefault();
                 }}
                 className={`inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 ${
-                  due === 0 ? "pointer-events-none opacity-40" : ""
+                  !canStart ? "pointer-events-none opacity-40" : ""
                 }`}
               >
                 {due > 0 ? "Iniciar sessão" : "Nada para revisar"}

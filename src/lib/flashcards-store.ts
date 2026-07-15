@@ -225,5 +225,63 @@ export function getDueCards(deckId?: string, at: number = Date.now()): Card[] {
 
 export function cardsForDeck(deckId: string): Card[] {
   ensureHydrated();
-  return state.cards.filter((c) => c.deckId === deckId);
+    return state.cards.filter((c) => c.deckId === deckId);
+}
+
+// ---- Limite diário de sessões "revisar tudo" (a partir da home) ----
+// 3 sessões/dia é o sweet spot da repetição espaçada (manhã/tarde/noite):
+// reforça a curva de esquecimento sem virar grind.
+export const HOME_DAILY_LIMIT = 3;
+const HOME_SESSIONS_KEY = "flashcards.homeSessions.v1";
+
+function todayKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+type HomeSessions = { day: string; count: number };
+
+function readHomeSessions(): HomeSessions {
+  if (!isBrowser()) return { day: todayKey(), count: 0 };
+  try {
+    const raw = localStorage.getItem(HOME_SESSIONS_KEY);
+    if (!raw) return { day: todayKey(), count: 0 };
+    const parsed = JSON.parse(raw) as HomeSessions;
+    if (parsed.day !== todayKey()) return { day: todayKey(), count: 0 };
+    return parsed;
+  } catch {
+    return { day: todayKey(), count: 0 };
+  }
+}
+
+const homeListeners = new Set<() => void>();
+function emitHome() {
+  homeListeners.forEach((l) => l());
+}
+
+export function getHomeSessionsToday(): number {
+  return readHomeSessions().count;
+}
+
+export function canStartHomeSession(): boolean {
+  return getHomeSessionsToday() < HOME_DAILY_LIMIT;
+}
+
+export function registerHomeSession() {
+  if (!isBrowser()) return;
+  const current = readHomeSessions();
+  const next: HomeSessions = { day: todayKey(), count: current.count + 1 };
+  localStorage.setItem(HOME_SESSIONS_KEY, JSON.stringify(next));
+  emitHome();
+}
+
+export function useHomeSessionsToday(): number {
+  return useSyncExternalStore(
+    (l) => {
+      homeListeners.add(l);
+      return () => homeListeners.delete(l);
+    },
+    () => getHomeSessionsToday(),
+    () => 0,
+  );
 }
