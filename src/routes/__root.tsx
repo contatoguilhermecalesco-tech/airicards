@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import { Home, Library, Sparkles } from "lucide-react";
 
 import appCss from "../styles.css?url";
+import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -115,7 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -155,11 +156,13 @@ function TopBar() {
       <div className="glass-panel border-b">
         <nav className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
           <Link to="/" className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary/15 text-primary">
-              <Sparkles className="h-4 w-4" strokeWidth={2.25} />
-            </span>
+            <img
+              src={airiLogo.url}
+              alt="Airi"
+              className="h-8 w-8 rounded-xl object-contain"
+            />
             <span className="text-[15px] font-semibold tracking-tight">
-              Lume
+              Airi
             </span>
           </Link>
           <div className="flex items-center gap-1">

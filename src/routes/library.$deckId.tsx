@@ -13,7 +13,7 @@ import { Field, ConfirmDialog } from "./library.index";
 export const Route = createFileRoute("/library/$deckId")({
   head: () => ({
     meta: [
-      { title: "Deck — Lume" },
+      { title: "Deck — Airi" },
       { name: "robots", content: "noindex" },
     ],
   }),

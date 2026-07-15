@@ -17,7 +17,7 @@ type Search = { deck?: string };
 export const Route = createFileRoute("/review")({
   head: () => ({
     meta: [
-      { title: "Revisão — Lume" },
+      { title: "Revisão — Airi" },
       { name: "robots", content: "noindex" },
     ],
   }),
