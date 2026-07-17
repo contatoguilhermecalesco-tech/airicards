@@ -23,6 +23,7 @@ export type Deck = {
   id: string;
   name: string;
   description?: string;
+  color?: string;
   createdAt: number;
 };
 
@@ -191,11 +192,12 @@ function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
 
-export function createDeck(name: string, description?: string): Deck {
+export function createDeck(name: string, description?: string, color?: string): Deck {
   const deck: Deck = {
     id: uid(),
     name: name.trim(),
     description: description?.trim() || undefined,
+    color: color || undefined,
     createdAt: Date.now(),
   };
   state = { ...state, decks: [deck, ...state.decks] };
@@ -213,7 +215,7 @@ export function deleteDeck(id: string) {
   scheduleSave();
 }
 
-export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "description">>) {
+export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "description" | "color">>) {
   state = {
     ...state,
     decks: state.decks.map((d) => (d.id === id ? { ...d, ...patch } : d)),
