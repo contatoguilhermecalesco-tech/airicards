@@ -28,7 +28,7 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
-type HomeSessions = { day: string; count: number };
+type HomeSessions = { day: string; count: number; reviewed?: number };
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -301,6 +301,10 @@ export function reviewCard(id: string, grade: Grade) {
       return { ...c, ease, interval, reps, dueAt: now + interval * dayMs, lapses, successes: successes + 1 };
     }),
   };
+  // Track cards revisadas hoje for the Home hero ring.
+  refreshHomeDay();
+  home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
+  emitHome();
   emit();
   scheduleSave();
 }
@@ -319,7 +323,7 @@ export const HOME_DAILY_LIMIT = 3;
 function refreshHomeDay() {
   const today = todayKey();
   if (home.day !== today) {
-    home = { day: today, count: 0 };
+    home = { day: today, count: 0, reviewed: 0 };
     scheduleSave();
     emitHome();
   }
@@ -330,13 +334,18 @@ export function getHomeSessionsToday(): number {
   return home.count;
 }
 
+export function getCardsReviewedToday(): number {
+  refreshHomeDay();
+  return home.reviewed ?? 0;
+}
+
 export function canStartHomeSession(): boolean {
   return getHomeSessionsToday() < HOME_DAILY_LIMIT;
 }
 
 export function registerHomeSession() {
   refreshHomeDay();
-  home = { day: todayKey(), count: home.count + 1 };
+  home = { ...home, day: todayKey(), count: home.count + 1 };
   emitHome();
   scheduleSave();
 }
@@ -348,6 +357,17 @@ export function useHomeSessionsToday(): number {
       return () => homeListeners.delete(l);
     },
     () => getHomeSessionsToday(),
+    () => 0,
+  );
+}
+
+export function useCardsReviewedToday(): number {
+  return useSyncExternalStore(
+    (l) => {
+      homeListeners.add(l);
+      return () => homeListeners.delete(l);
+    },
+    () => getCardsReviewedToday(),
     () => 0,
   );
 }
