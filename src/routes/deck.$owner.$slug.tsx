@@ -84,6 +84,7 @@ function SharedDeckPage() {
     if (!currentProfile) return;
     const id = importSharedDeck(deck, cards);
     setImportedId(id);
+    setConfirmOpen(false);
   }
 
   return (
