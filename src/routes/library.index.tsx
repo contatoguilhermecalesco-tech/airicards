@@ -54,13 +54,13 @@ function Library() {
 
   return (
     <main className="relative mx-auto max-w-3xl px-5 pt-6 pb-28 sm:pt-10">
-      {/* Ambient iOS-style backdrop */}
+      {/* Ambient iOS-style backdrop (soft) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[380px] opacity-80"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[320px] opacity-40"
         style={{
           background:
-            "radial-gradient(50% 60% at 20% 0%, rgba(167,139,250,0.28), transparent 70%), radial-gradient(45% 60% at 85% 5%, rgba(96,165,250,0.22), transparent 70%), radial-gradient(60% 80% at 50% 40%, rgba(236,72,153,0.10), transparent 70%)",
+            "radial-gradient(50% 60% at 20% 0%, rgba(167,139,250,0.14), transparent 70%), radial-gradient(45% 60% at 85% 5%, rgba(96,165,250,0.10), transparent 70%)",
         }}
       />
 
