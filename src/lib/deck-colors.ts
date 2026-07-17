@@ -9,19 +9,21 @@ export type DeckColor = {
   tint: string; // used for subtle backgrounds/borders
 };
 
+// Tuned for consistent luminance and saturation — sophisticated, not neon.
+// "from" is the lighter stop, "to" the deeper stop; tint is used for borders/badges.
 export const DECK_COLORS: DeckColor[] = [
-  { id: "violet",   label: "Violeta",   from: "#A78BFA", to: "#7C3AED", tint: "#7C3AED" },
-  { id: "blue",     label: "Azul",      from: "#60A5FA", to: "#2563EB", tint: "#2563EB" },
-  { id: "cyan",     label: "Ciano",     from: "#67E8F9", to: "#0891B2", tint: "#0891B2" },
-  { id: "teal",     label: "Verde-água",from: "#5EEAD4", to: "#0D9488", tint: "#0D9488" },
-  { id: "green",    label: "Verde",     from: "#86EFAC", to: "#16A34A", tint: "#16A34A" },
-  { id: "lime",     label: "Lima",      from: "#D9F99D", to: "#65A30D", tint: "#65A30D" },
-  { id: "yellow",   label: "Amarelo",   from: "#FDE68A", to: "#D97706", tint: "#D97706" },
-  { id: "orange",   label: "Laranja",   from: "#FDBA74", to: "#EA580C", tint: "#EA580C" },
-  { id: "red",      label: "Vermelho",  from: "#FCA5A5", to: "#DC2626", tint: "#DC2626" },
-  { id: "pink",     label: "Rosa",      from: "#F9A8D4", to: "#DB2777", tint: "#DB2777" },
-  { id: "fuchsia",  label: "Fúcsia",    from: "#F0ABFC", to: "#C026D3", tint: "#C026D3" },
-  { id: "graphite", label: "Grafite",   from: "#94A3B8", to: "#334155", tint: "#475569" },
+  { id: "violet",   label: "Violeta",    from: "#8B7BD8", to: "#5B4BB8", tint: "#6E5DC7" },
+  { id: "blue",     label: "Azul",       from: "#6B93D6", to: "#3A63A8", tint: "#4E7ABF" },
+  { id: "cyan",     label: "Ciano",      from: "#6BB6C7", to: "#3A7F92", tint: "#4E96AC" },
+  { id: "teal",     label: "Verde-água", from: "#6BB8A6", to: "#3A8878", tint: "#4E9E8E" },
+  { id: "green",    label: "Verde",      from: "#7FB682", to: "#4A8B4E", tint: "#619E64" },
+  { id: "lime",     label: "Lima",       from: "#A8BE6B", to: "#758A3A", tint: "#8FA24E" },
+  { id: "yellow",   label: "Âmbar",      from: "#D4B26B", to: "#A17E3A", tint: "#B8974E" },
+  { id: "orange",   label: "Laranja",    from: "#D69770", to: "#A56542", tint: "#BE7C56" },
+  { id: "red",      label: "Vermelho",   from: "#D67878", to: "#A54A4A", tint: "#BE6161" },
+  { id: "pink",     label: "Rosa",       from: "#D67AA8", to: "#A54A7A", tint: "#BE6191" },
+  { id: "fuchsia",  label: "Fúcsia",     from: "#B87AD6", to: "#8A4AA5", tint: "#A161BE" },
+  { id: "graphite", label: "Grafite",    from: "#8791A0", to: "#4A5568", tint: "#697384" },
 ];
 
 export const DEFAULT_DECK_COLOR: DeckColor = DECK_COLORS[0];
