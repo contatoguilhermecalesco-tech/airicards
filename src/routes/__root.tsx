@@ -227,6 +227,16 @@ function ProfileMenu() {
             <p className="text-sm font-medium">{profile.name}</p>
           </div>
           <div className="my-1 h-px bg-border" />
+          {profile.id === "guilherme" && (
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+            >
+              <Shield className="h-4 w-4" strokeWidth={2.25} />
+              Admin
+            </Link>
+          )}
           <button
             onClick={() => {
               setOpen(false);
