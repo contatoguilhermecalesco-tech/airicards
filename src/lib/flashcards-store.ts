@@ -360,3 +360,14 @@ export function useHomeSessionsToday(): number {
     () => 0,
   );
 }
+
+export function useCardsReviewedToday(): number {
+  return useSyncExternalStore(
+    (l) => {
+      homeListeners.add(l);
+      return () => homeListeners.delete(l);
+    },
+    () => getCardsReviewedToday(),
+    () => 0,
+  );
+}
