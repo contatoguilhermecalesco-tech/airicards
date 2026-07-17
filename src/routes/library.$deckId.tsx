@@ -113,6 +113,22 @@ function DeckDetail() {
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             Nova carta
           </button>
+          <button
+            onClick={handleShare}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent sm:flex-none"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+                Link copiado
+              </>
+            ) : (
+              <>
+                <Share2 className="h-4 w-4" strokeWidth={2.5} />
+                Compartilhar
+              </>
+            )}
+          </button>
           <Link
             to="/review"
             search={{ deck: deckId }}
