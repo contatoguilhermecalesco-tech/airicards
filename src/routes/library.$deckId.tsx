@@ -37,8 +37,30 @@ function DeckDetail() {
   const [addOpen, setAddOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const currentProfile = useCurrentProfile();
 
-  if (!deck) {
+  async function handleShare() {
+    if (!deck || !currentProfile) return;
+    const url = buildShareUrl(currentProfile.id, deck.name);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: deck.name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
     return (
       <main className="mx-auto max-w-3xl px-5 py-16 text-center">
         <h1 className="text-2xl font-semibold">Deck não encontrado</h1>
