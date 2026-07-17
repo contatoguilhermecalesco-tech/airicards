@@ -301,6 +301,10 @@ export function reviewCard(id: string, grade: Grade) {
       return { ...c, ease, interval, reps, dueAt: now + interval * dayMs, lapses, successes: successes + 1 };
     }),
   };
+  // Track cards revisadas hoje for the Home hero ring.
+  refreshHomeDay();
+  home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
+  emitHome();
   emit();
   scheduleSave();
 }
