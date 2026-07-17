@@ -148,7 +148,7 @@ function SharedDeckPage() {
           </div>
         ) : (
           <button
-            onClick={handleImport}
+            onClick={() => setConfirmOpen(true)}
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
           >
             <Download className="h-4 w-4" strokeWidth={2.5} />
