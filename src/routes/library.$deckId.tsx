@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Play, Plus, Sparkles, Swords, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -10,6 +10,8 @@ import {
   isEnemy,
 } from "@/lib/flashcards-store";
 import { translateEnToPt } from "@/lib/translate.functions";
+import { buildShareUrl } from "@/lib/share";
+import { useCurrentProfile } from "@/lib/profile";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
@@ -35,6 +37,30 @@ function DeckDetail() {
   const [addOpen, setAddOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const currentProfile = useCurrentProfile();
+
+  async function handleShare() {
+    if (!deck || !currentProfile) return;
+    const url = buildShareUrl(currentProfile.id, deck.name);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: deck.name, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
 
   if (!deck) {
     return (
@@ -86,6 +112,22 @@ function DeckDetail() {
           >
             <Plus className="h-4 w-4" strokeWidth={2.5} />
             Nova carta
+          </button>
+          <button
+            onClick={handleShare}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-medium hover:bg-accent sm:flex-none"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+                Link copiado
+              </>
+            ) : (
+              <>
+                <Share2 className="h-4 w-4" strokeWidth={2.5} />
+                Compartilhar
+              </>
+            )}
           </button>
           <Link
             to="/review"

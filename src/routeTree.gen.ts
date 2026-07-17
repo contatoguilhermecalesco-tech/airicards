@@ -14,6 +14,7 @@ import { Route as ReviewRouteImport } from './routes/review'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
+import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -40,6 +41,11 @@ const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   path: '/library/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
+  id: '/deck/$owner/$slug',
+  path: '/deck/$owner/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
+  '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library': typeof LibraryIndexRoute
+  '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,12 +70,25 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
+  '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/review' | '/sitemap.xml' | '/library/$deckId' | '/library/'
+  fullPaths:
+    | '/'
+    | '/review'
+    | '/sitemap.xml'
+    | '/library/$deckId'
+    | '/library/'
+    | '/deck/$owner/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/review' | '/sitemap.xml' | '/library/$deckId' | '/library'
+  to:
+    | '/'
+    | '/review'
+    | '/sitemap.xml'
+    | '/library/$deckId'
+    | '/library'
+    | '/deck/$owner/$slug'
   id:
     | '__root__'
     | '/'
@@ -75,6 +96,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/library/$deckId'
     | '/library/'
+    | '/deck/$owner/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,6 +105,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
+  DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryDeckIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deck/$owner/$slug': {
+      id: '/deck/$owner/$slug'
+      path: '/deck/$owner/$slug'
+      fullPath: '/deck/$owner/$slug'
+      preLoaderRoute: typeof DeckOwnerSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -131,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
+  DeckOwnerSlugRoute: DeckOwnerSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
