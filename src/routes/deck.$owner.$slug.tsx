@@ -4,6 +4,16 @@ import { ArrowLeft, Check, Download, Loader2 } from "lucide-react";
 import type { Card, Deck } from "@/lib/flashcards-store";
 import { fetchSharedDeck, importSharedDeck } from "@/lib/share";
 import { useCurrentProfile, type Profile } from "@/lib/profile";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/deck/$owner/$slug")({
   head: () => ({
