@@ -197,9 +197,9 @@ function DeckCard({
         {/* Subtle inner highlight */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-40"
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-15"
           style={{
-            background: `linear-gradient(180deg, ${color.from}22, transparent)`,
+            background: `linear-gradient(180deg, ${color.from}, transparent)`,
           }}
         />
 
