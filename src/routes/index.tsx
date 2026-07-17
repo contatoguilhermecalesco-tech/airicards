@@ -227,22 +227,43 @@ function Home() {
               Volte amanhã
             </div>
           ) : (
-            <Link
-              to="/review"
-              aria-disabled={!canStart}
-              onClick={(e) => {
-                if (!canStart) e.preventDefault();
-              }}
+            <button
+              type="button"
+              disabled={!canStart}
+              onClick={() => canStart && setConfirmOpen(true)}
               className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition hover:brightness-110 active:scale-[0.98] ${
                 !canStart ? "pointer-events-none opacity-40" : ""
               }`}
             >
               {due > 0 ? "Iniciar sessão" : "Nada para revisar"}
               <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-            </Link>
+            </button>
           )}
         </div>
       </section>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Iniciar sessão agora?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem {due} carta{due === 1 ? "" : "s"} para revisar. Esta
+              sessão contará como {sessionsToday + 1} de {HOME_DAILY_LIMIT} hoje.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmOpen(false);
+                void navigate({ to: "/review" });
+              }}
+            >
+              Iniciar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
