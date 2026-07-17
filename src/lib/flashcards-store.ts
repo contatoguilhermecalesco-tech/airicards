@@ -345,7 +345,7 @@ export function canStartHomeSession(): boolean {
 
 export function registerHomeSession() {
   refreshHomeDay();
-  home = { day: todayKey(), count: home.count + 1 };
+  home = { ...home, day: todayKey(), count: home.count + 1 };
   emitHome();
   scheduleSave();
 }
