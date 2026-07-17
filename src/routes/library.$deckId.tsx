@@ -43,17 +43,22 @@ function DeckDetail() {
   async function handleShare() {
     if (!deck || !currentProfile) return;
     const url = buildShareUrl(currentProfile.id, deck.name);
+    const message = `Olha esse deck de estudo — "${deck.name}": ${url}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: deck.name, url });
+        await navigator.share({
+          title: deck.name,
+          text: `Olha esse deck de estudo — "${deck.name}":`,
+          url,
+        });
       } else {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(message);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }
     } catch {
       try {
-        await navigator.clipboard.writeText(url);
+        await navigator.clipboard.writeText(message);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       } catch {
