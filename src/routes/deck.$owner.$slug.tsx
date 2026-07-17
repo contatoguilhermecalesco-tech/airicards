@@ -37,6 +37,7 @@ function SharedDeckPage() {
     cards: Card[];
   } | null>(null);
   const [importedId, setImportedId] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
