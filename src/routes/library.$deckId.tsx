@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Play, Plus, Sparkles, Swords, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -10,6 +10,8 @@ import {
   isEnemy,
 } from "@/lib/flashcards-store";
 import { translateEnToPt } from "@/lib/translate.functions";
+import { buildShareUrl } from "@/lib/share";
+import { useCurrentProfile } from "@/lib/profile";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
