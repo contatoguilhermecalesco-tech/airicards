@@ -48,7 +48,7 @@ export async function fetchSharedDeck(
 }
 
 export function importSharedDeck(deck: Deck, cards: Card[]): string {
-  const newDeck = createDeck(deck.name, deck.description);
+  const newDeck = createDeck(deck.name, deck.description, deck.color);
   for (const c of cards) {
     createCard(newDeck.id, c.front, c.back);
   }
