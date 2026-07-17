@@ -28,18 +28,30 @@ function greetingFor(hour: number): Greeting {
   return { salute: "Boa madrugada", icon: <Moon className="h-6 w-6 text-indigo-300" strokeWidth={2.25} /> };
 }
 
+function formatNextIn(ms: number): string {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return `em ${mins} min`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `em ${hours}h`;
+  const days = Math.round(hours / 24);
+  if (days === 1) return "amanhã";
+  return `em ${days} dias`;
+}
+
 function contextLine({
   due,
   totalCards,
   sessionsToday,
   reviewedToday,
   sessionsLeft,
+  nextDueInMs,
 }: {
   due: number;
   totalCards: number;
   sessionsToday: number;
   reviewedToday: number;
   sessionsLeft: number;
+  nextDueInMs: number | null;
 }): string {
   if (totalCards === 0) return "Crie seu primeiro deck para começar.";
   if (sessionsLeft === 0)
@@ -48,6 +60,12 @@ function contextLine({
     return `${due} carta${due === 1 ? "" : "s"} te esperando — primeira sessão do dia.`;
   if (due > 0)
     return `${due} carta${due === 1 ? "" : "s"} te esperando.`;
+  if (nextDueInMs !== null) {
+    const when = formatNextIn(nextDueInMs);
+    if (reviewedToday > 0)
+      return `${reviewedToday} revisadas hoje — próxima ${when}.`;
+    return `Próxima revisão ${when}.`;
+  }
   if (reviewedToday > 0) return `Tudo em dia — ${reviewedToday} revisadas hoje.`;
   return "Tudo em dia por aqui.";
 }
