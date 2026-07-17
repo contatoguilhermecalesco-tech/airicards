@@ -371,3 +371,49 @@ export function useCardsReviewedToday(): number {
     () => 0,
   );
 }
+
+// --- Admin helpers ----------------------------------------------------
+export type ProfileSessionInfo = {
+  profileId: string;
+  day: string;
+  count: number;
+  reviewed: number;
+};
+
+export async function fetchAllProfileSessions(): Promise<ProfileSessionInfo[]> {
+  const { data, error } = await supabase
+    .from("profile_data")
+    .select("profile_id, home_sessions");
+  if (error) {
+    console.error("[airi] fetchAllProfileSessions failed", error);
+    return [];
+  }
+  return (data ?? []).map((row) => {
+    const hs = (row.home_sessions ?? {}) as HomeSessions;
+    return {
+      profileId: row.profile_id as string,
+      day: hs.day ?? "",
+      count: hs.count ?? 0,
+      reviewed: hs.reviewed ?? 0,
+    };
+  });
+}
+
+export async function resetHomeSessionsForProfile(profileId: string): Promise<void> {
+  const fresh: HomeSessions = { day: todayKey(), count: 0, reviewed: 0 };
+  const { error } = await supabase
+    .from("profile_data")
+    .update({ home_sessions: fresh as never, updated_at: new Date().toISOString() })
+    .eq("profile_id", profileId);
+  if (error) {
+    console.error("[airi] resetHomeSessionsForProfile failed", error);
+    throw error;
+  }
+  // If it's the active profile, refresh local state immediately.
+  if (activeProfile === profileId) {
+    home = fresh;
+    saveCache(profileId, state, home);
+    emitHome();
+  }
+}
+
