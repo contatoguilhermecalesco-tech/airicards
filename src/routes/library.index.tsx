@@ -187,10 +187,10 @@ function DeckCard({
   const gradient = deckGradient(deck.color);
   return (
     <li className="group relative">
-      {/* Colored ambient glow behind card */}
+      {/* Colored ambient glow behind card (subtle) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-1 rounded-[30px] opacity-40 blur-2xl transition group-hover:opacity-70"
+        className="pointer-events-none absolute -inset-0.5 rounded-[28px] opacity-0 blur-xl transition group-hover:opacity-20"
         style={{ background: gradient }}
       />
       <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-2xl transition active:scale-[0.99]">
