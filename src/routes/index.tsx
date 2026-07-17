@@ -82,12 +82,17 @@ function Home() {
     () => cards.filter((c) => c.dueAt <= now).length,
     [cards, now],
   );
+  const nextDueInMs = useMemo(() => {
+    const futures = cards.map((c) => c.dueAt).filter((t) => t > now);
+    if (futures.length === 0) return null;
+    return Math.min(...futures) - now;
+  }, [cards, now]);
   const canStart = due > 0 && sessionsLeft > 0;
 
   const hour = new Date().getHours();
   const { salute, icon } = greetingFor(hour);
   const name = profile?.name ?? "";
-  const context = contextLine({ due, totalCards: cards.length, sessionsToday, reviewedToday, sessionsLeft });
+  const context = contextLine({ due, totalCards: cards.length, sessionsToday, reviewedToday, sessionsLeft, nextDueInMs });
 
   // Ring geometry
   const OUTER_R = 54;
