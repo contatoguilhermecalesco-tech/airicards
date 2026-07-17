@@ -258,7 +258,7 @@ function DeckCard({
               style={{
                 width: `${progress}%`,
                 background: gradient,
-                boxShadow: progress > 0 ? `0 0 10px ${color.tint}88` : undefined,
+                boxShadow: undefined,
               }}
             />
           </div>
