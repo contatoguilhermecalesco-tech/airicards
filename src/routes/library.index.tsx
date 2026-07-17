@@ -54,13 +54,13 @@ function Library() {
 
   return (
     <main className="relative mx-auto max-w-3xl px-5 pt-6 pb-28 sm:pt-10">
-      {/* Ambient iOS-style backdrop */}
+      {/* Ambient iOS-style backdrop (soft) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[380px] opacity-80"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[320px] opacity-40"
         style={{
           background:
-            "radial-gradient(50% 60% at 20% 0%, rgba(167,139,250,0.28), transparent 70%), radial-gradient(45% 60% at 85% 5%, rgba(96,165,250,0.22), transparent 70%), radial-gradient(60% 80% at 50% 40%, rgba(236,72,153,0.10), transparent 70%)",
+            "radial-gradient(50% 60% at 20% 0%, rgba(167,139,250,0.14), transparent 70%), radial-gradient(45% 60% at 85% 5%, rgba(96,165,250,0.10), transparent 70%)",
         }}
       />
 
@@ -187,19 +187,19 @@ function DeckCard({
   const gradient = deckGradient(deck.color);
   return (
     <li className="group relative">
-      {/* Colored ambient glow behind card */}
+      {/* Colored ambient glow behind card (subtle) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-1 rounded-[30px] opacity-40 blur-2xl transition group-hover:opacity-70"
+        className="pointer-events-none absolute -inset-0.5 rounded-[28px] opacity-0 blur-xl transition group-hover:opacity-20"
         style={{ background: gradient }}
       />
       <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-2xl transition active:scale-[0.99]">
         {/* Subtle inner highlight */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-40"
+          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-15"
           style={{
-            background: `linear-gradient(180deg, ${color.from}22, transparent)`,
+            background: `linear-gradient(180deg, ${color.from}, transparent)`,
           }}
         />
 
@@ -258,7 +258,7 @@ function DeckCard({
               style={{
                 width: `${progress}%`,
                 background: gradient,
-                boxShadow: progress > 0 ? `0 0 10px ${color.tint}88` : undefined,
+                boxShadow: undefined,
               }}
             />
           </div>
