@@ -98,6 +98,8 @@ function Home() {
     return Math.min(...futures) - now;
   }, [cards, now]);
   const canStart = due > 0 && sessionsLeft > 0;
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const navigate = useNavigate();
 
   const hour = new Date().getHours();
   const { salute, icon } = greetingFor(hour);
