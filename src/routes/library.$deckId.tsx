@@ -61,6 +61,8 @@ function DeckDetail() {
       }
     }
   }
+
+  if (!deck) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-16 text-center">
         <h1 className="text-2xl font-semibold">Deck não encontrado</h1>
