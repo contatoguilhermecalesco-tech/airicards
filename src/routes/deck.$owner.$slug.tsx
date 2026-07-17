@@ -180,6 +180,37 @@ function SharedDeckPage() {
           )}
         </div>
       )}
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent className="max-w-sm rounded-3xl border-0 bg-background/95 p-6 shadow-2xl backdrop-blur-xl">
+          <AlertDialogHeader className="space-y-3 text-left">
+            <AlertDialogTitle className="text-xl font-semibold">
+              Importar deck?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm leading-relaxed text-muted-foreground">
+              Você vai salvar uma <strong>cópia independente</strong> do deck{" "}
+              <em>"{deck.name}"</em> no seu perfil. Alterações futuras no deck
+              original não afetarão essa cópia, e o que você fizer nela não
+              passa para o perfil de {ownerProfile.name}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex-col-reverse gap-2 sm:flex-col-reverse">
+            <AlertDialogCancel
+              onClick={() => setConfirmOpen(false)}
+              className="w-full rounded-full border-border bg-transparent py-5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleImport}
+              className="w-full rounded-full bg-primary py-5 text-sm font-semibold text-primary-foreground hover:opacity-95"
+            >
+              <Download className="mr-2 h-4 w-4" strokeWidth={2.5} />
+              Sim, salvar cópia
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
