@@ -323,7 +323,7 @@ export const HOME_DAILY_LIMIT = 3;
 function refreshHomeDay() {
   const today = todayKey();
   if (home.day !== today) {
-    home = { day: today, count: 0 };
+    home = { day: today, count: 0, reviewed: 0 };
     scheduleSave();
     emitHome();
   }
@@ -332,6 +332,11 @@ function refreshHomeDay() {
 export function getHomeSessionsToday(): number {
   refreshHomeDay();
   return home.count;
+}
+
+export function getCardsReviewedToday(): number {
+  refreshHomeDay();
+  return home.reviewed ?? 0;
 }
 
 export function canStartHomeSession(): boolean {
