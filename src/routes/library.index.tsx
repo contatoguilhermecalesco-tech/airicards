@@ -194,14 +194,8 @@ function DeckCard({
         style={{ background: gradient }}
       />
       <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-2xl transition active:scale-[0.99]">
-        {/* Subtle inner highlight */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-15"
-          style={{
-            background: `linear-gradient(180deg, ${color.from}, transparent)`,
-          }}
-        />
+
+
 
         <Link
           to="/library/$deckId"
