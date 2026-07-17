@@ -28,7 +28,7 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
-type HomeSessions = { day: string; count: number };
+type HomeSessions = { day: string; count: number; reviewed?: number };
 
 function isBrowser() {
   return typeof window !== "undefined";
