@@ -204,7 +204,7 @@ function DeckCard({
         >
           {/* iOS app-icon tile */}
           <div
-            className="relative grid h-14 w-14 shrink-0 place-items-center rounded-[18px] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.35)]"
+            className="relative grid h-14 w-14 shrink-0 place-items-center rounded-[18px] text-white shadow-[0_10px_24px_-8px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.18)]"
             style={{ background: gradient }}
           >
             <Layers className="h-6 w-6 drop-shadow" strokeWidth={2.25} />
@@ -303,7 +303,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       />
       <div className="relative">
         <div
-          className="mx-auto grid h-16 w-16 place-items-center rounded-[20px] text-white shadow-[0_10px_30px_-8px_rgba(124,58,237,0.6),inset_0_1px_0_rgba(255,255,255,0.35)]"
+          className="mx-auto grid h-16 w-16 place-items-center rounded-[20px] text-white shadow-[0_10px_24px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.18)]"
           style={{ background: deckGradient("violet") }}
         >
           <Sparkles className="h-7 w-7" strokeWidth={2.25} />
@@ -343,7 +343,7 @@ function DeckSheet({ deck, onClose }: { deck?: Deck; onClose: () => void }) {
           {/* Preview badge */}
           <div className="flex items-center gap-3">
             <div
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-[16px] text-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.35)]"
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-[16px] text-white shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.18)]"
               style={{ background: deckGradient(color) }}
             >
               <Layers className="h-5 w-5" strokeWidth={2.25} />
