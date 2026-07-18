@@ -15,7 +15,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
 import { addWriting } from "@/lib/writing-store";
 
-export const Route = createFileRoute("/study/writing")({
+export const Route = createFileRoute("/study/writing/")({
   component: WritingPage,
 });
 
