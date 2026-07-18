@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
+import { NotificationsBell } from "../components/NotificationsBell";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
 function NotFoundComponent() {
@@ -189,6 +190,7 @@ function TopBar() {
               <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
               <span className="hidden sm:inline">Estudo</span>
             </Link>
+            <NotificationsBell />
             <ProfileMenu />
           </div>
         </nav>
