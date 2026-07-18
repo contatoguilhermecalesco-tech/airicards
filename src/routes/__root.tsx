@@ -182,6 +182,13 @@ function TopBar() {
               <Library className="h-4 w-4" strokeWidth={2.25} />
               <span className="hidden sm:inline">Biblioteca</span>
             </Link>
+            <Link
+              to="/study"
+              className={linkClass(pathname.startsWith("/study"))}
+            >
+              <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
+              <span className="hidden sm:inline">Estudo</span>
+            </Link>
             <ProfileMenu />
           </div>
         </nav>
