@@ -9,9 +9,11 @@ import {
   Target,
   AlertCircle,
   Loader2,
+  History,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
+import { addWriting } from "@/lib/writing-store";
 
 export const Route = createFileRoute("/study/writing")({
   component: WritingPage,
