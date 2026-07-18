@@ -62,9 +62,9 @@ const StudyWritingIndexRoute = StudyWritingIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudyWritingHistoryRoute = StudyWritingHistoryRouteImport.update({
-  id: '/history',
-  path: '/history',
-  getParentRoute: () => StudyWritingRoute,
+  id: '/study/writing/history',
+  path: '/study/writing/history',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
   id: '/deck/$owner/$slug',
@@ -168,6 +168,7 @@ export interface RootRouteChildren {
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
+  StudyWritingHistoryRoute: typeof StudyWritingHistoryRouteWithChildren
   StudyWritingIndexRoute: typeof StudyWritingIndexRoute
 }
 
@@ -231,10 +232,10 @@ declare module '@tanstack/react-router' {
     }
     '/study/writing/history': {
       id: '/study/writing/history'
-      path: '/history'
+      path: '/study/writing/history'
       fullPath: '/study/writing/history'
       preLoaderRoute: typeof StudyWritingHistoryRouteImport
-      parentRoute: typeof StudyWritingRoute
+      parentRoute: typeof rootRouteImport
     }
     '/deck/$owner/$slug': {
       id: '/deck/$owner/$slug'
@@ -253,6 +254,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface StudyWritingHistoryRouteChildren {
+  StudyWritingHistoryIdRoute: typeof StudyWritingHistoryIdRoute
+}
+
+const StudyWritingHistoryRouteChildren: StudyWritingHistoryRouteChildren = {
+  StudyWritingHistoryIdRoute: StudyWritingHistoryIdRoute,
+}
+
+const StudyWritingHistoryRouteWithChildren =
+  StudyWritingHistoryRoute._addFileChildren(StudyWritingHistoryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -262,18 +274,9 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
+  StudyWritingHistoryRoute: StudyWritingHistoryRouteWithChildren,
   StudyWritingIndexRoute: StudyWritingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
