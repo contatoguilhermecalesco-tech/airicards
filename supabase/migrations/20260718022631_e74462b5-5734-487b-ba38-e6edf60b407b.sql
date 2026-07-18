@@ -1,0 +1,1 @@
+ALTER TABLE public.profile_data ADD COLUMN IF NOT EXISTS writings jsonb NOT NULL DEFAULT '[]'::jsonb;

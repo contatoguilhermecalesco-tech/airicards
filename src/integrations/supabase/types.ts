@@ -20,18 +20,21 @@ export type Database = {
           home_sessions: Json
           profile_id: string
           updated_at: string
+          writings: Json
         }
         Insert: {
           data?: Json
           home_sessions?: Json
           profile_id: string
           updated_at?: string
+          writings?: Json
         }
         Update: {
           data?: Json
           home_sessions?: Json
           profile_id?: string
           updated_at?: string
+          writings?: Json
         }
         Relationships: []
       }
