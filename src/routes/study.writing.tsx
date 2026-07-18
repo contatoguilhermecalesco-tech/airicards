@@ -17,12 +17,6 @@ export const Route = createFileRoute("/study/writing")({
   component: WritingPage,
 });
 
-const SUGGESTED_PROMPTS = [
-  "Describe your perfect weekend.",
-  "Write about a memorable trip you took.",
-  "Explain why learning English is important to you.",
-  "Describe your dream job and why.",
-];
 
 function WritingPage() {
   const [text, setText] = useState("");
