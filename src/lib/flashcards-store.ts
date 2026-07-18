@@ -274,7 +274,11 @@ export function isDefeated(card: Card): boolean {
 
 export function reviewCard(id: string, grade: Grade) {
   const now = Date.now();
-  const dayMs = 86_400_000;
+  const minuteMs = 60_000;
+  // Cadência curta: as cartas voltam de minutos em minutos ao longo do dia,
+  // para o usuário conseguir revisar todas várias vezes por dia mesmo com
+  // decks pequenos. Intervalos em MINUTOS, com teto de ~4h.
+  const MAX_MINUTES = 240;
   state = {
     ...state,
     cards: state.cards.map((c) => {
@@ -287,20 +291,26 @@ export function reviewCard(id: string, grade: Grade) {
         reps = 0;
         interval = 0;
         ease = Math.max(1.3, ease - 0.2);
-        return { ...c, ease, interval, reps, dueAt: now + 60_000, lapses: lapses + 1, successes };
+        return { ...c, ease, interval, reps, dueAt: now + minuteMs, lapses: lapses + 1, successes };
       }
 
       const q = grade === "hard" ? 3 : grade === "good" ? 4 : 5;
       ease = Math.max(1.3, ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
       reps += 1;
 
-      if (reps === 1) interval = grade === "easy" ? 3 : 1;
-      else if (reps === 2) interval = grade === "easy" ? 6 : 3;
-      else interval = Math.round(interval * ease * (grade === "hard" ? 0.8 : 1));
+      // Passos iniciais em minutos (hard / good / easy)
+      if (reps === 1) interval = grade === "hard" ? 3 : grade === "good" ? 10 : 25;
+      else if (reps === 2) interval = grade === "hard" ? 8 : grade === "good" ? 25 : 60;
+      else {
+        const factor = grade === "hard" ? 1.3 : grade === "good" ? 1.8 : 2.2;
+        interval = Math.round(Math.max(interval, 1) * factor);
+      }
+      interval = Math.min(interval, MAX_MINUTES);
 
-      return { ...c, ease, interval, reps, dueAt: now + interval * dayMs, lapses, successes: successes + 1 };
+      return { ...c, ease, interval, reps, dueAt: now + interval * minuteMs, lapses, successes: successes + 1 };
     }),
   };
+
   // Track cards revisadas hoje for the Home hero ring.
   refreshHomeDay();
   home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
