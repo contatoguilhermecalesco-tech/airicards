@@ -44,6 +44,12 @@ function WritingPage() {
         data: { text: text.trim(), prompt: prompt.trim() || undefined, level },
       });
       setFeedback(result);
+      addWriting({
+        text: text.trim(),
+        prompt: prompt.trim() || undefined,
+        level,
+        feedback: result,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao corrigir.");
     } finally {
