@@ -112,18 +112,20 @@ function subscribe(cb: () => void) {
 export function useNotifications() {
   return useSyncExternalStore(
     subscribe,
-    () => ({ notifications, tags, readIds }),
-    () => ({ notifications: [] as Notification[], tags: [] as NotificationTag[], readIds: new Set<string>() }),
+    () => snapshot,
+    () => SERVER_SNAPSHOT,
   );
 }
 
 export function useUnreadCount() {
-  return useSyncExternalStore(
+  const s = useSyncExternalStore(
     subscribe,
-    () => notifications.filter((n) => !readIds.has(n.id)).length,
-    () => 0,
+    () => snapshot,
+    () => SERVER_SNAPSHOT,
   );
+  return s.notifications.filter((n) => !s.readIds.has(n.id)).length;
 }
+
 
 export async function markAsRead(notificationId: string) {
   const p = getCurrentProfile();
