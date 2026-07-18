@@ -17,12 +17,6 @@ export const Route = createFileRoute("/study/writing")({
   component: WritingPage,
 });
 
-const SUGGESTED_PROMPTS = [
-  "Describe your perfect weekend.",
-  "Write about a memorable trip you took.",
-  "Explain why learning English is important to you.",
-  "Describe your dream job and why.",
-];
 
 function WritingPage() {
   const [text, setText] = useState("");
@@ -89,17 +83,6 @@ function WritingPage() {
             className="mt-2 w-full rounded-2xl border border-border bg-surface/50 px-4 py-3 text-[16px] outline-none transition focus:border-primary/50"
           />
 
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {SUGGESTED_PROMPTS.map((p) => (
-              <button
-                key={p}
-                onClick={() => setPrompt(p)}
-                className="rounded-full border border-border bg-surface/50 px-3 py-1 text-xs text-muted-foreground transition hover:text-foreground"
-              >
-                {p}
-              </button>
-            ))}
-          </div>
 
           <div className="mt-5 flex items-center justify-between">
             <label className="text-sm font-medium">Seu texto em inglês</label>
