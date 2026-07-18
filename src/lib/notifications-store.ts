@@ -24,8 +24,24 @@ let notifications: Notification[] = [];
 let readIds = new Set<string>();
 let activeProfile: string | null = null;
 
+type Snapshot = {
+  notifications: Notification[];
+  tags: NotificationTag[];
+  readIds: Set<string>;
+};
+let snapshot: Snapshot = { notifications, tags, readIds };
+const SERVER_SNAPSHOT: Snapshot = {
+  notifications: [],
+  tags: [],
+  readIds: new Set<string>(),
+};
+
 const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
+function emit() {
+  snapshot = { notifications, tags, readIds };
+  listeners.forEach((l) => l());
+}
+
 
 let channel: ReturnType<typeof supabase.channel> | null = null;
 
