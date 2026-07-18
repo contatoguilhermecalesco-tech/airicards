@@ -62,23 +62,23 @@ export function NotificationsBell() {
         )}
       </button>
       {open && (
-        <div className="glass-panel absolute right-0 mt-2 w-[min(92vw,360px)] rounded-2xl p-1.5 shadow-card">
+        <div className="glass-panel absolute right-0 mt-2 w-[min(92vw,360px)] rounded-2xl border border-border/60 bg-surface-elevated/95 p-1.5 shadow-card backdrop-blur-2xl">
           <div className="flex items-center justify-between px-3 py-2">
-            <p className="text-sm font-semibold">Notificações</p>
+            <p className="text-sm font-semibold text-foreground">Notificações</p>
             {unread > 0 && (
               <button
                 onClick={() => void markAllAsRead()}
-                className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium text-foreground/80 transition hover:bg-accent hover:text-foreground"
               >
                 <CheckCheck className="h-3.5 w-3.5" strokeWidth={2.25} />
                 Marcar todas
               </button>
             )}
           </div>
-          <div className="my-1 h-px bg-border" />
+          <div className="my-1 h-px bg-border/70" />
           <div className="max-h-[60vh] overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="px-3 py-6 text-center text-xs text-muted-foreground">
+              <p className="px-3 py-6 text-center text-sm text-foreground/70">
                 Nenhuma notificação por aqui ainda.
               </p>
             ) : (
@@ -90,34 +90,35 @@ export function NotificationsBell() {
                     <li key={n.id}>
                       <button
                         onClick={() => void markAsRead(n.id)}
-                        className={`group relative flex w-full flex-col gap-1 rounded-xl px-3 py-2.5 text-left transition hover:bg-accent ${
-                          isRead ? "opacity-70" : ""
+                        className={`group relative flex w-full flex-col gap-1.5 rounded-xl px-3 py-2.5 text-left transition hover:bg-accent ${
+                          isRead ? "opacity-60" : ""
                         }`}
                       >
                         {!isRead && (
                           <span
                             aria-hidden
-                            className="absolute left-1 top-3.5 h-1.5 w-1.5 rounded-full bg-primary"
+                            className="absolute left-1 top-3.5 h-2 w-2 rounded-full bg-primary shadow-[0_0_6px] shadow-primary/80"
                           />
                         )}
                         <div className="flex items-center justify-between gap-2 pl-3">
-                          <p className="truncate text-sm font-medium text-foreground">
+                          <p className={`truncate text-sm font-semibold ${isRead ? "text-foreground/80" : "text-foreground"}`}>
                             {n.title}
                           </p>
-                          <span className="shrink-0 text-[10px] tabular-nums text-muted-foreground">
+                          <span className="shrink-0 text-[11px] tabular-nums text-foreground/55">
                             {timeAgo(n.created_at)}
                           </span>
                         </div>
-                        <p className="pl-3 text-xs leading-relaxed text-muted-foreground">
+                        <p className="pl-3 text-[13px] leading-relaxed text-foreground/85">
                           {n.body}
                         </p>
                         {tag && (
                           <span
-                            className="ml-3 mt-1 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                            className="ml-3 mt-0.5 inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold"
                             style={{
-                              backgroundColor: `${tag.color}22`,
+                              backgroundColor: `${tag.color}33`,
                               color: tag.color,
-                              border: `1px solid ${tag.color}44`,
+                              border: `1px solid ${tag.color}66`,
+                              textShadow: "0 1px 2px rgba(0,0,0,0.25)",
                             }}
                           >
                             {tag.name}
@@ -125,8 +126,8 @@ export function NotificationsBell() {
                         )}
                         {isRead && (
                           <Check
-                            className="absolute right-2 top-2 h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-70"
-                            strokeWidth={2.25}
+                            className="absolute right-2 top-2 h-3.5 w-3.5 text-foreground/50 opacity-0 group-hover:opacity-100"
+                            strokeWidth={2.5}
                           />
                         )}
                       </button>
@@ -141,3 +142,4 @@ export function NotificationsBell() {
     </div>
   );
 }
+
