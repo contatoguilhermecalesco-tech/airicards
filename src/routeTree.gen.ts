@@ -17,6 +17,7 @@ import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as StudyWritingRouteImport } from './routes/study.writing'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
+import { Route as StudyWritingHistoryRouteImport } from './routes/study.writing.history'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -59,6 +60,11 @@ const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   path: '/library/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyWritingHistoryRoute = StudyWritingHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => StudyWritingRoute,
+} as any)
 const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
   id: '/deck/$owner/$slug',
   path: '/deck/$owner/$slug',
@@ -71,10 +77,11 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
-  '/study/writing': typeof StudyWritingRoute
+  '/study/writing': typeof StudyWritingRouteWithChildren
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
+  '/study/writing/history': typeof StudyWritingHistoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -82,10 +89,11 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
-  '/study/writing': typeof StudyWritingRoute
+  '/study/writing': typeof StudyWritingRouteWithChildren
   '/library': typeof LibraryIndexRoute
   '/study': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
+  '/study/writing/history': typeof StudyWritingHistoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,10 +102,11 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
-  '/study/writing': typeof StudyWritingRoute
+  '/study/writing': typeof StudyWritingRouteWithChildren
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
+  '/study/writing/history': typeof StudyWritingHistoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/library/'
     | '/study/'
     | '/deck/$owner/$slug'
+    | '/study/writing/history'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/study'
     | '/deck/$owner/$slug'
+    | '/study/writing/history'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/library/'
     | '/study/'
     | '/deck/$owner/$slug'
+    | '/study/writing/history'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -141,7 +153,7 @@ export interface RootRouteChildren {
   ReviewRoute: typeof ReviewRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
-  StudyWritingRoute: typeof StudyWritingRoute
+  StudyWritingRoute: typeof StudyWritingRouteWithChildren
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryDeckIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study/writing/history': {
+      id: '/study/writing/history'
+      path: '/history'
+      fullPath: '/study/writing/history'
+      preLoaderRoute: typeof StudyWritingHistoryRouteImport
+      parentRoute: typeof StudyWritingRoute
+    }
     '/deck/$owner/$slug': {
       id: '/deck/$owner/$slug'
       path: '/deck/$owner/$slug'
@@ -215,13 +234,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface StudyWritingRouteChildren {
+  StudyWritingHistoryRoute: typeof StudyWritingHistoryRoute
+}
+
+const StudyWritingRouteChildren: StudyWritingRouteChildren = {
+  StudyWritingHistoryRoute: StudyWritingHistoryRoute,
+}
+
+const StudyWritingRouteWithChildren = StudyWritingRoute._addFileChildren(
+  StudyWritingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ReviewRoute: ReviewRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
-  StudyWritingRoute: StudyWritingRoute,
+  StudyWritingRoute: StudyWritingRouteWithChildren,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
