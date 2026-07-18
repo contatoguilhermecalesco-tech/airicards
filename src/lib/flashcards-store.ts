@@ -275,10 +275,9 @@ export function isDefeated(card: Card): boolean {
 export function reviewCard(id: string, grade: Grade) {
   const now = Date.now();
   const minuteMs = 60_000;
-  // Cadência curta: as cartas voltam de minutos em minutos ao longo do dia,
-  // para o usuário conseguir revisar todas várias vezes por dia mesmo com
-  // decks pequenos. Intervalos em MINUTOS, com teto de ~4h.
-  const MAX_MINUTES = 240;
+  // Cadência bem curta: as cartas voltam em poucos minutos para o usuário
+  // conseguir revisar tudo várias vezes por dia. Teto de ~15 min.
+  const MAX_MINUTES = 15;
   state = {
     ...state,
     cards: state.cards.map((c) => {
@@ -299,10 +298,10 @@ export function reviewCard(id: string, grade: Grade) {
       reps += 1;
 
       // Passos iniciais em minutos (hard / good / easy)
-      if (reps === 1) interval = grade === "hard" ? 3 : grade === "good" ? 10 : 25;
-      else if (reps === 2) interval = grade === "hard" ? 8 : grade === "good" ? 25 : 60;
+      if (reps === 1) interval = grade === "hard" ? 1 : grade === "good" ? 3 : 6;
+      else if (reps === 2) interval = grade === "hard" ? 2 : grade === "good" ? 5 : 10;
       else {
-        const factor = grade === "hard" ? 1.3 : grade === "good" ? 1.8 : 2.2;
+        const factor = grade === "hard" ? 1.2 : grade === "good" ? 1.5 : 1.8;
         interval = Math.round(Math.max(interval, 1) * factor);
       }
       interval = Math.min(interval, MAX_MINUTES);
@@ -310,6 +309,7 @@ export function reviewCard(id: string, grade: Grade) {
       return { ...c, ease, interval, reps, dueAt: now + interval * minuteMs, lapses, successes: successes + 1 };
     }),
   };
+
 
   // Track cards revisadas hoje for the Home hero ring.
   refreshHomeDay();
