@@ -60,6 +60,23 @@ function exerciseIsCorrect(ex: GrammarExercise, user: string): boolean {
   return candidates.includes(u);
 }
 
+function ensureLessonShape(lesson: GrammarLesson | undefined): GrammarLesson | undefined {
+  if (!lesson) return undefined;
+  return {
+    ...lesson,
+    introduction: lesson.introduction ?? lesson.explanation ?? "",
+    objectives: lesson.objectives ?? [],
+    sections: lesson.sections ?? [],
+    contrasts: lesson.contrasts ?? [],
+    commonMistakes: lesson.commonMistakes ?? [],
+    examples: lesson.examples ?? [],
+    glossary: lesson.glossary ?? [],
+    nextSteps: lesson.nextSteps ?? [],
+    exercises: lesson.exercises ?? [],
+    summary: lesson.summary ?? "",
+  };
+}
+
 const TYPE_LABEL: Record<GrammarExercise["type"], string> = {
   "multiple-choice": "Múltipla escolha",
   "fill-blank": "Preenchimento",
