@@ -378,11 +378,20 @@ function NotificationsSection() {
     setErr(null);
     setOk(null);
     try {
-      await createNotification({ title, body, tag_id: tagId || null, icon: iconKey || null });
+      await createNotification({
+        title,
+        body,
+        tag_id: tagId || null,
+        icon: iconKey || null,
+        action_label: actionLabel || null,
+        action_route: actionRoute || null,
+      });
       setTitle("");
       setBody("");
       setIdea("");
       setIconKey("");
+      setActionLabel("");
+      setActionRoute("");
       setOk("Notificação enviada para os perfis.");
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
