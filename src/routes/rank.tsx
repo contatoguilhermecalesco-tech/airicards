@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info, Users, RefreshCw } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -10,9 +10,12 @@ import {
   DIVISION_ROMAN,
   isElite,
   lpToReachTier,
+  readRankForProfile,
   type Tier,
+  type RankState,
 } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
+import { PROFILES, getCurrentProfile } from "@/lib/profile";
 
 
 export const Route = createFileRoute("/rank")({
