@@ -1,0 +1,1 @@
+ALTER TABLE public.profile_data ADD COLUMN IF NOT EXISTS exams jsonb NOT NULL DEFAULT '{"current": null, "history": []}'::jsonb;

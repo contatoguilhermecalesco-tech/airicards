@@ -99,6 +99,7 @@ export type Database = {
       profile_data: {
         Row: {
           data: Json
+          exams: Json
           grammar_progress: Json
           home_sessions: Json
           profile_id: string
@@ -107,6 +108,7 @@ export type Database = {
         }
         Insert: {
           data?: Json
+          exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
           profile_id: string
@@ -115,6 +117,7 @@ export type Database = {
         }
         Update: {
           data?: Json
+          exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
           profile_id?: string
