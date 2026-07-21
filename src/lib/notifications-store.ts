@@ -174,10 +174,10 @@ export async function deleteTag(id: string) {
   await fetchAll();
 }
 
-export async function createNotification(input: { title: string; body: string; tag_id: string | null }) {
+export async function createNotification(input: { title: string; body: string; tag_id: string | null; icon?: string | null }) {
   const { data, error } = await supabase
     .from("notifications")
-    .insert({ title: input.title.trim(), body: input.body.trim(), tag_id: input.tag_id })
+    .insert({ title: input.title.trim(), body: input.body.trim(), tag_id: input.tag_id, icon: input.icon ?? null })
     .select("*")
     .single();
   if (error) throw error;
