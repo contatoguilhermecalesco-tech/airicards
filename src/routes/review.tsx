@@ -161,10 +161,9 @@ function Review() {
           />
         </div>
 
-        {limitReached ? (
-          <LimitReachedState />
-        ) : queue.length === 0 && !current ? (
+        {queue.length === 0 && !current ? (
           <EmptyState />
+
         ) : finished || !current ? (
           <FinishedState reviewed={reviewed} deckId={deckId} />
         ) : (
