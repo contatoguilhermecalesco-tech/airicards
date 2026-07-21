@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -12,6 +12,8 @@ import {
   Languages,
   ChevronDown,
   ChevronUp,
+  Wand2,
+  Scissors,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -20,6 +22,7 @@ import {
   type ReadingPassage,
   type ReadingGrade,
 } from "@/lib/reading.functions";
+import { translateEnToPt } from "@/lib/translate.functions";
 import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/reading/")({
@@ -75,8 +78,26 @@ function ReadingPage() {
   const [savedCount, setSavedCount] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
 
+  // Snip-to-card (selection popover)
+  const articleRef = useRef<HTMLElement | null>(null);
+  const [snipChip, setSnipChip] = useState<{
+    text: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const [snip, setSnip] = useState<{
+    front: string;
+    back: string;
+    deckId: string;
+    translating: boolean;
+    saving: boolean;
+    saved: boolean;
+    error: string | null;
+  } | null>(null);
+
   const gen = useServerFn(generateReading);
   const grader = useServerFn(gradeReading);
+  const translate = useServerFn(translateEnToPt);
 
   useEffect(() => {
     if (!selectedDeck && decks.length > 0) setSelectedDeck(decks[0].id);
@@ -159,6 +180,107 @@ function ReadingPage() {
     } finally {
       setGrading(false);
     }
+  }
+
+  // Text-selection → floating "Criar carta" chip
+  function handleSelection() {
+    const el = articleRef.current;
+    if (!el) {
+      setSnipChip(null);
+      return;
+    }
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+      setSnipChip(null);
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    // Must be entirely inside the article
+    if (!el.contains(range.commonAncestorContainer)) {
+      setSnipChip(null);
+      return;
+    }
+    const text = sel.toString().trim();
+    if (text.length < 2 || text.length > 400) {
+      setSnipChip(null);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (!rect || (rect.width === 0 && rect.height === 0)) return;
+    setSnipChip({
+      text,
+      top: rect.top - 44,
+      left: rect.left + rect.width / 2,
+    });
+  }
+
+  useEffect(() => {
+    function onDown(e: MouseEvent | TouchEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+      // Ignore clicks on the chip or modal itself
+      const inChip = (target as HTMLElement).closest?.("[data-snip-chip]");
+      const inModal = (target as HTMLElement).closest?.("[data-snip-modal]");
+      if (inChip || inModal) return;
+      // Hide chip on tap outside; selection will re-fire on new drag
+      setSnipChip(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+    };
+  }, []);
+
+  async function openSnip(text: string) {
+    setSnipChip(null);
+    setSnip({
+      front: text,
+      back: "",
+      deckId: selectedDeck || decks[0]?.id || "",
+      translating: true,
+      saving: false,
+      saved: false,
+      error: null,
+    });
+    try {
+      const r = await translate({
+        data: {
+          text,
+          context: passage
+            ? `Trecho do texto "${passage.title}": ${passage.text.slice(0, 500)}`
+            : undefined,
+        },
+      });
+      setSnip((s) =>
+        s ? { ...s, translating: false, back: r.translation } : s,
+      );
+    } catch (e) {
+      setSnip((s) =>
+        s
+          ? {
+              ...s,
+              translating: false,
+              error: e instanceof Error ? e.message : "Falha na tradução",
+            }
+          : s,
+      );
+    }
+  }
+
+  function saveSnip() {
+    if (!snip) return;
+    const front = snip.front.trim();
+    const back = snip.back.trim();
+    if (!front || !back || !snip.deckId) return;
+    setSnip({ ...snip, saving: true });
+    const isSentence = /\s/.test(front) || front.length > 24;
+    createCard(snip.deckId, front, back, {
+      mode: isSentence ? "sentence" : "word",
+      source: passage ? `Reading · ${passage.title} · seleção` : "Reading · seleção",
+    });
+    setSnip({ ...snip, saving: false, saved: true });
   }
 
   function toggleGloss(i: number) {
@@ -310,9 +432,18 @@ function ReadingPage() {
             </button>
           </div>
 
-          <article className="prose-reading mt-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/95">
+          <article
+            ref={articleRef}
+            onMouseUp={handleSelection}
+            onTouchEnd={handleSelection}
+            className="prose-reading snip-source mt-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/95 selection:bg-sky-400/30 selection:text-sky-50"
+          >
             {passage.text}
           </article>
+          <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Scissors className="h-3 w-3" strokeWidth={2.25} />
+            Selecione um trecho para transformar em carta.
+          </p>
 
           {showTranslation && (
             <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -644,6 +775,201 @@ function ReadingPage() {
             </div>
           )}
         </section>
+      )}
+
+      {/* Floating "Criar carta" chip anchored to the current text selection */}
+      {snipChip && (
+        <button
+          data-snip-chip
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => openSnip(snipChip.text)}
+          style={{
+            position: "fixed",
+            top: `${snipChip.top}px`,
+            left: `${snipChip.left}px`,
+            transform: "translate(-50%, -100%)",
+          }}
+          className="pointer-events-auto z-50 inline-flex items-center gap-1.5 rounded-full border border-sky-400/40 bg-sky-500/95 px-3 py-1.5 text-xs font-medium text-white shadow-lg shadow-sky-500/30 backdrop-blur transition hover:bg-sky-500"
+        >
+          <Scissors className="h-3.5 w-3.5" strokeWidth={2.5} />
+          Criar carta
+        </button>
+      )}
+
+      {/* Snip modal */}
+      {snip && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setSnip(null);
+          }}
+        >
+          <div
+            data-snip-modal
+            className="glass-panel w-full max-w-md rounded-3xl border p-5"
+          >
+            <div className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-400/15 ring-1 ring-sky-400/30">
+                <Scissors className="h-4 w-4 text-sky-300" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Nova carta do texto
+                </p>
+                <p className="text-sm font-semibold">Trecho selecionado</p>
+              </div>
+              <button
+                onClick={() => setSnip(null)}
+                className="tap-target rounded-full p-1 text-muted-foreground hover:bg-white/10"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <label className="mt-4 block text-[10px] uppercase tracking-wider text-muted-foreground">
+              Frente (inglês)
+            </label>
+            <textarea
+              value={snip.front}
+              onChange={(e) =>
+                setSnip((s) => (s ? { ...s, front: e.target.value } : s))
+              }
+              rows={2}
+              className="mt-1 w-full resize-none rounded-2xl border border-border bg-surface/40 px-3 py-2 text-sm outline-none focus:border-sky-400/40"
+            />
+
+            <div className="mt-3 flex items-center justify-between">
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Verso (tradução)
+              </label>
+              {snip.translating && (
+                <span className="inline-flex items-center gap-1 text-[10px] text-sky-300">
+                  <Loader2 className="h-3 w-3 animate-spin" /> traduzindo…
+                </span>
+              )}
+              {!snip.translating && snip.front.trim() && (
+                <button
+                  onClick={async () => {
+                    setSnip((s) =>
+                      s ? { ...s, translating: true, error: null } : s,
+                    );
+                    try {
+                      const r = await translate({
+                        data: {
+                          text: snip.front.trim(),
+                          context: passage
+                            ? `Trecho do texto "${passage.title}": ${passage.text.slice(0, 500)}`
+                            : undefined,
+                        },
+                      });
+                      setSnip((s) =>
+                        s
+                          ? {
+                              ...s,
+                              translating: false,
+                              back: r.translation,
+                            }
+                          : s,
+                      );
+                    } catch (e) {
+                      setSnip((s) =>
+                        s
+                          ? {
+                              ...s,
+                              translating: false,
+                              error:
+                                e instanceof Error
+                                  ? e.message
+                                  : "Falha na tradução",
+                            }
+                          : s,
+                      );
+                    }
+                  }}
+                  className="inline-flex items-center gap-1 text-[10px] text-sky-300 hover:text-sky-200"
+                >
+                  <Wand2 className="h-3 w-3" /> retraduzir
+                </button>
+              )}
+            </div>
+            <textarea
+              value={snip.back}
+              onChange={(e) =>
+                setSnip((s) => (s ? { ...s, back: e.target.value } : s))
+              }
+              rows={3}
+              placeholder={snip.translating ? "Traduzindo…" : "Tradução em pt-BR"}
+              className="mt-1 w-full resize-none rounded-2xl border border-border bg-surface/40 px-3 py-2 text-sm outline-none focus:border-sky-400/40"
+            />
+
+            {snip.error && (
+              <p className="mt-2 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-200">
+                {snip.error}
+              </p>
+            )}
+
+            {decks.length === 0 ? (
+              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3 text-xs text-muted-foreground">
+                Crie um deck na biblioteca para salvar esta carta.
+              </div>
+            ) : (
+              <>
+                <label className="mt-4 block text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Deck
+                </label>
+                <select
+                  value={snip.deckId}
+                  onChange={(e) =>
+                    setSnip((s) => (s ? { ...s, deckId: e.target.value } : s))
+                  }
+                  className="mt-1 w-full rounded-2xl border border-border bg-surface/40 px-3 py-2 text-sm outline-none focus:border-sky-400/40"
+                >
+                  {decks.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
+
+            <div className="mt-5 flex items-center gap-2">
+              <button
+                onClick={() => setSnip(null)}
+                className="tap-target flex-1 rounded-2xl border border-border px-4 py-2.5 text-sm transition hover:bg-accent"
+              >
+                {snip.saved ? "Fechar" : "Cancelar"}
+              </button>
+              <button
+                onClick={saveSnip}
+                disabled={
+                  snip.saved ||
+                  snip.saving ||
+                  snip.translating ||
+                  !snip.front.trim() ||
+                  !snip.back.trim() ||
+                  !snip.deckId
+                }
+                className="tap-target flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-500/90 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-sky-500 disabled:opacity-50"
+              >
+                {snip.saved ? (
+                  <>
+                    <Check className="h-4 w-4" /> Adicionada
+                  </>
+                ) : snip.saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Salvando…
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" /> Adicionar carta
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );
