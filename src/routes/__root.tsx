@@ -17,6 +17,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
 import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
+import { RankEmblem } from "../components/RankBadge";
+import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
 
