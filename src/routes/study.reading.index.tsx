@@ -784,7 +784,7 @@ function ReadingPage() {
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => openSnip(snipChip.text)}
           style={{
-            position: "absolute",
+            position: "fixed",
             top: `${snipChip.top}px`,
             left: `${snipChip.left}px`,
             transform: "translate(-50%, -100%)",
