@@ -35,7 +35,24 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
-type HomeSessions = { day: string; count: number; reviewed?: number };
+export type Streak = {
+  current: number;
+  longest: number;
+  lastDay: string; // dateKey of the last day the user reviewed ≥1 card
+  startedOn?: string; // dateKey when the current streak began
+};
+type HomeSessions = {
+  day: string;
+  count: number;
+  reviewed?: number;
+  streak?: Streak;
+};
+
+const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
+export function nextStreakMilestone(current: number): number {
+  for (const m of STREAK_MILESTONES) if (m > current) return m;
+  return current + 100;
+}
 
 function isBrowser() {
   return typeof window !== "undefined";
