@@ -31,6 +31,7 @@ const DAYS: Day[] = [
     area: "Listening",
     desc: "Treino de escuta com áudios e transcrições.",
     icon: <Headphones className="h-5 w-5" strokeWidth={2.25} />,
+    to: "/study/listening",
     accent: "from-emerald-400/25 to-emerald-500/10",
   },
   {
@@ -39,6 +40,7 @@ const DAYS: Day[] = [
     area: "Speaking",
     desc: "Fala guiada e prática de pronúncia.",
     icon: <Mic className="h-5 w-5" strokeWidth={2.25} />,
+    to: "/study/speaking",
     accent: "from-orange-400/25 to-orange-500/10",
   },
   {
