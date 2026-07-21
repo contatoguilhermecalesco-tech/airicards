@@ -73,7 +73,8 @@ function GrammarPage() {
   const cycle = useCycleWeek();
   const [selectedWeek, setSelectedWeek] = useState(cycle?.week ?? 1);
   const progress = useGrammarProgress();
-  const lesson = progress.lessons[String(selectedWeek)];
+  const rawLesson = progress.lessons[String(selectedWeek)];
+  const lesson = useMemo(() => ensureLessonShape(rawLesson), [rawLesson]);
   const attempts = useMemo(
     () => progress.attempts.filter((a) => a.week === selectedWeek),
     [progress.attempts, selectedWeek],
