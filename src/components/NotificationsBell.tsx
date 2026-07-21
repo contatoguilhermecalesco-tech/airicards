@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { LucideIcon } from "lucide-react";
 import {
   Bell,
   BellOff,
@@ -7,23 +6,8 @@ import {
   Inbox,
   Settings2,
   Moon,
-  Sparkles,
-  AlertTriangle,
-  BookOpen,
-  Trophy,
-  Flame,
-  Megaphone,
-  Calendar,
-  Gift,
-  Zap,
-  Heart,
-  Info,
-  GraduationCap,
-  PenLine,
-  Headphones,
-  Mic,
-  Languages,
 } from "lucide-react";
+import { resolveNotificationIcon } from "@/lib/notification-icons";
 import { Link } from "@tanstack/react-router";
 import {
   initNotifications,
@@ -57,26 +41,6 @@ function isEssentialTag(name?: string | null) {
 type Notif = ReturnType<typeof useNotifications>["notifications"][number];
 type Tag = ReturnType<typeof useNotifications>["tags"][number];
 
-function iconFor(tagName?: string | null, title?: string): LucideIcon {
-  const s = `${tagName ?? ""} ${title ?? ""}`.toLowerCase();
-  if (/urg|alerta|crit|import/.test(s)) return AlertTriangle;
-  if (/conquist|trof|troph|medalh|record/.test(s)) return Trophy;
-  if (/streak|sequ[eê]ncia|fogo|flame/.test(s)) return Flame;
-  if (/dica|tip|estud|aprend|licao|lição/.test(s)) return GraduationCap;
-  if (/leit|read/.test(s)) return BookOpen;
-  if (/escri|writ|reda/.test(s)) return PenLine;
-  if (/listen|escut|áudio|audio/.test(s)) return Headphones;
-  if (/speak|fala|pron/.test(s)) return Mic;
-  if (/gram[aá]t|vocab|idioma|ingl/.test(s)) return Languages;
-  if (/event|agenda|calend/.test(s)) return Calendar;
-  if (/novidade|update|anunc|notíci|noticia/.test(s)) return Megaphone;
-  if (/presente|gift|recomp|bônus|bonus/.test(s)) return Gift;
-  if (/energ|boost|r[aá]pido|zap/.test(s)) return Zap;
-  if (/amor|coraç|love|favorit/.test(s)) return Heart;
-  if (/info|aviso/.test(s)) return Info;
-  return Sparkles;
-}
-
 function Row({
   n,
   tag,
@@ -89,7 +53,7 @@ function Row({
   onClick: () => void;
 }) {
   const accent = tag?.color ?? "hsl(var(--primary))";
-  const Icon = iconFor(tag?.name, n.title);
+  const Icon = resolveNotificationIcon(n.icon, tag?.name, n.title);
   return (
     <button
       onClick={onClick}

@@ -40,6 +40,7 @@ import {
 } from "@/lib/notifications-store";
 import { generateNotification } from "@/lib/notifications-ai.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { NOTIFICATION_ICONS, resolveNotificationIcon, type NotificationIconKey } from "@/lib/notification-icons";
 
 const ADMIN_PROFILE_ID = "guilherme";
 
@@ -329,6 +330,7 @@ function NotificationsSection() {
 
   const [idea, setIdea] = useState("");
   const [tagId, setTagId] = useState<string>("");
+  const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [genBusy, setGenBusy] = useState(false);
@@ -358,10 +360,11 @@ function NotificationsSection() {
     setErr(null);
     setOk(null);
     try {
-      await createNotification({ title, body, tag_id: tagId || null });
+      await createNotification({ title, body, tag_id: tagId || null, icon: iconKey || null });
       setTitle("");
       setBody("");
       setIdea("");
+      setIconKey("");
       setOk("Notificação enviada para os perfis.");
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
@@ -457,6 +460,46 @@ function NotificationsSection() {
             </button>
           ))}
         </div>
+
+        {/* Icon picker */}
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">Ícone</span>
+            {iconKey && (
+              <button
+                onClick={() => setIconKey("")}
+                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-12">
+            {NOTIFICATION_ICONS.map(({ key, Icon, label }) => {
+              const active = iconKey === key;
+              const tagColor = tags.find((t) => t.id === tagId)?.color ?? "#a78bfa";
+              return (
+                <button
+                  key={key}
+                  onClick={() => setIconKey(active ? "" : key)}
+                  title={label}
+                  aria-label={label}
+                  className={`flex aspect-square items-center justify-center rounded-xl border transition ${
+                    active
+                      ? "border-primary/60 bg-primary/15"
+                      : "border-white/5 bg-white/[0.02] text-muted-foreground hover:border-white/15 hover:text-foreground"
+                  }`}
+                  style={active ? { color: tagColor, borderColor: `${tagColor}88`, backgroundColor: `${tagColor}22` } : undefined}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Sem escolher, o ícone é inferido pela tag/título.
+          </p>
+        </div>
         <div className="flex items-center justify-end pt-1">
           <button
             onClick={() => void handleSend()}
@@ -485,11 +528,23 @@ function NotificationsSection() {
           <ul className="space-y-2">
             {notifications.slice(0, 8).map((n) => {
               const tag = n.tag_id ? tagMap.get(n.tag_id) : null;
+              const accent = tag?.color ?? "#a78bfa";
+              const Icon = resolveNotificationIcon(n.icon, tag?.name, n.title);
               return (
                 <li
                   key={n.id}
-                  className="flex items-start justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
+                  className="flex items-start gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
                 >
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border"
+                    style={{
+                      backgroundColor: `${accent}22`,
+                      borderColor: `${accent}44`,
+                      color: accent,
+                    }}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={2.25} />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-sm font-medium">{n.title}</p>
