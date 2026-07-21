@@ -23,6 +23,7 @@ import {
 } from "@/lib/speaking.functions";
 import { speak, stopSpeaking, ttsAvailable, sttAvailable, startRecognition, type STTHandle } from "@/lib/speech";
 import { createCard, useStore } from "@/lib/flashcards-store";
+import { addStudyEntry } from "@/lib/study-history-store";
 
 export const Route = createFileRoute("/study/speaking/")({
   head: () => ({
