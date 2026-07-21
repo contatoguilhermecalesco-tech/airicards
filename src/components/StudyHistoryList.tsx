@@ -86,11 +86,11 @@ export function StudyHistoryList({
       ) : (
         <ul className="space-y-3">
           {entries.map((e) => (
-            <li key={e.id}>
+            <li key={e.id} className="relative">
               <Link
                 to={detailTo}
                 params={{ id: e.id }}
-                className="glass-panel group relative block rounded-3xl border p-4 transition hover:border-primary/40"
+                className="glass-panel group block rounded-3xl border p-4 transition hover:border-primary/40 active:scale-[0.99]"
               >
                 <div className="flex items-start gap-3">
                   <div
@@ -98,7 +98,7 @@ export function StudyHistoryList({
                   >
                     {e.score ?? "—"}
                   </div>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 pr-10">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                         {formatDate(e.createdAt)}
@@ -116,21 +116,26 @@ export function StudyHistoryList({
                     <p className="mt-1.5 line-clamp-2 text-sm text-foreground/90">
                       {e.title}
                     </p>
+                    <p className="mt-2 text-[11px] font-medium text-primary/80 opacity-70 transition group-hover:opacity-100">
+                      Abrir exercício →
+                    </p>
                   </div>
-                  <button
-                    onClick={(ev) => {
-                      ev.preventDefault();
-                      if (confirm("Excluir este registro do histórico?")) {
-                        deleteStudyEntry(subject, e.id);
-                      }
-                    }}
-                    className="rounded-full p-2 text-muted-foreground opacity-60 transition hover:bg-red-500/10 hover:text-red-300 hover:opacity-100"
-                    aria-label="Excluir"
-                  >
-                    <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-                  </button>
                 </div>
               </Link>
+              <button
+                type="button"
+                onClick={(ev) => {
+                  ev.preventDefault();
+                  ev.stopPropagation();
+                  if (confirm("Excluir este registro do histórico?")) {
+                    deleteStudyEntry(subject, e.id);
+                  }
+                }}
+                className="absolute right-3 top-3 z-10 rounded-full p-2 text-muted-foreground opacity-60 transition hover:bg-red-500/10 hover:text-red-300 hover:opacity-100"
+                aria-label="Excluir"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={2.25} />
+              </button>
             </li>
           ))}
         </ul>
