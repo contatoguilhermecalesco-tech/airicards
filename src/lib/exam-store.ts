@@ -288,3 +288,21 @@ export function resetExamsForProfile() {
   emit();
   scheduleSave();
 }
+
+/** Reseta o histórico de provas de qualquer perfil (uso admin). */
+export async function resetExamsForProfileId(profileId: string): Promise<void> {
+  const fresh = defaultState();
+  const { error } = await supabase
+    .from("profile_data")
+    .update({ exams: fresh as never, updated_at: new Date().toISOString() })
+    .eq("profile_id", profileId);
+  if (error) {
+    console.error("[airi/exam] admin reset failed", error);
+    throw error;
+  }
+  if (activeProfile === profileId) {
+    state = fresh;
+    saveCache(profileId, state);
+    emit();
+  }
+}
