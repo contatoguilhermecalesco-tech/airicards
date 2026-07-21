@@ -527,6 +527,54 @@ function NotificationsSection() {
             Sem escolher, o ícone é inferido pela tag/título.
           </p>
         </div>
+
+        {/* Action button (optional) */}
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              Botão de ação (opcional)
+            </span>
+            {(actionRoute || actionLabel) && (
+              <button
+                onClick={() => {
+                  setActionRoute("");
+                  setActionLabel("");
+                }}
+                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <input
+            value={actionLabel}
+            onChange={(e) => setActionLabel(e.target.value)}
+            placeholder="Texto do botão (ex.: Fazer a prova)"
+            className="mb-2 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+          />
+          <div className="flex flex-wrap gap-1.5">
+            {NOTIFICATION_ROUTES.map((r) => {
+              const active = actionRoute === r.path;
+              return (
+                <button
+                  key={r.path}
+                  onClick={() => setActionRoute(active ? "" : r.path)}
+                  className={`rounded-full border px-2.5 py-1 text-xs transition ${
+                    active
+                      ? "border-primary/60 bg-primary/15 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Ao clicar, o usuário será enviado para essa aba.
+          </p>
+        </div>
+
         <div className="flex items-center justify-end pt-1">
           <button
             onClick={() => void handleSend()}
