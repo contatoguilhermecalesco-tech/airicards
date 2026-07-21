@@ -129,6 +129,36 @@ function StudyIndex() {
           );
         })}
       </div>
+
+      {/* Prova mensal */}
+      <section className="mt-8">
+        <p className="mb-3 px-1 text-xs uppercase tracking-wider text-muted-foreground">
+          Avaliação
+        </p>
+        <Link
+          to="/exam"
+          className="glass-panel relative block overflow-hidden rounded-3xl border p-5 transition hover:border-primary/30"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/25 to-primary/[0.05] opacity-60"
+          />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/25 text-primary">
+              <Sparkles className="h-5 w-5" strokeWidth={2.25} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                Todo mês
+              </span>
+              <p className="mt-0.5 text-lg font-semibold">Prova de nivelamento</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                25 questões geradas por IA para diagnosticar seu nível CEFR.
+              </p>
+            </div>
+          </div>
+        </Link>
+      </section>
     </main>
   );
 }
