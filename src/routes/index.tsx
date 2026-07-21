@@ -76,9 +76,7 @@ function Home() {
   const profile = useCurrentProfile();
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
-  const sessionsToday = useHomeSessionsToday();
   const reviewedToday = useCardsReviewedToday();
-  const sessionsLeft = Math.max(0, HOME_DAILY_LIMIT - sessionsToday);
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
@@ -89,22 +87,18 @@ function Home() {
     if (futures.length === 0) return null;
     return Math.min(...futures) - now;
   }, [cards, now]);
-  const canStart = due > 0 && sessionsLeft > 0;
+  const canStart = due > 0;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
 
   const hour = new Date().getHours();
   const { salute, icon } = greetingFor(hour);
   const name = profile?.name ?? "";
-  const context = contextLine({ due, totalCards: cards.length, sessionsToday, reviewedToday, sessionsLeft, nextDueInMs });
+  const context = contextLine({ due, totalCards: cards.length, reviewedToday, nextDueInMs });
 
   // Ring geometry
-  const OUTER_R = 54;
-  const INNER_R = 30;
-  const outerC = 2 * Math.PI * OUTER_R;
-  const innerC = 2 * Math.PI * INNER_R;
-  const sessionsPct = Math.min(1, sessionsToday / HOME_DAILY_LIMIT);
-  // Target: full ring when reviewed >= due at start of day. Fallback to due+reviewed as denominator.
+  const RING_R = 54;
+  const ringC = 2 * Math.PI * RING_R;
   const dailyTarget = Math.max(1, due + reviewedToday);
   const reviewedPct = Math.min(1, reviewedToday / dailyTarget);
 
@@ -136,59 +130,43 @@ function Home() {
       <section className="mt-6">
         <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-2xl sm:p-8">
           <div className="flex items-center gap-6 sm:gap-8">
-            {/* iOS-style concentric rings */}
+            {/* iOS-style progress ring */}
             <div className="relative h-32 w-32 shrink-0">
               <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
-                {/* Outer track */}
                 <circle
-                  cx="64" cy="64" r={OUTER_R}
+                  cx="64" cy="64" r={RING_R}
                   stroke="rgba(255,255,255,0.08)" strokeWidth="12" fill="none"
                 />
-                {/* Outer progress — sessions */}
                 <circle
-                  cx="64" cy="64" r={OUTER_R}
-                  stroke="url(#gradSessions)" strokeWidth="12" fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={outerC}
-                  strokeDashoffset={outerC * (1 - sessionsPct)}
-                  className="transition-[stroke-dashoffset] duration-700"
-                />
-                {/* Inner track */}
-                <circle
-                  cx="64" cy="64" r={INNER_R}
-                  stroke="rgba(255,255,255,0.08)" strokeWidth="12" fill="none"
-                />
-                {/* Inner progress — reviewed */}
-                <circle
-                  cx="64" cy="64" r={INNER_R}
+                  cx="64" cy="64" r={RING_R}
                   stroke="url(#gradReviewed)" strokeWidth="12" fill="none"
                   strokeLinecap="round"
-                  strokeDasharray={innerC}
-                  strokeDashoffset={innerC * (1 - reviewedPct)}
+                  strokeDasharray={ringC}
+                  strokeDashoffset={ringC * (1 - reviewedPct)}
                   className="transition-[stroke-dashoffset] duration-700"
                 />
                 <defs>
-                  <linearGradient id="gradSessions" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#8B7BD8" />
-                    <stop offset="100%" stopColor="#5B4BB8" />
-                  </linearGradient>
                   <linearGradient id="gradReviewed" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stopColor="#C4B5FD" />
                     <stop offset="100%" stopColor="#8B7BD8" />
                   </linearGradient>
                 </defs>
               </svg>
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <p className="text-3xl font-bold tabular-nums leading-none">{reviewedToday}</p>
+                <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Hoje</p>
+              </div>
             </div>
 
             {/* Stats */}
             <div className="min-w-0 flex-1 space-y-4">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary/80">
-                  Sessões
+                  Para revisar
                 </p>
                 <p className="mt-0.5 text-2xl font-semibold tabular-nums">
-                  {sessionsToday}
-                  <span className="text-muted-foreground/70"> de {HOME_DAILY_LIMIT}</span>
+                  {due}
+                  <span className="text-muted-foreground/70"> agora</span>
                 </p>
               </div>
               <div className="h-px w-8 bg-white/10" />
@@ -213,21 +191,19 @@ function Home() {
               Ir para a biblioteca
               <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
             </Link>
-          ) : sessionsLeft === 0 ? (
+          ) : due === 0 ? (
             <div className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-3.5 text-[15px] font-medium text-muted-foreground">
               <Moon className="h-4 w-4" strokeWidth={2.25} />
-              Volte amanhã
+              {nextDueInMs !== null ? `Próxima ${formatNextIn(nextDueInMs)}` : "Tudo em dia"}
             </div>
           ) : (
             <button
               type="button"
               disabled={!canStart}
               onClick={() => canStart && setConfirmOpen(true)}
-              className={`mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition hover:brightness-110 active:scale-[0.98] ${
-                !canStart ? "pointer-events-none opacity-40" : ""
-              }`}
+              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition hover:brightness-110 active:scale-[0.98]"
             >
-              {due > 0 ? "Iniciar sessão" : "Nada para revisar"}
+              Iniciar sessão
               <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
             </button>
           )}
@@ -239,8 +215,9 @@ function Home() {
           <AlertDialogHeader>
             <AlertDialogTitle>Iniciar sessão agora?</AlertDialogTitle>
             <AlertDialogDescription>
-              Você tem {due} carta{due === 1 ? "" : "s"} para revisar. Esta
-              sessão contará como {sessionsToday + 1} de {HOME_DAILY_LIMIT} hoje.
+              Você tem {due} carta{due === 1 ? "" : "s"} para revisar. As cartas
+              voltam de minutos em minutos, então sempre haverá algo novo para
+              praticar.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -256,6 +233,8 @@ function Home() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+
 
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
