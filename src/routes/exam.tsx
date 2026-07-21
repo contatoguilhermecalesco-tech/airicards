@@ -474,7 +474,7 @@ function ResultView({
           {reviewOpen && (
             <div className="mt-4 space-y-3">
               {questions.map((q, i) => {
-                const ans = state.current?.answers[q.id];
+                const ans = result.answers?.[q.id];
                 const ok = ans === q.answer;
                 return (
                   <div
