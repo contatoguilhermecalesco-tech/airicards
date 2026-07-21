@@ -131,8 +131,8 @@ function EnemiesPage() {
             tone="muted"
           />
         </div>
-        </div>
       )}
+
 
       {/* Podium — top 3 hardest active enemies */}
       {(() => {
