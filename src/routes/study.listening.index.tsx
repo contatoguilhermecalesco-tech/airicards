@@ -24,6 +24,7 @@ import {
 } from "@/lib/listening.functions";
 import { speak, stopSpeaking, ttsAvailable } from "@/lib/speech";
 import { createCard, useStore } from "@/lib/flashcards-store";
+import { addStudyEntry } from "@/lib/study-history-store";
 
 export const Route = createFileRoute("/study/listening/")({
   head: () => ({
