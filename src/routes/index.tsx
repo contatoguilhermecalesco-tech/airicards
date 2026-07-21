@@ -125,12 +125,7 @@ function Home() {
             {eyebrow}
           </span>
           <span className="shrink-0">{icon}</span>
-          {cycle && (
-            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Semana {cycle.week}<span className="text-muted-foreground/50">/8</span>
-              <span className="text-primary/80">· {todayFocus.focus}</span>
-            </span>
-          )}
+
         </div>
         <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
           {salute}
