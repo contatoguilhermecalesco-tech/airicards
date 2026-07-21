@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as ExamRouteImport } from './routes/exam'
+import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
@@ -42,6 +43,11 @@ const ReviewRoute = ReviewRouteImport.update({
 const ExamRoute = ExamRouteImport.update({
   id: '/exam',
   path: '/exam',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnemiesRoute = EnemiesRouteImport.update({
+  id: '/enemies',
+  path: '/enemies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -98,6 +104,7 @@ const StudyWritingHistoryIdRoute = StudyWritingHistoryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/enemies'
     | '/exam'
     | '/review'
     | '/settings'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/enemies'
     | '/exam'
     | '/review'
     | '/settings'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/enemies'
     | '/exam'
     | '/review'
     | '/settings'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/exam'
       fullPath: '/exam'
       preLoaderRoute: typeof ExamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enemies': {
+      id: '/enemies'
+      path: '/enemies'
+      fullPath: '/enemies'
+      preLoaderRoute: typeof EnemiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -328,6 +348,7 @@ const StudyWritingHistoryRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,

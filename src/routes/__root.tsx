@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2 } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
@@ -189,6 +189,14 @@ function TopBar() {
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
               <span className="hidden sm:inline">Estudo</span>
+            </Link>
+            <Link
+              to="/enemies"
+              className={linkClass(pathname.startsWith("/enemies"))}
+              aria-label="Cartas inimigas"
+            >
+              <Swords className="h-4 w-4" strokeWidth={2.25} />
+              <span className="hidden sm:inline">Inimigas</span>
             </Link>
             <NotificationsBell />
             <ProfileMenu />

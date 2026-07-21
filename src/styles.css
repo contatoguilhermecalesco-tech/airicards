@@ -184,3 +184,55 @@
   96% { transform: rotate(6deg); }
   98% { transform: rotate(-4deg); }
 }
+
+/* Boss / enemy card — dramatic entry + ambient pulse */
+@keyframes enemy-shake {
+  0% { transform: translate3d(0, 12px, 0) scale(0.96); opacity: 0; filter: blur(6px); }
+  25% { transform: translate3d(-10px, 0, 0) scale(1.01); opacity: 1; filter: blur(0); }
+  40% { transform: translate3d(9px, 0, 0) scale(1.01); }
+  55% { transform: translate3d(-6px, 0, 0); }
+  70% { transform: translate3d(4px, 0, 0); }
+  85% { transform: translate3d(-2px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes enemy-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.75; }
+}
+@keyframes enemy-vignette-anim {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.95; }
+}
+@keyframes enemy-scan {
+  0% { transform: translateY(-120%); opacity: 0; }
+  15% { opacity: 0.55; }
+  85% { opacity: 0.55; }
+  100% { transform: translateY(120%); opacity: 0; }
+}
+@keyframes enemy-flash {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes hp-fill {
+  from { width: 0%; }
+}
+
+@utility enemy-enter {
+  animation: enemy-shake 0.7s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@utility enemy-aura {
+  animation: enemy-pulse 2.4s ease-in-out infinite;
+}
+@utility enemy-vignette {
+  animation: enemy-vignette-anim 2.6s ease-in-out infinite;
+}
+@utility enemy-scan {
+  animation: enemy-scan 3.2s ease-in-out infinite;
+}
+@utility enemy-flash {
+  animation: enemy-flash 0.6s ease-out both;
+}
+@utility hp-fill {
+  animation: hp-fill 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
