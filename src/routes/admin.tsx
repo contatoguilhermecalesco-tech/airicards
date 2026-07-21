@@ -16,9 +16,9 @@ import {
 import {
   fetchAllProfileSessions,
   resetHomeSessionsForProfile,
-  HOME_DAILY_LIMIT,
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
+
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import {
   AlertDialog,
@@ -171,11 +171,12 @@ function AdminPage() {
                       {nameFor(r.profileId)}
                     </p>
                     <p className="text-xs text-muted-foreground tabular-nums">
-                      {r.count} de {HOME_DAILY_LIMIT} sessões
+                      {r.count} sessões
                       {" · "}
                       {r.reviewed} revisadas
                       {r.day ? ` · ${r.day}` : ""}
                     </p>
+
                   </div>
                 </div>
                 <button
@@ -206,9 +207,10 @@ function AdminPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Zerar sessões?</AlertDialogTitle>
             <AlertDialogDescription>
-              As sessões de hoje de{" "}
-              <strong>{confirmId ? nameFor(confirmId) : ""}</strong> voltarão
-              para 0 de {HOME_DAILY_LIMIT}. As cartas em si não são afetadas.
+              O contador de sessões de{" "}
+              <strong>{confirmId ? nameFor(confirmId) : ""}</strong> volta para
+              zero. As cartas em si não são afetadas.
+
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

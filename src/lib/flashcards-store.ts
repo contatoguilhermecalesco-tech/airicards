@@ -275,9 +275,9 @@ export function isDefeated(card: Card): boolean {
 export function reviewCard(id: string, grade: Grade) {
   const now = Date.now();
   const minuteMs = 60_000;
-  // Cadência bem curta: as cartas voltam em poucos minutos para o usuário
-  // conseguir revisar tudo várias vezes por dia. Teto de ~15 min.
-  const MAX_MINUTES = 15;
+  // Cadência contínua: as cartas voltam de minutos em minutos para o usuário
+  // sempre ter algo para revisar. Teto baixo (~10 min) mantém o fluxo ativo.
+  const MAX_MINUTES = 10;
   state = {
     ...state,
     cards: state.cards.map((c) => {
@@ -297,11 +297,11 @@ export function reviewCard(id: string, grade: Grade) {
       ease = Math.max(1.3, ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
       reps += 1;
 
-      // Passos iniciais em minutos (hard / good / easy)
-      if (reps === 1) interval = grade === "hard" ? 1 : grade === "good" ? 3 : 6;
-      else if (reps === 2) interval = grade === "hard" ? 2 : grade === "good" ? 5 : 10;
+      // Passos curtos em minutos (hard / good / easy)
+      if (reps === 1) interval = grade === "hard" ? 1 : grade === "good" ? 2 : 4;
+      else if (reps === 2) interval = grade === "hard" ? 2 : grade === "good" ? 4 : 7;
       else {
-        const factor = grade === "hard" ? 1.2 : grade === "good" ? 1.5 : 1.8;
+        const factor = grade === "hard" ? 1.15 : grade === "good" ? 1.35 : 1.6;
         interval = Math.round(Math.max(interval, 1) * factor);
       }
       interval = Math.min(interval, MAX_MINUTES);
@@ -319,6 +319,7 @@ export function reviewCard(id: string, grade: Grade) {
   scheduleSave();
 }
 
+
 export function getDueCards(deckId?: string, at: number = Date.now()): Card[] {
   return state.cards.filter((c) => c.dueAt <= at && (deckId ? c.deckId === deckId : true));
 }
@@ -327,8 +328,9 @@ export function cardsForDeck(deckId: string): Card[] {
   return state.cards.filter((c) => c.deckId === deckId);
 }
 
-// --- Daily "review everything" limit ---------------------------------
-export const HOME_DAILY_LIMIT = 3;
+// --- Home stats (sem limite diário) ----------------------------------
+// Mantemos o contador só para estatística; sessões são ilimitadas agora.
+export const HOME_DAILY_LIMIT = Infinity;
 
 function refreshHomeDay() {
   const today = todayKey();
@@ -350,7 +352,7 @@ export function getCardsReviewedToday(): number {
 }
 
 export function canStartHomeSession(): boolean {
-  return getHomeSessionsToday() < HOME_DAILY_LIMIT;
+  return true;
 }
 
 export function registerHomeSession() {
@@ -359,6 +361,7 @@ export function registerHomeSession() {
   emitHome();
   scheduleSave();
 }
+
 
 export function useHomeSessionsToday(): number {
   return useSyncExternalStore(
