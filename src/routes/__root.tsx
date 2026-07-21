@@ -145,13 +145,20 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Navegação responsiva:
+ * - Mobile (<640px): TopBar minimalista (logo + notificações + perfil) e
+ *   BottomBar fixa com os 4 destinos principais, respeitando safe-area do iOS.
+ * - Desktop (≥640px): tudo consolidado no topo, sem barra inferior.
+ * Todos os alvos clicáveis usam `tap-target` (>=44x44) para ergonomia touch.
+ */
 function TopBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isReview = pathname.startsWith("/review");
   if (isReview) return null;
 
   const linkClass = (active: boolean) =>
-    `inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition ${
+    `tap-target inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition sm:px-4 ${
       active
         ? "bg-accent text-foreground"
         : "text-muted-foreground hover:text-foreground"
@@ -160,50 +167,99 @@ function TopBar() {
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="glass-panel border-b">
-        <nav className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
-          <Link to="/" className="flex items-center gap-2.5">
+        <nav className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2 px-[clamp(0.75rem,4vw,1.5rem)] py-2.5">
+          <Link to="/" className="tap-target flex items-center gap-2.5" aria-label="airi — início">
             <img
               src={airiLogo.url}
-              alt="airi"
-              className="h-11 w-11 rounded-2xl object-contain"
+              alt=""
+              className="h-10 w-10 rounded-2xl object-contain sm:h-11 sm:w-11"
             />
             <span className="text-[17px] font-semibold lowercase tracking-tight">
               airi
             </span>
           </Link>
-          <div className="flex items-center gap-1">
+          {/* Navegação principal — visível só em ≥sm; no mobile vai para BottomBar */}
+          <div className="hidden items-center gap-1 sm:flex">
             <Link to="/" className={linkClass(pathname === "/")}>
               <Home className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Início</span>
+              <span>Início</span>
             </Link>
             <Link
               to="/library"
               className={linkClass(pathname.startsWith("/library"))}
             >
               <Library className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Biblioteca</span>
+              <span>Biblioteca</span>
             </Link>
             <Link
               to="/study"
               className={linkClass(pathname.startsWith("/study"))}
             >
               <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Estudo</span>
+              <span>Estudo</span>
             </Link>
             <Link
               to="/enemies"
               className={linkClass(pathname.startsWith("/enemies"))}
-              aria-label="Cartas inimigas"
             >
               <Swords className="h-4 w-4" strokeWidth={2.25} />
-              <span className="hidden sm:inline">Inimigas</span>
+              <span>Inimigas</span>
             </Link>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
             <NotificationsBell />
             <ProfileMenu />
           </div>
         </nav>
       </div>
     </header>
+  );
+}
+
+/**
+ * Barra inferior fixa (mobile). Escondida em ≥sm.
+ * Grid de 4 colunas iguais para hierarquia visual previsível independente
+ * do tamanho do texto (fluid), sempre com área de toque ≥44px.
+ */
+function BottomBar() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isReview = pathname.startsWith("/review");
+  if (isReview) return null;
+
+  const items = [
+    { to: "/", label: "Início", icon: Home, active: pathname === "/" },
+    { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
+    { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
+  ] as const;
+
+  return (
+    <nav
+      aria-label="Navegação principal"
+      className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
+    >
+      <div className="glass-panel border-t safe-bottom">
+        <ul className="mx-auto grid max-w-3xl grid-cols-4 gap-1 px-2 pt-1.5">
+          {items.map(({ to, label, icon: Icon, active }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className={`tap-target flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
+                  active ? "text-foreground" : "text-muted-foreground"
+                }`}
+                aria-current={active ? "page" : undefined}
+              >
+                <Icon
+                  className={`h-[22px] w-[22px] transition ${active ? "text-primary" : ""}`}
+                  strokeWidth={2.25}
+                />
+                <span className="truncate">{label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
   );
 }
 
@@ -227,18 +283,18 @@ function ProfileMenu() {
     <div ref={ref} className="relative ml-1">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3 text-sm font-medium text-foreground transition hover:bg-accent"
+        className="tap-target flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-2 text-sm font-medium text-foreground transition hover:bg-accent sm:pr-3"
         aria-label={`Perfil de ${profile.name}`}
       >
         <span
           aria-hidden
-          className="h-6 w-10 rounded-full ring-1 ring-white/10"
+          className="h-6 w-9 rounded-full ring-1 ring-white/10 sm:w-10"
           style={{ backgroundImage: profile.gradient }}
         />
         <span className="hidden sm:inline">{profile.name}</span>
       </button>
       {open && (
-        <div className="glass-panel absolute right-0 mt-2 w-56 rounded-2xl p-1.5 shadow-card">
+        <div className="glass-panel absolute right-0 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-2xl p-1.5 shadow-card">
           <div className="px-3 py-2">
             <p className="text-xs text-muted-foreground">Conectado como</p>
             <p className="text-sm font-medium">{profile.name}</p>
@@ -247,7 +303,7 @@ function ProfileMenu() {
           <Link
             to="/settings"
             onClick={() => setOpen(false)}
-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+            className="tap-target flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
           >
             <Settings2 className="h-4 w-4" strokeWidth={2.25} />
             Preferências
@@ -256,7 +312,7 @@ function ProfileMenu() {
             <Link
               to="/admin"
               onClick={() => setOpen(false)}
-              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+              className="tap-target flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
             >
               <Shield className="h-4 w-4" strokeWidth={2.25} />
               Admin
@@ -267,7 +323,7 @@ function ProfileMenu() {
               setOpen(false);
               signOutProfile();
             }}
-            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+            className="tap-target flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
           >
             <LogOut className="h-4 w-4" strokeWidth={2.25} />
             Trocar de perfil
@@ -284,9 +340,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ProfileGate>
-        <div className="min-h-screen">
+        {/*
+          Layout base:
+          - min-h-dvh cobre 100% da altura visível no Safari mobile (sem "salto" da barra).
+          - pb-24 no mobile reserva espaço para a BottomBar fixa; sm:pb-0 desativa em desktop.
+        */}
+        <div className="min-h-dvh pb-24 sm:pb-0">
           <TopBar />
           <Outlet />
+          <BottomBar />
         </div>
       </ProfileGate>
     </QueryClientProvider>
