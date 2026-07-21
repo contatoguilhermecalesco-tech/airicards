@@ -62,9 +62,9 @@ function formatNextIn(ms: number): string {
   return `${days} dias`;
 }
 
-// Reusable Liquid Glass surface — rim light + specular highlight + saturated blur
+// Reusable Liquid Glass surface — rim light + subtle depth, kept crisp
 const GLASS_BASE =
-  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_20px_50px_-30px_rgba(0,0,0,0.7)]";
+  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.045] backdrop-blur-md backdrop-saturate-125 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)]";
 
 function GlassHighlight() {
   return (
@@ -162,7 +162,7 @@ function Home() {
         {/* soft halo behind glass */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/20 opacity-60 blur-3xl"
+          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/15 opacity-40 blur-2xl"
         />
         <div
           className={`${GLASS_BASE} rounded-[28px] p-6 sm:p-8`}
@@ -171,11 +171,11 @@ function Home() {
           {/* specular sheen */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.06] blur-3xl"
+            className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.04] blur-2xl"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/25 blur-3xl"
+            className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/15 blur-2xl"
           />
 
           <div className="relative flex items-start justify-between gap-6">
@@ -202,7 +202,7 @@ function Home() {
               {/* halo behind ring */}
               <div
                 aria-hidden
-                className="absolute inset-2 rounded-full bg-primary/25 blur-2xl"
+                className="absolute inset-2 rounded-full bg-primary/15 opacity-70 blur-xl"
               />
               <svg viewBox="0 0 104 104" className="relative h-full w-full -rotate-90">
                 <circle
@@ -216,7 +216,7 @@ function Home() {
                   strokeDasharray={ringC}
                   strokeDashoffset={ringC * (1 - reviewedPct)}
                   className="transition-[stroke-dashoffset] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ filter: "drop-shadow(0 0 6px rgba(167,139,250,0.55))" }}
+                  style={{ filter: "drop-shadow(0 0 4px rgba(167,139,250,0.35))" }}
                 />
                 <defs>
                   <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
@@ -248,7 +248,7 @@ function Home() {
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
               </Link>
             ) : due === 0 ? (
-              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] py-3.5 text-[14px] font-medium text-muted-foreground backdrop-blur-xl">
+              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.05] py-3.5 text-[14px] font-medium text-muted-foreground">
                 <Moon className="h-4 w-4" strokeWidth={2.25} />
                 {nextDueInMs !== null ? `Próxima em ${formatNextIn(nextDueInMs)}` : "Tudo em dia"}
               </div>
@@ -360,7 +360,7 @@ function Home() {
             <GlassHighlight />
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/20 blur-3xl"
+              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/12 opacity-60 blur-2xl"
             />
             <div className="relative flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
