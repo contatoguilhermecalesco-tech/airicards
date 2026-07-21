@@ -376,16 +376,11 @@ function ResultView({
   result,
   onClose,
 }: {
-  result: ReturnType<typeof getResultForMonth> & object;
-}
-& { onClose: () => void }) {
-  const state = useExamState();
+  result: NonNullable<ReturnType<typeof getResultForMonth>>;
+  onClose: () => void;
+}) {
   const [reviewOpen, setReviewOpen] = useState(false);
-  const questions = useMemo(() => {
-    // Se ainda houver current com mesmo monthKey, use-o para revisão.
-    if (state.current?.monthKey === result.monthKey) return state.current.questions;
-    return [];
-  }, [state, result]);
+  const questions = result.questions ?? [];
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-10">
