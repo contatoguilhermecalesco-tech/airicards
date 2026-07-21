@@ -37,20 +37,11 @@ function Review() {
   const [showBack, setShowBack] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
-  const [limitReached, setLimitReached] = useState(false);
 
   const allCards = useStore((s) => s.cards);
 
   useEffect(() => {
-    // Limite diário só se aplica à sessão global (sem deckId).
-    if (!deckId && !canStartHomeSession()) {
-      setLimitReached(true);
-      setQueue([]);
-      setSessionCount(0);
-      return;
-    }
     if (!deckId) registerHomeSession();
-    setLimitReached(false);
     const due = getDueCards(deckId, Date.now());
     const ordered = [...due].sort(
       (a, b) =>
@@ -62,6 +53,7 @@ function Review() {
     setShowBack(false);
     setReviewed(0);
   }, [deckId]);
+
 
   const currentId = queue[index];
   const current = useMemo(
