@@ -328,8 +328,9 @@ export function cardsForDeck(deckId: string): Card[] {
   return state.cards.filter((c) => c.deckId === deckId);
 }
 
-// --- Daily "review everything" limit ---------------------------------
-export const HOME_DAILY_LIMIT = 3;
+// --- Home stats (sem limite diário) ----------------------------------
+// Mantemos o contador só para estatística; sessões são ilimitadas agora.
+export const HOME_DAILY_LIMIT = Infinity;
 
 function refreshHomeDay() {
   const today = todayKey();
@@ -351,7 +352,7 @@ export function getCardsReviewedToday(): number {
 }
 
 export function canStartHomeSession(): boolean {
-  return getHomeSessionsToday() < HOME_DAILY_LIMIT;
+  return true;
 }
 
 export function registerHomeSession() {
@@ -360,6 +361,7 @@ export function registerHomeSession() {
   emitHome();
   scheduleSave();
 }
+
 
 export function useHomeSessionsToday(): number {
   return useSyncExternalStore(
