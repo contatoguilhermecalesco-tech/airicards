@@ -1,5 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, BellOff, CheckCheck, Inbox, Settings2, Moon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  CheckCheck,
+  Inbox,
+  Settings2,
+  Moon,
+  Sparkles,
+  AlertTriangle,
+  BookOpen,
+  Trophy,
+  Flame,
+  Megaphone,
+  Calendar,
+  Gift,
+  Zap,
+  Heart,
+  Info,
+  GraduationCap,
+  PenLine,
+  Headphones,
+  Mic,
+  Languages,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import {
   initNotifications,
@@ -33,6 +57,26 @@ function isEssentialTag(name?: string | null) {
 type Notif = ReturnType<typeof useNotifications>["notifications"][number];
 type Tag = ReturnType<typeof useNotifications>["tags"][number];
 
+function iconFor(tagName?: string | null, title?: string): LucideIcon {
+  const s = `${tagName ?? ""} ${title ?? ""}`.toLowerCase();
+  if (/urg|alerta|crit|import/.test(s)) return AlertTriangle;
+  if (/conquist|trof|troph|medalh|record/.test(s)) return Trophy;
+  if (/streak|sequ[eê]ncia|fogo|flame/.test(s)) return Flame;
+  if (/dica|tip|estud|aprend|licao|lição/.test(s)) return GraduationCap;
+  if (/leit|read/.test(s)) return BookOpen;
+  if (/escri|writ|reda/.test(s)) return PenLine;
+  if (/listen|escut|áudio|audio/.test(s)) return Headphones;
+  if (/speak|fala|pron/.test(s)) return Mic;
+  if (/gram[aá]t|vocab|idioma|ingl/.test(s)) return Languages;
+  if (/event|agenda|calend/.test(s)) return Calendar;
+  if (/novidade|update|anunc|notíci|noticia/.test(s)) return Megaphone;
+  if (/presente|gift|recomp|bônus|bonus/.test(s)) return Gift;
+  if (/energ|boost|r[aá]pido|zap/.test(s)) return Zap;
+  if (/amor|coraç|love|favorit/.test(s)) return Heart;
+  if (/info|aviso/.test(s)) return Info;
+  return Sparkles;
+}
+
 function Row({
   n,
   tag,
@@ -45,22 +89,37 @@ function Row({
   onClick: () => void;
 }) {
   const accent = tag?.color ?? "hsl(var(--primary))";
+  const Icon = iconFor(tag?.name, n.title);
   return (
     <button
       onClick={onClick}
       className={`group relative flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors duration-150 hover:bg-white/[0.04] active:bg-white/[0.06] ${
-        isRead ? "opacity-60" : "opacity-100"
+        isRead ? "opacity-70" : "opacity-100"
       }`}
     >
-      <div
-        className="mt-1 flex h-2 w-2 shrink-0 items-center justify-center rounded-full"
-        aria-hidden
-        style={{
-          background: isRead ? "transparent" : accent,
-          boxShadow: isRead ? "none" : `0 0 8px ${accent}, 0 0 2px ${accent}`,
-          outline: isRead ? "1px solid hsl(var(--border))" : "none",
-        }}
-      />
+      <div className="relative mt-0.5 shrink-0">
+        <div
+          className="flex h-9 w-9 items-center justify-center rounded-2xl border"
+          style={{
+            background: `color-mix(in oklab, ${accent} 14%, transparent)`,
+            borderColor: `color-mix(in oklab, ${accent} 30%, transparent)`,
+            boxShadow: isRead ? "none" : `0 0 14px -4px ${accent}`,
+          }}
+        >
+          <Icon
+            className="h-[18px] w-[18px]"
+            strokeWidth={2.2}
+            style={{ color: accent }}
+          />
+        </div>
+        {!isRead && (
+          <span
+            className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-[oklch(0.19_0.02_290)]"
+            style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
+            aria-hidden
+          />
+        )}
+      </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
           <p className={`truncate text-[14px] font-semibold tracking-tight ${isRead ? "text-foreground/80" : "text-foreground"}`}>
