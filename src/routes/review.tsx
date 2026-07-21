@@ -333,27 +333,6 @@ function EmptyState() {
   );
 }
 
-function LimitReachedState() {
-  return (
-    <div className="mt-20 grid place-items-center text-center">
-      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-muted text-muted-foreground">
-        <Moon className="h-6 w-6" strokeWidth={2.5} />
-      </div>
-      <h2 className="mt-5 text-xl font-semibold">Limite diário atingido</h2>
-      <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-        Você já fez suas 3 sessões globais de hoje. O descanso ajuda a fixar
-        o que aprendeu — volte amanhã. Você ainda pode revisar decks
-        individuais sempre que quiser.
-      </p>
-      <Link
-        to="/library"
-        className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
-      >
-        Ir para a biblioteca
-      </Link>
-    </div>
-  );
-}
 
 function FinishedState({
   reviewed,
