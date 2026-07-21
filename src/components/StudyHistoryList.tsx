@@ -1,18 +1,20 @@
-import { Link } from "@tanstack/react-router";
-import { ArrowLeft, FileText, Trash2, MessageSquare } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeft, FileText, Trash2, MessageSquare, ChevronRight } from "lucide-react";
 import {
   deleteStudyEntry,
   useStudyHistory,
   type StudySubject,
 } from "@/lib/study-history-store";
 
+type DetailPath =
+  | "/study/reading/history/$id"
+  | "/study/listening/history/$id"
+  | "/study/speaking/history/$id";
+
 type Props = {
   subject: StudySubject;
   backTo: "/study/reading" | "/study/listening" | "/study/speaking";
-  detailTo:
-    | "/study/reading/history/$id"
-    | "/study/listening/history/$id"
-    | "/study/speaking/history/$id";
+  detailTo: DetailPath;
   eyebrow: string;
   title: string;
   description: string;
@@ -47,6 +49,13 @@ export function StudyHistoryList({
   emptyCTA,
 }: Props) {
   const entries = useStudyHistory(subject);
+  const navigate = useNavigate();
+
+  const goToDetail = (id: string) => {
+    // Cast keeps the typed-router happy while allowing a shared component
+    // to navigate to whichever subject it was mounted for.
+    navigate({ to: detailTo, params: { id } } as never);
+  };
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-8">
@@ -86,11 +95,18 @@ export function StudyHistoryList({
       ) : (
         <ul className="space-y-3">
           {entries.map((e) => (
-            <li key={e.id} className="relative">
-              <Link
-                to={detailTo}
-                params={{ id: e.id }}
-                className="glass-panel group block rounded-3xl border p-4 transition hover:border-primary/40 active:scale-[0.99]"
+            <li key={e.id}>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => goToDetail(e.id)}
+                onKeyDown={(ev) => {
+                  if (ev.key === "Enter" || ev.key === " ") {
+                    ev.preventDefault();
+                    goToDetail(e.id);
+                  }
+                }}
+                className="glass-panel group relative block cursor-pointer rounded-3xl border p-4 transition hover:border-primary/40 active:scale-[0.99]"
               >
                 <div className="flex items-start gap-3">
                   <div
@@ -98,7 +114,7 @@ export function StudyHistoryList({
                   >
                     {e.score ?? "—"}
                   </div>
-                  <div className="min-w-0 flex-1 pr-10">
+                  <div className="min-w-0 flex-1 pr-16">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                         {formatDate(e.createdAt)}
@@ -116,26 +132,27 @@ export function StudyHistoryList({
                     <p className="mt-1.5 line-clamp-2 text-sm text-foreground/90">
                       {e.title}
                     </p>
-                    <p className="mt-2 text-[11px] font-medium text-primary/80 opacity-70 transition group-hover:opacity-100">
-                      Abrir exercício →
+                    <p className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-primary/80">
+                      Abrir exercício
+                      <ChevronRight className="h-3 w-3" strokeWidth={2.5} />
                     </p>
                   </div>
                 </div>
-              </Link>
-              <button
-                type="button"
-                onClick={(ev) => {
-                  ev.preventDefault();
-                  ev.stopPropagation();
-                  if (confirm("Excluir este registro do histórico?")) {
-                    deleteStudyEntry(subject, e.id);
-                  }
-                }}
-                className="absolute right-3 top-3 z-10 rounded-full p-2 text-muted-foreground opacity-60 transition hover:bg-red-500/10 hover:text-red-300 hover:opacity-100"
-                aria-label="Excluir"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={2.25} />
-              </button>
+                <button
+                  type="button"
+                  onClick={(ev) => {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if (confirm("Excluir este registro do histórico?")) {
+                      deleteStudyEntry(subject, e.id);
+                    }
+                  }}
+                  className="absolute right-3 top-3 z-10 rounded-full p-2 text-muted-foreground opacity-60 transition hover:bg-red-500/10 hover:text-red-300 hover:opacity-100"
+                  aria-label="Excluir"
+                >
+                  <Trash2 className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              </div>
             </li>
           ))}
         </ul>
