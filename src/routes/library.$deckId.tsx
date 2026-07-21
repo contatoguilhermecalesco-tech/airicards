@@ -279,8 +279,7 @@ function AddCardSheet({
   }
 
   const isSentence = mode === "sentence";
-  const canSubmit =
-    front.trim() && back.trim() && (!isSentence || targetWord.trim());
+  const canSubmit = front.trim() && back.trim();
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
