@@ -376,7 +376,7 @@ function AddCardSheet({
               <p className="text-xs text-destructive">{translateError}</p>
             )}
             <Field
-              label={isSentence ? "Tradução contextual" : "Tradução"}
+              label="Tradução"
               value={back}
               onChange={setBack}
               placeholder={
@@ -402,37 +402,33 @@ function AddCardSheet({
                 ))}
               </div>
             )}
-            {isSentence && (
-              <div>
-                <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Fonte
-                </label>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {(
-                    [
-                      ["reading", "Reading"],
-                      ["listening", "Listening"],
-                      ["video", "Vídeo"],
-                      ["book", "Livro"],
-                      ["other", "Outra"],
-                    ] as const
-                  ).map(([id, label]) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => setSource(id)}
-                      className={`rounded-full border px-2.5 py-1 text-xs transition ${
-                        source === id
-                          ? "border-primary/40 bg-primary/15 text-primary"
-                          : "border-border bg-surface text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((o) => !o)}
+                className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground hover:text-foreground"
+              >
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${advancedOpen ? "rotate-180" : ""}`}
+                  strokeWidth={2.5}
+                />
+                Opções avançadas
+              </button>
+              {advancedOpen && (
+                <div className="mt-3">
+                  <Field
+                    label="Fonte"
+                    value={source}
+                    onChange={setSource}
+                    placeholder="Ex: livro Sapiens, podcast BBC 6-min, série Friends S2E4…"
+                  />
+                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+                    De onde você tirou essa {isSentence ? "frase" : "palavra"}. Opcional.
+                  </p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
             <button
               type="submit"
               disabled={!canSubmit}
