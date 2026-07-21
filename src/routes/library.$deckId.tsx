@@ -315,7 +315,7 @@ function AddCardSheet({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {m === "word" ? "Palavra" : "Frase (i+1)"}
+                {m === "word" ? "Palavra" : "Frase"}
               </button>
             ))}
           </div>
