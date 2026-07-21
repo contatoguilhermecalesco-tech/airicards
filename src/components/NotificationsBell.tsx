@@ -57,19 +57,6 @@ function isEssentialTag(name?: string | null) {
 type Notif = ReturnType<typeof useNotifications>["notifications"][number];
 type Tag = ReturnType<typeof useNotifications>["tags"][number];
 
-function Row({
-  n,
-  tag,
-  isRead,
-  onClick,
-}: {
-  n: Notif;
-  tag: Tag | null;
-  isRead: boolean;
-  onClick: () => void;
-}) {
-  const accent = tag?.color ?? "hsl(var(--primary))";
-  return (
 function iconFor(tagName?: string | null, title?: string): LucideIcon {
   const s = `${tagName ?? ""} ${title ?? ""}`.toLowerCase();
   if (/urg|alerta|crit|import/.test(s)) return AlertTriangle;
