@@ -23,6 +23,8 @@ export const Route = createFileRoute("/rank")({
       { name: "description", content: "Sua jornada de rank estilo LoL no airi." },
       { property: "og:title", content: "Rank — airi" },
       { property: "og:description", content: "Do Ferro ao Desafiante — evolua com cada carta." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
