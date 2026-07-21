@@ -64,6 +64,11 @@ function Review() {
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
   const [hitFlash, setHitFlash] = useState(false);
+  const [dmgFx, setDmgFx] = useState<
+    { id: number; text: string; tone: "damage" | "heal" }[]
+  >([]);
+  const [defeatFx, setDefeatFx] = useState<string | null>(null);
+  const dmgIdRef = useRef(0);
 
   const allCards = useStore((s) => s.cards);
 
@@ -109,6 +114,12 @@ function Review() {
     noticeTimer.current = setTimeout(() => setNotice(null), 1800);
   }
 
+  function spawnDmg(text: string, tone: "damage" | "heal") {
+    const id = ++dmgIdRef.current;
+    setDmgFx((xs) => [...xs, { id, text, tone }]);
+    setTimeout(() => setDmgFx((xs) => xs.filter((x) => x.id !== id)), 1200);
+  }
+
   function handleWrong() {
     if (!current) return;
     const wasEnemy = isEnemy(current);
@@ -118,6 +129,7 @@ function Review() {
     setReviewed((n) => n + 1);
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
+    if (wasEnemy) spawnDmg("+1 HP", "heal");
     if (willBecomeEnemy) {
       flashNotice({
         kind: "enemy-born",
@@ -138,13 +150,23 @@ function Review() {
     const wasEnemy = isEnemy(current);
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
+    const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
+    if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
     if (willDefeat) {
       flashNotice({
         kind: "enemy-defeated",
         text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
       });
+      setDefeatFx(current.front);
+      setTimeout(() => setDefeatFx(null), 1400);
+      setTimeout(() => {
+        setIndex((i) => i + 1);
+        setShowBack(false);
+        setAskDifficulty(false);
+      }, 900);
+      return;
     }
     setIndex((i) => i + 1);
     setShowBack(false);
@@ -153,6 +175,7 @@ function Review() {
 
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
+
 
   return (
     <main className="relative min-h-screen overflow-hidden">
