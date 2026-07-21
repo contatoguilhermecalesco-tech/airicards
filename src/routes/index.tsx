@@ -305,6 +305,53 @@ function Home() {
       )}
 
 
+      {/* Prova mensal de nivelamento */}
+      <section
+        className="animate-fade-in mt-6"
+        style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
+      >
+        <Link
+          to="/exam"
+          className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.10] via-white/[0.03] to-transparent p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/15 blur-2xl"
+          />
+          <div className="relative flex items-start gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+              <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                  Prova de nível · {monthLabel(examMonthKey)}
+                </p>
+                {examDone && examResult && (
+                  <span className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                    {examResult.level}
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 truncate text-[14px] font-medium text-foreground">
+                {examDone
+                  ? `Nível ${examResult?.level ?? ""} · ${examResult?.percent ?? 0}% de acerto`
+                  : "25 questões para descobrir seu nível CEFR"}
+              </p>
+              <p className="mt-0.5 text-[12px] text-muted-foreground">
+                {examDone
+                  ? "Ver detalhes e revisar respostas"
+                  : "Feita uma vez por mês · nova prova gerada por IA"}
+              </p>
+            </div>
+            <ChevronRight
+              className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+              strokeWidth={2.25}
+            />
+          </div>
+        </Link>
+      </section>
+
       {/* Decks list */}
       {decks.length > 0 && (
         <section
