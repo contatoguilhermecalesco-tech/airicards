@@ -137,6 +137,27 @@ function ExamPage() {
     );
   }
 
+  if (!exam_visible && !isAdmin) {
+    return (
+      <main className="mx-auto max-w-md px-5 py-16 text-center">
+        <div className="ios-card rounded-3xl p-8">
+          <Sparkles className="mx-auto h-10 w-10 text-primary/60" strokeWidth={1.75} />
+          <h1 className="mt-4 text-xl font-semibold">Prova indisponível</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A prova de nivelamento está pausada no momento. Volte em breve.
+          </p>
+          <button
+            type="button"
+            onClick={() => void navigate({ to: "/" })}
+            className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2.25} /> Início
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-5 py-10">
       <button
