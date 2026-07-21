@@ -434,6 +434,9 @@ function ProfilesRankOverview() {
       </p>
     </section>
   );
+}
+
+
 
 function TagsSection() {
   const { tags } = useNotifications();
