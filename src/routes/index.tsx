@@ -91,6 +91,12 @@ function Home() {
   const todayFocus = getTodayFocus();
   const ankiPending = due > 0 && reviewedToday === 0;
 
+  // Prova mensal
+  const examState = useExamState();
+  const examMonthKey = getMonthKey();
+  const examDone = hasCompletedExamThisMonth(examMonthKey);
+  const examResult = examState.history.find((h) => h.monthKey === examMonthKey);
+
   // Ring geometry — compact 96px ring
   const RING_R = 40;
   const ringC = 2 * Math.PI * RING_R;
