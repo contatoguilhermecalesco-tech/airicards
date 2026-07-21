@@ -460,6 +460,46 @@ function NotificationsSection() {
             </button>
           ))}
         </div>
+
+        {/* Icon picker */}
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">Ícone</span>
+            {iconKey && (
+              <button
+                onClick={() => setIconKey("")}
+                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-12">
+            {NOTIFICATION_ICONS.map(({ key, Icon, label }) => {
+              const active = iconKey === key;
+              const tagColor = tags.find((t) => t.id === tagId)?.color ?? "#a78bfa";
+              return (
+                <button
+                  key={key}
+                  onClick={() => setIconKey(active ? "" : key)}
+                  title={label}
+                  aria-label={label}
+                  className={`flex aspect-square items-center justify-center rounded-xl border transition ${
+                    active
+                      ? "border-primary/60 bg-primary/15"
+                      : "border-white/5 bg-white/[0.02] text-muted-foreground hover:border-white/15 hover:text-foreground"
+                  }`}
+                  style={active ? { color: tagColor, borderColor: `${tagColor}88`, backgroundColor: `${tagColor}22` } : undefined}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Sem escolher, o ícone é inferido pela tag/título.
+          </p>
+        </div>
         <div className="flex items-center justify-end pt-1">
           <button
             onClick={() => void handleSend()}
