@@ -359,8 +359,10 @@ function RootComponent() {
           <TopBar />
           <Outlet />
           <BottomBar />
+          <RankPromotionOverlay />
         </div>
       </ProfileGate>
+
     </QueryClientProvider>
   );
 }
