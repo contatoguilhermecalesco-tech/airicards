@@ -21,6 +21,8 @@ import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
+import { useRank, tierLabel, progressToNext, TIER_COLORS } from "@/lib/rank-store";
+import { RankEmblem } from "@/components/RankBadge";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -158,6 +160,7 @@ function Home() {
           {salute}
           {name ? `, ${name}` : ""}
         </h1>
+        <RankPill />
       </header>
 
       {/* Hero — Liquid Glass */}
@@ -576,5 +579,55 @@ function StatChip({ label, value }: { label: string; value: number }) {
         {value}
       </p>
     </div>
+  );
+}
+
+/**
+ * Mini badge de rank na home — mostra tier, LP e barra de progresso
+ * até a próxima divisão. Clica → /rank.
+ */
+function RankPill() {
+  const rank = useRank();
+  const colors = TIER_COLORS[rank.tier];
+  const progress = progressToNext(rank);
+  const pct = Math.min(100, Math.round((progress.value / Math.max(1, progress.max)) * 100));
+  return (
+    <Link
+      to="/rank"
+      className="mt-2 inline-flex items-center gap-2.5 self-start rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-3 transition hover:bg-white/[0.08]"
+      style={{ boxShadow: `0 0 24px -8px ${colors.glow}` }}
+    >
+      <RankEmblem tier={rank.tier} division={rank.division} size={30} />
+      <div className="flex flex-col leading-tight">
+        <span
+          className="text-[12px] font-semibold tracking-tight"
+          style={{ color: colors.text }}
+        >
+          {tierLabel(rank)}
+        </span>
+        <div className="mt-1 flex items-center gap-1.5">
+          <div className="h-1 w-16 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                background: `linear-gradient(90deg, ${colors.from}, ${colors.ring})`,
+              }}
+            />
+          </div>
+          <span className="text-[10px] font-medium tabular-nums text-muted-foreground">
+            {rank.lp} LP
+          </span>
+        </div>
+      </div>
+      {rank.promo && (
+        <span
+          className="ml-1 rounded-full border border-white/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
+          style={{ color: colors.ring }}
+        >
+          Promo
+        </span>
+      )}
+    </Link>
   );
 }

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as RankRouteImport } from './routes/rank'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -41,6 +42,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RankRoute = RankRouteImport.update({
+  id: '/rank',
+  path: '/rank',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamRoute = ExamRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/rank'
     | '/review'
     | '/settings'
     | '/sitemap.xml'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/rank'
     | '/review'
     | '/settings'
     | '/sitemap.xml'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/rank'
     | '/review'
     | '/settings'
     | '/sitemap.xml'
@@ -248,6 +260,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
+  RankRoute: typeof RankRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rank': {
+      id: '/rank'
+      path: '/rank'
+      fullPath: '/rank'
+      preLoaderRoute: typeof RankRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exam': {
@@ -410,6 +430,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
+  RankRoute: RankRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

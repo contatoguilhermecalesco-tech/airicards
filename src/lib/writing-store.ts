@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
+import { awardLp, LP } from "@/lib/rank-store";
 import type { WritingFeedback } from "@/lib/writing.functions";
 
 export type WritingNote = {
@@ -154,6 +155,11 @@ export function addWriting(input: Omit<WritingEntry, "id" | "createdAt" | "updat
   writings = [entry, ...writings];
   emit();
   scheduleSave();
+  // LP pela redação corrigida — nota ≥70 é bom, ≥90 é excelente.
+  const s = entry.feedback?.score ?? 0;
+  if (s >= 90) awardLp(LP.writingGreat, "writing.great");
+  else if (s >= 70) awardLp(LP.writingGood, "writing.good");
+  else awardLp(Math.max(5, Math.round(s * 0.2)), "writing.good");
   return entry;
 }
 

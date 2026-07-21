@@ -2,6 +2,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
+import { awardLp, LP } from "@/lib/rank-store";
 import type { ExamDifficulty, ExamQuestion } from "@/lib/exam.functions";
 
 export type ExamAnswer = {
@@ -270,6 +271,8 @@ export function finishExam(): ExamResult | null {
   };
   emit();
   scheduleSave();
+  // LP pela prova mensal — varia com o percentual.
+  awardLp(LP.examBonusByPercent(percent), "exam.completed");
   return result;
 }
 

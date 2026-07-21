@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
+import { awardLp, LP } from "@/lib/rank-store";
 import type { GrammarLesson } from "@/lib/grammar.functions";
 
 export type GrammarExerciseAnswer = string | number;
@@ -167,6 +168,10 @@ export function addAttempt(input: Omit<GrammarAttempt, "id" | "completedAt">): G
   progress = { ...progress, attempts: [attempt, ...progress.attempts] };
   emit();
   scheduleSave();
+  // LP pela aula concluída — escalado pela nota (mínimo garantido).
+  const pct = attempt.total > 0 ? (attempt.score / attempt.total) : 0;
+  const lp = Math.round(LP.grammarLesson * Math.max(0.4, pct));
+  awardLp(lp, "grammar.lesson");
   return attempt;
 }
 
