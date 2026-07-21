@@ -56,6 +56,7 @@ function SpeakingPage() {
   const decks = useStore((s) => s.decks);
   const [selectedDeck, setSelectedDeck] = useState<string>("");
   const [includeModel, setIncludeModel] = useState(true);
+  const [includeOwn, setIncludeOwn] = useState(false);
   const [pickedAlts, setPickedAlts] = useState<Record<number, boolean>>({});
   const [savedCount, setSavedCount] = useState(0);
 
@@ -74,16 +75,23 @@ function SpeakingPage() {
   useEffect(() => {
     if (!prompt) return;
     setIncludeModel(true);
+    setIncludeOwn(false);
     const init: Record<number, boolean> = {};
     prompt.altAnswers.forEach((_, i) => (init[i] = false));
     setPickedAlts(init);
     setSavedCount(0);
   }, [prompt]);
 
+  const ownSpeech = (grade?.refinedAttempt || spoken).trim();
+
   const pickedCount = useMemo(() => {
     const alts = prompt?.altAnswers ?? [];
-    return (includeModel ? 1 : 0) + alts.reduce((n, _, i) => n + (pickedAlts[i] ? 1 : 0), 0);
-  }, [prompt, includeModel, pickedAlts]);
+    return (
+      (includeModel ? 1 : 0) +
+      (includeOwn && ownSpeech ? 1 : 0) +
+      alts.reduce((n, _, i) => n + (pickedAlts[i] ? 1 : 0), 0)
+    );
+  }, [prompt, includeModel, includeOwn, ownSpeech, pickedAlts]);
 
   function saveCards() {
     if (!prompt || !selectedDeck || pickedCount === 0) return;
@@ -93,6 +101,13 @@ function SpeakingPage() {
       createCard(selectedDeck, prompt.modelAnswer, prompt.translation, {
         mode: "sentence",
         source: src,
+      });
+      n++;
+    }
+    if (includeOwn && ownSpeech) {
+      createCard(selectedDeck, ownSpeech, prompt.translation, {
+        mode: "sentence",
+        source: `${src} · minha fala`,
       });
       n++;
     }
@@ -459,6 +474,31 @@ function SpeakingPage() {
                   </span>
                 </span>
               </label>
+
+              {ownSpeech && (
+                <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-2xl border border-orange-400/25 bg-orange-400/5 p-3 text-sm transition hover:bg-orange-400/10">
+                  <input
+                    type="checkbox"
+                    checked={includeOwn}
+                    onChange={(e) => setIncludeOwn(e.target.checked)}
+                    className="mt-0.5 accent-orange-400"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <Mic className="h-3.5 w-3.5 text-orange-300" strokeWidth={2.25} />
+                      Minha fala
+                      {grade?.refinedAttempt && (
+                        <span className="rounded-full bg-orange-400/20 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-orange-200">
+                          refinada
+                        </span>
+                      )}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">"{ownSpeech}"</span>
+                  </span>
+                </label>
+              )}
+
+
 
               {prompt.altAnswers.length > 0 && (
                 <div className="mt-3">
