@@ -171,11 +171,12 @@ function AdminPage() {
                       {nameFor(r.profileId)}
                     </p>
                     <p className="text-xs text-muted-foreground tabular-nums">
-                      {r.count} de {HOME_DAILY_LIMIT} sessões
+                      {r.count} sessões
                       {" · "}
                       {r.reviewed} revisadas
                       {r.day ? ` · ${r.day}` : ""}
                     </p>
+
                   </div>
                 </div>
                 <button
