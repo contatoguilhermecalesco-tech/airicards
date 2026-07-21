@@ -3,10 +3,12 @@ import {
   Bell,
   BellOff,
   CheckCheck,
+  ChevronRight,
   Inbox,
   Settings2,
   Moon,
 } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 import { Link } from "@tanstack/react-router";
 import {
