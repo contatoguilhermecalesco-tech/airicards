@@ -24,6 +24,7 @@ import {
 } from "@/lib/reading.functions";
 import { translateEnToPt } from "@/lib/translate.functions";
 import { createCard, useStore } from "@/lib/flashcards-store";
+import { addStudyEntry } from "@/lib/study-history-store";
 
 export const Route = createFileRoute("/study/reading/")({
   head: () => ({
