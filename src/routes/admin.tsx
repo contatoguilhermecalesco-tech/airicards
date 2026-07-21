@@ -40,6 +40,7 @@ import {
 } from "@/lib/notifications-store";
 import { generateNotification } from "@/lib/notifications-ai.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { NOTIFICATION_ICONS, resolveNotificationIcon, type NotificationIconKey } from "@/lib/notification-icons";
 
 const ADMIN_PROFILE_ID = "guilherme";
 
