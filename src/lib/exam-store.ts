@@ -28,6 +28,9 @@ export type ExamResult = {
   level: ExamDifficulty;
   breakdown: Partial<Record<ExamDifficulty, { correct: number; total: number }>>;
   skills: Record<string, { correct: number; total: number }>;
+  /** Snapshot das questões e respostas para revisão posterior. */
+  questions: ExamQuestion[];
+  answers: Record<string, number | null>;
   /** Trecho curto de cada questão, usado para evitar repetição futura. */
   fingerprints: string[];
 };
