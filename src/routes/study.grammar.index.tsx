@@ -361,7 +361,7 @@ function GrammarPage() {
             />
           )}
           {tab === "historico" && (
-            <HistoryView attempts={attempts} onDelete={(id) => deleteAttempt(id)} />
+            <HistoryView attempts={attempts} onDelete={(id: string) => deleteAttempt(id)} />
           )}
 
 
