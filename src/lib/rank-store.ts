@@ -421,10 +421,18 @@ export function progressToNext(state: RankState): { value: number; max: number; 
       label: `${nextThreshold - state.lp} LP para ${state.tier === "master" ? "Grão-Mestre" : "Desafiante"}`,
     };
   }
+  const remaining = Math.max(0, LP_PER_DIVISION - state.lp);
+  const isPromoToNextTier = state.division === 1;
+  const jump = nextDivisionAfterPromo(state.tier, state.division);
+  const nextLabel = isPromoToNextTier
+    ? `promoção para ${TIER_LABEL[jump.tier]}${
+        isElite(jump.tier) ? "" : ` ${DIVISION_ROMAN[jump.division as Exclude<Division, null>]}`
+      }`
+    : `${TIER_LABEL[jump.tier]} ${DIVISION_ROMAN[jump.division as Exclude<Division, null>]}`;
   return {
     value: state.lp,
     max: LP_PER_DIVISION,
-    label: `${LP_PER_DIVISION - state.lp} LP para promoção`,
+    label: `${remaining} LP para ${nextLabel}`,
   };
 }
 
