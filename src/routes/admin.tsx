@@ -16,9 +16,9 @@ import {
 import {
   fetchAllProfileSessions,
   resetHomeSessionsForProfile,
-  HOME_DAILY_LIMIT,
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
+
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import {
   AlertDialog,
