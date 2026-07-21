@@ -182,6 +182,107 @@ function ReadingPage() {
     }
   }
 
+  // Text-selection → floating "Criar carta" chip
+  function handleSelection() {
+    const el = articleRef.current;
+    if (!el) {
+      setSnipChip(null);
+      return;
+    }
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+      setSnipChip(null);
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    // Must be entirely inside the article
+    if (!el.contains(range.commonAncestorContainer)) {
+      setSnipChip(null);
+      return;
+    }
+    const text = sel.toString().trim();
+    if (text.length < 2 || text.length > 400) {
+      setSnipChip(null);
+      return;
+    }
+    const rect = range.getBoundingClientRect();
+    if (!rect || (rect.width === 0 && rect.height === 0)) return;
+    setSnipChip({
+      text,
+      top: rect.top + window.scrollY - 44,
+      left: rect.left + window.scrollX + rect.width / 2,
+    });
+  }
+
+  useEffect(() => {
+    function onDown(e: MouseEvent | TouchEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+      // Ignore clicks on the chip or modal itself
+      const inChip = (target as HTMLElement).closest?.("[data-snip-chip]");
+      const inModal = (target as HTMLElement).closest?.("[data-snip-modal]");
+      if (inChip || inModal) return;
+      // Hide chip on tap outside; selection will re-fire on new drag
+      setSnipChip(null);
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+    };
+  }, []);
+
+  async function openSnip(text: string) {
+    setSnipChip(null);
+    setSnip({
+      front: text,
+      back: "",
+      deckId: selectedDeck || decks[0]?.id || "",
+      translating: true,
+      saving: false,
+      saved: false,
+      error: null,
+    });
+    try {
+      const r = await translate({
+        data: {
+          text,
+          context: passage
+            ? `Trecho do texto "${passage.title}": ${passage.text.slice(0, 500)}`
+            : undefined,
+        },
+      });
+      setSnip((s) =>
+        s ? { ...s, translating: false, back: r.translation } : s,
+      );
+    } catch (e) {
+      setSnip((s) =>
+        s
+          ? {
+              ...s,
+              translating: false,
+              error: e instanceof Error ? e.message : "Falha na tradução",
+            }
+          : s,
+      );
+    }
+  }
+
+  function saveSnip() {
+    if (!snip) return;
+    const front = snip.front.trim();
+    const back = snip.back.trim();
+    if (!front || !back || !snip.deckId) return;
+    setSnip({ ...snip, saving: true });
+    const isSentence = /\s/.test(front) || front.length > 24;
+    createCard(snip.deckId, front, back, {
+      mode: isSentence ? "sentence" : "word",
+      source: passage ? `Reading · ${passage.title} · seleção` : "Reading · seleção",
+    });
+    setSnip({ ...snip, saving: false, saved: true });
+  }
+
   function toggleGloss(i: number) {
     setPickedGloss((p) => ({ ...p, [i]: !p[i] }));
   }
