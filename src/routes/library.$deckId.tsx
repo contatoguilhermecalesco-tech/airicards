@@ -252,8 +252,11 @@ function AddCardSheet({
   deckId: string;
   onClose: () => void;
 }) {
+  const [mode, setMode] = useState<"word" | "sentence">("word");
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
+  const [targetWord, setTargetWord] = useState("");
+  const [source, setSource] = useState<"reading" | "listening" | "video" | "book" | "other">("reading");
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<string[]>([]);
@@ -275,6 +278,10 @@ function AddCardSheet({
     }
   }
 
+  const isSentence = mode === "sentence";
+  const canSubmit =
+    front.trim() && back.trim() && (!isSentence || targetWord.trim());
+
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
       <div
@@ -295,17 +302,45 @@ function AddCardSheet({
               <X className="h-4 w-4" />
             </button>
           </div>
+
+          {/* Mode toggle */}
+          <div className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-white/[0.04] p-1">
+            {(["word", "sentence"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={`rounded-full py-2 text-xs font-semibold transition ${
+                  mode === m
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {m === "word" ? "Palavra" : "Frase (i+1)"}
+              </button>
+            ))}
+          </div>
+          {isSentence && (
+            <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+              Sentence mining: uma frase com <span className="text-foreground">1 palavra nova</span> e contexto claro.
+            </p>
+          )}
+
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (!front.trim() || !back.trim()) return;
-              createCard(deckId, front, back);
+              if (!canSubmit) return;
+              createCard(deckId, front, back, {
+                mode,
+                targetWord: isSentence ? targetWord : undefined,
+                source: isSentence ? source : undefined,
+              });
               onClose();
             }}
             className="mt-4 space-y-3"
           >
             <Field
-              label="Inglês"
+              label={isSentence ? "Frase em inglês" : "Inglês"}
               autoFocus
               value={front}
               onChange={(v) => {
@@ -313,8 +348,20 @@ function AddCardSheet({
                 setAlternatives([]);
                 setTranslateError(null);
               }}
-              placeholder="Serendipity"
+              placeholder={
+                isSentence
+                  ? "Although it was raining, we went outside."
+                  : "Serendipity"
+              }
             />
+            {isSentence && (
+              <Field
+                label="Palavra-alvo"
+                value={targetWord}
+                onChange={setTargetWord}
+                placeholder="although"
+              />
+            )}
             <button
               type="button"
               onClick={handleTranslate}
@@ -328,10 +375,14 @@ function AddCardSheet({
               <p className="text-xs text-destructive">{translateError}</p>
             )}
             <Field
-              label="Tradução"
+              label={isSentence ? "Tradução contextual" : "Tradução"}
               value={back}
               onChange={setBack}
-              placeholder="Serendipidade"
+              placeholder={
+                isSentence
+                  ? "Embora estivesse chovendo, nós saímos."
+                  : "Serendipidade"
+              }
             />
             {alternatives.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -350,9 +401,40 @@ function AddCardSheet({
                 ))}
               </div>
             )}
+            {isSentence && (
+              <div>
+                <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Fonte
+                </label>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {(
+                    [
+                      ["reading", "Reading"],
+                      ["listening", "Listening"],
+                      ["video", "Vídeo"],
+                      ["book", "Livro"],
+                      ["other", "Outra"],
+                    ] as const
+                  ).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSource(id)}
+                      className={`rounded-full border px-2.5 py-1 text-xs transition ${
+                        source === id
+                          ? "border-primary/40 bg-primary/15 text-primary"
+                          : "border-border bg-surface text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <button
               type="submit"
-              disabled={!front.trim() || !back.trim()}
+              disabled={!canSubmit}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
               Adicionar carta
