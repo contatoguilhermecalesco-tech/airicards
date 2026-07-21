@@ -16,9 +16,18 @@ export type GrammarAttempt = {
   completedAt: number;
 };
 
+export type GrammarChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: number;
+};
+
 export type GrammarProgress = {
   lessons: Record<string, GrammarLesson>;
   attempts: GrammarAttempt[];
+  notes: Record<string, string>;
+  chats: Record<string, GrammarChatMessage[]>;
 };
 
 function isBrowser() {
@@ -26,11 +35,11 @@ function isBrowser() {
 }
 
 function cacheKey(profileId: string) {
-  return `airi.grammar.${profileId}.v1`;
+  return `airi.grammar.${profileId}.v2`;
 }
 
 function defaultProgress(): GrammarProgress {
-  return { lessons: {}, attempts: [] };
+  return { lessons: {}, attempts: [], notes: {}, chats: {} };
 }
 
 function loadCache(profileId: string): GrammarProgress {
@@ -169,4 +178,54 @@ export function getBestScoreForWeek(week: number): number | null {
   const attempts = getAttemptsForWeek(week);
   if (!attempts.length) return null;
   return Math.max(...attempts.map((a) => (a.score / a.total) * 100));
+}
+
+export function getNote(week: number): string {
+  return progress.notes?.[String(week)] ?? "";
+}
+
+export function setNote(week: number, value: string) {
+  progress = {
+    ...progress,
+    notes: { ...(progress.notes ?? {}), [String(week)]: value },
+  };
+  emit();
+  scheduleSave();
+}
+
+export function getChat(week: number): GrammarChatMessage[] {
+  return progress.chats?.[String(week)] ?? [];
+}
+
+function makeId() {
+  return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+export function appendChatMessage(
+  week: number,
+  message: Omit<GrammarChatMessage, "id" | "createdAt">,
+): GrammarChatMessage {
+  const msg: GrammarChatMessage = { ...message, id: makeId(), createdAt: Date.now() };
+  const current = progress.chats?.[String(week)] ?? [];
+  progress = {
+    ...progress,
+    chats: { ...(progress.chats ?? {}), [String(week)]: [...current, msg] },
+  };
+  emit();
+  scheduleSave();
+  return msg;
+}
+
+export function clearChat(week: number) {
+  const chats = { ...(progress.chats ?? {}) };
+  delete chats[String(week)];
+  progress = { ...progress, chats };
+  emit();
+  scheduleSave();
+}
+
+export function deleteAttempt(id: string) {
+  progress = { ...progress, attempts: progress.attempts.filter((a) => a.id !== id) };
+  emit();
+  scheduleSave();
 }
