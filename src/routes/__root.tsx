@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
@@ -205,6 +205,13 @@ function TopBar() {
               <Swords className="h-4 w-4" strokeWidth={2.25} />
               <span>Inimigas</span>
             </Link>
+            <Link
+              to="/rank"
+              className={linkClass(pathname.startsWith("/rank"))}
+            >
+              <Trophy className="h-4 w-4" strokeWidth={2.25} />
+              <span>Rank</span>
+            </Link>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <NotificationsBell />
@@ -231,6 +238,7 @@ function BottomBar() {
     { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
     { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
     { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
+    { to: "/rank", label: "Rank", icon: Trophy, active: pathname.startsWith("/rank") },
   ] as const;
 
   return (
@@ -239,7 +247,7 @@ function BottomBar() {
       className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
     >
       <div className="glass-panel border-t safe-bottom">
-        <ul className="mx-auto grid max-w-3xl grid-cols-4 gap-1 px-2 pt-1.5">
+        <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1 px-2 pt-1.5">
           {items.map(({ to, label, icon: Icon, active }) => (
             <li key={to}>
               <Link

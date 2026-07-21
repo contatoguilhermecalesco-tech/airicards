@@ -4,6 +4,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
+import { awardLp, LP } from "@/lib/rank-store";
 
 export type CardMode = "word" | "sentence";
 export type CardSource = string;
@@ -310,6 +311,11 @@ export function reviewCard(id: string, grade: Grade) {
   // Cadência contínua: as cartas voltam de minutos em minutos para o usuário
   // sempre ter algo para revisar. Teto baixo (~10 min) mantém o fluxo ativo.
   const MAX_MINUTES = 10;
+  // Capturar estado da carta antes da mutação (para detectar viradas de rank).
+  const prevCard = state.cards.find((c) => c.id === id);
+  const wasEnemyBefore = prevCard ? isEnemy(prevCard) && !isDefeated(prevCard) : false;
+  const wasBelowEnemyBefore = prevCard ? (prevCard.lapses ?? 0) < ENEMY_THRESHOLD : false;
+
   state = {
     ...state,
     cards: state.cards.map((c) => {
@@ -342,13 +348,37 @@ export function reviewCard(id: string, grade: Grade) {
     }),
   };
 
+  // --- Rank / LP ------------------------------------------------------
+  if (grade === "again") {
+    awardLp(LP.reviewWrong, "review.wrong");
+  } else {
+    const delta = grade === "easy" ? LP.reviewEasy : grade === "good" ? LP.reviewGood : LP.reviewHard;
+    awardLp(delta, `review.${grade}`);
+  }
+  // Detecta viradas de rank sobre a carta:
+  const nextCard = state.cards.find((c) => c.id === id);
+  if (nextCard) {
+    // Inimigo derrotado (era inimigo ativo, agora defeated).
+    if (wasEnemyBefore && isDefeated(nextCard)) {
+      awardLp(LP.enemyDefeated, "enemy.defeated");
+    }
+    // Virou inimigo agora (era não-inimigo, passou do threshold de lapses).
+    if (wasBelowEnemyBefore && isEnemy(nextCard) && !isDefeated(nextCard)) {
+      awardLp(LP.enemyEvolved, "enemy.evolved");
+    }
+  }
 
   // Track cards revisadas hoje for the Home hero ring.
   refreshHomeDay();
   const wasFirstToday = (home.reviewed ?? 0) === 0;
   home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
   if (wasFirstToday) {
-    home = { ...home, streak: bumpStreak(home.streak, todayKey()) };
+    const nextStreak = bumpStreak(home.streak, todayKey());
+    home = { ...home, streak: nextStreak };
+    // Bônus diário de streak.
+    if (nextStreak.current > 0) {
+      awardLp(LP.streakDay(nextStreak.current), "streak.day");
+    }
   }
   emitHome();
   emit();
