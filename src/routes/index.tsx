@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,7 @@ import {
   useCardsReviewedToday,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
+import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -85,6 +86,9 @@ function Home() {
   const hour = new Date().getHours();
   const { salute, icon, eyebrow } = greetingFor(hour);
   const name = profile?.name ?? "";
+  const cycle = useCycleWeek();
+  const todayFocus = getTodayFocus();
+  const ankiPending = due > 0 && reviewedToday === 0;
 
   // Ring geometry — compact 96px ring
   const RING_R = 40;
@@ -105,13 +109,19 @@ function Home() {
         }}
       />
 
-      {/* Header — eyebrow + salute */}
+      {/* Header — eyebrow + salute + ciclo RRSLG */}
       <header className="animate-fade-in flex flex-col space-y-1.5">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {eyebrow}
           </span>
           <span className="shrink-0">{icon}</span>
+          {cycle && (
+            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Semana {cycle.week}<span className="text-muted-foreground/50">/8</span>
+              <span className="text-primary/80">· {todayFocus.focus}</span>
+            </span>
+          )}
         </div>
         <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
           {salute}
@@ -244,6 +254,49 @@ function Home() {
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
       </section>
+
+      {/* Método RRSLG — semana + foco do dia */}
+      {cycle && (
+        <section
+          className="animate-fade-in mt-6"
+          style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
+        >
+          <Link
+            to="/study"
+            className="group block rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.08] hover:bg-white/[0.04]"
+          >
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+                <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Método RRSLG
+                  </p>
+                  {ankiPending && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-warning/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-warning">
+                      <Lock className="h-2.5 w-2.5" strokeWidth={2.5} />
+                      Anki primeiro
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 truncate text-[14px] font-medium text-foreground">
+                  {todayFocus.label} · {todayFocus.focus}
+                </p>
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  Gramática da semana: <span className="text-foreground/80">{cycle.grammar.topic}</span>
+                </p>
+              </div>
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                strokeWidth={2.25}
+              />
+            </div>
+          </Link>
+        </section>
+      )}
+
 
       {/* Decks list */}
       {decks.length > 0 && (

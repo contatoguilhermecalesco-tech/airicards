@@ -5,6 +5,9 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 
+export type CardMode = "word" | "sentence";
+export type CardSource = "reading" | "listening" | "video" | "book" | "other";
+
 export type Card = {
   id: string;
   deckId: string;
@@ -17,6 +20,10 @@ export type Card = {
   createdAt: number;
   lapses?: number;
   successes?: number;
+  // Wave 1 — sentence mining (método RRSLG).
+  mode?: CardMode;
+  targetWord?: string;
+  source?: CardSource;
 };
 
 export type Deck = {
@@ -224,7 +231,12 @@ export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "descr
   scheduleSave();
 }
 
-export function createCard(deckId: string, front: string, back: string): Card {
+export function createCard(
+  deckId: string,
+  front: string,
+  back: string,
+  extras?: { mode?: CardMode; targetWord?: string; source?: CardSource },
+): Card {
   const card: Card = {
     id: uid(),
     deckId,
@@ -235,6 +247,9 @@ export function createCard(deckId: string, front: string, back: string): Card {
     reps: 0,
     dueAt: Date.now(),
     createdAt: Date.now(),
+    ...(extras?.mode ? { mode: extras.mode } : {}),
+    ...(extras?.targetWord?.trim() ? { targetWord: extras.targetWord.trim() } : {}),
+    ...(extras?.source ? { source: extras.source } : {}),
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
