@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2 } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
@@ -236,6 +236,14 @@ function ProfileMenu() {
             <p className="text-sm font-medium">{profile.name}</p>
           </div>
           <div className="my-1 h-px bg-border" />
+          <Link
+            to="/settings"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+          >
+            <Settings2 className="h-4 w-4" strokeWidth={2.25} />
+            Preferências
+          </Link>
           {profile.id === "guilherme" && (
             <Link
               to="/admin"
