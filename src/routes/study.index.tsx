@@ -23,6 +23,7 @@ const DAYS: Day[] = [
     area: "Reading",
     desc: "Leitura guiada com textos e interpretação.",
     icon: <BookOpen className="h-5 w-5" strokeWidth={2.25} />,
+    to: "/study/reading",
     accent: "from-sky-400/25 to-sky-500/10",
   },
   {
