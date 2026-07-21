@@ -256,7 +256,8 @@ function AddCardSheet({
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [targetWord, setTargetWord] = useState("");
-  const [source, setSource] = useState<"reading" | "listening" | "video" | "book" | "other">("reading");
+  const [source, setSource] = useState("");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<string[]>([]);
