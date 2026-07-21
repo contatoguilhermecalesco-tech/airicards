@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Mic,
@@ -11,6 +11,8 @@ import {
   Check,
   Eye,
   EyeOff,
+  Plus,
+  Library,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -20,6 +22,7 @@ import {
   type SpeakingGrade,
 } from "@/lib/speaking.functions";
 import { speak, stopSpeaking, ttsAvailable, sttAvailable, startRecognition, type STTHandle } from "@/lib/speech";
+import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/speaking/")({
   head: () => ({
