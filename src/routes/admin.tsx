@@ -660,6 +660,8 @@ function NotificationsSection() {
 function ExamAdminSection() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const settings = useAppSettings();
+  const [toggling, setToggling] = useState(false);
 
   async function handleReset(profileId: string) {
     setBusy(profileId);
@@ -673,19 +675,61 @@ function ExamAdminSection() {
     }
   }
 
+  async function toggleVisible() {
+    setToggling(true);
+    try {
+      await setSetting("exam_visible", !settings.exam_visible);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setToggling(false);
+    }
+  }
+
   return (
     <section className="glass-panel rounded-3xl border p-6">
       <div className="mb-5 flex items-center gap-3">
         <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary ring-1 ring-primary/25">
           <Sparkles className="h-4 w-4" strokeWidth={2.25} />
         </div>
-        <div>
+        <div className="flex-1">
           <h2 className="text-lg font-semibold">Prova mensal</h2>
           <p className="text-xs text-muted-foreground">
-            Zerar histórico libera nova prova imediatamente.
+            Controle a visibilidade e zere o histórico dos perfis.
           </p>
         </div>
       </div>
+
+      {/* Visibility toggle */}
+      <button
+        onClick={() => void toggleVisible()}
+        disabled={toggling}
+        className="mb-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-left transition hover:border-white/10 disabled:opacity-50"
+      >
+        <div>
+          <p className="text-sm font-medium">
+            {settings.exam_visible ? "Visível para os usuários" : "Oculta para os usuários"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {settings.exam_visible
+              ? "A prova aparece na Home e em Estudos."
+              : "Ative para liberar a prova no app."}
+          </p>
+        </div>
+        <span
+          aria-hidden
+          className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+            settings.exam_visible ? "bg-primary" : "bg-white/10"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              settings.exam_visible ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </span>
+      </button>
+
 
       <ul className="space-y-2">
         {PROFILES.map((p) => (
