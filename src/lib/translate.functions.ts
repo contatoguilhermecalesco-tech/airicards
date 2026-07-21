@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const Input = z.object({
-  text: z.string().min(1).max(500),
-  context: z.string().max(500).optional(),
+  text: z.string().min(1).max(2000),
+  context: z.string().max(8000).optional(),
 });
 
 type Result = { translation: string; alternatives?: string[]; note?: string };
