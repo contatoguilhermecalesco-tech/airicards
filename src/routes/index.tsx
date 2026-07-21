@@ -360,7 +360,7 @@ function Home() {
             <GlassHighlight />
             <div
               aria-hidden
-              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/20 blur-3xl"
+              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/12 opacity-60 blur-2xl"
             />
             <div className="relative flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
