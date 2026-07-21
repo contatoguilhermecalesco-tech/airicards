@@ -11,76 +11,231 @@ const Input = z.object({
 export type GrammarExample = {
   en: string;
   pt: string;
+  note?: string;
 };
+
+export type GrammarSection = {
+  title: string;
+  content: string;
+};
+
+export type GrammarMistake = {
+  wrong: string;
+  right: string;
+  why: string;
+};
+
+export type GrammarContrast = {
+  title: string;
+  a: { label: string; example: string; when: string };
+  b: { label: string; example: string; when: string };
+};
+
+export type GrammarFormation = {
+  affirmative?: string;
+  negative?: string;
+  interrogative?: string;
+  short?: string;
+  notes?: string[];
+};
+
+export type GrammarGlossaryItem = {
+  term: string;
+  definition: string;
+};
+
+export type GrammarExerciseType =
+  | "multiple-choice"
+  | "fill-blank"
+  | "error-correction"
+  | "translation-en-pt"
+  | "translation-pt-en"
+  | "transformation";
 
 export type GrammarExercise = {
   id: string;
-  type: "multiple-choice" | "fill-blank";
+  type: GrammarExerciseType;
+  prompt?: string; // instruction like "Reescreva na negativa"
   question: string;
   options?: string[];
   answer: string;
+  acceptedAnswers?: string[]; // alternate correct answers for open-ended
   explanation: string;
+  hint?: string;
 };
 
 export type GrammarLesson = {
   week: number;
   topic: string;
   application: string;
+  // Legacy field for backward compatibility (mirrors introduction)
   explanation: string;
+  // New rich content
+  introduction: string;
+  objectives: string[];
+  sections: GrammarSection[];
+  formation?: GrammarFormation;
+  contrasts: GrammarContrast[];
+  commonMistakes: GrammarMistake[];
+  register?: string;
   examples: GrammarExample[];
+  glossary: GrammarGlossaryItem[];
+  summary: string;
+  nextSteps: string[];
   exercises: GrammarExercise[];
 };
 
-function normalizeExercise(raw: unknown): GrammarExercise | null {
+function asString(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+function asArray(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+function asStringArray(v: unknown): string[] {
+  return asArray(v).filter((x): x is string => typeof x === "string");
+}
+
+function normalizeExercise(raw: unknown, idx: number): GrammarExercise | null {
   if (!raw || typeof raw !== "object") return null;
   const e = raw as Record<string, unknown>;
-  const id = typeof e.id === "string" ? e.id : "";
-  const type = e.type === "multiple-choice" || e.type === "fill-blank" ? e.type : "multiple-choice";
-  const question = typeof e.question === "string" ? e.question : "";
-  const options = Array.isArray(e.options) ? e.options.filter((o): o is string => typeof o === "string") : undefined;
+  const validTypes: GrammarExerciseType[] = [
+    "multiple-choice",
+    "fill-blank",
+    "error-correction",
+    "translation-en-pt",
+    "translation-pt-en",
+    "transformation",
+  ];
+  const type = (validTypes as string[]).includes(e.type as string)
+    ? (e.type as GrammarExerciseType)
+    : "multiple-choice";
+  const id = asString(e.id) || `ex-${idx + 1}`;
+  const question = asString(e.question);
+  const prompt = typeof e.prompt === "string" ? e.prompt : undefined;
+  const options = Array.isArray(e.options)
+    ? e.options.filter((o): o is string => typeof o === "string")
+    : undefined;
   let answer = "";
-  if (typeof e.answer === "string") {
-    answer = e.answer;
-  } else if (typeof e.answer === "number" && options && options[e.answer]) {
-    answer = options[e.answer];
-  }
-  const explanation = typeof e.explanation === "string" ? e.explanation : "";
-  return { id, type, question, options, answer, explanation };
+  if (typeof e.answer === "string") answer = e.answer;
+  else if (typeof e.answer === "number" && options && options[e.answer]) answer = options[e.answer];
+  const acceptedAnswers = Array.isArray(e.acceptedAnswers)
+    ? e.acceptedAnswers.filter((o): o is string => typeof o === "string")
+    : undefined;
+  const explanation = asString(e.explanation);
+  const hint = typeof e.hint === "string" ? e.hint : undefined;
+  if (!question || !answer) return null;
+  return { id, type, prompt, question, options, answer, acceptedAnswers, explanation, hint };
 }
 
 function normalizeLesson(week: number, topic: string, application: string, raw: unknown): GrammarLesson {
-  const fallback: GrammarLesson = {
+  const obj = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const introduction = asString(obj.introduction) || asString(obj.explanation);
+  const objectives = asStringArray(obj.objectives);
+  const sections = asArray(obj.sections)
+    .map((s): GrammarSection | null => {
+      if (!s || typeof s !== "object") return null;
+      const x = s as Record<string, unknown>;
+      const title = asString(x.title);
+      const content = asString(x.content);
+      return title && content ? { title, content } : null;
+    })
+    .filter((s): s is GrammarSection => Boolean(s));
+
+  const formationRaw = obj.formation as Record<string, unknown> | undefined;
+  const formation: GrammarFormation | undefined = formationRaw
+    ? {
+        affirmative: typeof formationRaw.affirmative === "string" ? formationRaw.affirmative : undefined,
+        negative: typeof formationRaw.negative === "string" ? formationRaw.negative : undefined,
+        interrogative:
+          typeof formationRaw.interrogative === "string" ? formationRaw.interrogative : undefined,
+        short: typeof formationRaw.short === "string" ? formationRaw.short : undefined,
+        notes: Array.isArray(formationRaw.notes)
+          ? (formationRaw.notes.filter((n) => typeof n === "string") as string[])
+          : undefined,
+      }
+    : undefined;
+
+  const contrasts = asArray(obj.contrasts)
+    .map((c): GrammarContrast | null => {
+      if (!c || typeof c !== "object") return null;
+      const x = c as Record<string, unknown>;
+      const a = x.a as Record<string, unknown> | undefined;
+      const b = x.b as Record<string, unknown> | undefined;
+      if (!a || !b) return null;
+      return {
+        title: asString(x.title, "Contraste"),
+        a: {
+          label: asString(a.label),
+          example: asString(a.example),
+          when: asString(a.when),
+        },
+        b: {
+          label: asString(b.label),
+          example: asString(b.example),
+          when: asString(b.when),
+        },
+      };
+    })
+    .filter((c): c is GrammarContrast => Boolean(c));
+
+  const commonMistakes = asArray(obj.commonMistakes)
+    .map((m): GrammarMistake | null => {
+      if (!m || typeof m !== "object") return null;
+      const x = m as Record<string, unknown>;
+      const wrong = asString(x.wrong);
+      const right = asString(x.right);
+      const why = asString(x.why);
+      return wrong && right ? { wrong, right, why } : null;
+    })
+    .filter((m): m is GrammarMistake => Boolean(m));
+
+  const examples = asArray(obj.examples)
+    .map((ex): GrammarExample | null => {
+      if (!ex || typeof ex !== "object") return null;
+      const x = ex as Record<string, unknown>;
+      const en = asString(x.en);
+      const pt = asString(x.pt);
+      const note = typeof x.note === "string" ? x.note : undefined;
+      return en || pt ? { en, pt, note } : null;
+    })
+    .filter((x): x is GrammarExample => Boolean(x));
+
+  const glossary = asArray(obj.glossary)
+    .map((g): GrammarGlossaryItem | null => {
+      if (!g || typeof g !== "object") return null;
+      const x = g as Record<string, unknown>;
+      const term = asString(x.term);
+      const definition = asString(x.definition);
+      return term && definition ? { term, definition } : null;
+    })
+    .filter((g): g is GrammarGlossaryItem => Boolean(g));
+
+  const exercises = asArray(obj.exercises)
+    .map((e, i) => normalizeExercise(e, i))
+    .filter((e): e is GrammarExercise => Boolean(e));
+
+  return {
     week,
     topic,
     application,
-    explanation: "Não foi possível gerar a explicação. Tente novamente.",
-    examples: [],
-    exercises: [],
+    explanation: introduction || "Aula gerada.",
+    introduction: introduction || "",
+    objectives,
+    sections,
+    formation,
+    contrasts,
+    commonMistakes,
+    register: typeof obj.register === "string" ? obj.register : undefined,
+    examples,
+    glossary,
+    summary: asString(obj.summary),
+    nextSteps: asStringArray(obj.nextSteps),
+    exercises,
   };
-  if (!raw || typeof raw !== "object") return fallback;
-  const obj = raw as Record<string, unknown>;
-  const explanation = typeof obj.explanation === "string" ? obj.explanation : fallback.explanation;
-  const examples = Array.isArray(obj.examples)
-    ? obj.examples
-        .map((ex): GrammarExample | null => {
-          if (!ex || typeof ex !== "object") return null;
-          const x = ex as Record<string, unknown>;
-          return {
-            en: typeof x.en === "string" ? x.en : "",
-            pt: typeof x.pt === "string" ? x.pt : "",
-          };
-        })
-        .filter((x): x is GrammarExample => Boolean(x && (x.en || x.pt)))
-    : [];
-  const exercises = Array.isArray(obj.exercises)
-    ? obj.exercises.map(normalizeExercise).filter((x): x is GrammarExercise => Boolean(x))
-    : [];
-  return { week, topic, application, explanation, examples, exercises };
 }
 
 /**
- * Gera uma aula de gramática personalizada para a semana do ciclo RRSLG.
- * Inclui explicação didática, exemplos bilingues e exercícios interativos.
+ * Gera uma aula completa de gramática — nível professor universitário, mas didática.
  */
 export const generateGrammarLesson = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
@@ -89,29 +244,39 @@ export const generateGrammarLesson = createServerFn({ method: "POST" })
     if (!key) throw new Error("LOVABLE_API_KEY não configurada");
 
     const system = [
-      "Você é um professor particular de inglês, didático, encorajador e claro, ensinando alunos brasileiros.",
-      "Crie uma micro-aula de gramática em português brasileiro, com explicação simples, exemplos em inglês com tradução para o português, e exercícios interativos.",
-      "A aula deve ser prática: mostre QUANDO usar a estrutura, COMO formá-la e erros comuns que brasileiros cometem.",
-      "Os exemplos devem ser frases naturais do dia a dia, nunca isoladas sem contexto.",
-      "Inclua 5 exercícios: uma mistura de múltipla escolha (multiple-choice) e preenchimento (fill-blank). Cada exercício deve ter uma resposta correta e uma explicação didática da resposta.",
-      "No multiple-choice, forneça 4 opções. No fill-blank, a resposta é a palavra ou palavras que completam a frase.",
-      "A resposta (answer) deve ser sempre o texto exato da opção correta (string). No multiple-choice, answer deve ser igual a uma das opções.",
-      "Responda SOMENTE JSON válido no formato exato abaixo, sem markdown, sem comentários:",
+      "Você é um professor universitário de língua inglesa, com PhD em linguística aplicada, ensinando alunos brasileiros de forma didática, rigorosa e encorajadora.",
+      "Sua aula deve ter profundidade acadêmica — nunca superficial — mas com linguagem acessível em português brasileiro.",
+      "Explique a estrutura em camadas: conceito → regra formal → uso pragmático → nuances → registro (formal/informal) → contrastes com o português → erros típicos de brasileiros.",
+      "Use metalinguagem gramatical quando necessário (aspecto, modalidade, tempo verbal, voz, transitividade), mas sempre defina os termos no glossário.",
+      "Cada exemplo deve ser uma frase natural, real, do inglês contemporâneo, com contexto claro.",
+      "Os exercícios devem cobrir múltiplos ângulos da estrutura: reconhecimento, produção, correção e tradução. Faça 12 exercícios variados, aumentando a dificuldade.",
+      "Distribua os tipos: 4 multiple-choice (com 4 opções cada), 3 fill-blank, 2 error-correction (aluno reescreve corretamente), 2 translation-pt-en, 1 transformation (ex.: reescrever na negativa, na interrogativa, em outro tempo).",
+      "Em multiple-choice, 'answer' é o texto EXATO de uma das opções. Em fill-blank, 'answer' é a palavra/expressão que completa. Em translation/error-correction/transformation, 'answer' é a versão correta completa; forneça também 'acceptedAnswers' com 1-3 variações válidas.",
+      "Cada exercício traz 'explanation' que ensina o porquê da resposta (não apenas repete a regra). Adicione 'hint' em exercícios difíceis.",
+      "Responda SOMENTE JSON válido, sem markdown, no formato exato:",
       `{
-  "explanation": string,
-  "examples": [{"en": string, "pt": string}],
-  "exercises": [
-    {"id": string, "type": "multiple-choice" | "fill-blank", "question": string, "options": string[], "answer": string, "explanation": string}
-  ]
+  "introduction": string,
+  "objectives": string[],
+  "sections": [{"title": string, "content": string}],
+  "formation": {"affirmative"?: string, "negative"?: string, "interrogative"?: string, "short"?: string, "notes"?: string[]},
+  "contrasts": [{"title": string, "a": {"label": string, "example": string, "when": string}, "b": {"label": string, "example": string, "when": string}}],
+  "commonMistakes": [{"wrong": string, "right": string, "why": string}],
+  "register": string,
+  "examples": [{"en": string, "pt": string, "note"?: string}],
+  "glossary": [{"term": string, "definition": string}],
+  "summary": string,
+  "nextSteps": string[],
+  "exercises": [{"id": string, "type": "multiple-choice"|"fill-blank"|"error-correction"|"translation-pt-en"|"translation-en-pt"|"transformation", "prompt"?: string, "question": string, "options"?: string[], "answer": string, "acceptedAnswers"?: string[], "explanation": string, "hint"?: string}]
 }`,
+      "Requisitos mínimos: introduction com 2-3 parágrafos; sections com 3-5 blocos (ex.: 'Quando usar', 'Como formar', 'Aspectos sutis', 'Comparação com o português'); objectives com 3-5 itens; commonMistakes com 4-6 itens; examples com 6-10 frases; glossary com 4-8 termos técnicos definidos; summary curto e memorável; nextSteps com 3 sugestões práticas; exercises com exatamente 12 itens.",
     ].join(" ");
 
     const userMsg = [
-      `Semana ${data.week} do ciclo de estudos.`,
-      `Tópico de gramática: ${data.topic}.`,
-      `Aplicação prática: ${data.application}.`,
-      data.level ? `Nível do aluno: ${data.level}.` : null,
-      "Gere a micro-aula completa seguindo o formato JSON solicitado.",
+      `Semana ${data.week} do ciclo RRSLG.`,
+      `Tópico gramatical: ${data.topic}.`,
+      `Aplicação prática esperada: ${data.application}.`,
+      data.level ? `Nível declarado do aluno: ${data.level}.` : "Nível: intermediário.",
+      "Gere a aula completa seguindo rigorosamente o formato JSON e os requisitos mínimos.",
     ]
       .filter(Boolean)
       .join("\n\n");
