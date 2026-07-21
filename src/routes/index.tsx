@@ -308,6 +308,7 @@ function Home() {
 
 
       {/* Prova mensal de nivelamento */}
+      {appSettings.exam_visible && (
       <section
         className="animate-fade-in mt-6"
         style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
