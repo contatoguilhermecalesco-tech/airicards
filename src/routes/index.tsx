@@ -18,6 +18,7 @@ import {
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
+import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/")({
   component: Home,
