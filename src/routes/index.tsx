@@ -86,6 +86,9 @@ function Home() {
   const hour = new Date().getHours();
   const { salute, icon, eyebrow } = greetingFor(hour);
   const name = profile?.name ?? "";
+  const cycle = useCycleWeek();
+  const todayFocus = getTodayFocus();
+  const ankiPending = due > 0 && reviewedToday === 0;
 
   // Ring geometry — compact 96px ring
   const RING_R = 40;
