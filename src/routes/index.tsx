@@ -82,11 +82,16 @@ function Home() {
     () => cards.filter((c) => c.dueAt <= now).length,
     [cards, now],
   );
+  const pending = useMemo(
+    () => cards.filter((c) => c.dueAt > now).length,
+    [cards, now],
+  );
   const nextDueInMs = useMemo(() => {
     const futures = cards.map((c) => c.dueAt).filter((t) => t > now);
     if (futures.length === 0) return null;
     return Math.min(...futures) - now;
   }, [cards, now]);
+
   const canStart = due > 0;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
