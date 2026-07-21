@@ -65,6 +65,7 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          icon: string | null
           id: string
           tag_id: string | null
           title: string
@@ -72,6 +73,7 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string
+          icon?: string | null
           id?: string
           tag_id?: string | null
           title: string
@@ -79,6 +81,7 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string
+          icon?: string | null
           id?: string
           tag_id?: string | null
           title?: string
