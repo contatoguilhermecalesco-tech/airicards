@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -12,6 +12,8 @@ import {
   Languages,
   ChevronDown,
   ChevronUp,
+  Wand2,
+  Scissors,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -20,6 +22,7 @@ import {
   type ReadingPassage,
   type ReadingGrade,
 } from "@/lib/reading.functions";
+import { translateEnToPt } from "@/lib/translate.functions";
 import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/reading/")({
