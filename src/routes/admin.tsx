@@ -20,7 +20,7 @@ import {
 } from "@/lib/flashcards-store";
 import { resetExamsForProfileId } from "@/lib/exam-store";
 import { useAppSettings, setSetting } from "@/lib/app-settings";
-import { useRank, resetRank, tierLabel, TIER_COLORS } from "@/lib/rank-store";
+import { useRank, resetRank, tierLabel, TIER_COLORS, readRankForProfile, type RankState } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 
 export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
