@@ -354,6 +354,7 @@ function Home() {
           </div>
         </Link>
       </section>
+      )}
 
       {/* Decks list */}
       {decks.length > 0 && (
