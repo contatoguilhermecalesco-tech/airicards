@@ -255,7 +255,6 @@ function AddCardSheet({
   const [mode, setMode] = useState<"word" | "sentence">("word");
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
-  const [targetWord, setTargetWord] = useState("");
   const [source, setSource] = useState("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
