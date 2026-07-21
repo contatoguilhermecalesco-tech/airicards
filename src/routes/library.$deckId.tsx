@@ -331,7 +331,6 @@ function AddCardSheet({
               if (!canSubmit) return;
               createCard(deckId, front, back, {
                 mode,
-                targetWord: isSentence ? targetWord : undefined,
                 source: source.trim() || undefined,
               });
               onClose();
