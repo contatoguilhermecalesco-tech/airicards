@@ -160,6 +160,12 @@ function ListeningPage() {
         data: { reference: passage.transcript, attempt: attempt.trim() },
       });
       setGrade(g);
+      addStudyEntry("listening", {
+        title: passage.title || "Listening",
+        level,
+        score: g.score,
+        payload: { passage, attempt: attempt.trim(), grade: g },
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao corrigir.");
     } finally {
