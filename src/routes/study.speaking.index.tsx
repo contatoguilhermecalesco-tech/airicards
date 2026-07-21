@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Mic,
@@ -11,6 +11,8 @@ import {
   Check,
   Eye,
   EyeOff,
+  Plus,
+  Library,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -20,6 +22,7 @@ import {
   type SpeakingGrade,
 } from "@/lib/speaking.functions";
 import { speak, stopSpeaking, ttsAvailable, sttAvailable, startRecognition, type STTHandle } from "@/lib/speech";
+import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/speaking/")({
   head: () => ({
@@ -50,6 +53,12 @@ function SpeakingPage() {
   const gen = useServerFn(generateSpeaking);
   const grader = useServerFn(gradeSpeaking);
 
+  const decks = useStore((s) => s.decks);
+  const [selectedDeck, setSelectedDeck] = useState<string>("");
+  const [includeModel, setIncludeModel] = useState(true);
+  const [pickedAlts, setPickedAlts] = useState<Record<number, boolean>>({});
+  const [savedCount, setSavedCount] = useState(0);
+
   useEffect(
     () => () => {
       stopSpeaking();
@@ -57,6 +66,46 @@ function SpeakingPage() {
     },
     [recHandle],
   );
+
+  useEffect(() => {
+    if (!selectedDeck && decks.length > 0) setSelectedDeck(decks[0].id);
+  }, [decks, selectedDeck]);
+
+  useEffect(() => {
+    if (!prompt) return;
+    setIncludeModel(true);
+    const init: Record<number, boolean> = {};
+    prompt.altAnswers.forEach((_, i) => (init[i] = false));
+    setPickedAlts(init);
+    setSavedCount(0);
+  }, [prompt]);
+
+  const pickedCount = useMemo(() => {
+    const alts = prompt?.altAnswers ?? [];
+    return (includeModel ? 1 : 0) + alts.reduce((n, _, i) => n + (pickedAlts[i] ? 1 : 0), 0);
+  }, [prompt, includeModel, pickedAlts]);
+
+  function saveCards() {
+    if (!prompt || !selectedDeck || pickedCount === 0) return;
+    let n = 0;
+    const src = `Speaking · ${prompt.prompt.slice(0, 40)}${prompt.prompt.length > 40 ? "…" : ""}`;
+    if (includeModel) {
+      createCard(selectedDeck, prompt.modelAnswer, prompt.translation, {
+        mode: "sentence",
+        source: src,
+      });
+      n++;
+    }
+    prompt.altAnswers.forEach((alt, i) => {
+      if (!pickedAlts[i]) return;
+      createCard(selectedDeck, alt, prompt.translation, {
+        mode: "sentence",
+        source: src,
+      });
+      n++;
+    });
+    setSavedCount(n);
+  }
 
   async function loadNew() {
     setError(null);
@@ -356,6 +405,113 @@ function SpeakingPage() {
           </div>
         </section>
       )}
+
+      {/* Save to deck */}
+      {prompt && (
+        <section className="glass-panel mt-4 rounded-3xl border p-5">
+          <div className="flex items-center gap-2">
+            <Library className="h-4 w-4 text-orange-300" strokeWidth={2.25} />
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              Salvar como cartas
+            </p>
+          </div>
+
+          {decks.length === 0 ? (
+            <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm">
+              <p className="text-muted-foreground">
+                Você ainda não tem decks. Crie um na biblioteca para salvar cartas deste exercício.
+              </p>
+              <Link
+                to="/library"
+                className="tap-target mt-3 inline-flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/15"
+              >
+                <Plus className="h-3.5 w-3.5" /> Ir para biblioteca
+              </Link>
+            </div>
+          ) : (
+            <>
+              <label className="mt-3 block text-[10px] uppercase tracking-wider text-muted-foreground">
+                Deck
+              </label>
+              <select
+                value={selectedDeck}
+                onChange={(e) => setSelectedDeck(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-border bg-surface/40 px-4 py-2.5 text-sm outline-none focus:border-orange-400/40"
+              >
+                {decks.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+
+              <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                <input
+                  type="checkbox"
+                  checked={includeModel}
+                  onChange={(e) => setIncludeModel(e.target.checked)}
+                  className="mt-0.5 accent-orange-400"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="font-medium">Resposta modelo</span>
+                  <span className="block text-xs text-muted-foreground">
+                    {prompt.modelAnswer}
+                  </span>
+                </span>
+              </label>
+
+              {prompt.altAnswers.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Alternativas
+                  </p>
+                  <ul className="mt-2 space-y-1.5">
+                    {prompt.altAnswers.map((alt, i) => (
+                      <li key={i}>
+                        <label className="flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                          <input
+                            type="checkbox"
+                            checked={!!pickedAlts[i]}
+                            onChange={() =>
+                              setPickedAlts((p) => ({ ...p, [i]: !p[i] }))
+                            }
+                            className="mt-0.5 accent-orange-400"
+                          />
+                          <span className="min-w-0 flex-1">{alt}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Frente: frase em inglês · Verso: {prompt.translation}
+              </p>
+
+              <button
+                onClick={saveCards}
+                disabled={pickedCount === 0 || !selectedDeck}
+                className="tap-target mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-500/90 px-4 py-3 text-sm font-medium text-white transition hover:bg-orange-500 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.25} />
+                {pickedCount === 0
+                  ? "Selecione ao menos uma carta"
+                  : `Adicionar ${pickedCount} carta${pickedCount > 1 ? "s" : ""}`}
+              </button>
+
+              {savedCount > 0 && (
+                <p className="mt-3 rounded-2xl border border-orange-400/30 bg-orange-400/10 px-3 py-2 text-xs text-orange-200">
+                  ✓ {savedCount} carta{savedCount > 1 ? "s" : ""} adicionada
+                  {savedCount > 1 ? "s" : ""} ao deck.
+                </p>
+              )}
+            </>
+          )}
+        </section>
+      )}
+
+
 
       {/* Grade */}
       {grade && (
