@@ -260,6 +260,8 @@ export function finishExam(): ExamResult | null {
     level,
     breakdown,
     skills,
+    questions: current.questions,
+    answers: current.answers,
     fingerprints,
   };
   state = {
