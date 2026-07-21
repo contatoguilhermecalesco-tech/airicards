@@ -460,3 +460,17 @@ export function resetRank() {
   persist();
   emit();
 }
+
+/** Lê o rank persistido de qualquer perfil sem trocar o perfil ativo.
+ *  Retorna null quando o perfil ainda não tem histórico neste dispositivo. */
+export function readRankForProfile(profileId: string): RankState | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = localStorage.getItem(keyFor(profileId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as RankState;
+    return { ...INITIAL_RANK, ...parsed };
+  } catch {
+    return null;
+  }
+}
