@@ -162,7 +162,7 @@ function Home() {
         {/* soft halo behind glass */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/20 opacity-60 blur-3xl"
+          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/15 opacity-40 blur-2xl"
         />
         <div
           className={`${GLASS_BASE} rounded-[28px] p-6 sm:p-8`}
@@ -171,11 +171,11 @@ function Home() {
           {/* specular sheen */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.06] blur-3xl"
+            className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.04] blur-2xl"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/25 blur-3xl"
+            className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/15 blur-2xl"
           />
 
           <div className="relative flex items-start justify-between gap-6">
