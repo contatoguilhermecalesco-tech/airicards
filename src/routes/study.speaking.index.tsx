@@ -192,6 +192,12 @@ function SpeakingPage() {
         },
       });
       setGrade(g);
+      addStudyEntry("speaking", {
+        title: (prompt.prompt || "Speaking").slice(0, 80),
+        level,
+        score: g.score,
+        payload: { prompt, spoken: spoken.trim(), grade: g },
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao corrigir.");
     } finally {
