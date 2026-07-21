@@ -146,6 +146,27 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+// -------- eventos de promoção (para animação de UI) --------------------
+export type RankPromotionEvent = {
+  fromTier: Tier;
+  fromDivision: Division;
+  toTier: Tier;
+  toDivision: Division;
+  kind: "tier" | "division";
+  at: number;
+};
+const promoListeners = new Set<(e: RankPromotionEvent) => void>();
+export function onRankPromotion(cb: (e: RankPromotionEvent) => void) {
+  promoListeners.add(cb);
+  return () => promoListeners.delete(cb);
+}
+function emitPromotion(e: RankPromotionEvent) {
+  promoListeners.forEach((l) => {
+    try { l(e); } catch {}
+  });
+}
+
+
 export function setActiveRankProfile(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
@@ -306,8 +327,24 @@ export function awardLp(delta: number, reason: string): {
   state = next;
   persist();
   emit();
+
+  // Dispara evento de promoção para UI (animação + confete)
+  if (promoted) {
+    const kind: "tier" | "division" =
+      before.tier !== next.tier ? "tier" : "division";
+    emitPromotion({
+      fromTier: before.tier,
+      fromDivision: before.division,
+      toTier: next.tier,
+      toDivision: next.division,
+      kind,
+      at: Date.now(),
+    });
+  }
+
   return { state: next, promoted, demoted, promoStarted, promoWon, promoLost };
 }
+
 
 // LP por tipo de ação — cap e piso já são aplicados pela função awardLp.
 export const LP = {
