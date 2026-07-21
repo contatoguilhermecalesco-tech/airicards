@@ -5,6 +5,9 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 
+export type CardMode = "word" | "sentence";
+export type CardSource = "reading" | "listening" | "video" | "book" | "other";
+
 export type Card = {
   id: string;
   deckId: string;
@@ -17,6 +20,10 @@ export type Card = {
   createdAt: number;
   lapses?: number;
   successes?: number;
+  // Wave 1 — sentence mining (método RRSLG).
+  mode?: CardMode;
+  targetWord?: string;
+  source?: CardSource;
 };
 
 export type Deck = {
