@@ -255,7 +255,6 @@ function AddCardSheet({
   const [mode, setMode] = useState<"word" | "sentence">("word");
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
-  const [targetWord, setTargetWord] = useState("");
   const [source, setSource] = useState("");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [translating, setTranslating] = useState(false);
@@ -280,8 +279,7 @@ function AddCardSheet({
   }
 
   const isSentence = mode === "sentence";
-  const canSubmit =
-    front.trim() && back.trim() && (!isSentence || targetWord.trim());
+  const canSubmit = front.trim() && back.trim();
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
@@ -333,7 +331,6 @@ function AddCardSheet({
               if (!canSubmit) return;
               createCard(deckId, front, back, {
                 mode,
-                targetWord: isSentence ? targetWord : undefined,
                 source: source.trim() || undefined,
               });
               onClose();
@@ -355,14 +352,6 @@ function AddCardSheet({
                   : "Serendipity"
               }
             />
-            {isSentence && (
-              <Field
-                label="Palavra-alvo"
-                value={targetWord}
-                onChange={setTargetWord}
-                placeholder="although"
-              />
-            )}
             <button
               type="button"
               onClick={handleTranslate}
