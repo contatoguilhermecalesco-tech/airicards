@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
-import { Link } from "@tanstack/react-router";
+
 import {
   initNotifications,
   markAllAsRead,
