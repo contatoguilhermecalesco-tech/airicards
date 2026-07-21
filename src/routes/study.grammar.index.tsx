@@ -867,3 +867,350 @@ function SummaryView({
     </div>
   );
 }
+
+// ---------------- Tutor Chat ----------------
+
+function TutorView({
+  week,
+  lesson,
+  chat,
+}: {
+  week: number;
+  lesson: GrammarLesson;
+  chat: GrammarChatMessage[];
+}) {
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const ask = useServerFn(askGrammarTutor);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [chat.length, loading]);
+
+  async function send() {
+    const question = input.trim();
+    if (!question || loading) return;
+    setInput("");
+    setError(null);
+    appendChatMessage(week, { role: "user", content: question });
+    setLoading(true);
+    try {
+      const history = chat.slice(-10).map((m) => ({ role: m.role, content: m.content }));
+      const { answer } = await ask({
+        data: {
+          week,
+          topic: lesson.topic,
+          application: lesson.application,
+          lessonSummary: lesson.summary || lesson.introduction,
+          question,
+          history,
+        },
+      });
+      appendChatMessage(week, { role: "assistant", content: answer });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao consultar o tutor.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const suggestions = [
+    `Me dê 3 exemplos práticos de ${lesson.topic}.`,
+    "Qual o erro mais comum de brasileiros aqui?",
+    "Contraste esse tópico com o português.",
+    "Como usar isso em uma conversa informal?",
+  ];
+
+  return (
+    <div className="mt-6 flex flex-col gap-4">
+      <div className="glass-panel rounded-3xl border p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-400/30 to-violet-500/10 ring-1 ring-white/10">
+            <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Tutor de gramática</p>
+            <p className="text-xs text-muted-foreground">
+              Pergunte qualquer dúvida sobre <span className="text-foreground">{lesson.topic}</span>.
+              O tutor conhece o conteúdo desta aula.
+            </p>
+          </div>
+          {chat.length > 0 && (
+            <button
+              onClick={() => {
+                if (confirm("Limpar toda a conversa desta semana?")) clearChat(week);
+              }}
+              className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] text-muted-foreground transition hover:text-foreground"
+            >
+              <Trash2 className="h-3 w-3" strokeWidth={2.25} />
+              Limpar
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="glass-panel max-h-[55vh] min-h-[240px] overflow-y-auto rounded-3xl border p-4"
+      >
+        {chat.length === 0 && !loading && (
+          <div className="flex flex-col items-center justify-center gap-3 py-8 text-center">
+            <MessageCircle className="h-8 w-8 text-fuchsia-300/70" strokeWidth={1.75} />
+            <p className="text-sm text-muted-foreground">
+              Sem dúvidas registradas ainda. Comece com uma sugestão:
+            </p>
+            <div className="mt-1 flex flex-wrap justify-center gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setInput(s)}
+                  className="rounded-full border border-border bg-surface/40 px-3 py-1.5 text-xs text-foreground/85 transition hover:border-white/20 hover:text-foreground"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          {chat.map((m) => (
+            <ChatBubble key={m.id} message={m} />
+          ))}
+          {loading && (
+            <div className="flex items-center gap-2 pl-1 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.25} />
+              O tutor está pensando…
+            </div>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
+      <div className="glass-panel sticky bottom-2 rounded-3xl border p-3">
+        <div className="flex items-end gap-2">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                void send();
+              }
+            }}
+            placeholder="Pergunte algo sobre esta aula…"
+            rows={1}
+            className="min-h-[44px] max-h-32 flex-1 resize-none rounded-2xl border border-border bg-surface/40 px-4 py-3 text-sm outline-none transition focus:border-primary/50"
+          />
+          <button
+            onClick={() => void send()}
+            disabled={!input.trim() || loading}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground transition hover:bg-primary/90 disabled:opacity-50"
+            aria-label="Enviar"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.25} />
+            ) : (
+              <Send className="h-4 w-4" strokeWidth={2.25} />
+            )}
+          </button>
+        </div>
+        <p className="mt-2 px-1 text-[11px] text-muted-foreground">
+          Enter para enviar · Shift+Enter para nova linha
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ChatBubble({ message }: { message: GrammarChatMessage }) {
+  const isUser = message.role === "user";
+  return (
+    <div className={`flex gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+      <div
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ring-1 ${
+          isUser
+            ? "bg-primary/20 text-foreground ring-primary/30"
+            : "bg-fuchsia-500/15 text-fuchsia-200 ring-fuchsia-500/25"
+        }`}
+      >
+        {isUser ? (
+          <UserIcon className="h-3.5 w-3.5" strokeWidth={2.25} />
+        ) : (
+          <GraduationCap className="h-3.5 w-3.5" strokeWidth={2.25} />
+        )}
+      </div>
+      <div
+        className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+          isUser
+            ? "bg-primary/15 text-foreground"
+            : "border border-border bg-surface/60 text-foreground/90"
+        }`}
+      >
+        <p className="whitespace-pre-wrap">{message.content}</p>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Notes ----------------
+
+function NotesView({ week, value }: { week: number; value: string }) {
+  const [draft, setDraft] = useState(value);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [week, value]);
+
+  useEffect(() => {
+    if (draft === value) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setNote(week, draft);
+      setSavedAt(Date.now());
+    }, 500);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [draft, week, value]);
+
+  return (
+    <div className="mt-6 space-y-4">
+      <div className="glass-panel rounded-3xl border p-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/30 to-fuchsia-500/10 ring-1 ring-white/10">
+            <NotebookPen className="h-4 w-4" strokeWidth={2.25} />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Suas anotações</p>
+            <p className="text-xs text-muted-foreground">
+              Sincronizadas na nuvem. Uma anotação por semana.
+            </p>
+          </div>
+          {savedAt && (
+            <span className="text-[11px] text-emerald-300">Salvo</span>
+          )}
+        </div>
+      </div>
+
+      <textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        placeholder="Escreva aqui suas anotações da aula: exemplos que te marcaram, dúvidas, insights…"
+        rows={16}
+        className="w-full resize-y rounded-3xl border border-border bg-surface/40 p-5 text-[15px] leading-relaxed outline-none transition focus:border-primary/50"
+      />
+
+      <p className="px-1 text-[11px] text-muted-foreground">
+        {draft.length} caractere{draft.length === 1 ? "" : "s"} · salva automaticamente
+      </p>
+    </div>
+  );
+}
+
+// ---------------- History ----------------
+
+function formatDate(ts: number): string {
+  try {
+    return new Date(ts).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
+function HistoryView({
+  attempts,
+  onDelete,
+}: {
+  attempts: GrammarAttempt[];
+  onDelete: (id: string) => void;
+}) {
+  if (attempts.length === 0) {
+    return (
+      <div className="mt-6 rounded-3xl border border-border bg-surface/40 p-8 text-center">
+        <History className="mx-auto h-8 w-8 text-muted-foreground" strokeWidth={1.75} />
+        <p className="mt-3 text-sm font-medium">Sem tentativas ainda</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Complete a lista de exercícios para registrar aqui.
+        </p>
+      </div>
+    );
+  }
+
+  const avg =
+    attempts.reduce((acc, a) => acc + (a.score / a.total) * 100, 0) / attempts.length;
+  const best = Math.max(...attempts.map((a) => (a.score / a.total) * 100));
+
+  return (
+    <div className="mt-6 space-y-4">
+      <div className="grid grid-cols-3 gap-2">
+        {[
+          { label: "Tentativas", value: attempts.length.toString() },
+          { label: "Média", value: `${Math.round(avg)}%` },
+          { label: "Melhor", value: `${Math.round(best)}%` },
+        ].map((s) => (
+          <div
+            key={s.label}
+            className="rounded-2xl border border-border bg-surface/40 p-3 text-center"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {s.label}
+            </p>
+            <p className="mt-1 text-lg font-semibold">{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <ul className="space-y-2">
+        {attempts.map((a) => {
+          const pct = Math.round((a.score / a.total) * 100);
+          const tone =
+            pct >= 80
+              ? "text-emerald-300 bg-emerald-500/15"
+              : pct >= 60
+              ? "text-amber-300 bg-amber-500/15"
+              : "text-rose-300 bg-rose-500/15";
+          return (
+            <li
+              key={a.id}
+              className="glass-panel flex items-center gap-3 rounded-2xl border p-3"
+            >
+              <div className={`rounded-xl px-3 py-2 text-sm font-semibold ${tone}`}>
+                {pct}%
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{a.topic}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {a.score}/{a.total} · {formatDate(a.completedAt)}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm("Remover essa tentativa do histórico?")) onDelete(a.id);
+                }}
+                className="rounded-full p-2 text-muted-foreground transition hover:bg-white/5 hover:text-rose-300"
+                aria-label="Excluir tentativa"
+              >
+                <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
