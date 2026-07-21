@@ -475,6 +475,31 @@ function SpeakingPage() {
                 </span>
               </label>
 
+              {ownSpeech && (
+                <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-2xl border border-orange-400/25 bg-orange-400/5 p-3 text-sm transition hover:bg-orange-400/10">
+                  <input
+                    type="checkbox"
+                    checked={includeOwn}
+                    onChange={(e) => setIncludeOwn(e.target.checked)}
+                    className="mt-0.5 accent-orange-400"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5 font-medium">
+                      <Mic className="h-3.5 w-3.5 text-orange-300" strokeWidth={2.25} />
+                      Minha fala
+                      {grade?.refinedAttempt && (
+                        <span className="rounded-full bg-orange-400/20 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-orange-200">
+                          refinada
+                        </span>
+                      )}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">"{ownSpeech}"</span>
+                  </span>
+                </label>
+              )}
+
+
+
               {prompt.altAnswers.length > 0 && (
                 <div className="mt-3">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
