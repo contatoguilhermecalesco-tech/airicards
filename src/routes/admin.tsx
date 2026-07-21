@@ -330,6 +330,7 @@ function NotificationsSection() {
 
   const [idea, setIdea] = useState("");
   const [tagId, setTagId] = useState<string>("");
+  const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [genBusy, setGenBusy] = useState(false);
