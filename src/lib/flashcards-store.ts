@@ -231,7 +231,12 @@ export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "descr
   scheduleSave();
 }
 
-export function createCard(deckId: string, front: string, back: string): Card {
+export function createCard(
+  deckId: string,
+  front: string,
+  back: string,
+  extras?: { mode?: CardMode; targetWord?: string; source?: CardSource },
+): Card {
   const card: Card = {
     id: uid(),
     deckId,
@@ -242,6 +247,9 @@ export function createCard(deckId: string, front: string, back: string): Card {
     reps: 0,
     dueAt: Date.now(),
     createdAt: Date.now(),
+    ...(extras?.mode ? { mode: extras.mode } : {}),
+    ...(extras?.targetWord?.trim() ? { targetWord: extras.targetWord.trim() } : {}),
+    ...(extras?.source ? { source: extras.source } : {}),
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
