@@ -18,6 +18,7 @@ import {
   resetHomeSessionsForProfile,
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
+import { resetExamsForProfileId } from "@/lib/exam-store";
 
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import {
