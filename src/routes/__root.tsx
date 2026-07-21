@@ -16,7 +16,9 @@ import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
+import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
+
 
 function NotFoundComponent() {
   return (
