@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, CheckCheck, Inbox, Sparkles } from "lucide-react";
+import { Bell, BellOff, CheckCheck, Inbox, Settings2, Moon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   initNotifications,
   markAllAsRead,
   markAsRead,
   useNotifications,
-  useUnreadCount,
 } from "@/lib/notifications-store";
 import { subscribeProfile } from "@/lib/profile";
+import { isQuietNow, useNotificationPrefs } from "@/lib/notification-prefs";
+import { playChime, vibratePulse } from "@/lib/notification-sound";
 
 function timeAgo(iso: string) {
   const t = new Date(iso).getTime();
@@ -19,80 +21,69 @@ function timeAgo(iso: string) {
   if (h < 24) return `${h} h`;
   const d = Math.floor(h / 24);
   if (d < 7) return `${d} d`;
-  return new Date(iso).toLocaleDateString("pt-BR");
+  return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+}
+
+const ESSENTIAL_PATTERN = /essenc|import|urg|alerta|critico|crítico/i;
+function isEssentialTag(name?: string | null) {
+  if (!name) return false;
+  return ESSENTIAL_PATTERN.test(name);
 }
 
 type Notif = ReturnType<typeof useNotifications>["notifications"][number];
 type Tag = ReturnType<typeof useNotifications>["tags"][number];
 
-function NotificationItem({
+function Row({
   n,
   tag,
   isRead,
+  onClick,
 }: {
   n: Notif;
   tag: Tag | null;
   isRead: boolean;
+  onClick: () => void;
 }) {
   const accent = tag?.color ?? "hsl(var(--primary))";
   return (
     <button
-      onClick={() => void markAsRead(n.id)}
-      className={`group relative flex w-full gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition-all duration-200 hover:bg-accent/70 active:scale-[0.995] ${
-        isRead ? "opacity-70" : ""
+      onClick={onClick}
+      className={`group relative flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors duration-150 hover:bg-white/[0.04] active:bg-white/[0.06] ${
+        isRead ? "opacity-60" : "opacity-100"
       }`}
     >
-      {/* Left accent bar */}
-      <span
+      <div
+        className="mt-1 flex h-2 w-2 shrink-0 items-center justify-center rounded-full"
         aria-hidden
-        className={`absolute inset-y-2 left-0 w-[3px] rounded-full transition-all ${
-          isRead ? "opacity-0" : "opacity-100"
-        }`}
         style={{
-          background: accent,
-          boxShadow: isRead ? "none" : `0 0 12px ${accent}`,
+          background: isRead ? "transparent" : accent,
+          boxShadow: isRead ? "none" : `0 0 8px ${accent}, 0 0 2px ${accent}`,
+          outline: isRead ? "1px solid hsl(var(--border))" : "none",
         }}
       />
-      <div className="min-w-0 flex-1 pl-2">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            {!isRead && (
-              <span
-                aria-hidden
-                className="h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
-              />
-            )}
-            <p
-              className={`truncate text-[13.5px] font-semibold tracking-tight ${
-                isRead ? "text-foreground/75" : "text-foreground"
-              }`}
-            >
-              {n.title}
-            </p>
-          </div>
-          <span className="shrink-0 text-[10.5px] font-medium uppercase tracking-wider tabular-nums text-foreground/50">
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className={`truncate text-[14px] font-semibold tracking-tight ${isRead ? "text-foreground/80" : "text-foreground"}`}>
+            {n.title}
+          </p>
+          <span className="shrink-0 text-[11px] font-medium tabular-nums text-foreground/50">
             {timeAgo(n.created_at)}
           </span>
         </div>
-        <p className="mt-1 line-clamp-3 text-[12.5px] leading-relaxed text-foreground/75">
+        <p className="mt-0.5 line-clamp-2 text-[12.5px] leading-relaxed text-foreground/70">
           {n.body}
         </p>
         {tag && (
-          <span
-            className="mt-2 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10.5px] font-semibold tracking-wide"
-            style={{
-              backgroundColor: `${tag.color}1f`,
-              color: tag.color,
-              border: `1px solid ${tag.color}40`,
-            }}
-          >
+          <div className="mt-1.5 flex items-center gap-1.5">
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{ background: tag.color }}
+              aria-hidden
             />
-            {tag.name}
-          </span>
+            <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em]" style={{ color: tag.color }}>
+              {tag.name}
+            </span>
+          </div>
         )}
       </div>
     </button>
@@ -103,7 +94,7 @@ export function NotificationsBell() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { notifications, tags, readIds } = useNotifications();
-  const unread = useUnreadCount();
+  const prefs = useNotificationPrefs();
 
   useEffect(() => {
     void initNotifications();
@@ -131,15 +122,48 @@ export function NotificationsBell() {
 
   const tagMap = useMemo(() => new Map(tags.map((t) => [t.id, t])), [tags]);
 
+  // Apply "essential only" filter — keeps only notifications whose tag looks essential.
+  const visible = useMemo(() => {
+    if (!prefs.essentialOnly) return notifications;
+    return notifications.filter((n) => {
+      const tag = n.tag_id ? tagMap.get(n.tag_id) : null;
+      return isEssentialTag(tag?.name);
+    });
+  }, [notifications, prefs.essentialOnly, tagMap]);
+
+  const unread = useMemo(
+    () => visible.filter((n) => !readIds.has(n.id)).length,
+    [visible, readIds],
+  );
+
   const { news, older } = useMemo(() => {
     const news: Notif[] = [];
     const older: Notif[] = [];
-    for (const n of notifications) {
+    for (const n of visible) {
       if (readIds.has(n.id)) older.push(n);
       else news.push(n);
     }
     return { news, older };
-  }, [notifications, readIds]);
+  }, [visible, readIds]);
+
+  // Chime + vibrate when a truly new notification arrives (after first mount).
+  const lastIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const current = new Set(visible.map((n) => n.id));
+    const prev = lastIdsRef.current;
+    lastIdsRef.current = current;
+    if (!prev) return; // first load — don't chime
+    let hasNew = false;
+    current.forEach((id) => {
+      if (!prev.has(id)) hasNew = true;
+    });
+    if (!hasNew) return;
+    if (isQuietNow(prefs)) return;
+    if (prefs.sound) playChime();
+    if (prefs.vibration) vibratePulse();
+  }, [visible, prefs]);
+
+  const quiet = isQuietNow(prefs);
 
   return (
     <div ref={ref} className="relative">
@@ -150,94 +174,96 @@ export function NotificationsBell() {
             ? "text-foreground hover:bg-accent"
             : "text-muted-foreground hover:bg-accent hover:text-foreground"
         }`}
-        aria-label="Notificações"
+        aria-label={`Notificações${unread > 0 ? ` (${unread} não lidas)` : ""}`}
       >
-        <Bell
-          className={`h-[18px] w-[18px] ${unread > 0 ? "animate-[wiggle_2.5s_ease-in-out_infinite]" : ""}`}
-          strokeWidth={2.25}
-        />
+        {quiet ? (
+          <BellOff className="h-[18px] w-[18px]" strokeWidth={2.25} />
+        ) : (
+          <Bell className="h-[18px] w-[18px]" strokeWidth={2.25} />
+        )}
         {unread > 0 && (
-          <span className="absolute right-0.5 top-0.5 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-none text-primary-foreground ring-2 ring-background shadow-[0_0_8px_hsl(var(--primary)/0.6)]">
-            {unread > 9 ? "9+" : unread}
-          </span>
+          <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
         )}
       </button>
 
       {open && (
-        <div className="glass-panel fixed left-1/2 top-[64px] w-[min(94vw,380px)] -translate-x-1/2 overflow-hidden rounded-3xl border border-border/60 bg-surface-elevated/95 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:translate-x-0">
-          {/* Header with subtle gradient */}
-          <div className="relative overflow-hidden">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-70"
-              style={{
-                background:
-                  "radial-gradient(120% 100% at 0% 0%, hsl(var(--primary) / 0.18), transparent 60%)",
-              }}
-            />
-            <div className="relative flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
-                  <Bell className="h-3.5 w-3.5" strokeWidth={2.5} />
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold leading-none text-foreground">
-                    Notificações
-                  </p>
-                  <p className="mt-0.5 text-[10.5px] leading-none text-foreground/55">
-                    {unread > 0
-                      ? `${unread} não lida${unread > 1 ? "s" : ""}`
-                      : "tudo em dia"}
-                  </p>
-                </div>
-              </div>
+        <div className="fixed left-1/2 top-[64px] z-50 w-[min(94vw,380px)] -translate-x-1/2 overflow-hidden rounded-[26px] border border-white/[0.08] bg-[oklch(0.19_0.02_290/0.92)] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:translate-x-0">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 pb-2 pt-3.5">
+            <div>
+              <p className="text-[15px] font-semibold tracking-tight text-foreground">
+                Notificações
+              </p>
+              <p className="mt-0.5 text-[11.5px] text-foreground/55">
+                {unread > 0
+                  ? `${unread} nova${unread > 1 ? "s" : ""}`
+                  : "Tudo em dia"}
+                {prefs.essentialOnly && " · só essenciais"}
+                {quiet && " · silencioso"}
+              </p>
+            </div>
+            <div className="flex items-center gap-0.5">
               {unread > 0 && (
                 <button
                   onClick={() => void markAllAsRead()}
-                  className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2.5 py-1 text-[10.5px] font-semibold text-foreground/85 transition hover:bg-accent hover:text-foreground"
+                  className="inline-flex h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium text-foreground/80 transition hover:bg-white/[0.06] hover:text-foreground"
+                  title="Marcar todas como lidas"
                 >
-                  <CheckCheck className="h-3 w-3" strokeWidth={2.5} />
-                  Marcar todas
+                  <CheckCheck className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  Marcar tudo
                 </button>
               )}
+              <Link
+                to="/settings"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-foreground/70 transition hover:bg-white/[0.06] hover:text-foreground"
+                title="Preferências"
+              >
+                <Settings2 className="h-4 w-4" strokeWidth={2.25} />
+              </Link>
             </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
           </div>
+
+          {quiet && (
+            <div className="mx-3 mb-2 flex items-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-[11.5px] text-foreground/70">
+              <Moon className="h-3.5 w-3.5 text-primary/80" strokeWidth={2.25} />
+              Modo silencioso ativo — sem som nem vibração agora.
+            </div>
+          )}
+
+          <div className="h-px bg-white/[0.06]" />
 
           {/* Body */}
           <div className="max-h-[65vh] overflow-y-auto p-1.5">
-            {notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center">
-                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                  <Inbox className="h-6 w-6 text-primary/80" strokeWidth={2} />
-                  <Sparkles
-                    className="absolute -right-1 -top-1 h-4 w-4 text-primary"
-                    strokeWidth={2.5}
-                  />
+            {visible.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 px-6 py-10 text-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
+                  <Inbox className="h-5 w-5 text-foreground/50" strokeWidth={2} />
                 </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-foreground">
-                    Tudo tranquilo por aqui
-                  </p>
-                  <p className="mt-1 text-[11.5px] text-foreground/60">
-                    Novas notificações aparecem aqui em tempo real.
-                  </p>
-                </div>
+                <p className="mt-1 text-[13px] font-semibold text-foreground/90">
+                  Sua caixa está limpa
+                </p>
+                <p className="text-[11.5px] text-foreground/55">
+                  {prefs.essentialOnly
+                    ? "Nenhuma notificação essencial no momento."
+                    : "Volte mais tarde para novidades."}
+                </p>
               </div>
             ) : (
               <>
                 {news.length > 0 && (
-                  <div className="mb-1">
-                    <p className="px-3 pb-1 pt-1.5 text-[9.5px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                  <div>
+                    <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/40">
                       Novas
                     </p>
                     <ul className="space-y-0.5">
                       {news.map((n) => (
                         <li key={n.id}>
-                          <NotificationItem
+                          <Row
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={false}
+                            onClick={() => void markAsRead(n.id)}
                           />
                         </li>
                       ))}
@@ -246,19 +272,18 @@ export function NotificationsBell() {
                 )}
                 {older.length > 0 && (
                   <div>
-                    {news.length > 0 && (
-                      <div className="mx-3 my-1 h-px bg-border/60" />
-                    )}
-                    <p className="px-3 pb-1 pt-1.5 text-[9.5px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                    {news.length > 0 && <div className="mx-3 my-1 h-px bg-white/[0.05]" />}
+                    <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/40">
                       Anteriores
                     </p>
                     <ul className="space-y-0.5">
                       {older.map((n) => (
                         <li key={n.id}>
-                          <NotificationItem
+                          <Row
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={true}
+                            onClick={() => void markAsRead(n.id)}
                           />
                         </li>
                       ))}
@@ -267,6 +292,21 @@ export function NotificationsBell() {
                 )}
               </>
             )}
+          </div>
+
+          {/* Footer */}
+          <div className="border-t border-white/[0.06] px-4 py-2.5">
+            <Link
+              to="/settings"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between text-[11.5px] font-medium text-foreground/70 transition hover:text-foreground"
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <Settings2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+                Preferências de notificação
+              </span>
+              <span className="text-foreground/40">›</span>
+            </Link>
           </div>
         </div>
       )}
