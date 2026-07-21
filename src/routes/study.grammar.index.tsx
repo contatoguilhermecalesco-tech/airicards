@@ -321,18 +321,21 @@ function GrammarPage() {
 
       {lesson && (
         <>
-          <nav className="sticky top-2 z-20 mt-6 flex gap-1 rounded-2xl border border-border bg-surface/80 p-1 backdrop-blur-xl">
+          <nav className="sticky top-2 z-20 mt-6 flex gap-1 overflow-x-auto rounded-2xl border border-border bg-surface/80 p-1 backdrop-blur-xl">
             {(
               [
                 { id: "aula", label: "Aula" },
                 { id: "exercicios", label: `Exercícios · ${total}` },
+                { id: "tutor", label: "Tutor" },
+                { id: "notas", label: "Notas" },
+                { id: "historico", label: "Histórico" },
                 { id: "resumo", label: "Resumo" },
               ] as { id: Tab; label: string }[]
             ).map((t) => (
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex-1 rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-wider transition ${
+                className={`shrink-0 rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-wider transition ${
                   tab === t.id
                     ? "bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -344,6 +347,23 @@ function GrammarPage() {
           </nav>
 
           {tab === "aula" && <LessonView lesson={lesson} onStart={() => setTab("exercicios")} />}
+          {tab === "tutor" && (
+            <TutorView
+              week={selectedWeek}
+              lesson={lesson}
+              chat={progress.chats?.[String(selectedWeek)] ?? []}
+            />
+          )}
+          {tab === "notas" && (
+            <NotesView
+              week={selectedWeek}
+              value={progress.notes?.[String(selectedWeek)] ?? ""}
+            />
+          )}
+          {tab === "historico" && (
+            <HistoryView attempts={attempts} onDelete={(id) => deleteAttempt(id)} />
+          )}
+
 
           {tab === "exercicios" && (
             <div className="mt-6 space-y-4">
