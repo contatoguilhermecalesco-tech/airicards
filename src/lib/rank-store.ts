@@ -42,7 +42,7 @@ export type RankState = {
   peakDivision: Division;
 };
 
-const TIER_ORDER: Tier[] = [
+export const TIER_ORDER: Tier[] = [
   "iron",
   "bronze",
   "silver",
@@ -359,12 +359,30 @@ export const LP = {
   enemyEvolved: -12,
   streakDay: (days: number) => Math.min(12, Math.max(2, days * 2)),
   streakBroken: -35,
+  streakBrokenFor: (prevCurrent: number) => {
+    if (prevCurrent >= 7) return -35;
+    if (prevCurrent >= 3) return -20;
+    if (prevCurrent >= 1) return -10;
+    return 0;
+  },
   grammarLesson: 10,
   writingGood: 15,
   writingGreat: 30,
   examBonusByPercent: (pct: number) =>
     Math.round(25 + Math.max(0, pct - 30) * 1.4), // 25..123
+  examFailed: -25,
+  // Punições diárias — aplicadas por outros stores com cap.
+  enemyIgnoredPerDay: -3,
+  enemyIgnoredCapDaily: -15,
+  decayPerDay: -2,
+  decayCapDaily: -12,
 };
+
+/** Tier eligível para decaimento por inatividade (a partir de Ouro). */
+export function isDecayEligible(tier: Tier): boolean {
+  return TIER_ORDER.indexOf(tier) >= TIER_ORDER.indexOf("gold");
+}
+
 
 /**
  * LP acumulado necessário (a partir de Ferro IV, 0 LP) para *entrar* em um tier.
