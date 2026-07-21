@@ -56,6 +56,7 @@ function SpeakingPage() {
   const decks = useStore((s) => s.decks);
   const [selectedDeck, setSelectedDeck] = useState<string>("");
   const [includeModel, setIncludeModel] = useState(true);
+  const [includeOwn, setIncludeOwn] = useState(false);
   const [pickedAlts, setPickedAlts] = useState<Record<number, boolean>>({});
   const [savedCount, setSavedCount] = useState(0);
 
@@ -74,16 +75,23 @@ function SpeakingPage() {
   useEffect(() => {
     if (!prompt) return;
     setIncludeModel(true);
+    setIncludeOwn(false);
     const init: Record<number, boolean> = {};
     prompt.altAnswers.forEach((_, i) => (init[i] = false));
     setPickedAlts(init);
     setSavedCount(0);
   }, [prompt]);
 
+  const ownSpeech = (grade?.refinedAttempt || spoken).trim();
+
   const pickedCount = useMemo(() => {
     const alts = prompt?.altAnswers ?? [];
-    return (includeModel ? 1 : 0) + alts.reduce((n, _, i) => n + (pickedAlts[i] ? 1 : 0), 0);
-  }, [prompt, includeModel, pickedAlts]);
+    return (
+      (includeModel ? 1 : 0) +
+      (includeOwn && ownSpeech ? 1 : 0) +
+      alts.reduce((n, _, i) => n + (pickedAlts[i] ? 1 : 0), 0)
+    );
+  }, [prompt, includeModel, includeOwn, ownSpeech, pickedAlts]);
 
   function saveCards() {
     if (!prompt || !selectedDeck || pickedCount === 0) return;
@@ -93,6 +101,13 @@ function SpeakingPage() {
       createCard(selectedDeck, prompt.modelAnswer, prompt.translation, {
         mode: "sentence",
         source: src,
+      });
+      n++;
+    }
+    if (includeOwn && ownSpeech) {
+      createCard(selectedDeck, ownSpeech, prompt.translation, {
+        mode: "sentence",
+        source: `${src} · minha fala`,
       });
       n++;
     }
