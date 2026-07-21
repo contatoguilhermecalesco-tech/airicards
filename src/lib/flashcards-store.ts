@@ -345,10 +345,59 @@ export function reviewCard(id: string, grade: Grade) {
 
   // Track cards revisadas hoje for the Home hero ring.
   refreshHomeDay();
+  const wasFirstToday = (home.reviewed ?? 0) === 0;
   home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
+  if (wasFirstToday) {
+    home = { ...home, streak: bumpStreak(home.streak, todayKey()) };
+  }
   emitHome();
   emit();
   scheduleSave();
+}
+
+// --- Streak -----------------------------------------------------------
+function dayKeyFromDate(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+function yesterdayKey(today: string): string {
+  const [y, m, d] = today.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  dt.setDate(dt.getDate() - 1);
+  return dayKeyFromDate(dt);
+}
+function bumpStreak(prev: Streak | undefined, today: string): Streak {
+  const yday = yesterdayKey(today);
+  if (!prev || !prev.lastDay) {
+    return { current: 1, longest: 1, lastDay: today, startedOn: today };
+  }
+  if (prev.lastDay === today) return prev; // already counted today
+  const next = prev.lastDay === yday ? prev.current + 1 : 1;
+  return {
+    current: next,
+    longest: Math.max(prev.longest ?? 0, next),
+    lastDay: today,
+    startedOn: prev.lastDay === yday ? prev.startedOn ?? today : today,
+  };
+}
+/** Returns the effective streak, resetting to 0 if user missed ≥2 days. */
+export function getStreak(): Streak {
+  refreshHomeDay();
+  const s = home.streak;
+  const today = todayKey();
+  if (!s || !s.lastDay) return { current: 0, longest: s?.longest ?? 0, lastDay: "" };
+  if (s.lastDay === today || s.lastDay === yesterdayKey(today)) return s;
+  // Missed ≥1 full day → streak considered broken (still preserving longest)
+  return { current: 0, longest: s.longest ?? s.current ?? 0, lastDay: s.lastDay };
+}
+export function useStreak(): Streak {
+  return useSyncExternalStore(
+    (l) => {
+      homeListeners.add(l);
+      return () => homeListeners.delete(l);
+    },
+    () => getStreak(),
+    () => ({ current: 0, longest: 0, lastDay: "" }),
+  );
 }
 
 
