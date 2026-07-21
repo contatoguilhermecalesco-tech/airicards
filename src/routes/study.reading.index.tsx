@@ -432,9 +432,18 @@ function ReadingPage() {
             </button>
           </div>
 
-          <article className="prose-reading mt-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/95">
+          <article
+            ref={articleRef}
+            onMouseUp={handleSelection}
+            onTouchEnd={handleSelection}
+            className="prose-reading snip-source mt-4 whitespace-pre-wrap text-[15px] leading-relaxed text-foreground/95 selection:bg-sky-400/30 selection:text-sky-50"
+          >
             {passage.text}
           </article>
+          <p className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Scissors className="h-3 w-3" strokeWidth={2.25} />
+            Selecione um trecho para transformar em carta.
+          </p>
 
           {showTranslation && (
             <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
