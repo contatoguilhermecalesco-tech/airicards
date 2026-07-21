@@ -209,8 +209,8 @@ function ReadingPage() {
     if (!rect || (rect.width === 0 && rect.height === 0)) return;
     setSnipChip({
       text,
-      top: rect.top + window.scrollY - 44,
-      left: rect.left + window.scrollX + rect.width / 2,
+      top: rect.top - 44,
+      left: rect.left + rect.width / 2,
     });
   }
 
