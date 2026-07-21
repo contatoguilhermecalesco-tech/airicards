@@ -78,8 +78,26 @@ function ReadingPage() {
   const [savedCount, setSavedCount] = useState(0);
   const [saveOpen, setSaveOpen] = useState(false);
 
+  // Snip-to-card (selection popover)
+  const articleRef = useRef<HTMLElement | null>(null);
+  const [snipChip, setSnipChip] = useState<{
+    text: string;
+    top: number;
+    left: number;
+  } | null>(null);
+  const [snip, setSnip] = useState<{
+    front: string;
+    back: string;
+    deckId: string;
+    translating: boolean;
+    saving: boolean;
+    saved: boolean;
+    error: string | null;
+  } | null>(null);
+
   const gen = useServerFn(generateReading);
   const grader = useServerFn(gradeReading);
+  const translate = useServerFn(translateEnToPt);
 
   useEffect(() => {
     if (!selectedDeck && decks.length > 0) setSelectedDeck(decks[0].id);
