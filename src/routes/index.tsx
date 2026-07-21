@@ -173,7 +173,14 @@ function Home() {
                   {due}
                   <span className="text-muted-foreground/70"> agora</span>
                 </p>
+                {pending > 0 && (
+                  <p className="mt-1 text-[11px] text-muted-foreground/80 tabular-nums">
+                    +{pending} voltando
+                    {nextDueInMs !== null ? ` em ${formatNextIn(nextDueInMs)}` : ""}
+                  </p>
+                )}
               </div>
+
               <div className="h-px w-8 bg-white/10" />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary/60">
