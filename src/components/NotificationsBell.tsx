@@ -1,5 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Bell, BellOff, CheckCheck, Inbox, Settings2, Moon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  CheckCheck,
+  Inbox,
+  Settings2,
+  Moon,
+  Sparkles,
+  AlertTriangle,
+  BookOpen,
+  Trophy,
+  Flame,
+  Megaphone,
+  Calendar,
+  Gift,
+  Zap,
+  Heart,
+  Info,
+  GraduationCap,
+  PenLine,
+  Headphones,
+  Mic,
+  Languages,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import {
   initNotifications,
