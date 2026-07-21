@@ -146,6 +146,27 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+// -------- eventos de promoção (para animação de UI) --------------------
+export type RankPromotionEvent = {
+  fromTier: Tier;
+  fromDivision: Division;
+  toTier: Tier;
+  toDivision: Division;
+  kind: "tier" | "division";
+  at: number;
+};
+const promoListeners = new Set<(e: RankPromotionEvent) => void>();
+export function onRankPromotion(cb: (e: RankPromotionEvent) => void) {
+  promoListeners.add(cb);
+  return () => promoListeners.delete(cb);
+}
+function emitPromotion(e: RankPromotionEvent) {
+  promoListeners.forEach((l) => {
+    try { l(e); } catch {}
+  });
+}
+
+
 export function setActiveRankProfile(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
