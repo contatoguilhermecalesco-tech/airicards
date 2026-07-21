@@ -20,6 +20,8 @@ import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
+import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
+import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
 import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyWritingHistoryRouteImport } from './routes/study.writing.history'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
@@ -80,6 +82,16 @@ const StudyWritingIndexRoute = StudyWritingIndexRouteImport.update({
   path: '/study/writing/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudySpeakingIndexRoute = StudySpeakingIndexRouteImport.update({
+  id: '/study/speaking/',
+  path: '/study/speaking/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyListeningIndexRoute = StudyListeningIndexRouteImport.update({
+  id: '/study/listening/',
+  path: '/study/listening/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudyGrammarIndexRoute = StudyGrammarIndexRouteImport.update({
   id: '/study/grammar/',
   path: '/study/grammar/',
@@ -115,6 +127,8 @@ export interface FileRoutesByFullPath {
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
   '/study/grammar/': typeof StudyGrammarIndexRoute
+  '/study/listening/': typeof StudyListeningIndexRoute
+  '/study/speaking/': typeof StudySpeakingIndexRoute
   '/study/writing/': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -132,6 +146,8 @@ export interface FileRoutesByTo {
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
   '/study/grammar': typeof StudyGrammarIndexRoute
+  '/study/listening': typeof StudyListeningIndexRoute
+  '/study/speaking': typeof StudySpeakingIndexRoute
   '/study/writing': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -150,6 +166,8 @@ export interface FileRoutesById {
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
   '/study/grammar/': typeof StudyGrammarIndexRoute
+  '/study/listening/': typeof StudyListeningIndexRoute
+  '/study/speaking/': typeof StudySpeakingIndexRoute
   '/study/writing/': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -169,6 +187,8 @@ export interface FileRouteTypes {
     | '/deck/$owner/$slug'
     | '/study/writing/history'
     | '/study/grammar/'
+    | '/study/listening/'
+    | '/study/speaking/'
     | '/study/writing/'
     | '/study/writing/history/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -186,6 +206,8 @@ export interface FileRouteTypes {
     | '/deck/$owner/$slug'
     | '/study/writing/history'
     | '/study/grammar'
+    | '/study/listening'
+    | '/study/speaking'
     | '/study/writing'
     | '/study/writing/history/$id'
   id:
@@ -203,6 +225,8 @@ export interface FileRouteTypes {
     | '/deck/$owner/$slug'
     | '/study/writing/history'
     | '/study/grammar/'
+    | '/study/listening/'
+    | '/study/speaking/'
     | '/study/writing/'
     | '/study/writing/history/$id'
   fileRoutesById: FileRoutesById
@@ -221,6 +245,8 @@ export interface RootRouteChildren {
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
   StudyWritingHistoryRoute: typeof StudyWritingHistoryRouteWithChildren
   StudyGrammarIndexRoute: typeof StudyGrammarIndexRoute
+  StudyListeningIndexRoute: typeof StudyListeningIndexRoute
+  StudySpeakingIndexRoute: typeof StudySpeakingIndexRoute
   StudyWritingIndexRoute: typeof StudyWritingIndexRoute
 }
 
@@ -303,6 +329,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyWritingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study/speaking/': {
+      id: '/study/speaking/'
+      path: '/study/speaking'
+      fullPath: '/study/speaking/'
+      preLoaderRoute: typeof StudySpeakingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study/listening/': {
+      id: '/study/listening/'
+      path: '/study/listening'
+      fullPath: '/study/listening/'
+      preLoaderRoute: typeof StudyListeningIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/study/grammar/': {
       id: '/study/grammar/'
       path: '/study/grammar'
@@ -359,6 +399,8 @@ const rootRouteChildren: RootRouteChildren = {
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
   StudyWritingHistoryRoute: StudyWritingHistoryRouteWithChildren,
   StudyGrammarIndexRoute: StudyGrammarIndexRoute,
+  StudyListeningIndexRoute: StudyListeningIndexRoute,
+  StudySpeakingIndexRoute: StudySpeakingIndexRoute,
   StudyWritingIndexRoute: StudyWritingIndexRoute,
 }
 export const routeTree = rootRouteImport

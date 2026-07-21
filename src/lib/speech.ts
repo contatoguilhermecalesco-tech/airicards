@@ -45,6 +45,10 @@ type AnyWindow = Window & {
   SpeechRecognition?: new () => SpeechRecognitionLike;
 };
 
+type SRAlt = { transcript: string; confidence: number };
+type SRResult = { 0: SRAlt; isFinal: boolean; length: number };
+type SRResults = { length: number; [i: number]: SRResult };
+
 interface SpeechRecognitionLike extends EventTarget {
   lang: string;
   interimResults: boolean;
@@ -53,15 +57,7 @@ interface SpeechRecognitionLike extends EventTarget {
   start(): void;
   stop(): void;
   abort(): void;
-  onresult:
-    | ((e: {
-        results: ArrayLike<ArrayLike<{ transcript: string; confidence: number }>> & {
-          [index: number]: ArrayLike<{ transcript: string; confidence: number }> & {
-            isFinal: boolean;
-          };
-        };
-      }) => void)
-    | null;
+  onresult: ((e: { results: SRResults }) => void) | null;
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
 }
@@ -97,10 +93,8 @@ export function startRecognition(opts: {
   let finalConf = 0;
   rec.onresult = (e) => {
     let interim = "";
-    for (let i = 0; i < (e.results as unknown as ArrayLike<unknown>).length; i++) {
-      const res = e.results[i] as ArrayLike<{ transcript: string; confidence: number }> & {
-        isFinal: boolean;
-      };
+    for (let i = 0; i < e.results.length; i++) {
+      const res = e.results[i];
       const alt = res[0];
       if (res.isFinal) {
         finalText += alt.transcript;
