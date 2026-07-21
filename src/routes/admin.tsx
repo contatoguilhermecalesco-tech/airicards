@@ -196,10 +196,14 @@ function AdminPage() {
       </section>
 
       <div className="h-6" />
+      <ExamAdminSection />
+
+      <div className="h-6" />
       <TagsSection />
 
       <div className="h-6" />
       <NotificationsSection />
+
 
       <AlertDialog
         open={confirmId !== null}
