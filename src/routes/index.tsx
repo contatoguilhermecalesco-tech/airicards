@@ -97,6 +97,7 @@ function Home() {
   const examMonthKey = getMonthKey();
   const examDone = hasCompletedExamThisMonth(examMonthKey);
   const examResult = examState.history.find((h) => h.monthKey === examMonthKey);
+  const appSettings = useAppSettings();
 
   // Ring geometry — compact 96px ring
   const RING_R = 40;
