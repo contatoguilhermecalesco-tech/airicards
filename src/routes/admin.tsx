@@ -209,6 +209,9 @@ function AdminPage() {
       </section>
 
       <div className="h-6" />
+      <ProfilesRankOverview />
+
+      <div className="h-6" />
       <ExamAdminSection />
 
       <div className="h-6" />
