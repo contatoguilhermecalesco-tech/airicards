@@ -196,6 +196,11 @@ function RankPage() {
         />
       </section>
 
+      {/* Leaderboard entre perfis */}
+      <ProfilesLeaderboard glass={GLASS} />
+
+
+
       {/* Divisões — trilha com LP necessário por tier */}
       <section className={`${GLASS} mt-4 p-5`}>
         <div className="mb-3 flex items-center justify-between gap-2">
