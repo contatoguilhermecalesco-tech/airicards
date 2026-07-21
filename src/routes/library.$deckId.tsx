@@ -352,14 +352,6 @@ function AddCardSheet({
                   : "Serendipity"
               }
             />
-            {isSentence && (
-              <Field
-                label="Palavra-alvo"
-                value={targetWord}
-                onChange={setTargetWord}
-                placeholder="although"
-              />
-            )}
             <button
               type="button"
               onClick={handleTranslate}
