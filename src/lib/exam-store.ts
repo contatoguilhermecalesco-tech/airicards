@@ -271,8 +271,12 @@ export function finishExam(): ExamResult | null {
   };
   emit();
   scheduleSave();
-  // LP pela prova mensal — varia com o percentual.
-  awardLp(LP.examBonusByPercent(percent), "exam.completed");
+  // LP pela prova mensal — bônus proporcional ou punição em caso de reprovação (<50%).
+  if (percent < 50) {
+    awardLp(LP.examFailed, "exam.failed");
+  } else {
+    awardLp(LP.examBonusByPercent(percent), "exam.completed");
+  }
   return result;
 }
 
