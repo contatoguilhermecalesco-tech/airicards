@@ -82,6 +82,10 @@ function Home() {
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
   const reviewedToday = useCardsReviewedToday();
+  const streak = useStreak();
+  const nextMilestone = nextStreakMilestone(streak.current);
+  const milestoneProgress = streak.current === 0 ? 0 : Math.min(1, streak.current / nextMilestone);
+  const studiedToday = reviewedToday > 0;
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
