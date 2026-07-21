@@ -188,10 +188,12 @@ function Review() {
                 )}
                 <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
                   <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-primary/80">
-                    Inglês
+                    {current.mode === "sentence" ? "Frase" : "Inglês"}
                   </p>
                   <p className="text-3xl font-semibold text-balance sm:text-4xl">
-                    {current.front}
+                    {current.mode === "sentence" && current.targetWord
+                      ? renderSentence(current.front, current.targetWord)
+                      : current.front}
                   </p>
 
                   {showBack && (
