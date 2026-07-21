@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, Flame, Layers, Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,60 +17,47 @@ import {
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 
-
 export const Route = createFileRoute("/")({
   component: Home,
 });
 
-type Greeting = {
-  salute: string;
-  icon: React.ReactNode;
-};
+type Greeting = { salute: string; icon: React.ReactNode; eyebrow: string };
 
 function greetingFor(hour: number): Greeting {
   if (hour >= 5 && hour < 12)
-    return { salute: "Bom dia", icon: <Sunrise className="h-6 w-6 text-amber-300" strokeWidth={2.25} /> };
+    return {
+      salute: "Bom dia",
+      eyebrow: "Manhã",
+      icon: <Sunrise className="h-5 w-5 text-amber-300" strokeWidth={2.25} />,
+    };
   if (hour >= 12 && hour < 18)
-    return { salute: "Boa tarde", icon: <Sun className="h-6 w-6 text-amber-400" strokeWidth={2.25} /> };
+    return {
+      salute: "Boa tarde",
+      eyebrow: "Tarde",
+      icon: <Sun className="h-5 w-5 text-amber-400" strokeWidth={2.25} />,
+    };
   if (hour >= 18 && hour < 23)
-    return { salute: "Boa noite", icon: <Sunset className="h-6 w-6 text-orange-300" strokeWidth={2.25} /> };
-  return { salute: "Boa madrugada", icon: <Moon className="h-6 w-6 text-indigo-300" strokeWidth={2.25} /> };
+    return {
+      salute: "Boa noite",
+      eyebrow: "Noite",
+      icon: <Sunset className="h-5 w-5 text-orange-300" strokeWidth={2.25} />,
+    };
+  return {
+    salute: "Boa madrugada",
+    eyebrow: "Madrugada",
+    icon: <Moon className="h-5 w-5 text-indigo-300" strokeWidth={2.25} />,
+  };
 }
 
 function formatNextIn(ms: number): string {
   const mins = Math.max(1, Math.round(ms / 60000));
-  if (mins < 60) return `em ${mins} min`;
+  if (mins < 60) return `${mins} min`;
   const hours = Math.round(mins / 60);
-  if (hours < 24) return `em ${hours}h`;
+  if (hours < 24) return `${hours}h`;
   const days = Math.round(hours / 24);
-  if (days === 1) return "amanhã";
-  return `em ${days} dias`;
+  if (days === 1) return "1 dia";
+  return `${days} dias`;
 }
-
-function contextLine({
-  due,
-  totalCards,
-  reviewedToday,
-  nextDueInMs,
-}: {
-  due: number;
-  totalCards: number;
-  reviewedToday: number;
-  nextDueInMs: number | null;
-}): string {
-  if (totalCards === 0) return "Crie seu primeiro deck para começar.";
-  if (due > 0)
-    return `${due} carta${due === 1 ? "" : "s"} te esperando${reviewedToday > 0 ? ` — ${reviewedToday} revisadas hoje` : ""}.`;
-  if (nextDueInMs !== null) {
-    const when = formatNextIn(nextDueInMs);
-    if (reviewedToday > 0)
-      return `${reviewedToday} revisadas hoje — próxima ${when}.`;
-    return `Próxima revisão ${when}.`;
-  }
-  if (reviewedToday > 0) return `Tudo em dia — ${reviewedToday} revisadas hoje.`;
-  return "Tudo em dia por aqui.";
-}
-
 
 function Home() {
   const profile = useCurrentProfile();
@@ -91,134 +78,137 @@ function Home() {
     if (futures.length === 0) return null;
     return Math.min(...futures) - now;
   }, [cards, now]);
-
   const canStart = due > 0;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
 
   const hour = new Date().getHours();
-  const { salute, icon } = greetingFor(hour);
+  const { salute, icon, eyebrow } = greetingFor(hour);
   const name = profile?.name ?? "";
-  const context = contextLine({ due, totalCards: cards.length, reviewedToday, nextDueInMs });
 
-  // Ring geometry
-  const RING_R = 54;
+  // Ring geometry — compact 96px ring
+  const RING_R = 40;
   const ringC = 2 * Math.PI * RING_R;
   const dailyTarget = Math.max(1, due + reviewedToday);
   const reviewedPct = Math.min(1, reviewedToday / dailyTarget);
+  const pctLabel = Math.round(reviewedPct * 100);
 
   return (
-    <main className="relative mx-auto max-w-3xl px-5 pt-8 pb-24 sm:pt-14">
-      {/* Ambient backdrop — soft, no neon */}
+    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
+      {/* Ambient backdrop — soft */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[360px] opacity-40"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] opacity-40"
         style={{
           background:
-            "radial-gradient(50% 60% at 20% 0%, rgba(167,139,250,0.14), transparent 70%), radial-gradient(45% 60% at 85% 5%, rgba(96,165,250,0.10), transparent 70%)",
+            "radial-gradient(60% 60% at 20% 0%, rgba(167,139,250,0.14), transparent 70%), radial-gradient(45% 60% at 90% 8%, rgba(96,165,250,0.08), transparent 70%)",
         }}
       />
 
-      {/* Dynamic greeting */}
-      <header className="space-y-1.5">
-        <div className="flex items-center gap-2.5">
-          <h1 className="bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-[30px] font-bold leading-tight tracking-tight text-transparent sm:text-4xl">
-            {salute}
-            {name ? `, ${name}` : ""}
-          </h1>
+      {/* Header — eyebrow + salute */}
+      <header className="animate-fade-in flex flex-col space-y-1.5">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
+            {eyebrow}
+          </span>
           <span className="shrink-0">{icon}</span>
         </div>
-        <p className="text-[15px] text-muted-foreground">{context}</p>
+        <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
+          {salute}
+          {name ? `, ${name}` : ""}
+        </h1>
       </header>
 
-      {/* Ring hero */}
-      <section className="mt-6">
-        <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-2xl sm:p-8">
-          <div className="flex items-center gap-6 sm:gap-8">
-            {/* iOS-style progress ring */}
-            <div className="relative h-32 w-32 shrink-0">
-              <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
+      {/* Hero — assimétrico: stats à esquerda, anel à direita */}
+      <section
+        className="animate-fade-in relative mt-7 sm:mt-8"
+        style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
+      >
+        {/* soft halo */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-1 rounded-[36px] bg-primary/10 opacity-70 blur-2xl"
+        />
+        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.06] bg-[color-mix(in_oklab,var(--surface-elevated)_92%,transparent)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:p-8">
+          <div className="flex items-start justify-between gap-6">
+            {/* Left — copy */}
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                Sessão de hoje
+              </p>
+              <p className="mt-1 text-[26px] font-semibold leading-none tracking-tight text-foreground tabular-nums">
+                {due}
+                <span className="ml-1.5 text-[15px] font-medium text-muted-foreground/80">
+                  {due === 1 ? "carta agora" : "cartas agora"}
+                </span>
+              </p>
+              {pending > 0 && (
+                <p className="pt-1 text-[12px] font-medium text-primary/85 tabular-nums">
+                  +{pending} voltando{nextDueInMs !== null ? ` em ${formatNextIn(nextDueInMs)}` : ""}
+                </p>
+              )}
+            </div>
+
+            {/* Right — compact ring */}
+            <div className="relative h-24 w-24 shrink-0">
+              <svg viewBox="0 0 96 96" className="h-full w-full -rotate-90">
                 <circle
-                  cx="64" cy="64" r={RING_R}
-                  stroke="rgba(255,255,255,0.08)" strokeWidth="12" fill="none"
+                  cx="48" cy="48" r={RING_R}
+                  stroke="rgba(255,255,255,0.06)" strokeWidth="8" fill="none"
                 />
                 <circle
-                  cx="64" cy="64" r={RING_R}
-                  stroke="url(#gradReviewed)" strokeWidth="12" fill="none"
+                  cx="48" cy="48" r={RING_R}
+                  stroke="url(#ringGrad)" strokeWidth="8" fill="none"
                   strokeLinecap="round"
                   strokeDasharray={ringC}
                   strokeDashoffset={ringC * (1 - reviewedPct)}
-                  className="transition-[stroke-dashoffset] duration-700"
+                  className="transition-[stroke-dashoffset] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
                 />
                 <defs>
-                  <linearGradient id="gradReviewed" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0%" stopColor="#C4B5FD" />
                     <stop offset="100%" stopColor="#8B7BD8" />
                   </linearGradient>
                 </defs>
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-3xl font-bold tabular-nums leading-none">{reviewedToday}</p>
-                <p className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Hoje</p>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="min-w-0 flex-1 space-y-4">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary/80">
-                  Para revisar
-                </p>
-                <p className="mt-0.5 text-2xl font-semibold tabular-nums">
-                  {due}
-                  <span className="text-muted-foreground/70"> agora</span>
-                </p>
-                {pending > 0 && (
-                  <p className="mt-1 text-[11px] text-muted-foreground/80 tabular-nums">
-                    +{pending} voltando
-                    {nextDueInMs !== null ? ` em ${formatNextIn(nextDueInMs)}` : ""}
-                  </p>
-                )}
-              </div>
-
-              <div className="h-px w-8 bg-white/10" />
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary/60">
-                  Revisadas
-                </p>
-                <p className="mt-0.5 text-2xl font-semibold tabular-nums">
+                <p className="text-lg font-semibold leading-none tabular-nums text-foreground">
                   {reviewedToday}
-                  <span className="text-muted-foreground/70"> hoje</span>
+                </p>
+                <p className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {pctLabel}%
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Primary CTA */}
-          {cards.length === 0 ? (
-            <Link
-              to="/library"
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition hover:brightness-110 active:scale-[0.98]"
-            >
-              Ir para a biblioteca
-              <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-            </Link>
-          ) : due === 0 ? (
-            <div className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] py-3.5 text-[15px] font-medium text-muted-foreground">
-              <Moon className="h-4 w-4" strokeWidth={2.25} />
-              {nextDueInMs !== null ? `Próxima ${formatNextIn(nextDueInMs)}` : "Tudo em dia"}
-            </div>
-          ) : (
-            <button
-              type="button"
-              disabled={!canStart}
-              onClick={() => canStart && setConfirmOpen(true)}
-              className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_60%,transparent)] transition hover:brightness-110 active:scale-[0.98]"
-            >
-              Iniciar sessão
-              <ArrowRight className="h-4 w-4" strokeWidth={2.5} />
-            </button>
-          )}
+          {/* CTA */}
+          <div className="mt-7">
+            {cards.length === 0 ? (
+              <Link
+                to="/library"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3.5 text-[14px] font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-all duration-300 hover:brightness-95 active:scale-[0.98]"
+              >
+                Ir para a biblioteca
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
+              </Link>
+            ) : due === 0 ? (
+              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] py-3.5 text-[14px] font-medium text-muted-foreground">
+                <Moon className="h-4 w-4" strokeWidth={2.25} />
+                {nextDueInMs !== null ? `Próxima em ${formatNextIn(nextDueInMs)}` : "Tudo em dia"}
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={!canStart}
+                onClick={() => canStart && setConfirmOpen(true)}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3.5 text-[14px] font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-all duration-300 hover:brightness-95 active:scale-[0.98]"
+              >
+                Iniciar sessão
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.5} />
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
@@ -246,47 +236,81 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-
-
-
-      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <Stat icon={<Layers className="h-4 w-4" />} label="Decks" value={decks.length} />
-        <Stat icon={<BookOpen className="h-4 w-4" />} label="Cartas" value={cards.length} />
-        <Stat icon={<Flame className="h-4 w-4" />} label="Para revisar" value={due} accent />
+      {/* Stats — 2 chips minimalistas */}
+      <section
+        className="animate-fade-in mt-6 grid grid-cols-2 gap-3"
+        style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
+      >
+        <StatChip label="Decks" value={decks.length} />
+        <StatChip label="Cartas" value={cards.length} />
       </section>
 
+      {/* Decks list */}
       {decks.length > 0 && (
-        <section className="mt-10">
-          <div className="mb-3 flex items-baseline justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        <section
+          className="animate-fade-in mt-10"
+          style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
+        >
+          <div className="mb-4 flex items-baseline justify-between px-1">
+            <h2 className="text-[17px] font-semibold tracking-tight text-foreground">
               Seus decks
-            </h3>
-            <Link to="/library" className="text-sm text-primary hover:opacity-80">
+            </h2>
+            <Link
+              to="/library"
+              className="text-[13px] font-medium text-primary transition-opacity hover:opacity-80"
+            >
               Ver todos
             </Link>
           </div>
-          <ul className="space-y-2">
-            {decks.slice(0, 4).map((d) => {
+          <ul className="space-y-2.5">
+            {decks.slice(0, 4).map((d, i) => {
               const total = cards.filter((c) => c.deckId === d.id).length;
               const dueInDeck = cards.filter(
                 (c) => c.deckId === d.id && c.dueAt <= Date.now(),
               ).length;
               return (
-                <li key={d.id}>
+                <li
+                  key={d.id}
+                  className="animate-fade-in"
+                  style={{
+                    animationDelay: `${240 + i * 60}ms`,
+                    animationFillMode: "backwards",
+                  }}
+                >
                   <Link
                     to="/library/$deckId"
                     params={{ deckId: d.id }}
-                    className="ios-card flex items-center justify-between rounded-2xl px-5 py-4 transition hover:bg-accent/40"
+                    className="group flex items-center gap-4 rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.08] hover:bg-white/[0.04] active:scale-[0.995]"
                   >
-                    <div>
-                      <p className="font-medium">{d.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div
+                      className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${
+                        dueInDeck > 0
+                          ? "border-primary/30 bg-primary/10"
+                          : "border-white/[0.06] bg-white/[0.03]"
+                      }`}
+                    >
+                      <div
+                        className={`h-4 w-4 rounded-[5px] border-2 ${
+                          dueInDeck > 0 ? "border-primary" : "border-white/25"
+                        }`}
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[15px] font-medium text-foreground">
+                        {d.name}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-muted-foreground tabular-nums">
                         {total} carta{total === 1 ? "" : "s"}
-                        {dueInDeck > 0 && ` · ${dueInDeck} para revisar`}
+                        {dueInDeck > 0 && (
+                          <span className="text-primary/85">
+                            {" · "}
+                            {dueInDeck} para revisar
+                          </span>
+                        )}
                       </p>
                     </div>
-                    <ArrowRight
-                      className="h-4 w-4 text-muted-foreground"
+                    <ChevronRight
+                      className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
                       strokeWidth={2.25}
                     />
                   </Link>
@@ -300,28 +324,15 @@ function Home() {
   );
 }
 
-function Stat({
-  icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  accent?: boolean;
-}) {
+function StatChip({ label, value }: { label: string; value: number }) {
   return (
-    <div className="ios-card rounded-2xl px-4 py-4">
-      <div
-        className={`inline-flex items-center gap-1.5 text-xs font-medium ${
-          accent ? "text-primary" : "text-muted-foreground"
-        }`}
-      >
-        {icon}
+    <div className="rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-colors hover:bg-white/[0.04]">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         {label}
-      </div>
-      <p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p>
+      </p>
+      <p className="mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
+        {value}
+      </p>
     </div>
   );
 }
