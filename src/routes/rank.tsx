@@ -288,28 +288,47 @@ function RankPage() {
         <h2 className="text-sm font-semibold text-foreground">Como ganhar LP</h2>
         <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
           {[
-            ["Acerto fácil", "+2"],
-            ["Acerto médio", "+4"],
-            ["Acerto difícil", "+6"],
-            ["Derrotar inimigo", "+15"],
-            ["Aula de gramática", "+25"],
-            ["Redação ≥ 7", "+30"],
-            ["Prova mensal", "+50 a +200"],
-            ["Bônus de streak/dia", "+5 a +30"],
-            ["Erro em revisão", "−3"],
+            ["Acerto fácil", "+3"],
+            ["Acerto médio", "+2"],
+            ["Acerto difícil", "+1"],
+            ["Derrotar inimigo", "+8"],
+            ["Aula de gramática", "até +10"],
+            ["Redação ≥ 70", "+15"],
+            ["Redação ≥ 90", "+30"],
+            ["Prova mensal (aprovado)", "+25 a +123"],
+            ["Bônus diário de streak", "+2 a +12"],
           ].map(([label, val]) => (
             <div
               key={label}
               className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2"
             >
               <span className="text-muted-foreground">{label}</span>
-              <span
-                className={`font-semibold tabular-nums ${
-                  val.startsWith("-") || val.startsWith("−") ? "text-rose-400" : "text-emerald-400"
-                }`}
-              >
-                {val}
-              </span>
+              <span className="font-semibold tabular-nums text-emerald-400">{val}</span>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="mt-5 text-sm font-semibold text-foreground">Como perder LP</h2>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          O rank não é um caminho de mão única — descuido custa LP.
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+          {[
+            ["Errar carta", "−4"],
+            ["Carta virou inimiga", "−12"],
+            ["Prova mensal reprovado (<50%)", "−25"],
+            ["Streak quebrado (1–2 dias)", "−10"],
+            ["Streak quebrado (3–6 dias)", "−20"],
+            ["Streak quebrado (7+ dias)", "−35"],
+            ["Inimigo ignorado (>24h)", "−3 cada · cap −15/dia"],
+            ["Inatividade (a partir do Ouro)", "−2/dia após 3 dias · cap −12/dia"],
+          ].map(([label, val]) => (
+            <div
+              key={label}
+              className="flex items-center justify-between rounded-xl border border-rose-500/15 bg-rose-500/[0.06] px-3 py-2"
+            >
+              <span className="text-muted-foreground">{label}</span>
+              <span className="font-semibold tabular-nums text-rose-400">{val}</span>
             </div>
           ))}
         </div>
