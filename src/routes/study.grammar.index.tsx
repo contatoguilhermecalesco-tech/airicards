@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Sparkles,
   ArrowLeft,
@@ -20,6 +20,12 @@ import {
   Flag,
   Eye,
   EyeOff,
+  MessageCircle,
+  NotebookPen,
+  History,
+  Send,
+  Trash2,
+  User as UserIcon,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useCycleWeek, getGrammarForWeek } from "@/lib/cycle";
@@ -28,11 +34,18 @@ import {
   type GrammarLesson,
   type GrammarExercise,
 } from "@/lib/grammar.functions";
+import { askGrammarTutor } from "@/lib/grammar-tutor.functions";
 import {
   useGrammarProgress,
   saveLesson,
   addAttempt,
   getBestScoreForWeek,
+  setNote,
+  appendChatMessage,
+  clearChat,
+  deleteAttempt,
+  type GrammarChatMessage,
+  type GrammarAttempt,
 } from "@/lib/grammar-store";
 
 export const Route = createFileRoute("/study/grammar/")({
@@ -42,7 +55,7 @@ export const Route = createFileRoute("/study/grammar/")({
 type StringMap = Record<string, string>;
 type BoolMap = Record<string, boolean>;
 type FeedbackMap = Record<string, "correct" | "wrong">;
-type Tab = "aula" | "exercicios" | "resumo";
+type Tab = "aula" | "exercicios" | "tutor" | "notas" | "historico" | "resumo";
 
 function normalizeAnswer(value: string) {
   return value
