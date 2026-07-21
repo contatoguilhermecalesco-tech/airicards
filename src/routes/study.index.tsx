@@ -46,6 +46,7 @@ const DAYS: Day[] = [
     area: "Gramática",
     desc: "Fundamentos e exercícios de estrutura.",
     icon: <Sparkles className="h-5 w-5" strokeWidth={2.25} />,
+    to: "/study/grammar",
     accent: "from-fuchsia-400/25 to-fuchsia-500/10",
   },
   {

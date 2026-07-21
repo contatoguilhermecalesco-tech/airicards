@@ -18,6 +18,7 @@ import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
+import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyWritingHistoryRouteImport } from './routes/study.writing.history'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 import { Route as StudyWritingHistoryIdRouteImport } from './routes/study.writing.history.$id'
@@ -67,6 +68,11 @@ const StudyWritingIndexRoute = StudyWritingIndexRouteImport.update({
   path: '/study/writing/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyGrammarIndexRoute = StudyGrammarIndexRouteImport.update({
+  id: '/study/grammar/',
+  path: '/study/grammar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudyWritingHistoryRoute = StudyWritingHistoryRouteImport.update({
   id: '/study/writing/history',
   path: '/study/writing/history',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
+  '/study/grammar/': typeof StudyGrammarIndexRoute
   '/study/writing/': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/study': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
+  '/study/grammar': typeof StudyGrammarIndexRoute
   '/study/writing': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
+  '/study/grammar/': typeof StudyGrammarIndexRoute
   '/study/writing/': typeof StudyWritingIndexRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
 }
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
     | '/study/'
     | '/deck/$owner/$slug'
     | '/study/writing/history'
+    | '/study/grammar/'
     | '/study/writing/'
     | '/study/writing/history/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/study'
     | '/deck/$owner/$slug'
     | '/study/writing/history'
+    | '/study/grammar'
     | '/study/writing'
     | '/study/writing/history/$id'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/study/'
     | '/deck/$owner/$slug'
     | '/study/writing/history'
+    | '/study/grammar/'
     | '/study/writing/'
     | '/study/writing/history/$id'
   fileRoutesById: FileRoutesById
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   StudyIndexRoute: typeof StudyIndexRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
   StudyWritingHistoryRoute: typeof StudyWritingHistoryRouteWithChildren
+  StudyGrammarIndexRoute: typeof StudyGrammarIndexRoute
   StudyWritingIndexRoute: typeof StudyWritingIndexRoute
 }
 
@@ -250,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyWritingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study/grammar/': {
+      id: '/study/grammar/'
+      path: '/study/grammar'
+      fullPath: '/study/grammar/'
+      preLoaderRoute: typeof StudyGrammarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/study/writing/history': {
       id: '/study/writing/history'
       path: '/study/writing/history'
@@ -296,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudyIndexRoute: StudyIndexRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
   StudyWritingHistoryRoute: StudyWritingHistoryRouteWithChildren,
+  StudyGrammarIndexRoute: StudyGrammarIndexRoute,
   StudyWritingIndexRoute: StudyWritingIndexRoute,
 }
 export const routeTree = rootRouteImport
