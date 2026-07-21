@@ -190,6 +190,14 @@ function TopBar() {
               <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
               <span className="hidden sm:inline">Estudo</span>
             </Link>
+            <Link
+              to="/enemies"
+              className={linkClass(pathname.startsWith("/enemies"))}
+              aria-label="Cartas inimigas"
+            >
+              <Swords className="h-4 w-4" strokeWidth={2.25} />
+              <span className="hidden sm:inline">Inimigas</span>
+            </Link>
             <NotificationsBell />
             <ProfileMenu />
           </div>
