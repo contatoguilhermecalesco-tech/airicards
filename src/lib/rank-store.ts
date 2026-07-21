@@ -94,12 +94,13 @@ export const TIER_COLORS: Record<
 };
 
 const LP_PER_DIVISION = 100;
-const PROMO_WINS_REQUIRED = 2;
+const PROMO_WINS_REQUIRED = 3;
 const PROMO_MAX_LOSSES = 2;
 
 // Elite (a partir de Mestre): LP total é livre. Faixas visuais:
-const ELITE_GRANDMASTER_LP = 300;
-const ELITE_CHALLENGER_LP = 800;
+const ELITE_GRANDMASTER_LP = 800;
+const ELITE_CHALLENGER_LP = 2000;
+
 
 export const INITIAL_RANK: RankState = {
   tier: "iron",
@@ -347,21 +348,40 @@ export function awardLp(delta: number, reason: string): {
 
 
 // LP por tipo de ação — cap e piso já são aplicados pela função awardLp.
+// LP por tipo de ação — valores balanceados para tornar a subida de rank
+// consistente e progressivamente mais difícil (sem inflar recompensas).
 export const LP = {
-  reviewEasy: 6,
-  reviewGood: 4,
-  reviewHard: 2,
-  reviewWrong: -3,
-  enemyDefeated: 15,
-  enemyEvolved: -10,
-  streakDay: (days: number) => Math.min(30, Math.max(5, days * 5)),
-  streakBroken: -25,
-  grammarLesson: 25,
-  writingGood: 30,
-  writingGreat: 50,
+  reviewEasy: 3,
+  reviewGood: 2,
+  reviewHard: 1,
+  reviewWrong: -4,
+  enemyDefeated: 8,
+  enemyEvolved: -12,
+  streakDay: (days: number) => Math.min(12, Math.max(2, days * 2)),
+  streakBroken: -35,
+  grammarLesson: 10,
+  writingGood: 15,
+  writingGreat: 30,
   examBonusByPercent: (pct: number) =>
-    Math.round(50 + Math.max(0, pct - 30) * 2.5), // 50..200
+    Math.round(25 + Math.max(0, pct - 30) * 1.4), // 25..123
 };
+
+/**
+ * LP acumulado necessário (a partir de Ferro IV, 0 LP) para *entrar* em um tier.
+ * Cada tier tem 4 divisões (IV→I), cada uma 100 LP, e uma série de promoção.
+ * Master é considerado como o topo da trilha de divisões (10 tiers × 400 LP = 3600).
+ * Grão-Mestre/Desafiante usam LP absoluto do tier Elite (soma-se ao total de Master).
+ */
+export function lpToReachTier(tier: Tier): number {
+  const idx = TIER_ORDER.indexOf(tier);
+  if (idx <= 0) return 0;
+  // Cada tier abaixo do alvo contribui com 4 divisões × 100 LP
+  const base = idx * 4 * LP_PER_DIVISION;
+  if (tier === "grandmaster") return base + ELITE_GRANDMASTER_LP;
+  if (tier === "challenger") return base + ELITE_CHALLENGER_LP;
+  return base;
+}
+
 
 // -------- hooks e helpers ---------------------------------------------
 

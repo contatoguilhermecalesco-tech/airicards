@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -9,8 +9,11 @@ import {
   TIER_LABEL,
   DIVISION_ROMAN,
   isElite,
+  lpToReachTier,
+  type Tier,
 } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
+
 
 export const Route = createFileRoute("/rank")({
   component: RankPage,
@@ -153,38 +156,93 @@ function RankPage() {
         />
       </section>
 
-      {/* Divisões — trilha visual */}
+      {/* Divisões — trilha com LP necessário por tier */}
       <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-3 flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold text-foreground">Sua trilha</h2>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold text-foreground">Trilha de rank</h2>
+          </div>
+          <span className="text-[11px] text-muted-foreground">LP total acumulado</span>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as const).map((t) => {
-            const c = TIER_COLORS[t];
-            const active = t === rank.tier;
-            return (
-              <div
-                key={t}
-                className={`flex flex-col items-center gap-1 rounded-2xl border px-2.5 py-2 transition ${
-                  active
-                    ? "border-white/25 bg-white/[0.08]"
-                    : "border-white/[0.06] bg-white/[0.02] opacity-60"
-                }`}
-                style={active ? { boxShadow: `0 0 24px ${c.glow}` } : undefined}
-              >
-                <RankEmblem tier={t} division={4} size={36} />
-                <span
-                  className="text-[10px] font-semibold uppercase tracking-wider"
-                  style={{ color: c.text }}
-                >
-                  {TIER_LABEL[t]}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+
+        {/* LP acumulado ganho pelo jogador — usado para marcar tiers alcançados */}
+        {(() => {
+          const earned = rank.totalEarned - rank.totalLost;
+          const TIERS: Tier[] = [
+            "iron", "bronze", "silver", "gold", "platinum",
+            "emerald", "diamond", "master", "grandmaster", "challenger",
+          ];
+          const currentIdx = TIERS.indexOf(rank.tier);
+          return (
+            <ol className="space-y-1.5">
+              {TIERS.map((t, i) => {
+                const c = TIER_COLORS[t];
+                const lpNeeded = lpToReachTier(t);
+                const isCurrent = i === currentIdx;
+                const reached = i <= currentIdx;
+                const remaining = Math.max(0, lpNeeded - Math.max(0, earned));
+                return (
+                  <li
+                    key={t}
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2 transition ${
+                      isCurrent
+                        ? "border-white/20 bg-white/[0.06]"
+                        : reached
+                        ? "border-white/[0.08] bg-white/[0.025]"
+                        : "border-white/[0.05] bg-white/[0.015] opacity-70"
+                    }`}
+                    style={isCurrent ? { boxShadow: `0 0 22px ${c.glow}` } : undefined}
+                  >
+                    <div className="shrink-0">
+                      <RankEmblem tier={t} division={4} size={30} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="text-[13px] font-semibold tracking-tight"
+                          style={{ color: c.text }}
+                        >
+                          {TIER_LABEL[t]}
+                        </span>
+                        {isCurrent && (
+                          <span className="rounded-full border border-white/15 bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white/80">
+                            Atual
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
+                        {i === 0
+                          ? "Ponto de partida"
+                          : `Requer ${lpNeeded.toLocaleString("pt-BR")} LP acumulados`}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      {reached ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+                          Alcançado
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-white/60">
+                          <Lock className="h-3 w-3" strokeWidth={2.25} />
+                          faltam {remaining.toLocaleString("pt-BR")} LP
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          );
+        })()}
+
+        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          Cada divisão custa 100 LP e a promoção exige 3 vitórias com no máximo 2 derrotas.
+          Recompensas foram calibradas para uma progressão mais lenta e valiosa.
+        </p>
       </section>
+
 
       {/* Histórico */}
       <section className={`${GLASS} mt-4 p-5`}>
