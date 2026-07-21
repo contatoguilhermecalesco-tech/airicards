@@ -528,11 +528,23 @@ function NotificationsSection() {
           <ul className="space-y-2">
             {notifications.slice(0, 8).map((n) => {
               const tag = n.tag_id ? tagMap.get(n.tag_id) : null;
+              const accent = tag?.color ?? "#a78bfa";
+              const Icon = resolveNotificationIcon(n.icon, tag?.name, n.title);
               return (
                 <li
                   key={n.id}
-                  className="flex items-start justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
+                  className="flex items-start gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
                 >
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border"
+                    style={{
+                      backgroundColor: `${accent}22`,
+                      borderColor: `${accent}44`,
+                      color: accent,
+                    }}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={2.25} />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-sm font-medium">{n.title}</p>
