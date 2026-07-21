@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info } from "lucide-react";
 import {
   useRank,
   tierLabel,
