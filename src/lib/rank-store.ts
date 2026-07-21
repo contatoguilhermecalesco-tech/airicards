@@ -42,7 +42,7 @@ export type RankState = {
   peakDivision: Division;
 };
 
-const TIER_ORDER: Tier[] = [
+export const TIER_ORDER: Tier[] = [
   "iron",
   "bronze",
   "silver",
