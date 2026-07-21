@@ -327,8 +327,24 @@ export function awardLp(delta: number, reason: string): {
   state = next;
   persist();
   emit();
+
+  // Dispara evento de promoção para UI (animação + confete)
+  if (promoted) {
+    const kind: "tier" | "division" =
+      before.tier !== next.tier ? "tier" : "division";
+    emitPromotion({
+      fromTier: before.tier,
+      fromDivision: before.division,
+      toTier: next.tier,
+      toDivision: next.division,
+      kind,
+      at: Date.now(),
+    });
+  }
+
   return { state: next, promoted, demoted, promoStarted, promoWon, promoLost };
 }
+
 
 // LP por tipo de ação — cap e piso já são aplicados pela função awardLp.
 export const LP = {
