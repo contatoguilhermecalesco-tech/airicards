@@ -360,10 +360,11 @@ function NotificationsSection() {
     setErr(null);
     setOk(null);
     try {
-      await createNotification({ title, body, tag_id: tagId || null });
+      await createNotification({ title, body, tag_id: tagId || null, icon: iconKey || null });
       setTitle("");
       setBody("");
       setIdea("");
+      setIconKey("");
       setOk("Notificação enviada para os perfis.");
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
