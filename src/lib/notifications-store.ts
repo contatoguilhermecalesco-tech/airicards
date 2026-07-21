@@ -17,6 +17,8 @@ export type Notification = {
   body: string;
   tag_id: string | null;
   icon: string | null;
+  action_label: string | null;
+  action_route: string | null;
   created_at: string;
 };
 
