@@ -380,15 +380,26 @@ function bumpStreak(prev: Streak | undefined, today: string): Streak {
   };
 }
 /** Returns the effective streak, resetting to 0 if user missed ≥2 days. */
-export function getStreak(): Streak {
+let streakSnapshot: Streak = { current: 0, longest: 0, lastDay: "" };
+let streakSnapshotKey = "";
+function computeStreak(): Streak {
   refreshHomeDay();
   const s = home.streak;
   const today = todayKey();
   if (!s || !s.lastDay) return { current: 0, longest: s?.longest ?? 0, lastDay: "" };
   if (s.lastDay === today || s.lastDay === yesterdayKey(today)) return s;
-  // Missed ≥1 full day → streak considered broken (still preserving longest)
   return { current: 0, longest: s.longest ?? s.current ?? 0, lastDay: s.lastDay };
 }
+export function getStreak(): Streak {
+  const s = computeStreak();
+  const key = `${s.current}|${s.longest}|${s.lastDay}|${s.startedOn ?? ""}`;
+  if (key !== streakSnapshotKey) {
+    streakSnapshotKey = key;
+    streakSnapshot = s;
+  }
+  return streakSnapshot;
+}
+const EMPTY_STREAK: Streak = { current: 0, longest: 0, lastDay: "" };
 export function useStreak(): Streak {
   return useSyncExternalStore(
     (l) => {
@@ -396,7 +407,7 @@ export function useStreak(): Streak {
       return () => homeListeners.delete(l);
     },
     () => getStreak(),
-    () => ({ current: 0, longest: 0, lastDay: "" }),
+    () => EMPTY_STREAK,
   );
 }
 
