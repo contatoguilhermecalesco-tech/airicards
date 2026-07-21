@@ -176,6 +176,18 @@ function ReadingPage() {
         },
       });
       setGrade(g);
+      addStudyEntry("reading", {
+        title: passage.title || "Reading",
+        level,
+        score: g.score,
+        payload: {
+          passage,
+          question: passage.open.q,
+          guidance: passage.open.guidance,
+          answer: openAnswer.trim(),
+          grade: g,
+        },
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao corrigir.");
     } finally {
