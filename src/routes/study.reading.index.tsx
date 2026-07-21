@@ -14,6 +14,7 @@ import {
   ChevronUp,
   Wand2,
   Scissors,
+  History,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
