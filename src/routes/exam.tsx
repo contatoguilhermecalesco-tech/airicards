@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCurrentProfile } from "@/lib/profile";
+import { useAppSettings } from "@/lib/app-settings";
 import { generateMonthlyExam } from "@/lib/exam.functions";
 import {
   useExamState,
@@ -77,6 +78,8 @@ const LEVEL_COLOR: Record<ExamDifficulty, string> = {
 function ExamPage() {
   const profile = useCurrentProfile();
   const state = useExamState();
+  const { exam_visible } = useAppSettings();
+  const isAdmin = profile?.id === "guilherme";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
