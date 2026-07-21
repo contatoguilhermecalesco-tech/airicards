@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Check, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
 import {
   useStore,
   createCard,
