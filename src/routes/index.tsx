@@ -202,7 +202,7 @@ function Home() {
               {/* halo behind ring */}
               <div
                 aria-hidden
-                className="absolute inset-2 rounded-full bg-primary/25 blur-2xl"
+                className="absolute inset-2 rounded-full bg-primary/15 opacity-70 blur-xl"
               />
               <svg viewBox="0 0 104 104" className="relative h-full w-full -rotate-90">
                 <circle
@@ -216,7 +216,7 @@ function Home() {
                   strokeDasharray={ringC}
                   strokeDashoffset={ringC * (1 - reviewedPct)}
                   className="transition-[stroke-dashoffset] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ filter: "drop-shadow(0 0 6px rgba(167,139,250,0.55))" }}
+                  style={{ filter: "drop-shadow(0 0 4px rgba(167,139,250,0.35))" }}
                 />
                 <defs>
                   <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
