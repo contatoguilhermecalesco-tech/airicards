@@ -30,6 +30,10 @@ import { Route as StudySpeakingHistoryRouteImport } from './routes/study.speakin
 import { Route as StudyReadingHistoryRouteImport } from './routes/study.reading.history'
 import { Route as StudyListeningHistoryRouteImport } from './routes/study.listening.history'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
+import { Route as StudyWritingHistoryIndexRouteImport } from './routes/study.writing.history.index'
+import { Route as StudySpeakingHistoryIndexRouteImport } from './routes/study.speaking.history.index'
+import { Route as StudyReadingHistoryIndexRouteImport } from './routes/study.reading.history.index'
+import { Route as StudyListeningHistoryIndexRouteImport } from './routes/study.listening.history.index'
 import { Route as StudyWritingHistoryIdRouteImport } from './routes/study.writing.history.$id'
 import { Route as StudySpeakingHistoryIdRouteImport } from './routes/study.speaking.history.$id'
 import { Route as StudyReadingHistoryIdRouteImport } from './routes/study.reading.history.$id'
@@ -140,6 +144,30 @@ const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
   path: '/deck/$owner/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyWritingHistoryIndexRoute =
+  StudyWritingHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudyWritingHistoryRoute,
+  } as any)
+const StudySpeakingHistoryIndexRoute =
+  StudySpeakingHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudySpeakingHistoryRoute,
+  } as any)
+const StudyReadingHistoryIndexRoute =
+  StudyReadingHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudyReadingHistoryRoute,
+  } as any)
+const StudyListeningHistoryIndexRoute =
+  StudyListeningHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudyListeningHistoryRoute,
+  } as any)
 const StudyWritingHistoryIdRoute = StudyWritingHistoryIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -187,6 +215,10 @@ export interface FileRoutesByFullPath {
   '/study/reading/history/$id': typeof StudyReadingHistoryIdRoute
   '/study/speaking/history/$id': typeof StudySpeakingHistoryIdRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
+  '/study/listening/history/': typeof StudyListeningHistoryIndexRoute
+  '/study/reading/history/': typeof StudyReadingHistoryIndexRoute
+  '/study/speaking/history/': typeof StudySpeakingHistoryIndexRoute
+  '/study/writing/history/': typeof StudyWritingHistoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -201,10 +233,6 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryIndexRoute
   '/study': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
-  '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
-  '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
-  '/study/speaking/history': typeof StudySpeakingHistoryRouteWithChildren
-  '/study/writing/history': typeof StudyWritingHistoryRouteWithChildren
   '/study/grammar': typeof StudyGrammarIndexRoute
   '/study/listening': typeof StudyListeningIndexRoute
   '/study/reading': typeof StudyReadingIndexRoute
@@ -214,6 +242,10 @@ export interface FileRoutesByTo {
   '/study/reading/history/$id': typeof StudyReadingHistoryIdRoute
   '/study/speaking/history/$id': typeof StudySpeakingHistoryIdRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
+  '/study/listening/history': typeof StudyListeningHistoryIndexRoute
+  '/study/reading/history': typeof StudyReadingHistoryIndexRoute
+  '/study/speaking/history': typeof StudySpeakingHistoryIndexRoute
+  '/study/writing/history': typeof StudyWritingHistoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -242,6 +274,10 @@ export interface FileRoutesById {
   '/study/reading/history/$id': typeof StudyReadingHistoryIdRoute
   '/study/speaking/history/$id': typeof StudySpeakingHistoryIdRoute
   '/study/writing/history/$id': typeof StudyWritingHistoryIdRoute
+  '/study/listening/history/': typeof StudyListeningHistoryIndexRoute
+  '/study/reading/history/': typeof StudyReadingHistoryIndexRoute
+  '/study/speaking/history/': typeof StudySpeakingHistoryIndexRoute
+  '/study/writing/history/': typeof StudyWritingHistoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -271,6 +307,10 @@ export interface FileRouteTypes {
     | '/study/reading/history/$id'
     | '/study/speaking/history/$id'
     | '/study/writing/history/$id'
+    | '/study/listening/history/'
+    | '/study/reading/history/'
+    | '/study/speaking/history/'
+    | '/study/writing/history/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -285,10 +325,6 @@ export interface FileRouteTypes {
     | '/library'
     | '/study'
     | '/deck/$owner/$slug'
-    | '/study/listening/history'
-    | '/study/reading/history'
-    | '/study/speaking/history'
-    | '/study/writing/history'
     | '/study/grammar'
     | '/study/listening'
     | '/study/reading'
@@ -298,6 +334,10 @@ export interface FileRouteTypes {
     | '/study/reading/history/$id'
     | '/study/speaking/history/$id'
     | '/study/writing/history/$id'
+    | '/study/listening/history'
+    | '/study/reading/history'
+    | '/study/speaking/history'
+    | '/study/writing/history'
   id:
     | '__root__'
     | '/'
@@ -325,6 +365,10 @@ export interface FileRouteTypes {
     | '/study/reading/history/$id'
     | '/study/speaking/history/$id'
     | '/study/writing/history/$id'
+    | '/study/listening/history/'
+    | '/study/reading/history/'
+    | '/study/speaking/history/'
+    | '/study/writing/history/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -500,6 +544,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeckOwnerSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study/writing/history/': {
+      id: '/study/writing/history/'
+      path: '/'
+      fullPath: '/study/writing/history/'
+      preLoaderRoute: typeof StudyWritingHistoryIndexRouteImport
+      parentRoute: typeof StudyWritingHistoryRoute
+    }
+    '/study/speaking/history/': {
+      id: '/study/speaking/history/'
+      path: '/'
+      fullPath: '/study/speaking/history/'
+      preLoaderRoute: typeof StudySpeakingHistoryIndexRouteImport
+      parentRoute: typeof StudySpeakingHistoryRoute
+    }
+    '/study/reading/history/': {
+      id: '/study/reading/history/'
+      path: '/'
+      fullPath: '/study/reading/history/'
+      preLoaderRoute: typeof StudyReadingHistoryIndexRouteImport
+      parentRoute: typeof StudyReadingHistoryRoute
+    }
+    '/study/listening/history/': {
+      id: '/study/listening/history/'
+      path: '/'
+      fullPath: '/study/listening/history/'
+      preLoaderRoute: typeof StudyListeningHistoryIndexRouteImport
+      parentRoute: typeof StudyListeningHistoryRoute
+    }
     '/study/writing/history/$id': {
       id: '/study/writing/history/$id'
       path: '/$id'
@@ -533,10 +605,12 @@ declare module '@tanstack/react-router' {
 
 interface StudyListeningHistoryRouteChildren {
   StudyListeningHistoryIdRoute: typeof StudyListeningHistoryIdRoute
+  StudyListeningHistoryIndexRoute: typeof StudyListeningHistoryIndexRoute
 }
 
 const StudyListeningHistoryRouteChildren: StudyListeningHistoryRouteChildren = {
   StudyListeningHistoryIdRoute: StudyListeningHistoryIdRoute,
+  StudyListeningHistoryIndexRoute: StudyListeningHistoryIndexRoute,
 }
 
 const StudyListeningHistoryRouteWithChildren =
@@ -546,10 +620,12 @@ const StudyListeningHistoryRouteWithChildren =
 
 interface StudyReadingHistoryRouteChildren {
   StudyReadingHistoryIdRoute: typeof StudyReadingHistoryIdRoute
+  StudyReadingHistoryIndexRoute: typeof StudyReadingHistoryIndexRoute
 }
 
 const StudyReadingHistoryRouteChildren: StudyReadingHistoryRouteChildren = {
   StudyReadingHistoryIdRoute: StudyReadingHistoryIdRoute,
+  StudyReadingHistoryIndexRoute: StudyReadingHistoryIndexRoute,
 }
 
 const StudyReadingHistoryRouteWithChildren =
@@ -557,10 +633,12 @@ const StudyReadingHistoryRouteWithChildren =
 
 interface StudySpeakingHistoryRouteChildren {
   StudySpeakingHistoryIdRoute: typeof StudySpeakingHistoryIdRoute
+  StudySpeakingHistoryIndexRoute: typeof StudySpeakingHistoryIndexRoute
 }
 
 const StudySpeakingHistoryRouteChildren: StudySpeakingHistoryRouteChildren = {
   StudySpeakingHistoryIdRoute: StudySpeakingHistoryIdRoute,
+  StudySpeakingHistoryIndexRoute: StudySpeakingHistoryIndexRoute,
 }
 
 const StudySpeakingHistoryRouteWithChildren =
@@ -568,10 +646,12 @@ const StudySpeakingHistoryRouteWithChildren =
 
 interface StudyWritingHistoryRouteChildren {
   StudyWritingHistoryIdRoute: typeof StudyWritingHistoryIdRoute
+  StudyWritingHistoryIndexRoute: typeof StudyWritingHistoryIndexRoute
 }
 
 const StudyWritingHistoryRouteChildren: StudyWritingHistoryRouteChildren = {
   StudyWritingHistoryIdRoute: StudyWritingHistoryIdRoute,
+  StudyWritingHistoryIndexRoute: StudyWritingHistoryIndexRoute,
 }
 
 const StudyWritingHistoryRouteWithChildren =

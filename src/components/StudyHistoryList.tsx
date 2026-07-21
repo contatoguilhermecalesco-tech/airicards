@@ -52,9 +52,10 @@ export function StudyHistoryList({
   const navigate = useNavigate();
 
   const goToDetail = (id: string) => {
-    // Cast keeps the typed-router happy while allowing a shared component
-    // to navigate to whichever subject it was mounted for.
-    navigate({ to: detailTo, params: { id } } as never);
+    // Resolve the $id template to a concrete URL so navigation works
+    // regardless of how the router matches dynamic `to` templates.
+    const url = detailTo.replace("$id", encodeURIComponent(id));
+    navigate({ to: url } as never);
   };
 
   return (
