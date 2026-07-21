@@ -82,11 +82,16 @@ function Home() {
     () => cards.filter((c) => c.dueAt <= now).length,
     [cards, now],
   );
+  const pending = useMemo(
+    () => cards.filter((c) => c.dueAt > now).length,
+    [cards, now],
+  );
   const nextDueInMs = useMemo(() => {
     const futures = cards.map((c) => c.dueAt).filter((t) => t > now);
     if (futures.length === 0) return null;
     return Math.min(...futures) - now;
   }, [cards, now]);
+
   const canStart = due > 0;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const navigate = useNavigate();
@@ -168,7 +173,14 @@ function Home() {
                   {due}
                   <span className="text-muted-foreground/70"> agora</span>
                 </p>
+                {pending > 0 && (
+                  <p className="mt-1 text-[11px] text-muted-foreground/80 tabular-nums">
+                    +{pending} voltando
+                    {nextDueInMs !== null ? ` em ${formatNextIn(nextDueInMs)}` : ""}
+                  </p>
+                )}
               </div>
+
               <div className="h-px w-8 bg-white/10" />
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-primary/60">
