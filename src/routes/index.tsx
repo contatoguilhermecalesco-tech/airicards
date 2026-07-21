@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,7 @@ import {
   useCardsReviewedToday,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
+import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 
 export const Route = createFileRoute("/")({
   component: Home,

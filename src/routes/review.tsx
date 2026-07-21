@@ -27,6 +27,26 @@ export const Route = createFileRoute("/review")({
   component: Review,
 });
 
+function renderSentence(sentence: string, target: string) {
+  const t = target.trim();
+  if (!t) return sentence;
+  const re = new RegExp(`(${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "ig");
+  const parts = sentence.split(re);
+  return (
+    <>
+      {parts.map((part, i) =>
+        re.test(part) && part.toLowerCase() === t.toLowerCase() ? (
+          <span key={i} className="rounded-md bg-primary/20 px-1.5 text-primary">
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 function Review() {
   const { deck: deckId } = Route.useSearch();
   
