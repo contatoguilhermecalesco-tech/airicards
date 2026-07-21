@@ -131,6 +131,15 @@ function Row({
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = (n: Notif) => {
+    void markAsRead(n.id);
+    if (n.action_route) {
+      setOpen(false);
+      void navigate({ to: n.action_route as any });
+    }
+  };
   const ref = useRef<HTMLDivElement>(null);
   const { notifications, tags, readIds } = useNotifications();
   const prefs = useNotificationPrefs();
@@ -302,7 +311,7 @@ export function NotificationsBell() {
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={false}
-                            onClick={() => void markAsRead(n.id)}
+                            onClick={() => handleClick(n)}
                           />
                         </li>
                       ))}
@@ -322,7 +331,7 @@ export function NotificationsBell() {
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={true}
-                            onClick={() => void markAsRead(n.id)}
+                            onClick={() => handleClick(n)}
                           />
                         </li>
                       ))}
