@@ -94,12 +94,13 @@ export const TIER_COLORS: Record<
 };
 
 const LP_PER_DIVISION = 100;
-const PROMO_WINS_REQUIRED = 2;
+const PROMO_WINS_REQUIRED = 3;
 const PROMO_MAX_LOSSES = 2;
 
 // Elite (a partir de Mestre): LP total é livre. Faixas visuais:
-const ELITE_GRANDMASTER_LP = 300;
-const ELITE_CHALLENGER_LP = 800;
+const ELITE_GRANDMASTER_LP = 800;
+const ELITE_CHALLENGER_LP = 2000;
+
 
 export const INITIAL_RANK: RankState = {
   tier: "iron",
