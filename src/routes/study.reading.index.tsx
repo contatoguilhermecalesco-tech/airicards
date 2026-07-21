@@ -329,13 +329,22 @@ function ReadingPage() {
 
   return (
     <main className="mx-auto max-w-3xl px-5 py-8">
-      <Link
-        to="/study"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" strokeWidth={2.25} />
-        Áreas de estudo
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to="/study"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" strokeWidth={2.25} />
+          Áreas de estudo
+        </Link>
+        <Link
+          to="/study/reading/history"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-3 py-1.5 text-xs font-medium text-foreground/90 transition hover:bg-accent"
+        >
+          <History className="h-3.5 w-3.5" strokeWidth={2.25} />
+          Histórico
+        </Link>
+      </div>
 
       <header className="mt-4 mb-6 flex items-center gap-3">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400/30 to-sky-500/10 ring-1 ring-white/10">
