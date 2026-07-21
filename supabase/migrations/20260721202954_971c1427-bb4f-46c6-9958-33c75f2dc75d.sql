@@ -1,0 +1,1 @@
+ALTER TABLE public.profile_data ADD COLUMN IF NOT EXISTS study_history jsonb NOT NULL DEFAULT '{}'::jsonb;
