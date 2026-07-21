@@ -62,6 +62,19 @@ function formatNextIn(ms: number): string {
   return `${days} dias`;
 }
 
+// Reusable Liquid Glass surface — rim light + specular highlight + saturated blur
+const GLASS_BASE =
+  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_20px_50px_-30px_rgba(0,0,0,0.7)]";
+
+function GlassHighlight() {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+    />
+  );
+}
+
 function Home() {
   const profile = useCurrentProfile();
   const decks = useStore((s) => s.decks);
@@ -99,8 +112,8 @@ function Home() {
   const examResult = examState.history.find((h) => h.monthKey === examMonthKey);
   const appSettings = useAppSettings();
 
-  // Ring geometry — compact 96px ring
-  const RING_R = 40;
+  // Ring geometry — compact 104px ring
+  const RING_R = 44;
   const ringC = 2 * Math.PI * RING_R;
   const dailyTarget = Math.max(1, due + reviewedToday);
   const reviewedPct = Math.min(1, reviewedToday / dailyTarget);
@@ -108,24 +121,32 @@ function Home() {
 
   return (
     <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
-      {/* Ambient backdrop — soft */}
+      {/* Ambient aurora — soft violet layers */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] opacity-40"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px]"
         style={{
           background:
-            "radial-gradient(60% 60% at 20% 0%, rgba(167,139,250,0.14), transparent 70%), radial-gradient(45% 60% at 90% 8%, rgba(96,165,250,0.08), transparent 70%)",
+            "radial-gradient(55% 55% at 18% 0%, rgba(167,139,250,0.22), transparent 65%), radial-gradient(45% 55% at 92% 6%, rgba(129,140,248,0.14), transparent 70%), radial-gradient(80% 40% at 50% 100%, rgba(139,92,246,0.06), transparent 70%)",
+        }}
+      />
+      {/* Grain */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>\")",
         }}
       />
 
-      {/* Header — eyebrow + salute + ciclo RRSLG */}
+      {/* Header */}
       <header className="animate-fade-in flex flex-col space-y-1.5">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {eyebrow}
           </span>
           <span className="shrink-0">{icon}</span>
-
         </div>
         <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
           {salute}
@@ -133,24 +154,37 @@ function Home() {
         </h1>
       </header>
 
-      {/* Hero — assimétrico: stats à esquerda, anel à direita */}
+      {/* Hero — Liquid Glass */}
       <section
         className="animate-fade-in relative mt-7 sm:mt-8"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
-        {/* soft halo */}
+        {/* soft halo behind glass */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-1 rounded-[36px] bg-primary/10 opacity-70 blur-2xl"
+          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/20 opacity-60 blur-3xl"
         />
-        <div className="relative overflow-hidden rounded-[28px] border border-white/[0.06] bg-[color-mix(in_oklab,var(--surface-elevated)_92%,transparent)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-2xl sm:p-8">
-          <div className="flex items-start justify-between gap-6">
+        <div
+          className={`${GLASS_BASE} rounded-[28px] p-6 sm:p-8`}
+        >
+          <GlassHighlight />
+          {/* specular sheen */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.06] blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/25 blur-3xl"
+          />
+
+          <div className="relative flex items-start justify-between gap-6">
             {/* Left — copy */}
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Sessão de hoje
               </p>
-              <p className="mt-1 text-[26px] font-semibold leading-none tracking-tight text-foreground tabular-nums">
+              <p className="mt-1 text-[28px] font-semibold leading-none tracking-tight text-foreground tabular-nums">
                 {due}
                 <span className="ml-1.5 text-[15px] font-medium text-muted-foreground/80">
                   {due === 1 ? "carta agora" : "cartas agora"}
@@ -163,33 +197,40 @@ function Home() {
               )}
             </div>
 
-            {/* Right — compact ring */}
-            <div className="relative h-24 w-24 shrink-0">
-              <svg viewBox="0 0 96 96" className="h-full w-full -rotate-90">
+            {/* Right — glass ring */}
+            <div className="relative h-26 w-26 shrink-0" style={{ height: 104, width: 104 }}>
+              {/* halo behind ring */}
+              <div
+                aria-hidden
+                className="absolute inset-2 rounded-full bg-primary/25 blur-2xl"
+              />
+              <svg viewBox="0 0 104 104" className="relative h-full w-full -rotate-90">
                 <circle
-                  cx="48" cy="48" r={RING_R}
-                  stroke="rgba(255,255,255,0.06)" strokeWidth="8" fill="none"
+                  cx="52" cy="52" r={RING_R}
+                  stroke="rgba(255,255,255,0.07)" strokeWidth="9" fill="none"
                 />
                 <circle
-                  cx="48" cy="48" r={RING_R}
-                  stroke="url(#ringGrad)" strokeWidth="8" fill="none"
+                  cx="52" cy="52" r={RING_R}
+                  stroke="url(#ringGrad)" strokeWidth="9" fill="none"
                   strokeLinecap="round"
                   strokeDasharray={ringC}
                   strokeDashoffset={ringC * (1 - reviewedPct)}
                   className="transition-[stroke-dashoffset] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{ filter: "drop-shadow(0 0 6px rgba(167,139,250,0.55))" }}
                 />
                 <defs>
                   <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#C4B5FD" />
-                    <stop offset="100%" stopColor="#8B7BD8" />
+                    <stop offset="0%" stopColor="#DDD6FE" />
+                    <stop offset="55%" stopColor="#A78BFA" />
+                    <stop offset="100%" stopColor="#7C6BD8" />
                   </linearGradient>
                 </defs>
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-lg font-semibold leading-none tabular-nums text-foreground">
+                <p className="text-xl font-semibold leading-none tabular-nums text-foreground">
                   {reviewedToday}
                 </p>
-                <p className="mt-0.5 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <p className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                   {pctLabel}%
                 </p>
               </div>
@@ -197,17 +238,17 @@ function Home() {
           </div>
 
           {/* CTA */}
-          <div className="mt-7">
+          <div className="relative mt-7">
             {cards.length === 0 ? (
               <Link
                 to="/library"
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3.5 text-[14px] font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-all duration-300 hover:brightness-95 active:scale-[0.98]"
+                className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-b from-white to-white/90 py-3.5 text-[14px] font-semibold text-background shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,0_10px_30px_-10px_rgba(0,0,0,0.7)] transition-all duration-300 hover:brightness-[1.02] active:scale-[0.98]"
               >
                 Ir para a biblioteca
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
               </Link>
             ) : due === 0 ? (
-              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] py-3.5 text-[14px] font-medium text-muted-foreground">
+              <div className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] py-3.5 text-[14px] font-medium text-muted-foreground backdrop-blur-xl">
                 <Moon className="h-4 w-4" strokeWidth={2.25} />
                 {nextDueInMs !== null ? `Próxima em ${formatNextIn(nextDueInMs)}` : "Tudo em dia"}
               </div>
@@ -216,8 +257,12 @@ function Home() {
                 type="button"
                 disabled={!canStart}
                 onClick={() => canStart && setConfirmOpen(true)}
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-3.5 text-[14px] font-semibold text-background shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] transition-all duration-300 hover:brightness-95 active:scale-[0.98]"
+                className="group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-b from-white to-white/90 py-3.5 text-[14px] font-semibold text-background shadow-[0_1px_0_rgba(255,255,255,0.6)_inset,0_10px_30px_-10px_rgba(0,0,0,0.7)] transition-all duration-300 hover:brightness-[1.02] active:scale-[0.98]"
               >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80"
+                />
                 Iniciar sessão
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.5} />
               </button>
@@ -250,7 +295,7 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Stats — 2 chips minimalistas */}
+      {/* Stats — glass chips */}
       <section
         className="animate-fade-in mt-6 grid grid-cols-2 gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
@@ -259,7 +304,7 @@ function Home() {
         <StatChip label="Cartas" value={cards.length} />
       </section>
 
-      {/* Método RRSLG — semana + foco do dia */}
+      {/* Método RRSLG */}
       {cycle && (
         <section
           className="animate-fade-in mt-6"
@@ -267,10 +312,11 @@ function Home() {
         >
           <Link
             to="/study"
-            className="group block rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.08] hover:bg-white/[0.04]"
+            className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055]`}
           >
-            <div className="flex items-start gap-3">
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+            <GlassHighlight />
+            <div className="relative flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
                 <Sparkles className="h-4 w-4" strokeWidth={2.25} />
               </div>
               <div className="min-w-0 flex-1">
@@ -301,54 +347,54 @@ function Home() {
         </section>
       )}
 
-
-      {/* Prova mensal de nivelamento */}
+      {/* Prova mensal */}
       {appSettings.exam_visible && (
-      <section
-        className="animate-fade-in mt-6"
-        style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
-      >
-        <Link
-          to="/exam"
-          className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.10] via-white/[0.03] to-transparent p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/25"
+        <section
+          className="animate-fade-in mt-6"
+          style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/15 blur-2xl"
-          />
-          <div className="relative flex items-start gap-3">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
-              <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-                  Prova de nível · {monthLabel(examMonthKey)}
-                </p>
-                {examDone && examResult && (
-                  <span className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
-                    {examResult.level}
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 truncate text-[14px] font-medium text-foreground">
-                {examDone
-                  ? `Nível ${examResult?.level ?? ""} · ${examResult?.percent ?? 0}% de acerto`
-                  : "25 questões para descobrir seu nível CEFR"}
-              </p>
-              <p className="mt-0.5 text-[12px] text-muted-foreground">
-                {examDone
-                  ? "Ver detalhes e revisar respostas"
-                  : "Feita uma vez por mês · nova prova gerada por IA"}
-              </p>
-            </div>
-            <ChevronRight
-              className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
-              strokeWidth={2.25}
+          <Link
+            to="/exam"
+            className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30`}
+          >
+            <GlassHighlight />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-primary/20 blur-3xl"
             />
-          </div>
-        </Link>
-      </section>
+            <div className="relative flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
+                <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                    Prova de nível · {monthLabel(examMonthKey)}
+                  </p>
+                  {examDone && examResult && (
+                    <span className="rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-emerald-300">
+                      {examResult.level}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 truncate text-[14px] font-medium text-foreground">
+                  {examDone
+                    ? `Nível ${examResult?.level ?? ""} · ${examResult?.percent ?? 0}% de acerto`
+                    : "25 questões para descobrir seu nível CEFR"}
+                </p>
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  {examDone
+                    ? "Ver detalhes e revisar respostas"
+                    : "Feita uma vez por mês · nova prova gerada por IA"}
+                </p>
+              </div>
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                strokeWidth={2.25}
+              />
+            </div>
+          </Link>
+        </section>
       )}
 
       {/* Decks list */}
@@ -386,13 +432,14 @@ function Home() {
                   <Link
                     to="/library/$deckId"
                     params={{ deckId: d.id }}
-                    className="group flex items-center gap-4 rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.08] hover:bg-white/[0.04] active:scale-[0.995]"
+                    className={`${GLASS_BASE} group flex items-center gap-4 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055] active:scale-[0.995]`}
                   >
+                    <GlassHighlight />
                     <div
-                      className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${
+                      className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${
                         dueInDeck > 0
-                          ? "border-primary/30 bg-primary/10"
-                          : "border-white/[0.06] bg-white/[0.03]"
+                          ? "border-primary/30 bg-primary/10 shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]"
+                          : "border-white/[0.08] bg-white/[0.04]"
                       }`}
                     >
                       <div
@@ -401,7 +448,7 @@ function Home() {
                         }`}
                       />
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="relative min-w-0 flex-1">
                       <p className="truncate text-[15px] font-medium text-foreground">
                         {d.name}
                       </p>
@@ -416,7 +463,7 @@ function Home() {
                       </p>
                     </div>
                     <ChevronRight
-                      className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+                      className="relative h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
                       strokeWidth={2.25}
                     />
                   </Link>
@@ -432,11 +479,12 @@ function Home() {
 
 function StatChip({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-white/[0.05] bg-white/[0.025] p-4 transition-colors hover:bg-white/[0.04]">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+    <div className={`${GLASS_BASE} p-4 transition-colors hover:bg-white/[0.055]`}>
+      <GlassHighlight />
+      <p className="relative text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
+      <p className="relative mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
         {value}
       </p>
     </div>
