@@ -4,7 +4,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
-import { awardLp, LP } from "@/lib/rank-store";
+import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 
 export type CardMode = "word" | "sentence";
 export type CardSource = string;
@@ -42,11 +42,17 @@ export type Streak = {
   lastDay: string; // dateKey of the last day the user reviewed ≥1 card
   startedOn?: string; // dateKey when the current streak began
 };
+type PunishmentsState = {
+  streakBrokenAppliedFor?: string; // dayKey da lastDay já penalizada
+  enemyPenaltyDay?: string; // dayKey em que já foi cobrada punição de inimigos ignorados
+  decayLastDay?: string; // último dia em que foi aplicado decay
+};
 type HomeSessions = {
   day: string;
   count: number;
   reviewed?: number;
   streak?: Streak;
+  punishments?: PunishmentsState;
 };
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
@@ -167,12 +173,14 @@ export function setActiveProfileId(profileId: string | null) {
   // Instant paint from local cache.
   const cached = loadCache(profileId);
   state = cached.state;
-  home = cached.home.day === todayKey() ? cached.home : { day: todayKey(), count: 0 };
+  home = cached.home.day === todayKey() ? cached.home : { ...cached.home, day: todayKey(), count: 0 };
   emit();
   emitHome();
+  // Punições diárias com base no estado carregado.
+  runDailyPunishments();
 
   // Refresh from Cloud, then subscribe to Realtime updates from other devices.
-  void pullFromCloud(profileId);
+  void pullFromCloud(profileId).then(() => runDailyPunishments());
   realtimeChannel = supabase
     .channel(`profile_data:${profileId}`)
     .on(
