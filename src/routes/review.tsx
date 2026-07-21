@@ -64,6 +64,11 @@ function Review() {
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
   const [hitFlash, setHitFlash] = useState(false);
+  const [dmgFx, setDmgFx] = useState<
+    { id: number; text: string; tone: "damage" | "heal" }[]
+  >([]);
+  const [defeatFx, setDefeatFx] = useState<string | null>(null);
+  const dmgIdRef = useRef(0);
 
   const allCards = useStore((s) => s.cards);
 
@@ -109,6 +114,12 @@ function Review() {
     noticeTimer.current = setTimeout(() => setNotice(null), 1800);
   }
 
+  function spawnDmg(text: string, tone: "damage" | "heal") {
+    const id = ++dmgIdRef.current;
+    setDmgFx((xs) => [...xs, { id, text, tone }]);
+    setTimeout(() => setDmgFx((xs) => xs.filter((x) => x.id !== id)), 1200);
+  }
+
   function handleWrong() {
     if (!current) return;
     const wasEnemy = isEnemy(current);
@@ -118,6 +129,7 @@ function Review() {
     setReviewed((n) => n + 1);
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
+    if (wasEnemy) spawnDmg("+1 HP", "heal");
     if (willBecomeEnemy) {
       flashNotice({
         kind: "enemy-born",
@@ -138,13 +150,23 @@ function Review() {
     const wasEnemy = isEnemy(current);
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
+    const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
+    if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
     if (willDefeat) {
       flashNotice({
         kind: "enemy-defeated",
         text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
       });
+      setDefeatFx(current.front);
+      setTimeout(() => setDefeatFx(null), 1400);
+      setTimeout(() => {
+        setIndex((i) => i + 1);
+        setShowBack(false);
+        setAskDifficulty(false);
+      }, 900);
+      return;
     }
     setIndex((i) => i + 1);
     setShowBack(false);
@@ -153,6 +175,7 @@ function Review() {
 
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
+
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -298,6 +321,61 @@ function Review() {
               )}
             </div>
 
+            {/* Floating damage / heal numbers */}
+            {dmgFx.length > 0 && (
+              <div className="pointer-events-none fixed inset-x-0 top-1/2 z-40 mx-auto flex justify-center">
+                {dmgFx.map((f) => (
+                  <span
+                    key={f.id}
+                    className={`dmg-float absolute left-1/2 text-[34px] font-black tabular-nums drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] ${
+                      f.tone === "damage"
+                        ? "text-success"
+                        : "text-destructive"
+                    }`}
+                    style={{
+                      textShadow:
+                        f.tone === "damage"
+                          ? "0 0 24px hsl(var(--success) / 0.9)"
+                          : "0 0 24px hsl(var(--destructive) / 0.9)",
+                    }}
+                  >
+                    {f.text}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Defeat cinematic overlay */}
+            {defeatFx && (
+              <div className="pointer-events-none fixed inset-0 z-50 grid place-items-center">
+                <div
+                  className="defeat-fade absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(closest-side, hsl(var(--destructive) / 0.35), transparent 60%), linear-gradient(180deg, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.25))",
+                    backdropFilter: "blur(6px)",
+                  }}
+                />
+                <div
+                  aria-hidden
+                  className="defeat-ring absolute h-40 w-40 rounded-full border-2 border-destructive"
+                  style={{ boxShadow: "0 0 60px hsl(var(--destructive) / 0.8)" }}
+                />
+                <div className="relative flex flex-col items-center gap-3 text-center">
+                  <Skull
+                    className="defeat-burst h-14 w-14 text-destructive"
+                    strokeWidth={2.5}
+                  />
+                  <p className="defeat-burst text-[26px] font-black uppercase tracking-[0.28em] text-destructive-foreground">
+                    Derrotado
+                  </p>
+                  <p className="defeat-fade max-w-[280px] truncate text-[13px] font-medium text-muted-foreground">
+                    “{defeatFx}”
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Notice */}
             {notice && (
               <div
@@ -315,6 +393,7 @@ function Review() {
                 <span>{notice.text}</span>
               </div>
             )}
+
 
             {/* Actions */}
             <div className="mt-8">
