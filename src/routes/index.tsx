@@ -62,9 +62,9 @@ function formatNextIn(ms: number): string {
   return `${days} dias`;
 }
 
-// Reusable Liquid Glass surface — rim light + specular highlight + saturated blur
+// Reusable Liquid Glass surface — rim light + subtle depth, kept crisp
 const GLASS_BASE =
-  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_20px_50px_-30px_rgba(0,0,0,0.7)]";
+  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.045] backdrop-blur-md backdrop-saturate-125 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)]";
 
 function GlassHighlight() {
   return (
