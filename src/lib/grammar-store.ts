@@ -16,9 +16,18 @@ export type GrammarAttempt = {
   completedAt: number;
 };
 
+export type GrammarChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: number;
+};
+
 export type GrammarProgress = {
   lessons: Record<string, GrammarLesson>;
   attempts: GrammarAttempt[];
+  notes: Record<string, string>;
+  chats: Record<string, GrammarChatMessage[]>;
 };
 
 function isBrowser() {
@@ -26,11 +35,11 @@ function isBrowser() {
 }
 
 function cacheKey(profileId: string) {
-  return `airi.grammar.${profileId}.v1`;
+  return `airi.grammar.${profileId}.v2`;
 }
 
 function defaultProgress(): GrammarProgress {
-  return { lessons: {}, attempts: [] };
+  return { lessons: {}, attempts: [], notes: {}, chats: {} };
 }
 
 function loadCache(profileId: string): GrammarProgress {
