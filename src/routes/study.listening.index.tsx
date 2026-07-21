@@ -54,7 +54,68 @@ function ListeningPage() {
   const gen = useServerFn(generateListening);
   const grader = useServerFn(gradeListening);
 
+  const decks = useStore((s) => s.decks);
+  const [selectedDeck, setSelectedDeck] = useState<string>("");
+  const [pickedVocab, setPickedVocab] = useState<Record<number, boolean>>({});
+  const [includePassage, setIncludePassage] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+
   useEffect(() => () => stopSpeaking(), []);
+
+  useEffect(() => {
+    if (!selectedDeck && decks.length > 0) setSelectedDeck(decks[0].id);
+  }, [decks, selectedDeck]);
+
+  // Reset picker whenever a new passage loads
+  useEffect(() => {
+    if (!passage) return;
+    const init: Record<number, boolean> = {};
+    passage.vocabulary.forEach((_, i) => (init[i] = true));
+    setPickedVocab(init);
+    setIncludePassage(false);
+    setSavedCount(0);
+  }, [passage]);
+
+  const pickedCount = useMemo(
+    () =>
+      (passage?.vocabulary ?? []).reduce(
+        (n, _, i) => n + (pickedVocab[i] ? 1 : 0),
+        0,
+      ) + (includePassage ? 1 : 0),
+    [passage, pickedVocab, includePassage],
+  );
+
+  function toggleVocab(i: number) {
+    setPickedVocab((p) => ({ ...p, [i]: !p[i] }));
+  }
+
+  function selectAllVocab(v: boolean) {
+    if (!passage) return;
+    const next: Record<number, boolean> = {};
+    passage.vocabulary.forEach((_, i) => (next[i] = v));
+    setPickedVocab(next);
+  }
+
+  function saveCards() {
+    if (!passage || !selectedDeck || pickedCount === 0) return;
+    let n = 0;
+    passage.vocabulary.forEach((v, i) => {
+      if (!pickedVocab[i]) return;
+      createCard(selectedDeck, v.word, v.meaning, {
+        mode: "word",
+        source: `Listening · ${passage.title}`,
+      });
+      n++;
+    });
+    if (includePassage) {
+      createCard(selectedDeck, passage.transcript, passage.translation, {
+        mode: "sentence",
+        source: `Listening · ${passage.title}`,
+      });
+      n++;
+    }
+    setSavedCount(n);
+  }
 
   async function loadNew() {
     setError(null);
