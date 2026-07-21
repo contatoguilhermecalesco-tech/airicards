@@ -339,6 +339,12 @@ export function getDueCards(deckId?: string, at: number = Date.now()): Card[] {
   return state.cards.filter((c) => c.dueAt <= at && (deckId ? c.deckId === deckId : true));
 }
 
+export function getEnemyCards(deckId?: string): Card[] {
+  return state.cards.filter(
+    (c) => isEnemy(c) && (deckId ? c.deckId === deckId : true),
+  );
+}
+
 export function cardsForDeck(deckId: string): Card[] {
   return state.cards.filter((c) => c.deckId === deckId);
 }
