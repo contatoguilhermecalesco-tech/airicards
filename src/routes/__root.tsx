@@ -17,6 +17,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
 import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
+import { RankEmblem } from "../components/RankBadge";
+import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
 
@@ -154,68 +156,94 @@ function RootShell({ children }: { children: ReactNode }) {
  * - Desktop (≥640px): tudo consolidado no topo, sem barra inferior.
  * Todos os alvos clicáveis usam `tap-target` (>=44x44) para ergonomia touch.
  */
+function RankPill() {
+  const rank = useRank();
+  const colors = TIER_COLORS[rank.tier];
+  const label = isElite(rank.tier)
+    ? TIER_LABEL[rank.tier]
+    : `${TIER_LABEL[rank.tier]} ${DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}`;
+  return (
+    <Link
+      to="/rank"
+      aria-label={`Rank: ${label} · ${rank.lp} LP`}
+      className="tap-target group relative inline-flex items-center gap-2 rounded-full border border-white/10 bg-surface/70 py-1 pl-1 pr-3 text-sm transition hover:bg-accent"
+      style={{
+        boxShadow: `0 0 0 1px ${colors.ring}22, 0 6px 20px -10px ${colors.glow}`,
+      }}
+    >
+      <span className="grid h-7 w-9 place-items-center">
+        <RankEmblem tier={rank.tier} division={rank.division} size={30} />
+      </span>
+      <span className="hidden flex-col leading-tight md:flex">
+        <span
+          className="text-[11px] font-semibold uppercase tracking-wide"
+          style={{ color: colors.text }}
+        >
+          {label}
+        </span>
+        <span className="text-[10px] font-medium text-muted-foreground">
+          {rank.lp} LP
+        </span>
+      </span>
+      <span
+        className="text-[11px] font-semibold md:hidden"
+        style={{ color: colors.text }}
+      >
+        {rank.lp}
+      </span>
+    </Link>
+  );
+}
+
 function TopBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isReview = pathname.startsWith("/review");
   if (isReview) return null;
 
   const linkClass = (active: boolean) =>
-    `tap-target inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition sm:px-4 ${
+    `tap-target relative inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium transition lg:px-3.5 lg:text-sm ${
       active
         ? "bg-accent text-foreground"
-        : "text-muted-foreground hover:text-foreground"
+        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
     }`;
+
+  const navItems = [
+    { to: "/", label: "Início", icon: Home, active: pathname === "/" },
+    { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
+    { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
+  ] as const;
 
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="glass-panel border-b">
-        <nav className="mx-auto flex w-full max-w-3xl items-center justify-between gap-2 px-[clamp(0.75rem,4vw,1.5rem)] py-2.5">
+        <nav className="mx-auto grid w-full max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-3 px-[clamp(0.75rem,3vw,1.5rem)] py-2.5 lg:gap-6">
+          {/* Esquerda: logo */}
           <Link to="/" className="tap-target flex items-center gap-2.5" aria-label="airi — início">
             <img
               src={airiLogo.url}
               alt=""
               className="h-10 w-10 rounded-2xl object-contain sm:h-11 sm:w-11"
             />
-            <span className="text-[17px] font-semibold lowercase tracking-tight">
+            <span className="hidden text-[17px] font-semibold lowercase tracking-tight sm:inline">
               airi
             </span>
           </Link>
-          {/* Navegação principal — visível só em ≥sm; no mobile vai para BottomBar */}
-          <div className="hidden items-center gap-1 sm:flex">
-            <Link to="/" className={linkClass(pathname === "/")}>
-              <Home className="h-4 w-4" strokeWidth={2.25} />
-              <span>Início</span>
-            </Link>
-            <Link
-              to="/library"
-              className={linkClass(pathname.startsWith("/library"))}
-            >
-              <Library className="h-4 w-4" strokeWidth={2.25} />
-              <span>Biblioteca</span>
-            </Link>
-            <Link
-              to="/study"
-              className={linkClass(pathname.startsWith("/study"))}
-            >
-              <GraduationCap className="h-4 w-4" strokeWidth={2.25} />
-              <span>Estudo</span>
-            </Link>
-            <Link
-              to="/enemies"
-              className={linkClass(pathname.startsWith("/enemies"))}
-            >
-              <Swords className="h-4 w-4" strokeWidth={2.25} />
-              <span>Inimigas</span>
-            </Link>
-            <Link
-              to="/rank"
-              className={linkClass(pathname.startsWith("/rank"))}
-            >
-              <Trophy className="h-4 w-4" strokeWidth={2.25} />
-              <span>Rank</span>
-            </Link>
+
+          {/* Centro: navegação principal (≥sm) */}
+          <div className="hidden items-center justify-center gap-0.5 sm:flex lg:gap-1">
+            {navItems.map(({ to, label, icon: Icon, active }) => (
+              <Link key={to} to={to} className={linkClass(active)}>
+                <Icon className="h-4 w-4" strokeWidth={2.25} />
+                <span className="hidden lg:inline">{label}</span>
+                <span className="lg:hidden">{label}</span>
+              </Link>
+            ))}
           </div>
-          <div className="flex shrink-0 items-center gap-1">
+
+          {/* Direita: rank + notificações + perfil */}
+          <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
+            <RankPill />
             <NotificationsBell />
             <ProfileMenu />
           </div>
