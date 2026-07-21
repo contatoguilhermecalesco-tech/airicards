@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Headphones,
@@ -12,6 +12,8 @@ import {
   Eye,
   EyeOff,
   Check,
+  Plus,
+  Library,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -21,6 +23,7 @@ import {
   type ListeningGrade,
 } from "@/lib/listening.functions";
 import { speak, stopSpeaking, ttsAvailable } from "@/lib/speech";
+import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/listening/")({
   head: () => ({
@@ -51,7 +54,68 @@ function ListeningPage() {
   const gen = useServerFn(generateListening);
   const grader = useServerFn(gradeListening);
 
+  const decks = useStore((s) => s.decks);
+  const [selectedDeck, setSelectedDeck] = useState<string>("");
+  const [pickedVocab, setPickedVocab] = useState<Record<number, boolean>>({});
+  const [includePassage, setIncludePassage] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+
   useEffect(() => () => stopSpeaking(), []);
+
+  useEffect(() => {
+    if (!selectedDeck && decks.length > 0) setSelectedDeck(decks[0].id);
+  }, [decks, selectedDeck]);
+
+  // Reset picker whenever a new passage loads
+  useEffect(() => {
+    if (!passage) return;
+    const init: Record<number, boolean> = {};
+    passage.vocabulary.forEach((_, i) => (init[i] = true));
+    setPickedVocab(init);
+    setIncludePassage(false);
+    setSavedCount(0);
+  }, [passage]);
+
+  const pickedCount = useMemo(
+    () =>
+      (passage?.vocabulary ?? []).reduce(
+        (n, _, i) => n + (pickedVocab[i] ? 1 : 0),
+        0,
+      ) + (includePassage ? 1 : 0),
+    [passage, pickedVocab, includePassage],
+  );
+
+  function toggleVocab(i: number) {
+    setPickedVocab((p) => ({ ...p, [i]: !p[i] }));
+  }
+
+  function selectAllVocab(v: boolean) {
+    if (!passage) return;
+    const next: Record<number, boolean> = {};
+    passage.vocabulary.forEach((_, i) => (next[i] = v));
+    setPickedVocab(next);
+  }
+
+  function saveCards() {
+    if (!passage || !selectedDeck || pickedCount === 0) return;
+    let n = 0;
+    passage.vocabulary.forEach((v, i) => {
+      if (!pickedVocab[i]) return;
+      createCard(selectedDeck, v.word, v.meaning, {
+        mode: "word",
+        source: `Listening · ${passage.title}`,
+      });
+      n++;
+    });
+    if (includePassage) {
+      createCard(selectedDeck, passage.transcript, passage.translation, {
+        mode: "sentence",
+        source: `Listening · ${passage.title}`,
+      });
+      n++;
+    }
+    setSavedCount(n);
+  }
 
   async function loadNew() {
     setError(null);
@@ -330,6 +394,126 @@ function ListeningPage() {
           )}
         </section>
       )}
+
+      {/* Save to deck */}
+      {passage && (
+        <section className="glass-panel mt-4 rounded-3xl border p-5">
+          <div className="flex items-center gap-2">
+            <Library className="h-4 w-4 text-emerald-300" strokeWidth={2.25} />
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">
+              Salvar como cartas
+            </p>
+          </div>
+
+          {decks.length === 0 ? (
+            <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm">
+              <p className="text-muted-foreground">
+                Você ainda não tem decks. Crie um na biblioteca para salvar cartas a partir deste
+                áudio.
+              </p>
+              <Link
+                to="/library"
+                className="tap-target mt-3 inline-flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/15"
+              >
+                <Plus className="h-3.5 w-3.5" /> Ir para biblioteca
+              </Link>
+            </div>
+          ) : (
+            <>
+              <label className="mt-3 block text-[10px] uppercase tracking-wider text-muted-foreground">
+                Deck
+              </label>
+              <select
+                value={selectedDeck}
+                onChange={(e) => setSelectedDeck(e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-border bg-surface/40 px-4 py-2.5 text-sm outline-none focus:border-emerald-400/40"
+              >
+                {decks.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+
+              {passage.vocabulary.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Vocabulário ({passage.vocabulary.length})
+                    </p>
+                    <div className="flex gap-1 text-[11px]">
+                      <button
+                        onClick={() => selectAllVocab(true)}
+                        className="rounded-full px-2 py-1 text-emerald-300 hover:bg-emerald-400/10"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => selectAllVocab(false)}
+                        className="rounded-full px-2 py-1 text-muted-foreground hover:bg-white/5"
+                      >
+                        Nenhum
+                      </button>
+                    </div>
+                  </div>
+                  <ul className="mt-2 space-y-1.5">
+                    {passage.vocabulary.map((v, i) => (
+                      <li key={i}>
+                        <label className="flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                          <input
+                            type="checkbox"
+                            checked={!!pickedVocab[i]}
+                            onChange={() => toggleVocab(i)}
+                            className="mt-0.5 accent-emerald-400"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="font-medium">{v.word}</span>
+                            <span className="text-muted-foreground"> — {v.meaning}</span>
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                <input
+                  type="checkbox"
+                  checked={includePassage}
+                  onChange={(e) => setIncludePassage(e.target.checked)}
+                  className="mt-0.5 accent-emerald-400"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="font-medium">Passagem completa</span>
+                  <span className="block text-xs text-muted-foreground">
+                    Frente: texto em inglês · Verso: tradução
+                  </span>
+                </span>
+              </label>
+
+              <button
+                onClick={saveCards}
+                disabled={pickedCount === 0 || !selectedDeck}
+                className="tap-target mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500/90 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.25} />
+                {pickedCount === 0
+                  ? "Selecione ao menos uma carta"
+                  : `Adicionar ${pickedCount} carta${pickedCount > 1 ? "s" : ""}`}
+              </button>
+
+              {savedCount > 0 && (
+                <p className="mt-3 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-200">
+                  ✓ {savedCount} carta{savedCount > 1 ? "s" : ""} adicionada
+                  {savedCount > 1 ? "s" : ""} ao deck.
+                </p>
+              )}
+            </>
+          )}
+        </section>
+      )}
+
 
       {/* Feedback */}
       {grade && (
