@@ -19,6 +19,17 @@ import {
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
 import { resetExamsForProfileId } from "@/lib/exam-store";
+import { useAppSettings, setSetting } from "@/lib/app-settings";
+
+export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
+  { path: "/", label: "Início" },
+  { path: "/library", label: "Biblioteca" },
+  { path: "/study", label: "Estudos" },
+  { path: "/study/writing", label: "Writing" },
+  { path: "/study/grammar", label: "Gramática" },
+  { path: "/exam", label: "Prova mensal" },
+  { path: "/settings", label: "Configurações" },
+];
 
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import {
