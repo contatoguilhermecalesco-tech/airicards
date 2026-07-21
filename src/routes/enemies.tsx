@@ -131,7 +131,52 @@ function EnemiesPage() {
             tone="muted"
           />
         </div>
+        </div>
       )}
+
+      {/* Podium — top 3 hardest active enemies */}
+      {(() => {
+        const top = enemies.filter((c) => !isDefeated(c)).slice(0, 3);
+        if (top.length === 0) return null;
+        const podiumOrder = [top[1], top[0], top[2]].filter(Boolean);
+        const heights = { 0: "h-16", 1: "h-24", 2: "h-12" } as const;
+        const medals = ["🥈", "🥇", "🥉"];
+        return (
+          <section className="relative mt-8 overflow-hidden rounded-[24px] border border-destructive/20 bg-gradient-to-b from-destructive/[0.08] via-transparent to-transparent p-5 backdrop-blur-md">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-destructive" strokeWidth={2.5} />
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-destructive">
+                Ranking dos chefes
+              </p>
+            </div>
+            <div className="mt-4 grid grid-cols-3 items-end gap-3">
+              {podiumOrder.map((c, i) => {
+                const lapses = c.lapses ?? 0;
+                const successes = c.successes ?? 0;
+                const net = lapses - successes;
+                return (
+                  <div key={c.id} className="flex flex-col items-center">
+                    <span className="text-[22px]">{medals[i]}</span>
+                    <p className="mt-1 line-clamp-2 max-w-full text-center text-[12px] font-semibold leading-tight text-foreground">
+                      {c.front}
+                    </p>
+                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive/90 tabular-nums">
+                      {net} pt · {lapses} err
+                    </p>
+                    <div
+                      className={`mt-2 w-full rounded-t-lg bg-gradient-to-t from-destructive/40 to-destructive/70 ${heights[i as 0 | 1 | 2]}`}
+                      style={{
+                        boxShadow:
+                          "inset 0 1px 0 hsl(var(--destructive) / 0.6), 0 10px 30px -10px hsl(var(--destructive) / 0.5)",
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Search */}
       {enemies.length > 0 && (
