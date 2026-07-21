@@ -430,12 +430,91 @@ function computeStreak(): Streak {
 }
 export function getStreak(): Streak {
   const s = computeStreak();
+  // Punição por streak quebrado — aplicada uma vez por lastDay perdido.
+  maybePenalizeBrokenStreak(s);
   const key = `${s.current}|${s.longest}|${s.lastDay}|${s.startedOn ?? ""}`;
   if (key !== streakSnapshotKey) {
     streakSnapshotKey = key;
     streakSnapshot = s;
   }
   return streakSnapshot;
+}
+
+function maybePenalizeBrokenStreak(effective: Streak) {
+  const stored = home.streak;
+  if (!stored || !stored.lastDay) return;
+  // Só penalizamos quando o streak efetivo caiu a 0 e o storage guarda um streak anterior > 0.
+  const prevCurrent = stored.current ?? 0;
+  if (effective.current !== 0 || prevCurrent <= 0) return;
+  const marker = home.punishments?.streakBrokenAppliedFor;
+  if (marker === stored.lastDay) return;
+  const delta = LP.streakBrokenFor(prevCurrent);
+  if (delta < 0) {
+    awardLp(delta, "streak.broken");
+  }
+  home = {
+    ...home,
+    streak: { ...stored, current: 0 },
+    punishments: { ...(home.punishments ?? {}), streakBrokenAppliedFor: stored.lastDay },
+  };
+  emitHome();
+  scheduleSave();
+}
+
+/** Executa checagens diárias de punição (inimigos ignorados, decaimento por inatividade). */
+function runDailyPunishments() {
+  if (!isBrowser() || !activeProfile) return;
+  const today = todayKey();
+  const punishments: PunishmentsState = { ...(home.punishments ?? {}) };
+  let changed = false;
+
+  // 1) Streak quebrado — cobre o caso de ainda não termos chamado getStreak.
+  maybePenalizeBrokenStreak(computeStreak());
+
+  // 2) Inimigos ignorados: cartas inimigas com vencimento > 24h atrás.
+  if (punishments.enemyPenaltyDay !== today) {
+    const dayMs = 86_400_000;
+    const cutoff = Date.now() - dayMs;
+    const overdueEnemies = state.cards.filter(
+      (c) => isEnemy(c) && !isDefeated(c) && c.dueAt < cutoff,
+    ).length;
+    if (overdueEnemies > 0) {
+      const raw = overdueEnemies * LP.enemyIgnoredPerDay; // negativo
+      const capped = Math.max(LP.enemyIgnoredCapDaily, raw);
+      awardLp(capped, `punish.enemies_ignored:${overdueEnemies}`);
+      punishments.enemyPenaltyDay = today;
+      changed = true;
+    } else {
+      punishments.enemyPenaltyDay = today;
+      changed = true;
+    }
+  }
+
+  // 3) Decaimento por inatividade (a partir de Ouro): mais de 3 dias sem revisar.
+  const rank = getRank();
+  if (isDecayEligible(rank.tier) && punishments.decayLastDay !== today) {
+    const lastDay = home.streak?.lastDay;
+    if (lastDay) {
+      const [ly, lm, ld] = lastDay.split("-").map(Number);
+      const last = new Date(ly, lm - 1, ld).getTime();
+      const now = Date.now();
+      const daysIdle = Math.floor((now - last) / 86_400_000);
+      const extra = daysIdle - 3;
+      if (extra > 0) {
+        const raw = extra * LP.decayPerDay; // negativo
+        const capped = Math.max(LP.decayCapDaily, raw);
+        awardLp(capped, `punish.decay:${daysIdle}d`);
+      }
+    }
+    punishments.decayLastDay = today;
+    changed = true;
+  }
+
+  if (changed) {
+    home = { ...home, punishments };
+    emitHome();
+    scheduleSave();
+  }
 }
 const EMPTY_STREAK: Streak = { current: 0, longest: 0, lastDay: "" };
 export function useStreak(): Streak {
