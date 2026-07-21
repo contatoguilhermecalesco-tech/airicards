@@ -50,25 +50,17 @@ function formatNextIn(ms: number): string {
 function contextLine({
   due,
   totalCards,
-  sessionsToday,
   reviewedToday,
-  sessionsLeft,
   nextDueInMs,
 }: {
   due: number;
   totalCards: number;
-  sessionsToday: number;
   reviewedToday: number;
-  sessionsLeft: number;
   nextDueInMs: number | null;
 }): string {
   if (totalCards === 0) return "Crie seu primeiro deck para começar.";
-  if (sessionsLeft === 0)
-    return `${reviewedToday} cartas hoje — descanso faz parte.`;
-  if (sessionsToday === 0 && due > 0)
-    return `${due} carta${due === 1 ? "" : "s"} te esperando — primeira sessão do dia.`;
   if (due > 0)
-    return `${due} carta${due === 1 ? "" : "s"} te esperando.`;
+    return `${due} carta${due === 1 ? "" : "s"} te esperando${reviewedToday > 0 ? ` — ${reviewedToday} revisadas hoje` : ""}.`;
   if (nextDueInMs !== null) {
     const when = formatNextIn(nextDueInMs);
     if (reviewedToday > 0)
@@ -78,6 +70,7 @@ function contextLine({
   if (reviewedToday > 0) return `Tudo em dia — ${reviewedToday} revisadas hoje.`;
   return "Tudo em dia por aqui.";
 }
+
 
 function Home() {
   const profile = useCurrentProfile();
