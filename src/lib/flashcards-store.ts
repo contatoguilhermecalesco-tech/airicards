@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 
 export type CardMode = "word" | "sentence";
-export type CardSource = "reading" | "listening" | "video" | "book" | "other";
+export type CardSource = string;
 
 export type Card = {
   id: string;
