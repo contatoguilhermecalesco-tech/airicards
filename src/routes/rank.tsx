@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/rank")({
       { name: "description", content: "Sua jornada de rank estilo LoL no airi." },
       { property: "og:title", content: "Rank — airi" },
       { property: "og:description", content: "Do Ferro ao Desafiante — evolua com cada carta." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
 });
@@ -137,6 +139,41 @@ function RankPage() {
               </div>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* O que é o rank */}
+      <section className={`${GLASS} mt-4 p-5`}>
+        <div className="mb-3 flex items-center gap-2">
+          <Info className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold text-foreground">O que é o Rank?</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-sm leading-relaxed text-foreground">
+              O rank transforma o seu estudo de inglês em uma jornada de progressão.
+              Assim como nas ligas de e-sports, você sobe de elo conforme acerta
+              cartas, derrota inimigos e mantém constância nos estudos.
+            </p>
+          </div>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span>Mostra o quanto você evoluiu de forma visual e motivadora.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span>Cria metas de longo prazo: do Ferro ao Desafiante.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span>Recompensa acertos, streaks e aulas com LP.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-rose-400" />
+              <span>Penaliza abandono e erros repetidos, mantendo o desafio real.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
