@@ -13,11 +13,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   useStore,
-  useHomeSessionsToday,
   useCardsReviewedToday,
-  HOME_DAILY_LIMIT,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
+
 
 export const Route = createFileRoute("/")({
   component: Home,
