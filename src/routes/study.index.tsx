@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BookOpen, Headphones, Mic, PenLine, Sparkles, Lock } from "lucide-react";
+import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/study/")({
   component: StudyIndex,
@@ -67,6 +68,7 @@ function todayId(): string {
 
 function StudyIndex() {
   const today = todayId();
+  const { exam_visible } = useAppSettings();
   return (
     <main className="mx-auto max-w-3xl px-5 py-10">
       <header className="mb-8">
@@ -131,6 +133,7 @@ function StudyIndex() {
       </div>
 
       {/* Prova mensal */}
+      {exam_visible && (
       <section className="mt-8">
         <p className="mb-3 px-1 text-xs uppercase tracking-wider text-muted-foreground">
           Avaliação
@@ -159,6 +162,7 @@ function StudyIndex() {
           </div>
         </Link>
       </section>
+      )}
     </main>
   );
 }

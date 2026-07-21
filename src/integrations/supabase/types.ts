@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -63,6 +81,8 @@ export type Database = {
       }
       notifications: {
         Row: {
+          action_label: string | null
+          action_route: string | null
           body: string
           created_at: string
           icon: string | null
@@ -71,6 +91,8 @@ export type Database = {
           title: string
         }
         Insert: {
+          action_label?: string | null
+          action_route?: string | null
           body: string
           created_at?: string
           icon?: string | null
@@ -79,6 +101,8 @@ export type Database = {
           title: string
         }
         Update: {
+          action_label?: string | null
+          action_route?: string | null
           body?: string
           created_at?: string
           icon?: string | null

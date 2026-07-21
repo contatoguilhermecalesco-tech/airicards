@@ -19,6 +19,17 @@ import {
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
 import { resetExamsForProfileId } from "@/lib/exam-store";
+import { useAppSettings, setSetting } from "@/lib/app-settings";
+
+export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
+  { path: "/", label: "Início" },
+  { path: "/library", label: "Biblioteca" },
+  { path: "/study", label: "Estudos" },
+  { path: "/study/writing", label: "Writing" },
+  { path: "/study/grammar", label: "Gramática" },
+  { path: "/exam", label: "Prova mensal" },
+  { path: "/settings", label: "Configurações" },
+];
 
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import {
@@ -336,6 +347,8 @@ function NotificationsSection() {
   const [idea, setIdea] = useState("");
   const [tagId, setTagId] = useState<string>("");
   const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
+  const [actionLabel, setActionLabel] = useState("");
+  const [actionRoute, setActionRoute] = useState<string>("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [genBusy, setGenBusy] = useState(false);
@@ -365,11 +378,20 @@ function NotificationsSection() {
     setErr(null);
     setOk(null);
     try {
-      await createNotification({ title, body, tag_id: tagId || null, icon: iconKey || null });
+      await createNotification({
+        title,
+        body,
+        tag_id: tagId || null,
+        icon: iconKey || null,
+        action_label: actionLabel || null,
+        action_route: actionRoute || null,
+      });
       setTitle("");
       setBody("");
       setIdea("");
       setIconKey("");
+      setActionLabel("");
+      setActionRoute("");
       setOk("Notificação enviada para os perfis.");
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
@@ -505,6 +527,54 @@ function NotificationsSection() {
             Sem escolher, o ícone é inferido pela tag/título.
           </p>
         </div>
+
+        {/* Action button (optional) */}
+        <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              Botão de ação (opcional)
+            </span>
+            {(actionRoute || actionLabel) && (
+              <button
+                onClick={() => {
+                  setActionRoute("");
+                  setActionLabel("");
+                }}
+                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <input
+            value={actionLabel}
+            onChange={(e) => setActionLabel(e.target.value)}
+            placeholder="Texto do botão (ex.: Fazer a prova)"
+            className="mb-2 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+          />
+          <div className="flex flex-wrap gap-1.5">
+            {NOTIFICATION_ROUTES.map((r) => {
+              const active = actionRoute === r.path;
+              return (
+                <button
+                  key={r.path}
+                  onClick={() => setActionRoute(active ? "" : r.path)}
+                  className={`rounded-full border px-2.5 py-1 text-xs transition ${
+                    active
+                      ? "border-primary/60 bg-primary/15 text-primary"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            Ao clicar, o usuário será enviado para essa aba.
+          </p>
+        </div>
+
         <div className="flex items-center justify-end pt-1">
           <button
             onClick={() => void handleSend()}
@@ -590,6 +660,8 @@ function NotificationsSection() {
 function ExamAdminSection() {
   const [busy, setBusy] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const settings = useAppSettings();
+  const [toggling, setToggling] = useState(false);
 
   async function handleReset(profileId: string) {
     setBusy(profileId);
@@ -603,19 +675,61 @@ function ExamAdminSection() {
     }
   }
 
+  async function toggleVisible() {
+    setToggling(true);
+    try {
+      await setSetting("exam_visible", !settings.exam_visible);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setToggling(false);
+    }
+  }
+
   return (
     <section className="glass-panel rounded-3xl border p-6">
       <div className="mb-5 flex items-center gap-3">
         <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary ring-1 ring-primary/25">
           <Sparkles className="h-4 w-4" strokeWidth={2.25} />
         </div>
-        <div>
+        <div className="flex-1">
           <h2 className="text-lg font-semibold">Prova mensal</h2>
           <p className="text-xs text-muted-foreground">
-            Zerar histórico libera nova prova imediatamente.
+            Controle a visibilidade e zere o histórico dos perfis.
           </p>
         </div>
       </div>
+
+      {/* Visibility toggle */}
+      <button
+        onClick={() => void toggleVisible()}
+        disabled={toggling}
+        className="mb-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3 text-left transition hover:border-white/10 disabled:opacity-50"
+      >
+        <div>
+          <p className="text-sm font-medium">
+            {settings.exam_visible ? "Visível para os usuários" : "Oculta para os usuários"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {settings.exam_visible
+              ? "A prova aparece na Home e em Estudos."
+              : "Ative para liberar a prova no app."}
+          </p>
+        </div>
+        <span
+          aria-hidden
+          className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+            settings.exam_visible ? "bg-primary" : "bg-white/10"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+              settings.exam_visible ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </span>
+      </button>
+
 
       <ul className="space-y-2">
         {PROFILES.map((p) => (

@@ -18,6 +18,7 @@ import {
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
+import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -96,6 +97,7 @@ function Home() {
   const examMonthKey = getMonthKey();
   const examDone = hasCompletedExamThisMonth(examMonthKey);
   const examResult = examState.history.find((h) => h.monthKey === examMonthKey);
+  const appSettings = useAppSettings();
 
   // Ring geometry — compact 96px ring
   const RING_R = 40;
@@ -306,6 +308,7 @@ function Home() {
 
 
       {/* Prova mensal de nivelamento */}
+      {appSettings.exam_visible && (
       <section
         className="animate-fade-in mt-6"
         style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
@@ -351,6 +354,7 @@ function Home() {
           </div>
         </Link>
       </section>
+      )}
 
       {/* Decks list */}
       {decks.length > 0 && (

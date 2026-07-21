@@ -21,6 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useCurrentProfile } from "@/lib/profile";
+import { useAppSettings } from "@/lib/app-settings";
 import { generateMonthlyExam } from "@/lib/exam.functions";
 import {
   useExamState,
@@ -77,6 +78,8 @@ const LEVEL_COLOR: Record<ExamDifficulty, string> = {
 function ExamPage() {
   const profile = useCurrentProfile();
   const state = useExamState();
+  const { exam_visible } = useAppSettings();
+  const isAdmin = profile?.id === "guilherme";
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +134,27 @@ function ExamPage() {
           void navigate({ to: "/" });
         }}
       />
+    );
+  }
+
+  if (!exam_visible && !isAdmin) {
+    return (
+      <main className="mx-auto max-w-md px-5 py-16 text-center">
+        <div className="ios-card rounded-3xl p-8">
+          <Sparkles className="mx-auto h-10 w-10 text-primary/60" strokeWidth={1.75} />
+          <h1 className="mt-4 text-xl font-semibold">Prova indisponível</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A prova de nivelamento está pausada no momento. Volte em breve.
+          </p>
+          <button
+            type="button"
+            onClick={() => void navigate({ to: "/" })}
+            className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2.25} /> Início
+          </button>
+        </div>
+      </main>
     );
   }
 

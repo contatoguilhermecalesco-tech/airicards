@@ -17,6 +17,8 @@ export type Notification = {
   body: string;
   tag_id: string | null;
   icon: string | null;
+  action_label: string | null;
+  action_route: string | null;
   created_at: string;
 };
 
@@ -174,10 +176,24 @@ export async function deleteTag(id: string) {
   await fetchAll();
 }
 
-export async function createNotification(input: { title: string; body: string; tag_id: string | null; icon?: string | null }) {
+export async function createNotification(input: {
+  title: string;
+  body: string;
+  tag_id: string | null;
+  icon?: string | null;
+  action_label?: string | null;
+  action_route?: string | null;
+}) {
   const { data, error } = await supabase
     .from("notifications")
-    .insert({ title: input.title.trim(), body: input.body.trim(), tag_id: input.tag_id, icon: input.icon ?? null })
+    .insert({
+      title: input.title.trim(),
+      body: input.body.trim(),
+      tag_id: input.tag_id,
+      icon: input.icon ?? null,
+      action_label: input.action_label?.trim() || null,
+      action_route: input.action_route?.trim() || null,
+    })
     .select("*")
     .single();
   if (error) throw error;

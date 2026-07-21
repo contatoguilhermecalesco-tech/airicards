@@ -3,12 +3,14 @@ import {
   Bell,
   BellOff,
   CheckCheck,
+  ChevronRight,
   Inbox,
   Settings2,
   Moon,
 } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
-import { Link } from "@tanstack/react-router";
+
 import {
   initNotifications,
   markAllAsRead,
@@ -96,18 +98,32 @@ function Row({
         <p className="mt-0.5 line-clamp-2 text-[12.5px] leading-relaxed text-foreground/70">
           {n.body}
         </p>
-        {tag && (
-          <div className="mt-1.5 flex items-center gap-1.5">
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ background: tag.color }}
-              aria-hidden
-            />
-            <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em]" style={{ color: tag.color }}>
-              {tag.name}
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          {tag && (
+            <span className="inline-flex items-center gap-1.5">
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: tag.color }}
+                aria-hidden
+              />
+              <span
+                className="text-[10.5px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: tag.color }}
+              >
+                {tag.name}
+              </span>
             </span>
-          </div>
-        )}
+          )}
+          {n.action_route && (
+            <span
+              className="ml-auto inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2 py-0.5 text-[10.5px] font-semibold text-primary"
+              aria-hidden
+            >
+              {n.action_label?.trim() || "Abrir"}
+              <ChevronRight className="h-3 w-3" strokeWidth={2.5} />
+            </span>
+          )}
+        </div>
       </div>
     </button>
   );
@@ -115,6 +131,15 @@ function Row({
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleClick = (n: Notif) => {
+    void markAsRead(n.id);
+    if (n.action_route) {
+      setOpen(false);
+      void navigate({ to: n.action_route as any });
+    }
+  };
   const ref = useRef<HTMLDivElement>(null);
   const { notifications, tags, readIds } = useNotifications();
   const prefs = useNotificationPrefs();
@@ -286,7 +311,7 @@ export function NotificationsBell() {
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={false}
-                            onClick={() => void markAsRead(n.id)}
+                            onClick={() => handleClick(n)}
                           />
                         </li>
                       ))}
@@ -306,7 +331,7 @@ export function NotificationsBell() {
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={true}
-                            onClick={() => void markAsRead(n.id)}
+                            onClick={() => handleClick(n)}
                           />
                         </li>
                       ))}
