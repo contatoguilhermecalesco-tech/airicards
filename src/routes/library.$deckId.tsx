@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Check, ChevronDown, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Globe, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, Upload, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -15,6 +15,7 @@ import {
 import { translateEnToPt } from "@/lib/translate.functions";
 import { buildShareUrl } from "@/lib/share";
 import { useCurrentProfile } from "@/lib/profile";
+import { publishDeck, unpublishDeck, findPublishedDeck } from "@/lib/marketplace";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
@@ -42,7 +43,52 @@ function DeckDetail() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [publishState, setPublishState] = useState<"idle" | "publishing" | "published" | "unpublishing">("idle");
+  const [isPublished, setIsPublished] = useState(false);
   const currentProfile = useCurrentProfile();
+
+  useEffect(() => {
+    let cancel = false;
+    if (!deck || !currentProfile) return;
+    findPublishedDeck(currentProfile.id, deck.name).then((row) => {
+      if (!cancel) setIsPublished(!!row);
+    });
+    return () => {
+      cancel = true;
+    };
+  }, [deck?.name, currentProfile?.id]);
+
+  async function handlePublish() {
+    if (!deck || !currentProfile || publishState !== "idle") return;
+    if (cards.length === 0) return;
+    try {
+      setPublishState("publishing");
+      await publishDeck({
+        ownerId: currentProfile.id,
+        ownerName: currentProfile.name,
+        deck,
+        cards,
+      });
+      setIsPublished(true);
+      setPublishState("published");
+      setTimeout(() => setPublishState("idle"), 1800);
+    } catch {
+      setPublishState("idle");
+    }
+  }
+
+  async function handleUnpublish() {
+    if (!deck || !currentProfile || publishState !== "idle") return;
+    try {
+      setPublishState("unpublishing");
+      await unpublishDeck(currentProfile.id, deck.name);
+      setIsPublished(false);
+      setPublishState("idle");
+    } catch {
+      setPublishState("idle");
+    }
+  }
+
 
   async function handleShare() {
     if (!deck || !currentProfile) return;
