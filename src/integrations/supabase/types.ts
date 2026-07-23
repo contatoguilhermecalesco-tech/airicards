@@ -127,6 +127,7 @@ export type Database = {
           grammar_progress: Json
           home_sessions: Json
           profile_id: string
+          rank: Json
           study_history: Json
           updated_at: string
           writings: Json
@@ -137,6 +138,7 @@ export type Database = {
           grammar_progress?: Json
           home_sessions?: Json
           profile_id: string
+          rank?: Json
           study_history?: Json
           updated_at?: string
           writings?: Json
@@ -147,6 +149,7 @@ export type Database = {
           grammar_progress?: Json
           home_sessions?: Json
           profile_id?: string
+          rank?: Json
           study_history?: Json
           updated_at?: string
           writings?: Json
