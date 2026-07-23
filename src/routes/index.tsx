@@ -503,11 +503,7 @@ function StatChip({ label, value }: { label: string; value: number }) {
   );
 }
 
-// ---- Streak card + helpers ------------------------------------------------
-function dayKeyFromDate(d: Date): string {
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-}
-const WEEK_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+// ---- Streak card ---------------------------------------------------------
 
 function StreakCard({
   streak,
@@ -520,23 +516,12 @@ function StreakCard({
   nextMilestone: number;
   milestoneProgress: number;
 }) {
-  // Últimos 7 dias — hoje encostado à direita
   const now = new Date();
-  const days: { key: string; label: string; dayNum: number; isToday: boolean; status: "done" | "miss" | "future"; date: Date }[] = [];
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = dayKeyFromDate(d);
-    const st = streak.history?.[key];
-    const isToday = i === 0;
-    const status: "done" | "miss" | "future" =
-      st === "done" ? "done" : isToday && !studiedToday ? "future" : "miss";
-    days.push({ key, label: WEEK_LABELS[d.getDay()], dayNum: d.getDate(), isToday, status, date: d });
-  }
 
   const atRisk = streak.current > 0 && !studiedToday && now.getHours() >= 19;
   const isBroken = streak.current === 0 && streak.longest > 0;
   const isActive = streak.current > 0;
+
 
   // Estado visual da chama
   const flameState: "ashes" | "risk" | "alive" | "empty" = isBroken
@@ -656,43 +641,6 @@ function StreakCard({
           </div>
         </div>
 
-        {/* Weekly dots — cada dia visualmente ganho ou perdido */}
-        <div className="relative mt-4 flex items-center justify-between gap-1">
-          {days.map((d) => {
-            const dotBase =
-              "grid h-8 w-8 place-items-center rounded-full border text-[10px] font-semibold transition-all";
-            let dot = "";
-            let icon: React.ReactNode = null;
-            if (d.status === "done") {
-              dot =
-                "border-orange-300/50 bg-gradient-to-b from-orange-400/30 to-rose-500/15 text-orange-100 shadow-[0_0_12px_-4px_rgba(251,146,60,0.6)]";
-              icon = <Flame className="h-3.5 w-3.5" strokeWidth={2.5} fill="currentColor" fillOpacity={0.35} />;
-            } else if (d.status === "future") {
-              dot = "border-dashed border-white/30 bg-white/[0.03] text-muted-foreground";
-              icon = <span className="text-[10px] leading-none opacity-70">?</span>;
-            } else {
-              dot = "border-white/[0.06] bg-white/[0.015] text-muted-foreground/40";
-              icon = <span className="h-1 w-1 rounded-full bg-white/15" aria-hidden />;
-            }
-            return (
-              <div key={d.key} className="flex flex-col items-center gap-1">
-                <div
-                  className={`${dotBase} ${dot} ${d.isToday ? "ring-1 ring-white/30 scale-110" : ""}`}
-                  aria-label={`${d.label} ${d.dayNum} — ${d.status}`}
-                >
-                  {icon}
-                </div>
-                <span
-                  className={`text-[9px] font-medium tabular-nums tracking-wide ${
-                    d.isToday ? "text-foreground" : "text-muted-foreground/60"
-                  }`}
-                >
-                  {d.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
 
         {/* Contextual banners */}
         {isBroken && (
