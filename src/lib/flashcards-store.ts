@@ -594,6 +594,7 @@ function maybePenalizeBrokenStreak(effective: Streak) {
     streak: { ...stored, current: 0 },
     punishments: { ...(home.punishments ?? {}), streakBrokenAppliedFor: stored.lastDay },
   };
+  emitStreakChange({ kind: "lost", previous: prevCurrent, at: Date.now() });
   emitHome();
   scheduleSave();
 }
