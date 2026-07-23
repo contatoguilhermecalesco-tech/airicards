@@ -36,11 +36,17 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
+export type StreakDayStatus = "done" | "freeze";
 export type Streak = {
   current: number;
   longest: number;
   lastDay: string; // dateKey of the last day the user reviewed ≥1 card
   startedOn?: string; // dateKey when the current streak began
+  freezes?: number; // escudos disponíveis (protege contra 1 dia perdido)
+  freezesEarnedFor?: number; // marca "current" onde já demos escudo (para não repetir)
+  history?: Record<string, StreakDayStatus>; // últimos ~60 dias
+  milestonesReached?: number[]; // marcos já recompensados
+  lastFreezeUsedOn?: string; // dayKey do dia salvo pelo escudo (para UI)
 };
 type PunishmentsState = {
   streakBrokenAppliedFor?: string; // dayKey da lastDay já penalizada
@@ -55,10 +61,28 @@ type HomeSessions = {
   punishments?: PunishmentsState;
 };
 
-const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
+/** Marcos de streak (em dias). Cruzá-los concede LP extra e uma celebração. */
+export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
 export function nextStreakMilestone(current: number): number {
   for (const m of STREAK_MILESTONES) if (m > current) return m;
   return current + 100;
+}
+
+/** Máximo de escudos que o usuário pode acumular. */
+export const MAX_STREAK_FREEZES = 3;
+/** A cada N dias completos de streak, ganha 1 escudo (respeita o máximo). */
+export const FREEZE_EARN_EVERY = 7;
+
+// ---- Streak milestone event bus (para celebração global) --------------
+export type StreakMilestoneEvent = { days: number; lpGained: number; at: number };
+type StreakMilestoneListener = (e: StreakMilestoneEvent) => void;
+const streakMilestoneListeners = new Set<StreakMilestoneListener>();
+export function onStreakMilestone(fn: StreakMilestoneListener): () => void {
+  streakMilestoneListeners.add(fn);
+  return () => streakMilestoneListeners.delete(fn);
+}
+function emitStreakMilestone(e: StreakMilestoneEvent) {
+  streakMilestoneListeners.forEach((l) => l(e));
 }
 
 function isBrowser() {
