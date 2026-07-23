@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 
-export type CardMode = "word" | "sentence";
+export type CardMode = "word" | "sentence" | "expression";
 export type CardSource = string;
 
 export type Card = {
