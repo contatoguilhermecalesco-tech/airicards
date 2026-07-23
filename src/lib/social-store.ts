@@ -123,11 +123,12 @@ function subscribe(cb: () => void) {
   };
 }
 function useSocial<T>(selector: (s: State) => T): T {
-  return useSyncExternalStore(
+  const snap = useSyncExternalStore(
     subscribe,
-    () => selector(state),
-    () => selector(state),
+    () => state,
+    () => state,
   );
+  return useMemo(() => selector(snap), [snap, selector]);
 }
 
 // ============================================================
