@@ -448,6 +448,10 @@ export function reviewCard(id: string, grade: Grade) {
     if (nextStreak.current > 0) {
       awardLp(LP.streakDay(nextStreak.current), "streak.day");
     }
+    // Ganhou dia — celebra visualmente.
+    if (nextStreak.current > prevCurrent) {
+      emitStreakChange({ kind: "gained", current: nextStreak.current, at: Date.now() });
+    }
     // Marco atingido? Recompensa em LP + evento de celebração.
     maybeRewardMilestone(prevCurrent, nextStreak.current);
   }
