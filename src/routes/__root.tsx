@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2 } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
