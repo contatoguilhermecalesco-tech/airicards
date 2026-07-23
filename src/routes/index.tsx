@@ -503,11 +503,7 @@ function StatChip({ label, value }: { label: string; value: number }) {
   );
 }
 
-// ---- Streak card + helpers ------------------------------------------------
-function dayKeyFromDate(d: Date): string {
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-}
-const WEEK_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+// ---- Streak card ---------------------------------------------------------
 
 function StreakCard({
   streak,
@@ -520,23 +516,12 @@ function StreakCard({
   nextMilestone: number;
   milestoneProgress: number;
 }) {
-  // Últimos 7 dias — hoje encostado à direita
   const now = new Date();
-  const days: { key: string; label: string; dayNum: number; isToday: boolean; status: "done" | "miss" | "future"; date: Date }[] = [];
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const key = dayKeyFromDate(d);
-    const st = streak.history?.[key];
-    const isToday = i === 0;
-    const status: "done" | "miss" | "future" =
-      st === "done" ? "done" : isToday && !studiedToday ? "future" : "miss";
-    days.push({ key, label: WEEK_LABELS[d.getDay()], dayNum: d.getDate(), isToday, status, date: d });
-  }
 
   const atRisk = streak.current > 0 && !studiedToday && now.getHours() >= 19;
   const isBroken = streak.current === 0 && streak.longest > 0;
   const isActive = streak.current > 0;
+
 
   // Estado visual da chama
   const flameState: "ashes" | "risk" | "alive" | "empty" = isBroken
