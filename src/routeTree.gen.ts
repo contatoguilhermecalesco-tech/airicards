@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SocialRouteImport } from './routes/social'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
@@ -41,6 +42,11 @@ import { Route as StudySpeakingHistoryIdRouteImport } from './routes/study.speak
 import { Route as StudyReadingHistoryIdRouteImport } from './routes/study.reading.history.$id'
 import { Route as StudyListeningHistoryIdRouteImport } from './routes/study.listening.history.$id'
 
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/social': typeof SocialRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/social': typeof SocialRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library': typeof LibraryIndexRoute
   '/study': typeof StudyIndexRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/social': typeof SocialRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
@@ -310,6 +319,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/sitemap.xml'
+    | '/social'
     | '/library/$deckId'
     | '/library/'
     | '/study/'
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/sitemap.xml'
+    | '/social'
     | '/library/$deckId'
     | '/library'
     | '/study'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/sitemap.xml'
+    | '/social'
     | '/library/$deckId'
     | '/library/'
     | '/study/'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SocialRoute: typeof SocialRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
@@ -423,6 +436,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -708,6 +728,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SocialRoute: SocialRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
