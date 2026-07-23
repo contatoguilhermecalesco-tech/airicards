@@ -409,8 +409,6 @@ function Home() {
         </section>
       )}
 
-      <GiftInbox />
-      <PresenceCard />
 
       {/* Decks list */}
       {decks.length > 0 && (
