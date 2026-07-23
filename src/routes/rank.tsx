@@ -61,6 +61,14 @@ function RankPage() {
   const colors = TIER_COLORS[rank.tier];
   const progress = progressToNext(rank);
   const progressPct = Math.min(100, Math.round((progress.value / Math.max(1, progress.max)) * 100));
+  const currentProfile = useCurrentProfile();
+  const streak = useStreak();
+  const cards = useStore((s) => s.cards);
+  const cardsMastered = useMemo(
+    () => cards.filter((c) => (c.reps ?? 0) >= 3 && (c.lapses ?? 0) === 0).length,
+    [cards],
+  );
+  const [shareOpen, setShareOpen] = useState(false);
 
   const winRate = useMemo(() => {
     const total = rank.totalEarned + rank.totalLost;
