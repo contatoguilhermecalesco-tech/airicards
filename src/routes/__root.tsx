@@ -223,6 +223,7 @@ function TopBar() {
     { to: "/", label: "Início", icon: Home, active: pathname === "/" },
     { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
     { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
     { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
   ] as const;
 
