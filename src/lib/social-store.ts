@@ -1,6 +1,6 @@
 // Social store — Duelos, Presentes de cartas, Feed de atividade (kudos).
 // App familiar de 2 perfis ('guilherme' | 'arlayne'), sem auth.
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROFILES } from "@/lib/profile";
 
@@ -123,11 +123,12 @@ function subscribe(cb: () => void) {
   };
 }
 function useSocial<T>(selector: (s: State) => T): T {
-  return useSyncExternalStore(
+  const snap = useSyncExternalStore(
     subscribe,
-    () => selector(state),
-    () => selector(state),
+    () => state,
+    () => state,
   );
+  return useMemo(() => selector(snap), [snap, selector]);
 }
 
 // ============================================================
