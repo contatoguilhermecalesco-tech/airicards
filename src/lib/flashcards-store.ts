@@ -36,17 +36,14 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
-export type StreakDayStatus = "done" | "freeze";
+export type StreakDayStatus = "done";
 export type Streak = {
   current: number;
   longest: number;
   lastDay: string; // dateKey of the last day the user reviewed ≥1 card
   startedOn?: string; // dateKey when the current streak began
-  freezes?: number; // escudos disponíveis (protege contra 1 dia perdido)
-  freezesEarnedFor?: number; // marca "current" onde já demos escudo (para não repetir)
   history?: Record<string, StreakDayStatus>; // últimos ~60 dias
   milestonesReached?: number[]; // marcos já recompensados
-  lastFreezeUsedOn?: string; // dayKey do dia salvo pelo escudo (para UI)
 };
 type PunishmentsState = {
   streakBrokenAppliedFor?: string; // dayKey da lastDay já penalizada
@@ -68,11 +65,6 @@ export function nextStreakMilestone(current: number): number {
   return current + 100;
 }
 
-/** Máximo de escudos que o usuário pode acumular. */
-export const MAX_STREAK_FREEZES = 3;
-/** A cada N dias completos de streak, ganha 1 escudo (respeita o máximo). */
-export const FREEZE_EARN_EVERY = 7;
-
 // ---- Streak milestone event bus (para celebração global) --------------
 export type StreakMilestoneEvent = { days: number; lpGained: number; at: number };
 type StreakMilestoneListener = (e: StreakMilestoneEvent) => void;
@@ -83,6 +75,20 @@ export function onStreakMilestone(fn: StreakMilestoneListener): () => void {
 }
 function emitStreakMilestone(e: StreakMilestoneEvent) {
   streakMilestoneListeners.forEach((l) => l(e));
+}
+
+// ---- Streak change event bus — ganho/perda visual global --------------
+export type StreakChangeEvent =
+  | { kind: "gained"; current: number; at: number }
+  | { kind: "lost"; previous: number; at: number };
+type StreakChangeListener = (e: StreakChangeEvent) => void;
+const streakChangeListeners = new Set<StreakChangeListener>();
+export function onStreakChange(fn: StreakChangeListener): () => void {
+  streakChangeListeners.add(fn);
+  return () => streakChangeListeners.delete(fn);
+}
+function emitStreakChange(e: StreakChangeEvent) {
+  streakChangeListeners.forEach((l) => l(e));
 }
 
 function isBrowser() {
