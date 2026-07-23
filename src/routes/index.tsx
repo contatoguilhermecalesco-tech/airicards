@@ -16,6 +16,8 @@ import {
   useCardsReviewedToday,
   useStreak,
   nextStreakMilestone,
+  MAX_STREAK_FREEZES,
+  type Streak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
