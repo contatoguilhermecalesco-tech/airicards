@@ -1,7 +1,8 @@
-// Sistema de rank estilo LoL — persistido em localStorage por perfil.
-// Isolado por perfil (Guilherme / Arlayne), sem mesclar entre contas.
+// Sistema de rank estilo LoL — unificado entre dispositivos via Lovable Cloud.
+// Cache local (localStorage) para paint instantâneo + sync realtime por perfil.
 import { useSyncExternalStore } from "react";
-import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
+import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Tier =
   | "iron"
