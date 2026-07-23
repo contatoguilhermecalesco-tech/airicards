@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Check, ChevronDown, Globe, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Gift, Globe, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, Upload, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -16,6 +16,7 @@ import { translateEnToPt } from "@/lib/translate.functions";
 import { buildShareUrl } from "@/lib/share";
 import { useCurrentProfile } from "@/lib/profile";
 import { publishDeck, unpublishDeck, findPublishedDeck } from "@/lib/marketplace";
+import { SendGiftDialog } from "@/components/SendGiftDialog";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
@@ -41,6 +42,7 @@ function DeckDetail() {
   const [addOpen, setAddOpen] = useState(false);
   const [editCard, setEditCard] = useState<Card | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [giftCard, setGiftCard] = useState<Card | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [publishState, setPublishState] = useState<"idle" | "publishing" | "published" | "unpublishing">("idle");
@@ -299,6 +301,14 @@ function DeckDetail() {
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
+                    onClick={() => setGiftCard(c)}
+                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-primary/15 hover:text-primary sm:opacity-0 sm:group-hover:opacity-100"
+                    aria-label="Enviar carta"
+                    title="Enviar para o outro perfil"
+                  >
+                    <Gift className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => setConfirmDelete(c.id)}
                     className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                     aria-label="Excluir carta"
@@ -330,6 +340,9 @@ function DeckDetail() {
           card={editCard}
           onClose={() => setEditCard(null)}
         />
+      )}
+      {giftCard && (
+        <SendGiftDialog card={giftCard} onClose={() => setGiftCard(null)} />
       )}
       {confirmDelete && (
         <ConfirmDialog

@@ -23,6 +23,8 @@ import { RankEmblem } from "../components/RankBadge";
 import { OnboardingTour } from "../components/OnboardingTour";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
+import { useSocialSync } from "../lib/social-store";
+import { startActivityBridge } from "../lib/activity-bridge";
 
 
 function NotFoundComponent() {
@@ -384,6 +386,10 @@ function ProfileMenu() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useSocialSync();
+  useEffect(() => {
+    startActivityBridge();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
