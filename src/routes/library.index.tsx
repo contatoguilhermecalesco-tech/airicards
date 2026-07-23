@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, ArrowRight, Trash2, X, Search, Sparkles, Pencil, Layers, Check } from "lucide-react";
+import { Plus, ArrowRight, Trash2, X, Search, Sparkles, Pencil, Layers, Check, Globe } from "lucide-react";
 import {
   useStore,
   createDeck,
@@ -79,13 +79,23 @@ function Library() {
               : "Organize seu vocabulário e revise todos os dias."}
           </p>
         </div>
-        <button
-          onClick={() => setSheet({ mode: "create" })}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary px-4 py-2.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_70%,transparent)] transition active:scale-95 hover:brightness-110"
-        >
-          <Plus className="h-4 w-4" strokeWidth={2.75} />
-          <span className="hidden sm:inline">Novo deck</span>
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            to="/marketplace"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[15px] font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.08]"
+            title="Explorar decks públicos"
+          >
+            <Globe className="h-4 w-4" strokeWidth={2.5} />
+            <span className="hidden sm:inline">Marketplace</span>
+          </Link>
+          <button
+            onClick={() => setSheet({ mode: "create" })}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-primary px-4 py-2.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-10px_color-mix(in_oklab,var(--primary)_70%,transparent)] transition active:scale-95 hover:brightness-110"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2.75} />
+            <span className="hidden sm:inline">Novo deck</span>
+          </button>
+        </div>
       </header>
 
       {/* Search — iOS 18 chunky field */}
