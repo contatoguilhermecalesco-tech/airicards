@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles } from "lucide-react";
+import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle } from "lucide-react";
 import { useCurrentProfile, PROFILES } from "@/lib/profile";
 import { useStore } from "@/lib/flashcards-store";
 import {
