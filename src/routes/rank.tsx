@@ -11,6 +11,7 @@ import {
   isElite,
   lpToReachTier,
   readRankForProfile,
+  subscribeAllRanks,
   type Tier,
   type RankState,
 } from "@/lib/rank-store";
