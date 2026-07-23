@@ -233,7 +233,14 @@ function DeckDetail() {
       </div>
 
       {addOpen && (
-        <AddCardSheet deckId={deckId} onClose={() => setAddOpen(false)} />
+        <CardSheet deckId={deckId} onClose={() => setAddOpen(false)} />
+      )}
+      {editCard && (
+        <CardSheet
+          deckId={deckId}
+          card={editCard}
+          onClose={() => setEditCard(null)}
+        />
       )}
       {confirmDelete && (
         <ConfirmDialog
