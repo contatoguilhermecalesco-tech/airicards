@@ -399,6 +399,18 @@ function RankPage() {
           ))}
         </div>
       </section>
+
+      {currentProfile && (
+        <ShareAchievement
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          profile={currentProfile}
+          rank={rank}
+          streak={streak}
+          cardsMastered={cardsMastered}
+          totalCards={cards.length}
+        />
+      )}
     </main>
   );
 }
