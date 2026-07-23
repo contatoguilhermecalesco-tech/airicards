@@ -399,6 +399,7 @@ function RootComponent() {
           <BottomBar />
           <RankPromotionOverlay />
           <StreakMilestoneOverlay />
+          <StreakChangeOverlay />
           <OnboardingTour />
         </div>
       </ProfileGate>
