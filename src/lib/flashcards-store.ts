@@ -434,12 +434,16 @@ export function reviewCard(id: string, grade: Grade) {
   const wasFirstToday = (home.reviewed ?? 0) === 0;
   home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
   if (wasFirstToday) {
-    const nextStreak = bumpStreak(home.streak, todayKey());
+    const prev = home.streak;
+    const prevCurrent = prev?.current ?? 0;
+    const nextStreak = bumpStreak(prev, todayKey());
     home = { ...home, streak: nextStreak };
     // Bônus diário de streak.
     if (nextStreak.current > 0) {
       awardLp(LP.streakDay(nextStreak.current), "streak.day");
     }
+    // Marco atingido? Recompensa em LP + evento de celebração.
+    maybeRewardMilestone(prevCurrent, nextStreak.current);
   }
   emitHome();
   emit();
