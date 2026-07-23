@@ -38,6 +38,7 @@ function DeckDetail() {
   );
 
   const [addOpen, setAddOpen] = useState(false);
+  const [editCard, setEditCard] = useState<Card | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -184,6 +185,11 @@ function DeckDetail() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium">{c.front}</p>
+                    {c.mode === "expression" && (
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                        expressão
+                      </span>
+                    )}
                     {isEnemy(c) && (
                       <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
                         <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
@@ -195,13 +201,22 @@ function DeckDetail() {
                     {c.back}
                   </p>
                 </div>
-                <button
-                  onClick={() => setConfirmDelete(c.id)}
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
-                  aria-label="Excluir carta"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    onClick={() => setEditCard(c)}
+                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-accent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
+                    aria-label="Editar carta"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setConfirmDelete(c.id)}
+                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
+                    aria-label="Excluir carta"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
