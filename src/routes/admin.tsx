@@ -325,10 +325,13 @@ function RankAdminSection() {
 function ProfilesRankOverview() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    // Reavalia quando a janela ganha foco (ex.: após navegar do /rank).
     const onFocus = () => setTick((t) => t + 1);
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const unsub = subscribeAllRanks(() => setTick((t) => t + 1));
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      unsub();
+    };
   }, []);
 
   const active = getCurrentProfile();
