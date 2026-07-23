@@ -289,6 +289,35 @@ export function deleteCard(id: string) {
   scheduleSave();
 }
 
+export function updateCard(
+  id: string,
+  patch: Partial<Pick<Card, "front" | "back" | "mode" | "source" | "targetWord">>,
+) {
+  state = {
+    ...state,
+    cards: state.cards.map((c) => {
+      if (c.id !== id) return c;
+      const next: Card = { ...c };
+      if (patch.front !== undefined) next.front = patch.front.trim();
+      if (patch.back !== undefined) next.back = patch.back.trim();
+      if (patch.mode !== undefined) next.mode = patch.mode;
+      if (patch.source !== undefined) {
+        const s = patch.source.trim();
+        if (s) next.source = s;
+        else delete next.source;
+      }
+      if (patch.targetWord !== undefined) {
+        const t = patch.targetWord.trim();
+        if (t) next.targetWord = t;
+        else delete next.targetWord;
+      }
+      return next;
+    }),
+  };
+  emit();
+  scheduleSave();
+}
+
 export type Grade = "again" | "hard" | "good" | "easy";
 
 export function autoClassify(card: Card): "hard" | "good" | "easy" {
