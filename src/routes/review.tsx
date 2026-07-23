@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Sparkles, Skull, Flame } from "lucide-react";
+import { X, Check, Swords, Trophy, Sparkles, Skull, Flame, Focus, Minimize2, Keyboard } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -176,6 +176,73 @@ function Review() {
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
 
+  // -------- Modo Foco (esconde chrome extra) --------
+  const [focusMode, setFocusMode] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem("airi.focus-mode") === "1";
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("airi.focus-mode", focusMode ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, [focusMode]);
+
+  // -------- Atalhos de teclado (desktop) --------
+  useEffect(() => {
+    function isTypingTarget(t: EventTarget | null): boolean {
+      if (!(t instanceof HTMLElement)) return false;
+      const tag = t.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable;
+    }
+    function onKey(e: KeyboardEvent) {
+      if (isTypingTarget(e.target)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (finished || !current) return;
+
+      const k = e.key.toLowerCase();
+
+      // Virar carta
+      if (!showBack && (k === " " || k === "spacebar" || k === "enter")) {
+        e.preventDefault();
+        setShowBack(true);
+        return;
+      }
+
+      // Aguardando escolha de dificuldade (após "Acertei")
+      if (showBack && askDifficulty) {
+        if (k === "f") return handleDifficulty("easy");
+        if (k === "m") return handleDifficulty("good");
+        if (k === "d") return handleDifficulty("hard");
+        if (k === "1") return handleDifficulty("hard");
+        if (k === "2") return handleDifficulty("good");
+        if (k === "3") return handleDifficulty("easy");
+        return;
+      }
+
+      // Errei / Acertei
+      if (showBack && !askDifficulty) {
+        if (k === "1" || k === "e") {
+          e.preventDefault();
+          return handleWrong();
+        }
+        if (k === "2" || k === "a") {
+          e.preventDefault();
+          return handleRight();
+        }
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showBack, askDifficulty, finished, current]);
+
+
+
 
   return (
     <main className="relative min-h-screen overflow-hidden">
@@ -239,52 +306,73 @@ function Review() {
               <X className="h-4 w-4" strokeWidth={2.5} />
             </Link>
           )}
-          <div className="flex flex-col items-center gap-0.5">
-            <div
-              className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.24em] ${
-                isEnemyRun ? "text-destructive" : "text-muted-foreground/70"
-              }`}
+          {!focusMode && (
+            <div className="flex flex-col items-center gap-0.5">
+              <div
+                className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.24em] ${
+                  isEnemyRun ? "text-destructive" : "text-muted-foreground/70"
+                }`}
+              >
+                {isEnemyRun && <Skull className="h-3 w-3" strokeWidth={2.75} />}
+                {isEnemyRun ? "Arena" : "Sessão"}
+              </div>
+              <div className="max-w-[180px] truncate text-[13px] font-medium text-foreground/90">
+                {isEnemyRun
+                  ? "Cartas inimigas"
+                  : deckName
+                  ? deckName
+                  : "Todos os decks"}
+              </div>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            {!focusMode && (
+              <div
+                className={`grid h-10 min-w-10 place-items-center rounded-full border px-3 text-[12px] font-semibold tabular-nums backdrop-blur-md ${
+                  isEnemyRun
+                    ? "border-destructive/30 bg-destructive/10 text-destructive"
+                    : "border-white/[0.08] bg-white/[0.04] text-foreground/80"
+                }`}
+              >
+                {Math.min(index + (finished ? 0 : 1), sessionCount)}
+                <span className="mx-1 opacity-50">/</span>
+                {sessionCount || 0}
+              </div>
+            )}
+            <button
+              onClick={() => setFocusMode((f) => !f)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground backdrop-blur-md transition hover:bg-white/[0.08] hover:text-foreground"
+              aria-label={focusMode ? "Sair do modo foco" : "Ativar modo foco"}
+              aria-pressed={focusMode}
+              title={focusMode ? "Sair do modo foco" : "Modo foco"}
             >
-              {isEnemyRun && <Skull className="h-3 w-3" strokeWidth={2.75} />}
-              {isEnemyRun ? "Arena" : "Sessão"}
-            </div>
-            <div className="max-w-[180px] truncate text-[13px] font-medium text-foreground/90">
-              {isEnemyRun
-                ? "Cartas inimigas"
-                : deckName
-                ? deckName
-                : "Todos os decks"}
-            </div>
-          </div>
-          <div
-            className={`grid h-10 min-w-10 place-items-center rounded-full border px-3 text-[12px] font-semibold tabular-nums backdrop-blur-md ${
-              isEnemyRun
-                ? "border-destructive/30 bg-destructive/10 text-destructive"
-                : "border-white/[0.08] bg-white/[0.04] text-foreground/80"
-            }`}
-          >
-            {Math.min(index + (finished ? 0 : 1), sessionCount)}
-            <span className="mx-1 opacity-50">/</span>
-            {sessionCount || 0}
+              {focusMode ? (
+                <Minimize2 className="h-4 w-4" strokeWidth={2.5} />
+              ) : (
+                <Focus className="h-4 w-4" strokeWidth={2.5} />
+              )}
+            </button>
           </div>
         </div>
 
         {/* Progress rail */}
-        <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-white/[0.06]">
-          <div
-            className={`h-full rounded-full transition-[width] duration-500 ease-out ${
-              isEnemyRun
-                ? "bg-gradient-to-r from-destructive/70 via-destructive to-destructive/70"
-                : "bg-gradient-to-r from-primary/70 via-primary to-primary/70"
-            }`}
-            style={{
-              width: `${progressPct}%`,
-              boxShadow: isEnemyRun
-                ? "0 0 12px hsl(var(--destructive) / 0.6)"
-                : "0 0 12px hsl(var(--primary) / 0.5)",
-            }}
-          />
-        </div>
+        {!focusMode && (
+          <div className="mt-5 h-[3px] w-full overflow-hidden rounded-full bg-white/[0.06]">
+            <div
+              className={`h-full rounded-full transition-[width] duration-500 ease-out ${
+                isEnemyRun
+                  ? "bg-gradient-to-r from-destructive/70 via-destructive to-destructive/70"
+                  : "bg-gradient-to-r from-primary/70 via-primary to-primary/70"
+              }`}
+              style={{
+                width: `${progressPct}%`,
+                boxShadow: isEnemyRun
+                  ? "0 0 12px hsl(var(--destructive) / 0.6)"
+                  : "0 0 12px hsl(var(--primary) / 0.5)",
+              }}
+            />
+          </div>
+        )}
 
         {queue.length === 0 && !current ? (
           <EmptyState enemyRun={isEnemyRun} />
@@ -469,6 +557,18 @@ function Review() {
                     onClick={handleRight}
                   />
                 </div>
+              )}
+
+              {/* Dica de atalhos — só desktop, escondida no modo foco */}
+              {!focusMode && (
+                <p className="mt-4 hidden items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60 sm:inline-flex">
+                  <Keyboard className="h-3 w-3" strokeWidth={2.5} />
+                  {!showBack
+                    ? "Espaço para virar"
+                    : askDifficulty
+                    ? "F Fácil · M Médio · D Difícil"
+                    : "1 Errei · 2 Acertei"}
+                </p>
               )}
             </div>
           </div>
