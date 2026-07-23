@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles } from "lucide-react";
+import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle } from "lucide-react";
 import { useCurrentProfile, PROFILES } from "@/lib/profile";
 import { useStore } from "@/lib/flashcards-store";
 import {
@@ -135,27 +135,75 @@ function DuelPage() {
               Ainda não há duelo esta semana
             </p>
             <p className="mt-1 text-[15px] font-medium text-foreground">
-              Escolha um dos seus decks. O sistema sorteia 5 cartas — mesmas para os dois.
+              Escolha um baralho para o desafio
             </p>
-            <select
-              value={pickDeckId}
-              onChange={(e) => setPickDeckId(e.target.value)}
-              className="mt-4 w-full rounded-2xl border border-white/[0.08] bg-white/[0.02] px-3 py-3 text-[14px] text-foreground focus:border-primary/40 focus:outline-none"
-            >
-              <option value="">Escolha um deck…</option>
-              {decks.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
+            <p className="mt-1 text-[12.5px] text-muted-foreground">
+              O sistema sorteia 5 cartas — as mesmas para os dois duelistas.
+            </p>
+
+            {decks.length === 0 ? (
+              <div className="mt-4 flex items-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-3.5 py-3 text-[13px] text-muted-foreground">
+                <AlertCircle className="h-4 w-4" />
+                Você ainda não tem baralhos. Crie um na biblioteca.
+              </div>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {decks.map((d) => {
+                  const count = cards.filter((c) => c.deckId === d.id).length;
+                  const selected = pickDeckId === d.id;
+                  const eligible = count >= 3;
+                  const accent = d.color || "hsl(265 85% 65%)";
+                  return (
+                    <button
+                      key={d.id}
+                      type="button"
+                      disabled={!eligible}
+                      onClick={() => setPickDeckId(d.id)}
+                      className={`group relative overflow-hidden rounded-2xl border p-3.5 text-left transition-all active:scale-[0.98] ${
+                        selected
+                          ? "border-primary/60 bg-primary/[0.08] shadow-[0_0_0_1px_hsl(var(--primary)/0.35),0_10px_30px_-12px_hsl(var(--primary)/0.5)]"
+                          : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.14] hover:bg-white/[0.04]"
+                      } ${!eligible ? "opacity-50" : ""}`}
+                    >
+                      <div
+                        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-30 blur-2xl transition-opacity group-hover:opacity-50"
+                        style={{ background: accent }}
+                      />
+                      <div className="relative flex items-start gap-3">
+                        <div
+                          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white shadow-inner"
+                          style={{ background: `linear-gradient(135deg, ${accent}, ${accent}aa)` }}
+                        >
+                          <Layers className="h-4.5 w-4.5" strokeWidth={2.25} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[14px] font-semibold text-foreground">
+                            {d.name}
+                          </p>
+                          <p className="mt-0.5 text-[11.5px] tabular-nums text-muted-foreground">
+                            {count} {count === 1 ? "carta" : "cartas"}
+                            {!eligible && " · mín. 3"}
+                          </p>
+                        </div>
+                        {selected && (
+                          <div className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+                            <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <button
               disabled={!pickDeckId || creating}
               onClick={handleCreate}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[15px] font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[15px] font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-60"
             >
               <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-              {creating ? "Criando…" : "Criar duelo desta semana"}
+              {creating ? "Criando duelo…" : "Criar duelo desta semana"}
             </button>
           </>
         ) : duel.status === "completed" ? (
