@@ -397,6 +397,7 @@ function RootComponent() {
           <Outlet />
           <BottomBar />
           <RankPromotionOverlay />
+          <StreakMilestoneOverlay />
           <OnboardingTour />
         </div>
       </ProfileGate>
