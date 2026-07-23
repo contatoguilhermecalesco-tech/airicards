@@ -490,7 +490,7 @@ function NormalCard({
   front: string;
   back: string;
   targetWord?: string;
-  mode?: "word" | "sentence";
+  mode?: "word" | "sentence" | "expression";
   showBack: boolean;
 }) {
   return (
@@ -509,7 +509,7 @@ function NormalCard({
       <div className="flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
         <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70">
           <span className="h-1 w-1 rounded-full bg-primary/70" />
-          {mode === "sentence" ? "Frase" : "Inglês"}
+          {mode === "sentence" ? "Frase" : mode === "expression" ? "Expressão" : "Inglês"}
         </p>
         <p className="text-balance text-[26px] font-semibold leading-tight text-foreground sm:text-[34px]">
           {mode === "sentence" && targetWord
@@ -545,7 +545,7 @@ function EnemyCard({
   front: string;
   back: string;
   targetWord?: string;
-  mode?: "word" | "sentence";
+  mode?: "word" | "sentence" | "expression";
   lapses: number;
   successes: number;
   showBack: boolean;
@@ -608,7 +608,7 @@ function EnemyCard({
         <div className="relative flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
           <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-destructive/90">
             <Flame className="h-3 w-3" strokeWidth={2.75} />
-            {mode === "sentence" ? "Frase inimiga" : "Palavra inimiga"}
+            {mode === "sentence" ? "Frase inimiga" : mode === "expression" ? "Expressão inimiga" : "Palavra inimiga"}
           </p>
           <p className="text-balance text-[26px] font-semibold leading-tight text-foreground sm:text-[34px]">
             {mode === "sentence" && targetWord
