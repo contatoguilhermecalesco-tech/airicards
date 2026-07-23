@@ -301,6 +301,14 @@ function DeckDetail() {
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
+                    onClick={() => setGiftCard(c)}
+                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-primary/15 hover:text-primary sm:opacity-0 sm:group-hover:opacity-100"
+                    aria-label="Enviar carta"
+                    title="Enviar para o outro perfil"
+                  >
+                    <Gift className="h-4 w-4" />
+                  </button>
+                  <button
                     onClick={() => setConfirmDelete(c.id)}
                     className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
                     aria-label="Excluir carta"
@@ -332,6 +340,9 @@ function DeckDetail() {
           card={editCard}
           onClose={() => setEditCard(null)}
         />
+      )}
+      {giftCard && (
+        <SendGiftDialog card={giftCard} onClose={() => setGiftCard(null)} />
       )}
       {confirmDelete && (
         <ConfirmDialog
