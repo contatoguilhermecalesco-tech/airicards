@@ -184,6 +184,49 @@ function DeckDetail() {
               </>
             )}
           </button>
+          <button
+            onClick={isPublished ? handleUnpublish : handlePublish}
+            disabled={cards.length === 0 || publishState !== "idle"}
+            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition sm:flex-none ${
+              isPublished
+                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/15"
+                : "border-border bg-surface hover:bg-accent"
+            } ${cards.length === 0 || publishState !== "idle" ? "opacity-50" : ""}`}
+            title={
+              cards.length === 0
+                ? "Adicione cartas antes de publicar"
+                : isPublished
+                ? "Remover do marketplace"
+                : "Publicar no marketplace"
+            }
+          >
+            {publishState === "publishing" ? (
+              <>
+                <Upload className="h-4 w-4 animate-pulse" strokeWidth={2.5} />
+                Publicando…
+              </>
+            ) : publishState === "published" ? (
+              <>
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+                Publicado
+              </>
+            ) : publishState === "unpublishing" ? (
+              <>
+                <X className="h-4 w-4" strokeWidth={2.5} />
+                Removendo…
+              </>
+            ) : isPublished ? (
+              <>
+                <Globe className="h-4 w-4" strokeWidth={2.5} />
+                No marketplace
+              </>
+            ) : (
+              <>
+                <Globe className="h-4 w-4" strokeWidth={2.5} />
+                Publicar
+              </>
+            )}
+          </button>
           <Link
             to="/review"
             search={{ deck: deckId }}
