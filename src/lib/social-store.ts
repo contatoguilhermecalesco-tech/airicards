@@ -1,6 +1,6 @@
 // Social store — Duelos, Presentes de cartas, Feed de atividade (kudos).
 // App familiar de 2 perfis ('guilherme' | 'arlayne'), sem auth.
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROFILES } from "@/lib/profile";
 
