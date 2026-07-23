@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RankRouteImport } from './routes/rank'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -57,6 +58,11 @@ const ReviewRoute = ReviewRouteImport.update({
 const RankRoute = RankRouteImport.update({
   id: '/rank',
   path: '/rank',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExamRoute = ExamRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/marketplace': typeof MarketplaceRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/marketplace': typeof MarketplaceRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
+  '/marketplace': typeof MarketplaceRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/marketplace'
     | '/rank'
     | '/review'
     | '/settings'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/marketplace'
     | '/rank'
     | '/review'
     | '/settings'
@@ -344,6 +355,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/enemies'
     | '/exam'
+    | '/marketplace'
     | '/rank'
     | '/review'
     | '/settings'
@@ -376,6 +388,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
+  MarketplaceRoute: typeof MarketplaceRoute
   RankRoute: typeof RankRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
@@ -423,6 +436,13 @@ declare module '@tanstack/react-router' {
       path: '/rank'
       fullPath: '/rank'
       preLoaderRoute: typeof RankRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exam': {
@@ -662,6 +682,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
+  MarketplaceRoute: MarketplaceRoute,
   RankRoute: RankRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,

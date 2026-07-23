@@ -156,6 +156,54 @@ export type Database = {
         }
         Relationships: []
       }
+      published_decks: {
+        Row: {
+          card_count: number
+          cards: Json
+          color_key: string
+          created_at: string
+          description: string
+          id: string
+          imports: number
+          likes: number
+          name: string
+          owner_name: string
+          owner_profile_id: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          card_count?: number
+          cards?: Json
+          color_key?: string
+          created_at?: string
+          description?: string
+          id?: string
+          imports?: number
+          likes?: number
+          name: string
+          owner_name: string
+          owner_profile_id: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          card_count?: number
+          cards?: Json
+          color_key?: string
+          created_at?: string
+          description?: string
+          id?: string
+          imports?: number
+          likes?: number
+          name?: string
+          owner_name?: string
+          owner_profile_id?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,104 +1,59 @@
-## Sistema de Elo estilo League of Legends — "airi Rank"
+# Plano — UX + Social
 
-Um sistema de ranqueamento visual e progressivo que transforma o estudo em jornada competitiva contra si mesmo. Nada de comparação social direta — é o **seu elo**, subindo conforme você domina o inglês.
+Vou entregar todos os 7 itens de uma vez, priorizando os que dão mais valor imediato. Os dois pesados (offline real e marketplace) recebem tratamento cuidadoso para não quebrar o app.
 
-### 🏆 Tiers (10 patamares clássicos do LoL)
+## 1. Widget iOS / Instalável (PWA manifest)
+- Criar `public/manifest.webmanifest` com nome "airi", ícones (do logo atual), `theme_color` roxo, `display: standalone`.
+- Adicionar `<link rel="manifest">`, `apple-touch-icon` e `apple-mobile-web-app-*` no `__root.tsx`.
+- Resultado: no iPhone, "Adicionar à Tela de Início" cria ícone airi, abre em fullscreen sem barra do Safari. Não é widget nativo (iOS não permite via web), mas é o mais próximo possível.
 
-```text
-Ferro  →  Bronze  →  Prata  →  Ouro  →  Platina
-   →  Esmeralda  →  Diamante  →  Mestre  →  Grão-Mestre  →  Desafiante
-```
+## 2. Modo Offline
+- Instalar `vite-plugin-pwa` com `generateSW` + `registerType: "autoUpdate"`.
+- Criar wrapper `src/lib/register-sw.ts` que **só registra em produção** (bloqueia iframe/preview/dev — conforme regras Lovable).
+- Estratégia: `NetworkFirst` para HTML, `CacheFirst` para assets hasheados. Cartas e progresso já ficam no Supabase — o app volta a abrir offline e cartas locais (LocalStorage) funcionam sem rede.
+- Aviso: offline só funciona no app publicado, nunca no preview.
 
-- Cada tier de Ferro até Diamante tem **4 divisões** (IV, III, II, I).
-- Mestre / Grão-Mestre / Desafiante são **tiers absolutos** (sem divisão), acessados por LP total.
-- Cada tier tem sua **cor, gradiente e emblema** próprios (visual iOS glass — sem neon de IA).
+## 3. Atalhos de teclado (review)
+- Em `src/routes/review.tsx`, adicionar `useEffect` com `keydown`:
+  - `Espaço` → virar carta
+  - `1` ou `E` → Errei
+  - `2` ou `A` → Acertei
+  - `F` (após acerto) → Fácil, `M` → Médio, `D` → Difícil
+  - `Esc` → sair
+- Adicionar dica visual pequena ("Espaço para virar · 1 Errei · 2 Acertei") só em `sm:` (desktop).
 
-### 💎 LP (League Points) — como ganhar e perder
+## 4. Modo Foco
+- Toggle no topo da tela de revisão (ícone `Focus`/`Minimize2`).
+- Ativo: esconde header interno, contador de sessão, botão sair, atalhos de teclado; deixa só a carta + botões grandes. Vinheta escura no fundo.
+- Estado guardado em `localStorage` (`airi.focus-mode`) — quem gosta, mantém sempre.
 
-| Ação | LP |
-|---|---|
-| Acerto fácil em revisão | +2 |
-| Acerto médio | +4 |
-| Acerto difícil | +6 |
-| Derrotar carta inimiga | +15 |
-| Completar meta diária | +20 |
-| Manter streak (bônus por dia) | +5 × dias (até cap) |
-| Concluir aula de gramática | +25 |
-| Redação corrigida (nota ≥ 7) | +30 |
-| Prova mensal (varia por nota) | +50 a +200 |
-| Erro em revisão | −1 |
-| Inimigo evoluiu (lapse ≥ 3) | −10 |
-| Quebrar streak | −25 |
+## 5. Onboarding progressivo
+- Novo `src/components/OnboardingTour.tsx` — 4 slides curtos estilo iOS (Início / Biblioteca / Revisão / Rank).
+- Trigger: `localStorage.getItem("airi.onboarded") !== "v1"` na primeira visita do perfil.
+- Estilo: bottom sheet no mobile, modal centrado no desktop. Botão "Pular" + "Próximo/Começar".
 
-### 📈 Promoção e Rebaixamento
+## 6. Compartilhar conquistas (estilo Wrapped)
+- Botão "Compartilhar" no `/rank` e no header do streak em `/`.
+- Novo componente `src/components/ShareCard.tsx` que renderiza um card 1080×1920 (formato stories) via HTML Canvas puro (sem `html-to-image`):
+  - Gradiente roxo profundo, emblema do rank, LP, tier, streak, cartas dominadas, nome do perfil, marca "airi".
+- Ação: `canvas.toBlob` → `navigator.share` no mobile (com fallback para `download`).
 
-- Chegou a **100 LP** numa divisão → dispara **Série de Promoção** (melhor de 3 acertos consecutivos numa mini-revisão especial).
-- Passou na série → sobe de divisão com animação cinematográfica.
-- Perdeu 3 dias seguidos sem estudar → risco de **rebaixamento** (barra vermelha, aviso claro).
-- Existe **proteção de tier**: nunca cai de tier maior (ex: Ouro IV não cai pra Prata I na primeira falha — precisa esgotar buffer).
+## 7. Marketplace de decks
+- **Migration**: nova tabela `public.published_decks` (owner_profile_id, slug, name, description, color_key, card_count, cards jsonb, likes int, created_at, updated_at). Índice único em `(owner_profile_id, slug)`. RLS: leitura pública, escrita só pelo dono do slug (baseado em `X-Profile-ID` header — simplificando: qualquer authenticated pode inserir/atualizar já que o app já usa profile_id texto).
+- **Publicar deck**: no `library.$deckId.tsx`, adicionar botão "Publicar no Marketplace" ao lado do "Compartilhar link". Copia cartas p/ tabela pública.
+- **Nova rota `/marketplace`**: grid dos decks públicos com filtro por autor, busca, contagem de cartas, botão "Curtir" (incrementa `likes`) e "Adicionar à minha biblioteca" (reusa lógica de importação atual).
+- Item no navbar bottom não muda (já cheio); acesso via `/library` — botão "Explorar marketplace".
 
-### 🎨 Onde o rank aparece
+## Ordem de execução técnica
 
-1. **Home** — badge do tier ao lado do nome, mini barra de LP abaixo do anel de progresso.
-2. **Nova rota `/rank`** — página dedicada estilo tela de perfil do LoL:
-   - Emblema grande do tier atual com animação de brilho.
-   - Barra de LP com marcação da série de promoção.
-   - Histórico de promoções (timeline).
-   - "Próximo objetivo": quanto falta pra próxima divisão.
-   - Estatísticas: taxa de acerto, inimigos derrotados, dias no tier atual.
-3. **Review** — micro-popup "+4 LP" ao lado do botão quando acerta (estilo dano flutuante que já existe).
-4. **Bottom bar** — ícone de escudo/coroa acessa `/rank`.
+1. Disparar migration do marketplace (aprovação assíncrona).
+2. Em paralelo, escrever: manifest, wrapper SW, config vite, review keyboard/focus, OnboardingTour, ShareCard, componente do marketplace.
+3. Ligar botões no `/rank`, `/library.$deckId`, `/library.index`.
+4. Verificação final: build/typecheck automático + screenshot rápido do review + rank.
 
-### 🛡️ Mecânicas anti-frustração (nada de punir demais)
+## O que NÃO faço (por segurança)
+- Widget de tela de bloqueio nativo do iOS — impossível via PWA.
+- Marketplace com pagamentos/moderação — só listagem pública gratuita.
+- Estatísticas complexas no share card (v1 mostra rank + streak + cartas).
 
-- **LP nunca vai abaixo de 0** dentro de uma divisão até esgotar buffer de proteção.
-- **Placement Games**: nas primeiras 10 sessões o usuário faz "partidas de posicionamento" e é colocado num tier inicial justo (baseado em acertos, não em Ferro forçado).
-- Rebaixamento só acontece após **avisos claros** (notificação + toast).
-
-### 🔧 Detalhes técnicos
-
-**Novo arquivo `src/lib/rank-store.ts`:**
-- `RankState = { tier: TierName, division: 1..4 | null, lp: number, promoSeries?: { wins, losses, target }, placementGamesLeft: number, history: RankEvent[] }`
-- Persistido em `profile_data.data.rank` (JSON, isolado por perfil como o resto).
-- Funções puras: `addLp(state, amount, reason)`, `checkPromotion(state)`, `checkDemotion(state)`, `tierMeta(tier)` (cor, gradiente, nome PT-BR, ícone SVG inline).
-- Hook `useRank()` com subscription pattern igual ao `useStreak`.
-
-**Gatilhos (sem quebrar fluxos existentes):**
-- Em `flashcards-store.ts`: hooks `onCorrect(difficulty)`, `onWrong()`, `onEnemyDefeated()` chamam `addLp`.
-- Em `writing-store.ts`, `grammar-store.ts`, `exam-store.ts`: gatilho ao completar.
-- `bumpStreak` dispara bônus diário.
-
-**Nova rota `src/routes/rank.tsx`:**
-- Emblema SVG por tier (formas geométricas iOS — losango, escudo, coroa — nada de neon).
-- Barra de LP animada (0-100).
-- Modal da Série de Promoção quando LP = 100.
-- Histórico em cards estilo iOS (data, evento, ganho/perda).
-
-**Componente `<RankBadge size="sm|md|lg" />`:**
-- Reutilizável em Home, admin, notificações.
-- Emblema + tier + divisão + LP compacto.
-
-**Admin (`/admin`):**
-- Botão "Recalibrar rank do perfil" (reset para placement).
-- Toggle "Ativar/desativar sistema de rank" via `app_settings` (caso queira esconder depois).
-
-**Design (iOS glass, sem neon de IA):**
-- Cada tier tem paleta sutil: Ferro (grafite), Bronze (âmbar queimado), Prata (cinza perolado), Ouro (dourado quente), Platina (verde-água claro), Esmeralda (verde jade), Diamante (azul gelo), Mestre (roxo do app), Grão-Mestre (vermelho vinho), Desafiante (branco luminescente com detalhe roxo).
-- Emblemas em SVG geométrico com gradiente linear + rim light — sem partículas.
-- Transições de tier: fade + scale suave, som opcional (respeita preferências de notificação).
-
-### 📦 Ordem de implementação (num único envio)
-
-1. `src/lib/rank-store.ts` — tipos, tiers, cálculos, hook, persistência.
-2. `src/components/RankBadge.tsx` — badge reutilizável + emblemas SVG.
-3. Integrações de gatilho em `flashcards-store.ts` (revisão), `writing-store.ts`, `grammar-store.ts`, `exam-store.ts`.
-4. `src/routes/rank.tsx` — página completa do rank + série de promoção.
-5. Home (`src/routes/index.tsx`) — badge ao lado do nome + mini barra de LP.
-6. Bottom bar — novo ícone "Rank".
-7. Admin — controle de recalibração e toggle global.
-
-### 🎯 Fora do escopo (podemos fazer depois)
-
-- Comparação entre perfis (Guilherme vs Arlayne) — hoje deixa cada um no seu.
-- Leaderboard global.
-- Cosméticos por tier (skins de deck).
+Se você aprovar, sigo direto para implementação. Se quiser ajustar algo (ex: remover algum atalho, mudar formato do share pra quadrado, etc.), me diz agora.

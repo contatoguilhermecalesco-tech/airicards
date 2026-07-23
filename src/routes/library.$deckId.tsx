@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Check, ChevronDown, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Globe, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, Upload, X } from "lucide-react";
 import {
   useStore,
   createCard,
@@ -15,6 +15,7 @@ import {
 import { translateEnToPt } from "@/lib/translate.functions";
 import { buildShareUrl } from "@/lib/share";
 import { useCurrentProfile } from "@/lib/profile";
+import { publishDeck, unpublishDeck, findPublishedDeck } from "@/lib/marketplace";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
@@ -42,7 +43,52 @@ function DeckDetail() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [deleteDeckOpen, setDeleteDeckOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [publishState, setPublishState] = useState<"idle" | "publishing" | "published" | "unpublishing">("idle");
+  const [isPublished, setIsPublished] = useState(false);
   const currentProfile = useCurrentProfile();
+
+  useEffect(() => {
+    let cancel = false;
+    if (!deck || !currentProfile) return;
+    findPublishedDeck(currentProfile.id, deck.name).then((row) => {
+      if (!cancel) setIsPublished(!!row);
+    });
+    return () => {
+      cancel = true;
+    };
+  }, [deck?.name, currentProfile?.id]);
+
+  async function handlePublish() {
+    if (!deck || !currentProfile || publishState !== "idle") return;
+    if (cards.length === 0) return;
+    try {
+      setPublishState("publishing");
+      await publishDeck({
+        ownerId: currentProfile.id,
+        ownerName: currentProfile.name,
+        deck,
+        cards,
+      });
+      setIsPublished(true);
+      setPublishState("published");
+      setTimeout(() => setPublishState("idle"), 1800);
+    } catch {
+      setPublishState("idle");
+    }
+  }
+
+  async function handleUnpublish() {
+    if (!deck || !currentProfile || publishState !== "idle") return;
+    try {
+      setPublishState("unpublishing");
+      await unpublishDeck(currentProfile.id, deck.name);
+      setIsPublished(false);
+      setPublishState("idle");
+    } catch {
+      setPublishState("idle");
+    }
+  }
+
 
   async function handleShare() {
     if (!deck || !currentProfile) return;
@@ -135,6 +181,49 @@ function DeckDetail() {
               <>
                 <Share2 className="h-4 w-4" strokeWidth={2.5} />
                 Compartilhar
+              </>
+            )}
+          </button>
+          <button
+            onClick={isPublished ? handleUnpublish : handlePublish}
+            disabled={cards.length === 0 || publishState !== "idle"}
+            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition sm:flex-none ${
+              isPublished
+                ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/15"
+                : "border-border bg-surface hover:bg-accent"
+            } ${cards.length === 0 || publishState !== "idle" ? "opacity-50" : ""}`}
+            title={
+              cards.length === 0
+                ? "Adicione cartas antes de publicar"
+                : isPublished
+                ? "Remover do marketplace"
+                : "Publicar no marketplace"
+            }
+          >
+            {publishState === "publishing" ? (
+              <>
+                <Upload className="h-4 w-4 animate-pulse" strokeWidth={2.5} />
+                Publicando…
+              </>
+            ) : publishState === "published" ? (
+              <>
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+                Publicado
+              </>
+            ) : publishState === "unpublishing" ? (
+              <>
+                <X className="h-4 w-4" strokeWidth={2.5} />
+                Removendo…
+              </>
+            ) : isPublished ? (
+              <>
+                <Globe className="h-4 w-4" strokeWidth={2.5} />
+                No marketplace
+              </>
+            ) : (
+              <>
+                <Globe className="h-4 w-4" strokeWidth={2.5} />
+                Publicar
               </>
             )}
           </button>

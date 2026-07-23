@@ -18,6 +18,7 @@ import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
 import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
 import { RankEmblem } from "../components/RankBadge";
+import { OnboardingTour } from "../components/OnboardingTour";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 
@@ -90,6 +91,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#231e2c" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "airi" },
+      { name: "mobile-web-app-capable", content: "yes" },
       { title: "airi" },
       {
         name: "description",
@@ -113,6 +118,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/fSE9nIncamQ6thBvnCyu3ZzOV1N2/social-images/social-1784155934586-72e471ee-7eec-482a-853f-99c18d7552c9.webp" },
     ],
     links: [
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: airiLogo.url },
+      { rel: "icon", type: "image/png", href: airiLogo.url },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
@@ -388,6 +396,7 @@ function RootComponent() {
           <Outlet />
           <BottomBar />
           <RankPromotionOverlay />
+          <OnboardingTour />
         </div>
       </ProfileGate>
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info, Users, RefreshCw } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info, Users, RefreshCw, Share2 } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -16,7 +16,9 @@ import {
   type RankState,
 } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
-import { PROFILES, getCurrentProfile } from "@/lib/profile";
+import { PROFILES, getCurrentProfile, useCurrentProfile } from "@/lib/profile";
+import { useStore, useStreak } from "@/lib/flashcards-store";
+import { ShareAchievement } from "@/components/ShareAchievement";
 
 
 export const Route = createFileRoute("/rank")({
@@ -59,6 +61,14 @@ function RankPage() {
   const colors = TIER_COLORS[rank.tier];
   const progress = progressToNext(rank);
   const progressPct = Math.min(100, Math.round((progress.value / Math.max(1, progress.max)) * 100));
+  const currentProfile = useCurrentProfile();
+  const streak = useStreak();
+  const cards = useStore((s) => s.cards);
+  const cardsMastered = useMemo(
+    () => cards.filter((c) => (c.reps ?? 0) >= 3 && (c.lapses ?? 0) === 0).length,
+    [cards],
+  );
+  const [shareOpen, setShareOpen] = useState(false);
 
   const winRate = useMemo(() => {
     const total = rank.totalEarned + rank.totalLost;
@@ -100,6 +110,16 @@ function RankPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               {rank.lp} LP · {progress.label}
             </p>
+
+            <div className="mt-3 flex justify-center sm:justify-start">
+              <button
+                onClick={() => setShareOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1.5 text-xs font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.12]"
+              >
+                <Share2 className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Compartilhar conquista
+              </button>
+            </div>
 
             {/* Barra de LP */}
             <div className="mt-4">
@@ -379,6 +399,18 @@ function RankPage() {
           ))}
         </div>
       </section>
+
+      {currentProfile && (
+        <ShareAchievement
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          profile={currentProfile}
+          rank={rank}
+          streak={streak}
+          cardsMastered={cardsMastered}
+          totalCards={cards.length}
+        />
+      )}
     </main>
   );
 }
