@@ -270,18 +270,21 @@ function DeckDetail() {
   );
 }
 
-function AddCardSheet({
+function CardSheet({
   deckId,
+  card,
   onClose,
 }: {
   deckId: string;
+  card?: Card;
   onClose: () => void;
 }) {
-  const [mode, setMode] = useState<"word" | "sentence">("word");
-  const [front, setFront] = useState("");
-  const [back, setBack] = useState("");
-  const [source, setSource] = useState("");
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const isEdit = !!card;
+  const [mode, setMode] = useState<CardMode>(card?.mode ?? "word");
+  const [front, setFront] = useState(card?.front ?? "");
+  const [back, setBack] = useState(card?.back ?? "");
+  const [source, setSource] = useState(card?.source ?? "");
+  const [advancedOpen, setAdvancedOpen] = useState(!!card?.source);
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState<string | null>(null);
   const [alternatives, setAlternatives] = useState<string[]>([]);
@@ -304,7 +307,25 @@ function AddCardSheet({
   }
 
   const isSentence = mode === "sentence";
+  const isExpression = mode === "expression";
   const canSubmit = front.trim() && back.trim();
+
+  const frontLabel = isSentence
+    ? "Frase em inglês"
+    : isExpression
+      ? "Expressão em inglês"
+      : "Inglês";
+  const frontPlaceholder = isSentence
+    ? "Although it was raining, we went outside."
+    : isExpression
+      ? "Break a leg"
+      : "Serendipity";
+  const backPlaceholder = isSentence
+    ? "Embora estivesse chovendo, nós saímos."
+    : isExpression
+      ? "Boa sorte / Quebre a perna"
+      : "Serendipidade";
+  const kindLabel = isSentence ? "frase" : isExpression ? "expressão" : "palavra";
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-end sm:place-items-center">
@@ -318,7 +339,9 @@ function AddCardSheet({
           style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Nova carta</h3>
+            <h3 className="text-lg font-semibold">
+              {isEdit ? "Editar carta" : "Nova carta"}
+            </h3>
             <button
               onClick={onClose}
               className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -328,8 +351,8 @@ function AddCardSheet({
           </div>
 
           {/* Mode toggle */}
-          <div className="mt-4 grid grid-cols-2 gap-1 rounded-full bg-white/[0.04] p-1">
-            {(["word", "sentence"] as const).map((m) => (
+          <div className="mt-4 grid grid-cols-3 gap-1 rounded-full bg-white/[0.04] p-1">
+            {(["word", "sentence", "expression"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
@@ -340,7 +363,7 @@ function AddCardSheet({
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {m === "word" ? "Palavra" : "Frase"}
+                {m === "word" ? "Palavra" : m === "sentence" ? "Frase" : "Expressão"}
               </button>
             ))}
           </div>
@@ -349,21 +372,36 @@ function AddCardSheet({
               Sentence mining: uma frase com <span className="text-foreground">1 palavra nova</span> e contexto claro.
             </p>
           )}
+          {isExpression && (
+            <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+              Expressões idiomáticas, phrasal verbs ou combinações de palavras
+              cujo sentido não é literal.
+            </p>
+          )}
 
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (!canSubmit) return;
-              createCard(deckId, front, back, {
-                mode,
-                source: source.trim() || undefined,
-              });
+              if (isEdit && card) {
+                updateCard(card.id, {
+                  front,
+                  back,
+                  mode,
+                  source: source.trim(),
+                });
+              } else {
+                createCard(deckId, front, back, {
+                  mode,
+                  source: source.trim() || undefined,
+                });
+              }
               onClose();
             }}
             className="mt-4 space-y-3"
           >
             <Field
-              label={isSentence ? "Frase em inglês" : "Inglês"}
+              label={frontLabel}
               autoFocus
               value={front}
               onChange={(v) => {
@@ -371,11 +409,7 @@ function AddCardSheet({
                 setAlternatives([]);
                 setTranslateError(null);
               }}
-              placeholder={
-                isSentence
-                  ? "Although it was raining, we went outside."
-                  : "Serendipity"
-              }
+              placeholder={frontPlaceholder}
             />
             <button
               type="button"
@@ -393,11 +427,7 @@ function AddCardSheet({
               label="Tradução"
               value={back}
               onChange={setBack}
-              placeholder={
-                isSentence
-                  ? "Embora estivesse chovendo, nós saímos."
-                  : "Serendipidade"
-              }
+              placeholder={backPlaceholder}
             />
             {alternatives.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
@@ -438,7 +468,7 @@ function AddCardSheet({
                     placeholder="Ex: livro Sapiens, podcast BBC 6-min, série Friends S2E4…"
                   />
                   <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-                    De onde você tirou essa {isSentence ? "frase" : "palavra"}. Opcional.
+                    De onde você tirou essa {kindLabel}. Opcional.
                   </p>
                 </div>
               )}
@@ -448,7 +478,7 @@ function AddCardSheet({
               disabled={!canSubmit}
               className="mt-2 w-full rounded-full bg-primary py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
-              Adicionar carta
+              {isEdit ? "Salvar alterações" : "Adicionar carta"}
             </button>
           </form>
         </div>
