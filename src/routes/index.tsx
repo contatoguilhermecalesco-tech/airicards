@@ -302,85 +302,8 @@ function Home() {
       </AlertDialog>
 
       {/* Streak — sequência de dias */}
-      <section
-        className="animate-fade-in mt-6"
-        style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
-      >
-        <div className={`${GLASS_BASE} relative p-4`}>
-          <GlassHighlight />
-          {/* ambient flame halo */}
-          <div
-            aria-hidden
-            className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${
-              streak.current > 0 ? "opacity-70" : "opacity-20"
-            }`}
-            style={{
-              background:
-                studiedToday && streak.current > 0
-                  ? "radial-gradient(closest-side, rgba(251,146,60,0.35), transparent 70%)"
-                  : "radial-gradient(closest-side, rgba(167,139,250,0.25), transparent 70%)",
-            }}
-          />
-          <div className="relative flex items-center gap-4">
-            <div
-              className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${
-                streak.current > 0
-                  ? "border-orange-300/25 bg-gradient-to-b from-orange-400/20 to-rose-500/10 text-orange-200"
-                  : "border-white/[0.08] bg-white/[0.04] text-muted-foreground"
-              }`}
-            >
-              <Flame
-                className={`h-[22px] w-[22px] ${
-                  studiedToday && streak.current > 0 ? "animate-pulse" : ""
-                }`}
-                strokeWidth={2.25}
-                fill={streak.current > 0 ? "currentColor" : "none"}
-                fillOpacity={studiedToday ? 0.25 : 0}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
-                  {streak.current}
-                </p>
-                <p className="text-[13px] font-medium text-muted-foreground">
-                  {streak.current === 1 ? "dia" : "dias"} seguido{streak.current === 1 ? "" : "s"}
-                </p>
-                {streak.longest > 0 && streak.current >= streak.longest && streak.current > 0 && (
-                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-amber-300">
-                    <Trophy className="h-2.5 w-2.5" strokeWidth={2.5} />
-                    recorde
-                  </span>
-                )}
-              </div>
-              <p className="mt-1.5 text-[11px] font-medium text-muted-foreground">
-                {streak.current === 0
-                  ? "Revise 1 carta hoje para começar sua sequência"
-                  : studiedToday
-                    ? `Continue amanhã · próximo marco ${nextMilestone} dias`
-                    : `Revise hoje para manter · próximo marco ${nextMilestone} dias`}
-              </p>
-              {/* progress toward next milestone */}
-              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-orange-300 via-amber-300 to-rose-300 transition-all duration-700"
-                  style={{ width: `${milestoneProgress * 100}%` }}
-                />
-              </div>
-            </div>
-            {streak.longest > 0 && (
-              <div className="hidden shrink-0 text-right sm:block">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  Recorde
-                </p>
-                <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-foreground">
-                  {streak.longest}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
+
 
       {/* Stats — glass chips */}
       <section
