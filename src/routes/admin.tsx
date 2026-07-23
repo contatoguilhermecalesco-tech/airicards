@@ -20,7 +20,7 @@ import {
 } from "@/lib/flashcards-store";
 import { resetExamsForProfileId } from "@/lib/exam-store";
 import { useAppSettings, setSetting } from "@/lib/app-settings";
-import { useRank, resetRank, tierLabel, TIER_COLORS, readRankForProfile, type RankState } from "@/lib/rank-store";
+import { useRank, resetRank, tierLabel, TIER_COLORS, readRankForProfile, subscribeAllRanks, type RankState } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 
 export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
@@ -325,10 +325,13 @@ function RankAdminSection() {
 function ProfilesRankOverview() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    // Reavalia quando a janela ganha foco (ex.: após navegar do /rank).
     const onFocus = () => setTick((t) => t + 1);
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const unsub = subscribeAllRanks(() => setTick((t) => t + 1));
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      unsub();
+    };
   }, []);
 
   const active = getCurrentProfile();

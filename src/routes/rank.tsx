@@ -11,6 +11,7 @@ import {
   isElite,
   lpToReachTier,
   readRankForProfile,
+  subscribeAllRanks,
   type Tier,
   type RankState,
 } from "@/lib/rank-store";
@@ -398,9 +399,14 @@ function ProfilesLeaderboard({ glass }: { glass: string }) {
   useEffect(() => {
     const onFocus = () => setTick((t) => t + 1);
     window.addEventListener("focus", onFocus);
-    return () => window.removeEventListener("focus", onFocus);
+    const unsub = subscribeAllRanks(() => setTick((t) => t + 1));
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      unsub();
+    };
   }, []);
   void tick;
+
 
   const active = getCurrentProfile();
   const entries: {

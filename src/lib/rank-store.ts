@@ -1,7 +1,8 @@
-// Sistema de rank estilo LoL — persistido em localStorage por perfil.
-// Isolado por perfil (Guilherme / Arlayne), sem mesclar entre contas.
+// Sistema de rank estilo LoL — unificado entre dispositivos via Lovable Cloud.
+// Cache local (localStorage) para paint instantâneo + sync realtime por perfil.
 import { useSyncExternalStore } from "react";
-import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
+import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
+import { supabase } from "@/integrations/supabase/client";
 
 export type Tier =
   | "iron"
@@ -147,6 +148,19 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+// Cache global de ranks de TODOS os perfis (para leaderboard sincronizado).
+const remoteRanks = new Map<string, RankState>();
+const remoteListeners = new Set<() => void>();
+function emitRemote() {
+  remoteListeners.forEach((l) => l());
+}
+export function subscribeAllRanks(cb: () => void) {
+  remoteListeners.add(cb);
+  return () => {
+    remoteListeners.delete(cb);
+  };
+}
+
 // -------- eventos de promoção (para animação de UI) --------------------
 export type RankPromotionEvent = {
   fromTier: Tier;
@@ -167,12 +181,114 @@ function emitPromotion(e: RankPromotionEvent) {
   });
 }
 
+// -------- sync com Lovable Cloud --------------------------------------
+let cloudSaveTimer: ReturnType<typeof setTimeout> | null = null;
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+function isValidRank(r: unknown): r is RankState {
+  if (!r || typeof r !== "object") return false;
+  const rr = r as Partial<RankState>;
+  return typeof rr.tier === "string" && "lp" in rr;
+}
+
+function pickCanonical(a: RankState, b: RankState): RankState {
+  // Mescla conservadora: mantém o estado com maior LP total ganho.
+  // Assim, se um dispositivo estava atrasado, ele adota o mais avançado.
+  const aScore = a.totalEarned ?? 0;
+  const bScore = b.totalEarned ?? 0;
+  return bScore > aScore ? b : a;
+}
+
+async function pullFromCloud(profileId: string) {
+  const { data, error } = await supabase
+    .from("profile_data")
+    .select("rank")
+    .eq("profile_id", profileId)
+    .maybeSingle();
+  if (error) {
+    console.error("[airi/rank] pull failed", error);
+    return;
+  }
+  if (activeProfile !== profileId) return;
+  const remote = (data && isValidRank((data as { rank?: unknown }).rank))
+    ? { ...INITIAL_RANK, ...((data as { rank: RankState }).rank) }
+    : null;
+  const local = state;
+  if (!remote) {
+    // Primeira sincronização: sobe o estado local para a nuvem.
+    if (local.totalEarned > 0 || local.history.length > 0) {
+      scheduleCloudSave();
+    }
+    return;
+  }
+  const merged = pickCanonical(local, remote);
+  state = merged;
+  save(profileId, merged);
+  remoteRanks.set(profileId, merged);
+  emit();
+  emitRemote();
+  // Se o local venceu, empurra para a nuvem para unificar.
+  if (merged !== remote) scheduleCloudSave();
+}
+
+function scheduleCloudSave() {
+  if (!activeProfile || !isBrowser()) return;
+  const profileId = activeProfile;
+  const snapshot = state;
+  if (cloudSaveTimer) clearTimeout(cloudSaveTimer);
+  cloudSaveTimer = setTimeout(async () => {
+    const { error } = await supabase
+      .from("profile_data")
+      .upsert(
+        {
+          profile_id: profileId,
+          rank: snapshot as never,
+          updated_at: new Date().toISOString(),
+        } as never,
+        { onConflict: "profile_id" },
+      );
+    if (error) console.error("[airi/rank] save failed", error);
+  }, 400);
+}
+
+async function fetchAllRemoteRanks() {
+  if (!isBrowser()) return;
+  const ids = PROFILES.map((p) => p.id);
+  const { data, error } = await supabase
+    .from("profile_data")
+    .select("profile_id, rank")
+    .in("profile_id", ids);
+  if (error) {
+    console.error("[airi/rank] leaderboard fetch failed", error);
+    return;
+  }
+  for (const row of (data ?? []) as { profile_id: string; rank: unknown }[]) {
+    if (isValidRank(row.rank)) {
+      remoteRanks.set(row.profile_id, { ...INITIAL_RANK, ...row.rank });
+    }
+  }
+  emitRemote();
+}
 
 export function setActiveRankProfile(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
   state = profileId ? load(profileId) : INITIAL_RANK;
   emit();
+  if (!profileId) return;
+  void pullFromCloud(profileId);
+  realtimeChannel = supabase
+    .channel(`rank:${profileId}`)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "profile_data", filter: `profile_id=eq.${profileId}` },
+      () => void pullFromCloud(profileId),
+    )
+    .subscribe();
 }
 
 if (isBrowser()) {
@@ -182,10 +298,25 @@ if (isBrowser()) {
   };
   apply();
   subscribeProfile(apply);
+  // Popular leaderboard e ouvir mudanças de qualquer perfil.
+  void fetchAllRemoteRanks();
+  supabase
+    .channel("rank:all")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "profile_data" },
+      () => void fetchAllRemoteRanks(),
+    )
+    .subscribe();
 }
 
 function persist() {
-  if (activeProfile) save(activeProfile, state);
+  if (activeProfile) {
+    save(activeProfile, state);
+    remoteRanks.set(activeProfile, state);
+    emitRemote();
+    scheduleCloudSave();
+  }
 }
 
 // -------- lógica de progressão ----------------------------------------
@@ -461,9 +592,11 @@ export function resetRank() {
   emit();
 }
 
-/** Lê o rank persistido de qualquer perfil sem trocar o perfil ativo.
- *  Retorna null quando o perfil ainda não tem histórico neste dispositivo. */
+/** Lê o rank de qualquer perfil (nuvem quando disponível, senão cache local).
+ *  Retorna null quando o perfil ainda não tem histórico. */
 export function readRankForProfile(profileId: string): RankState | null {
+  const remote = remoteRanks.get(profileId);
+  if (remote) return remote;
   if (!isBrowser()) return null;
   try {
     const raw = localStorage.getItem(keyFor(profileId));
