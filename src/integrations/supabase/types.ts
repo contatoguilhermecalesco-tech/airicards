@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_events: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          payload: Json
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          payload?: Json
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          payload?: Json
+          profile_id?: string
+        }
+        Relationships: []
+      }
+      activity_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          event_id: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          event_id: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          event_id?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_reactions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "activity_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string
@@ -29,6 +85,125 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: Json
+        }
+        Relationships: []
+      }
+      card_gifts: {
+        Row: {
+          back: string
+          category: string
+          created_at: string
+          from_profile: string
+          front: string
+          id: string
+          responded_at: string | null
+          source_note: string | null
+          status: string
+          to_profile: string
+        }
+        Insert: {
+          back: string
+          category?: string
+          created_at?: string
+          from_profile: string
+          front: string
+          id?: string
+          responded_at?: string | null
+          source_note?: string | null
+          status?: string
+          to_profile: string
+        }
+        Update: {
+          back?: string
+          category?: string
+          created_at?: string
+          from_profile?: string
+          front?: string
+          id?: string
+          responded_at?: string | null
+          source_note?: string | null
+          status?: string
+          to_profile?: string
+        }
+        Relationships: []
+      }
+      duel_results: {
+        Row: {
+          accuracy: number
+          completed_at: string
+          correct: number
+          duel_id: string
+          id: string
+          profile_id: string
+          time_ms: number
+          total: number
+        }
+        Insert: {
+          accuracy?: number
+          completed_at?: string
+          correct?: number
+          duel_id: string
+          id?: string
+          profile_id: string
+          time_ms?: number
+          total?: number
+        }
+        Update: {
+          accuracy?: number
+          completed_at?: string
+          correct?: number
+          duel_id?: string
+          id?: string
+          profile_id?: string
+          time_ms?: number
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_results_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "duels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      duels: {
+        Row: {
+          cards_snapshot: Json
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          deck_name: string
+          deck_source_id: string | null
+          id: string
+          status: string
+          week_key: string
+          winner: string | null
+        }
+        Insert: {
+          cards_snapshot: Json
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          deck_name: string
+          deck_source_id?: string | null
+          id?: string
+          status?: string
+          week_key: string
+          winner?: string | null
+        }
+        Update: {
+          cards_snapshot?: Json
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          deck_name?: string
+          deck_source_id?: string | null
+          id?: string
+          status?: string
+          week_key?: string
+          winner?: string | null
         }
         Relationships: []
       }
