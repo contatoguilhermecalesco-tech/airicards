@@ -16,6 +16,7 @@ import { Route as RankRouteImport } from './routes/rank'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as EnemiesRouteImport } from './routes/enemies'
+import { Route as DuelRouteImport } from './routes/duel'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
@@ -73,6 +74,11 @@ const ExamRoute = ExamRouteImport.update({
 const EnemiesRoute = EnemiesRouteImport.update({
   id: '/enemies',
   path: '/enemies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DuelRoute = DuelRouteImport.update({
+  id: '/duel',
+  path: '/duel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -198,6 +204,7 @@ const StudyListeningHistoryIdRoute = StudyListeningHistoryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/duel'
     | '/enemies'
     | '/exam'
     | '/marketplace'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/duel'
     | '/enemies'
     | '/exam'
     | '/marketplace'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/duel'
     | '/enemies'
     | '/exam'
     | '/marketplace'
@@ -386,6 +398,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
   MarketplaceRoute: typeof MarketplaceRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/enemies'
       fullPath: '/enemies'
       preLoaderRoute: typeof EnemiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/duel': {
+      id: '/duel'
+      path: '/duel'
+      fullPath: '/duel'
+      preLoaderRoute: typeof DuelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -680,6 +700,7 @@ const StudyWritingHistoryRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
   MarketplaceRoute: MarketplaceRoute,
