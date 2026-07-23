@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, Shield, AlertTriangle, Check } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,8 @@ import {
   useCardsReviewedToday,
   useStreak,
   nextStreakMilestone,
+  MAX_STREAK_FREEZES,
+  type Streak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
@@ -302,85 +304,8 @@ function Home() {
       </AlertDialog>
 
       {/* Streak — sequência de dias */}
-      <section
-        className="animate-fade-in mt-6"
-        style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
-      >
-        <div className={`${GLASS_BASE} relative p-4`}>
-          <GlassHighlight />
-          {/* ambient flame halo */}
-          <div
-            aria-hidden
-            className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${
-              streak.current > 0 ? "opacity-70" : "opacity-20"
-            }`}
-            style={{
-              background:
-                studiedToday && streak.current > 0
-                  ? "radial-gradient(closest-side, rgba(251,146,60,0.35), transparent 70%)"
-                  : "radial-gradient(closest-side, rgba(167,139,250,0.25), transparent 70%)",
-            }}
-          />
-          <div className="relative flex items-center gap-4">
-            <div
-              className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${
-                streak.current > 0
-                  ? "border-orange-300/25 bg-gradient-to-b from-orange-400/20 to-rose-500/10 text-orange-200"
-                  : "border-white/[0.08] bg-white/[0.04] text-muted-foreground"
-              }`}
-            >
-              <Flame
-                className={`h-[22px] w-[22px] ${
-                  studiedToday && streak.current > 0 ? "animate-pulse" : ""
-                }`}
-                strokeWidth={2.25}
-                fill={streak.current > 0 ? "currentColor" : "none"}
-                fillOpacity={studiedToday ? 0.25 : 0}
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
-                  {streak.current}
-                </p>
-                <p className="text-[13px] font-medium text-muted-foreground">
-                  {streak.current === 1 ? "dia" : "dias"} seguido{streak.current === 1 ? "" : "s"}
-                </p>
-                {streak.longest > 0 && streak.current >= streak.longest && streak.current > 0 && (
-                  <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-amber-300">
-                    <Trophy className="h-2.5 w-2.5" strokeWidth={2.5} />
-                    recorde
-                  </span>
-                )}
-              </div>
-              <p className="mt-1.5 text-[11px] font-medium text-muted-foreground">
-                {streak.current === 0
-                  ? "Revise 1 carta hoje para começar sua sequência"
-                  : studiedToday
-                    ? `Continue amanhã · próximo marco ${nextMilestone} dias`
-                    : `Revise hoje para manter · próximo marco ${nextMilestone} dias`}
-              </p>
-              {/* progress toward next milestone */}
-              <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-orange-300 via-amber-300 to-rose-300 transition-all duration-700"
-                  style={{ width: `${milestoneProgress * 100}%` }}
-                />
-              </div>
-            </div>
-            {streak.longest > 0 && (
-              <div className="hidden shrink-0 text-right sm:block">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  Recorde
-                </p>
-                <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-foreground">
-                  {streak.longest}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+      <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
+
 
       {/* Stats — glass chips */}
       <section
@@ -578,4 +503,206 @@ function StatChip({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+// ---- Streak card + helpers ------------------------------------------------
+function dayKeyFromDate(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+const WEEK_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+function StreakCard({
+  streak,
+  studiedToday,
+  nextMilestone,
+  milestoneProgress,
+}: {
+  streak: Streak;
+  studiedToday: boolean;
+  nextMilestone: number;
+  milestoneProgress: number;
+}) {
+  // Últimos 7 dias — hoje encostado à direita
+  const now = new Date();
+  const days: { key: string; label: string; isToday: boolean; status: "done" | "freeze" | "miss" | "future"; date: Date }[] = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const key = dayKeyFromDate(d);
+    const st = streak.history?.[key];
+    const isToday = i === 0;
+    const status: "done" | "freeze" | "miss" | "future" =
+      st === "done" ? "done" : st === "freeze" ? "freeze" : isToday && !studiedToday ? "future" : "miss";
+    days.push({ key, label: WEEK_LABELS[d.getDay()], isToday, status, date: d });
+  }
+
+  const freezes = streak.freezes ?? 0;
+  const atRisk = streak.current > 0 && !studiedToday && now.getHours() >= 19;
+  const shieldSavedYesterday =
+    streak.lastFreezeUsedOn &&
+    (() => {
+      const y = new Date(now);
+      y.setDate(now.getDate() - 1);
+      return streak.lastFreezeUsedOn === dayKeyFromDate(y);
+    })();
+
+  return (
+    <section
+      className="animate-fade-in mt-6"
+      style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
+    >
+      <div className={`${GLASS_BASE} relative p-4`}>
+        <GlassHighlight />
+        {/* ambient flame halo */}
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${
+            streak.current > 0 ? "opacity-70" : "opacity-20"
+          }`}
+          style={{
+            background:
+              studiedToday && streak.current > 0
+                ? "radial-gradient(closest-side, rgba(251,146,60,0.35), transparent 70%)"
+                : "radial-gradient(closest-side, rgba(167,139,250,0.25), transparent 70%)",
+          }}
+        />
+
+        <div className="relative flex items-center gap-4">
+          <div
+            className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${
+              streak.current > 0
+                ? "border-orange-300/25 bg-gradient-to-b from-orange-400/20 to-rose-500/10 text-orange-200"
+                : "border-white/[0.08] bg-white/[0.04] text-muted-foreground"
+            }`}
+          >
+            <Flame
+              className={`h-[22px] w-[22px] ${
+                studiedToday && streak.current > 0 ? "animate-pulse" : ""
+              }`}
+              strokeWidth={2.25}
+              fill={streak.current > 0 ? "currentColor" : "none"}
+              fillOpacity={studiedToday ? 0.25 : 0}
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <p className="text-[22px] font-semibold leading-none tabular-nums text-foreground">
+                {streak.current}
+              </p>
+              <p className="text-[13px] font-medium text-muted-foreground">
+                {streak.current === 1 ? "dia" : "dias"} seguido{streak.current === 1 ? "" : "s"}
+              </p>
+              {streak.longest > 0 && streak.current >= streak.longest && streak.current > 0 && (
+                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-amber-300">
+                  <Trophy className="h-2.5 w-2.5" strokeWidth={2.5} />
+                  recorde
+                </span>
+              )}
+            </div>
+            <p className="mt-1.5 text-[11px] font-medium text-muted-foreground">
+              {streak.current === 0
+                ? "Revise 1 carta hoje para começar sua sequência"
+                : studiedToday
+                  ? `Continue amanhã · próximo marco ${nextMilestone} dias`
+                  : `Revise hoje para manter · próximo marco ${nextMilestone} dias`}
+            </p>
+            {/* progress toward next milestone */}
+            <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-orange-300 via-amber-300 to-rose-300 transition-all duration-700"
+                style={{ width: `${milestoneProgress * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Escudos */}
+          <div className="hidden sm:flex shrink-0 flex-col items-end gap-1">
+            <div className="flex items-center gap-1" title={`${freezes} escudo(s) — cada um salva 1 dia perdido`}>
+              {Array.from({ length: MAX_STREAK_FREEZES }).map((_, i) => (
+                <Shield
+                  key={i}
+                  className={`h-3.5 w-3.5 ${i < freezes ? "text-sky-300" : "text-white/15"}`}
+                  strokeWidth={2.25}
+                  fill={i < freezes ? "currentColor" : "none"}
+                  fillOpacity={i < freezes ? 0.15 : 0}
+                />
+              ))}
+            </div>
+            <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              {freezes}/{MAX_STREAK_FREEZES} escudos
+            </p>
+          </div>
+        </div>
+
+        {/* Weekly dots */}
+        <div className="relative mt-4 flex items-center justify-between gap-1.5">
+          {days.map((d) => {
+            const base = "flex flex-col items-center gap-1";
+            const dotBase =
+              "grid h-7 w-7 place-items-center rounded-full border text-[10px] font-semibold transition-colors";
+            let dot = "";
+            let icon: React.ReactNode = null;
+            if (d.status === "done") {
+              dot = "border-orange-300/40 bg-gradient-to-b from-orange-400/25 to-rose-500/10 text-orange-200";
+              icon = <Flame className="h-3 w-3" strokeWidth={2.5} fill="currentColor" fillOpacity={0.3} />;
+            } else if (d.status === "freeze") {
+              dot = "border-sky-300/40 bg-sky-400/15 text-sky-200";
+              icon = <Shield className="h-3 w-3" strokeWidth={2.5} fill="currentColor" fillOpacity={0.25} />;
+            } else if (d.status === "future") {
+              dot = "border-dashed border-white/25 bg-white/[0.03] text-muted-foreground";
+              icon = <span className="opacity-70">?</span>;
+            } else {
+              dot = "border-white/[0.08] bg-white/[0.02] text-muted-foreground/60";
+              icon = <span className="h-1 w-1 rounded-full bg-white/20" aria-hidden />;
+            }
+            return (
+              <div key={d.key} className={base}>
+                <div
+                  className={`${dotBase} ${dot} ${d.isToday ? "ring-1 ring-white/25" : ""}`}
+                  aria-label={`${d.label} ${d.date.getDate()} — ${d.status}`}
+                >
+                  {icon}
+                </div>
+                <span
+                  className={`text-[9px] font-medium tabular-nums ${
+                    d.isToday ? "text-foreground" : "text-muted-foreground/70"
+                  }`}
+                >
+                  {d.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Contextual banners */}
+        {shieldSavedYesterday && (
+          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-sky-300/20 bg-sky-400/[0.06] px-3 py-2">
+            <Shield className="h-3.5 w-3.5 shrink-0 text-sky-300" strokeWidth={2.5} fill="currentColor" fillOpacity={0.2} />
+            <p className="text-[11px] font-medium text-sky-100/90">
+              Um escudo salvou sua sequência ontem. Revise hoje para renovar.
+            </p>
+          </div>
+        )}
+        {atRisk && !shieldSavedYesterday && (
+          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-amber-300/25 bg-amber-400/[0.07] px-3 py-2">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-300" strokeWidth={2.5} />
+            <p className="text-[11px] font-medium text-amber-100/90">
+              Sua sequência de {streak.current} dia{streak.current === 1 ? "" : "s"} termina à meia-noite.
+              {freezes > 0 ? " Você tem 1 escudo se falhar." : " Revise 1 carta para mantê-la viva."}
+            </p>
+          </div>
+        )}
+        {studiedToday && streak.current > 0 && !atRisk && !shieldSavedYesterday && (
+          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-300" strokeWidth={2.75} />
+            <p className="text-[11px] font-medium text-muted-foreground">
+              Dia de hoje garantido · {streak.longest} é seu recorde
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 

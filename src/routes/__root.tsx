@@ -17,6 +17,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
 import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
+import { StreakMilestoneOverlay } from "../components/StreakMilestoneOverlay";
 import { RankEmblem } from "../components/RankBadge";
 import { OnboardingTour } from "../components/OnboardingTour";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
@@ -396,6 +397,7 @@ function RootComponent() {
           <Outlet />
           <BottomBar />
           <RankPromotionOverlay />
+          <StreakMilestoneOverlay />
           <OnboardingTour />
         </div>
       </ProfileGate>

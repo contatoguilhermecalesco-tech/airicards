@@ -489,6 +489,18 @@ export const LP = {
   enemyDefeated: 8,
   enemyEvolved: -12,
   streakDay: (days: number) => Math.min(12, Math.max(2, days * 2)),
+  streakMilestone: (days: number) => {
+    // Bônus grande por cruzar marcos — cresce com dificuldade.
+    if (days >= 365) return 1500;
+    if (days >= 180) return 700;
+    if (days >= 100) return 400;
+    if (days >= 60) return 250;
+    if (days >= 30) return 150;
+    if (days >= 14) return 80;
+    if (days >= 7) return 50;
+    if (days >= 3) return 20;
+    return 0;
+  },
   streakBroken: -35,
   streakBrokenFor: (prevCurrent: number) => {
     if (prevCurrent >= 7) return -35;

@@ -36,11 +36,17 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[] };
+export type StreakDayStatus = "done" | "freeze";
 export type Streak = {
   current: number;
   longest: number;
   lastDay: string; // dateKey of the last day the user reviewed ≥1 card
   startedOn?: string; // dateKey when the current streak began
+  freezes?: number; // escudos disponíveis (protege contra 1 dia perdido)
+  freezesEarnedFor?: number; // marca "current" onde já demos escudo (para não repetir)
+  history?: Record<string, StreakDayStatus>; // últimos ~60 dias
+  milestonesReached?: number[]; // marcos já recompensados
+  lastFreezeUsedOn?: string; // dayKey do dia salvo pelo escudo (para UI)
 };
 type PunishmentsState = {
   streakBrokenAppliedFor?: string; // dayKey da lastDay já penalizada
@@ -55,10 +61,28 @@ type HomeSessions = {
   punishments?: PunishmentsState;
 };
 
-const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
+/** Marcos de streak (em dias). Cruzá-los concede LP extra e uma celebração. */
+export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 180, 365];
 export function nextStreakMilestone(current: number): number {
   for (const m of STREAK_MILESTONES) if (m > current) return m;
   return current + 100;
+}
+
+/** Máximo de escudos que o usuário pode acumular. */
+export const MAX_STREAK_FREEZES = 3;
+/** A cada N dias completos de streak, ganha 1 escudo (respeita o máximo). */
+export const FREEZE_EARN_EVERY = 7;
+
+// ---- Streak milestone event bus (para celebração global) --------------
+export type StreakMilestoneEvent = { days: number; lpGained: number; at: number };
+type StreakMilestoneListener = (e: StreakMilestoneEvent) => void;
+const streakMilestoneListeners = new Set<StreakMilestoneListener>();
+export function onStreakMilestone(fn: StreakMilestoneListener): () => void {
+  streakMilestoneListeners.add(fn);
+  return () => streakMilestoneListeners.delete(fn);
+}
+function emitStreakMilestone(e: StreakMilestoneEvent) {
+  streakMilestoneListeners.forEach((l) => l(e));
 }
 
 function isBrowser() {
@@ -410,12 +434,16 @@ export function reviewCard(id: string, grade: Grade) {
   const wasFirstToday = (home.reviewed ?? 0) === 0;
   home = { ...home, reviewed: (home.reviewed ?? 0) + 1 };
   if (wasFirstToday) {
-    const nextStreak = bumpStreak(home.streak, todayKey());
+    const prev = home.streak;
+    const prevCurrent = prev?.current ?? 0;
+    const nextStreak = bumpStreak(prev, todayKey());
     home = { ...home, streak: nextStreak };
     // Bônus diário de streak.
     if (nextStreak.current > 0) {
       awardLp(LP.streakDay(nextStreak.current), "streak.day");
     }
+    // Marco atingido? Recompensa em LP + evento de celebração.
+    maybeRewardMilestone(prevCurrent, nextStreak.current);
   }
   emitHome();
   emit();
@@ -426,42 +454,166 @@ export function reviewCard(id: string, grade: Grade) {
 function dayKeyFromDate(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
+function parseDayKey(k: string): Date {
+  const [y, m, d] = k.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
 function yesterdayKey(today: string): string {
-  const [y, m, d] = today.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
+  const dt = parseDayKey(today);
   dt.setDate(dt.getDate() - 1);
   return dayKeyFromDate(dt);
 }
+function daysBetween(a: string, b: string): number {
+  const da = parseDayKey(a).getTime();
+  const db = parseDayKey(b).getTime();
+  return Math.round((db - da) / 86_400_000);
+}
+
+/** Poda histórico para manter só os últimos ~60 dias. */
+function pruneHistory(history: Record<string, StreakDayStatus> | undefined): Record<string, StreakDayStatus> {
+  const out: Record<string, StreakDayStatus> = {};
+  if (!history) return out;
+  const today = todayKey();
+  const cutoff = parseDayKey(today).getTime() - 60 * 86_400_000;
+  for (const [k, v] of Object.entries(history)) {
+    if (parseDayKey(k).getTime() >= cutoff) out[k] = v;
+  }
+  return out;
+}
+
 function bumpStreak(prev: Streak | undefined, today: string): Streak {
   const yday = yesterdayKey(today);
+  const history = pruneHistory(prev?.history);
+  history[today] = "done";
   if (!prev || !prev.lastDay) {
-    return { current: 1, longest: 1, lastDay: today, startedOn: today };
+    return {
+      current: 1,
+      longest: Math.max(1, prev?.longest ?? 0),
+      lastDay: today,
+      startedOn: today,
+      freezes: prev?.freezes ?? 0,
+      freezesEarnedFor: prev?.freezesEarnedFor ?? 0,
+      milestonesReached: prev?.milestonesReached ?? [],
+      history,
+      lastFreezeUsedOn: prev?.lastFreezeUsedOn,
+    };
   }
   if (prev.lastDay === today) return prev; // already counted today
-  const next = prev.lastDay === yday ? prev.current + 1 : 1;
+
+  const continued = prev.lastDay === yday;
+  const nextCurrent = continued ? prev.current + 1 : 1;
+
+  // Ganha 1 escudo a cada FREEZE_EARN_EVERY dias completos — no máx MAX_STREAK_FREEZES.
+  let freezes = prev.freezes ?? 0;
+  let freezesEarnedFor = prev.freezesEarnedFor ?? 0;
+  if (
+    nextCurrent > 0 &&
+    nextCurrent % FREEZE_EARN_EVERY === 0 &&
+    freezesEarnedFor < nextCurrent &&
+    freezes < MAX_STREAK_FREEZES
+  ) {
+    freezes = Math.min(MAX_STREAK_FREEZES, freezes + 1);
+    freezesEarnedFor = nextCurrent;
+  }
+
   return {
-    current: next,
-    longest: Math.max(prev.longest ?? 0, next),
+    current: nextCurrent,
+    longest: Math.max(prev.longest ?? 0, nextCurrent),
     lastDay: today,
-    startedOn: prev.lastDay === yday ? prev.startedOn ?? today : today,
+    startedOn: continued ? prev.startedOn ?? today : today,
+    freezes,
+    freezesEarnedFor,
+    milestonesReached: prev.milestonesReached ?? [],
+    history,
+    lastFreezeUsedOn: prev.lastFreezeUsedOn,
   };
 }
-/** Returns the effective streak, resetting to 0 if user missed ≥2 days. */
+
+/** Recompensa em LP ao cruzar um marco (uma única vez por marco). */
+function maybeRewardMilestone(prevCurrent: number, nextCurrent: number) {
+  const stored = home.streak;
+  if (!stored) return;
+  const reached = new Set(stored.milestonesReached ?? []);
+  const newlyReached: number[] = [];
+  for (const m of STREAK_MILESTONES) {
+    if (nextCurrent >= m && prevCurrent < m && !reached.has(m)) {
+      newlyReached.push(m);
+      reached.add(m);
+    }
+  }
+  if (newlyReached.length === 0) return;
+  // Recompensa pelo maior marco cruzado neste bump.
+  const top = newlyReached[newlyReached.length - 1];
+  const bonus = LP.streakMilestone(top);
+  if (bonus > 0) awardLp(bonus, `streak.milestone:${top}`);
+  home = {
+    ...home,
+    streak: { ...stored, milestonesReached: Array.from(reached).sort((a, b) => a - b) },
+  };
+  // Notifica a UI para tocar a celebração.
+  emitStreakMilestone({ days: top, lpGained: bonus, at: Date.now() });
+}
+
+/**
+ * Tenta salvar a streak consumindo um escudo quando o usuário perdeu
+ * exatamente 1 dia. Retorna a streak "efetiva" já com escudo aplicado.
+ * Persiste o estado atualizado em `home.streak`.
+ */
+function applyFreezeIfPossible(stored: Streak, today: string): Streak | null {
+  if (!stored.lastDay) return null;
+  const gap = daysBetween(stored.lastDay, today); // dias completos entre lastDay e hoje
+  // gap<=1 → nada a fazer (hoje ou ontem já cobre o streak).
+  if (gap <= 1) return null;
+  const freezes = stored.freezes ?? 0;
+  if (gap !== 2 || freezes < 1) return null; // só cobre 1 dia perdido
+
+  // Consome 1 escudo, marca o dia perdido como "freeze" no histórico, avança lastDay para ontem.
+  const missedDay = yesterdayKey(today);
+  const history = pruneHistory(stored.history);
+  history[missedDay] = "freeze";
+  const next: Streak = {
+    ...stored,
+    freezes: freezes - 1,
+    lastDay: missedDay, // mantém a corrente viva; usuário ainda precisa estudar hoje
+    history,
+    lastFreezeUsedOn: missedDay,
+  };
+  home = { ...home, streak: next };
+  emitHome();
+  scheduleSave();
+  return next;
+}
+
+/** Returns the effective streak, resetting to 0 if user missed ≥2 days sem escudo. */
 let streakSnapshot: Streak = { current: 0, longest: 0, lastDay: "" };
 let streakSnapshotKey = "";
 function computeStreak(): Streak {
   refreshHomeDay();
   const s = home.streak;
   const today = todayKey();
-  if (!s || !s.lastDay) return { current: 0, longest: s?.longest ?? 0, lastDay: "" };
+  if (!s || !s.lastDay) {
+    return { current: 0, longest: s?.longest ?? 0, lastDay: "", freezes: s?.freezes ?? 0 };
+  }
   if (s.lastDay === today || s.lastDay === yesterdayKey(today)) return s;
-  return { current: 0, longest: s.longest ?? s.current ?? 0, lastDay: s.lastDay };
+  // Perdeu 1 dia? Tenta escudo.
+  const saved = applyFreezeIfPossible(s, today);
+  if (saved) return saved;
+  // Streak quebrado.
+  return {
+    current: 0,
+    longest: s.longest ?? s.current ?? 0,
+    lastDay: s.lastDay,
+    freezes: s.freezes ?? 0,
+    milestonesReached: s.milestonesReached ?? [],
+    history: pruneHistory(s.history),
+    lastFreezeUsedOn: s.lastFreezeUsedOn,
+  };
 }
 export function getStreak(): Streak {
   const s = computeStreak();
   // Punição por streak quebrado — aplicada uma vez por lastDay perdido.
   maybePenalizeBrokenStreak(s);
-  const key = `${s.current}|${s.longest}|${s.lastDay}|${s.startedOn ?? ""}`;
+  const key = `${s.current}|${s.longest}|${s.lastDay}|${s.startedOn ?? ""}|${s.freezes ?? 0}|${s.lastFreezeUsedOn ?? ""}|${(s.milestonesReached ?? []).join(",")}|${Object.keys(s.history ?? {}).length}`;
   if (key !== streakSnapshotKey) {
     streakSnapshotKey = key;
     streakSnapshot = s;
