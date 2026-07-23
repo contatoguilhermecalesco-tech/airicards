@@ -291,7 +291,7 @@ function BottomBar() {
       className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
     >
       <div className="glass-panel border-t safe-bottom">
-        <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1 px-2 pt-1.5">
+        <ul className="mx-auto grid max-w-3xl grid-cols-6 gap-1 px-2 pt-1.5">
           {items.map(({ to, label, icon: Icon, active }) => (
             <li key={to}>
               <Link
