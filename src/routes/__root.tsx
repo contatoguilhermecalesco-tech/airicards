@@ -386,6 +386,10 @@ function ProfileMenu() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useSocialSync();
+  useEffect(() => {
+    startActivityBridge();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
