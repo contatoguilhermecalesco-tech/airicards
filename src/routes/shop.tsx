@@ -878,13 +878,13 @@ function CosmeticCard({
   const v = visualFor(item);
   return (
     <li
-      className="relative overflow-hidden rounded-3xl border border-white/10 p-4"
+      className="group relative overflow-hidden rounded-3xl border border-white/10 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.6)]"
       style={{ background: "#1e1f22" }}
     >
       {/* Subtle glow */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
+        className="cosmetic-glow-pulse pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-30 blur-3xl transition-opacity duration-300 group-hover:opacity-60"
         style={{ background: v.ring }}
       />
 
