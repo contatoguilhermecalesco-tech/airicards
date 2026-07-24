@@ -234,7 +234,9 @@ async function fetchAll() {
 export function startSocialSync() {
   if (started) return;
   started = true;
-  fetchAll().catch(() => {});
+  fetchAll()
+    .then(() => runDuelMaintenance())
+    .catch(() => {});
 
   channel = supabase
     .channel("social-sync")
@@ -244,6 +246,13 @@ export function startSocialSync() {
     .on("postgres_changes", { event: "*", schema: "public", table: "activity_events" }, () => fetchAll())
     .on("postgres_changes", { event: "*", schema: "public", table: "activity_reactions" }, () => fetchAll())
     .subscribe();
+
+  // Verifica prazos a cada 5 minutos.
+  if (typeof window !== "undefined") {
+    setInterval(() => {
+      runDuelMaintenance().catch(() => {});
+    }, 5 * 60_000);
+  }
 }
 
 export function useSocialSync() {
