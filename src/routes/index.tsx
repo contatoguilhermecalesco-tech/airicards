@@ -250,6 +250,16 @@ function Home() {
                   cx="52" cy="52" r={RING_R}
                   stroke="rgba(255,255,255,0.07)" strokeWidth="9" fill="none"
                 />
+                {/* Pending faint arc (cartas voltando) */}
+                {pendingPct > 0 && (
+                  <circle
+                    cx="52" cy="52" r={RING_R}
+                    stroke="rgba(167,139,250,0.22)" strokeWidth="9" fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={`${ringC * pendingPct} ${ringC}`}
+                    strokeDashoffset={-ringC * reviewedPct}
+                  />
+                )}
                 <circle
                   cx="52" cy="52" r={RING_R}
                   stroke="url(#ringGrad)" strokeWidth="9" fill="none"
@@ -266,6 +276,7 @@ function Home() {
                     <stop offset="100%" stopColor="#7C6BD8" />
                   </linearGradient>
                 </defs>
+
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <p className="text-xl font-semibold leading-none tabular-nums text-foreground">
