@@ -152,7 +152,9 @@ function MarketplacePage() {
       )}
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        <label className="relative flex flex-1 min-w-[220px] items-center">
+        {/* Busca: flex-1 + min-w-0 permite encolher em telas <360px sem
+            estourar o container pai; em ≥sm, ganha espaço junto dos filtros. */}
+        <label className="relative flex min-w-0 flex-1 basis-full items-center sm:basis-[220px]">
           <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" strokeWidth={2.25} />
           <input
             value={q}
