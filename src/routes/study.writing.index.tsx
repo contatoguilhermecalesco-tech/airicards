@@ -167,6 +167,8 @@ function WritingPage() {
       {feedback && (
         <FeedbackView
           feedback={feedback}
+          originalText={text}
+          prompt={prompt}
           onRestart={() => {
             setFeedback(null);
           }}
@@ -183,10 +185,14 @@ function WritingPage() {
 
 function FeedbackView({
   feedback,
+  originalText,
+  prompt,
   onRestart,
   onNew,
 }: {
   feedback: WritingFeedback;
+  originalText: string;
+  prompt: string;
   onRestart: () => void;
   onNew: () => void;
 }) {
