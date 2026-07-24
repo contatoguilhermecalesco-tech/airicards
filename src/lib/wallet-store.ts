@@ -78,8 +78,8 @@ export async function loadWallet(profileId: string, force = false) {
     if (data) {
       state = normalize(data as unknown as WalletRow, profileId);
     } else {
-      // First login: create wallet with welcome bonus
-      const { data: created } = await supabase
+      // First login: try to create wallet with welcome bonus.
+      const { data: created, error: insertErr } = await supabase
         .from("wallets")
         .insert({
           profile_id: profileId,
@@ -88,9 +88,16 @@ export async function loadWallet(profileId: string, force = false) {
         })
         .select("profile_id, crystals, inventory")
         .maybeSingle();
-      state = created
-        ? normalize(created as unknown as WalletRow, profileId)
-        : { ...empty(profileId), crystals: WELCOME_BONUS, loaded: true };
+      if (insertErr || !created) {
+        // BUGFIX: antes fingíamos que o usuário tinha WELCOME_BONUS mesmo
+        // quando o insert falhava (ex.: RLS bloqueou porque o perfil ainda
+        // não foi vinculado). Isso mostrava saldo fantasma. Agora paramos
+        // em estado zerado e `loaded=true` só se o insert deu certo.
+        if (insertErr) console.error("[airi] wallet insert failed", insertErr);
+        state = empty(profileId);
+      } else {
+        state = normalize(created as unknown as WalletRow, profileId);
+      }
     }
     emit();
   })();
