@@ -744,7 +744,10 @@ function DiscordAvatar({
   showDecoration: boolean;
   initial?: string;
 }) {
+  const profile = useCurrentProfile();
+  const avatarUrl = useProfileAvatar(profile?.id);
   const inner = size - (showDecoration ? 10 : 0);
+  const displayInitial = profile?.name?.charAt(0)?.toUpperCase() ?? initial;
   return (
     <div
       className="relative grid place-items-center"
@@ -773,16 +776,20 @@ function DiscordAvatar({
         </>
       )}
       <div
-        className="relative grid place-items-center rounded-full text-white font-semibold"
+        className="relative grid place-items-center overflow-hidden rounded-full text-white font-semibold"
         style={{
           width: inner,
           height: inner,
-          background: "linear-gradient(135deg,#5865f2 0%,#7c3aed 100%)",
+          background: avatarUrl ? "#000" : "linear-gradient(135deg,#5865f2 0%,#7c3aed 100%)",
           fontSize: inner * 0.42,
           boxShadow: showDecoration ? `0 0 12px ${ring}55` : "none",
         }}
       >
-        {initial}
+        {avatarUrl ? (
+          <img src={avatarUrl} alt="" draggable={false} className="h-full w-full object-cover" />
+        ) : (
+          displayInitial
+        )}
       </div>
       <span
         className="absolute rounded-full border-2"
