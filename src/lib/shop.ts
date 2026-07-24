@@ -59,7 +59,7 @@ async function logPurchase(row: {
   price_paid: number;
   payload?: Record<string, unknown>;
 }) {
-  await supabase.from("shop_purchases").insert(row);
+  await supabase.from("shop_purchases").insert(row as never);
 }
 
 export async function buyShopItem(profileId: string, item: ShopItem): Promise<BuyResult> {
