@@ -215,6 +215,46 @@
   text-wrap: balance;
 }
 
+/* Tipografia fluida — títulos que escalam por clamp() em vez de
+   quebras bruscas nos breakpoints. Base: mobile 22px → desktop 40px. */
+@utility h-display {
+  font-size: clamp(1.5rem, 1.1rem + 2vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+@utility h-title {
+  font-size: clamp(1.15rem, 0.95rem + 1vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Container queries: cards que reagem ao próprio pai (ex.: grade
+   biblioteca) em vez de ao viewport global. Evita que 2 colunas
+   fiquem esmagadas em telas dobráveis / tablets em modo retrato. */
+@utility card-cq {
+  container-type: inline-size;
+}
+
+/* Hover-safe: só ativa efeitos custosos em ponteiros reais.
+   Uso: <a className="hover-safe:hover:bg-white/10">…</a>
+   Em toques, o hover fica preso após o tap — este guard evita isso. */
+@custom-variant hover-safe (@media (hover: hover) and (pointer: fine));
+
+/* Scroll horizontal controlado (para trilhas de chips/tabs).
+   Esconde a barra de rolagem em iOS mas mantém a rolagem suave e
+   evita o clássico "scroll horizontal fantasma" no body. */
+@utility scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
 #lovable-badge {
   display: none !important;
 }
