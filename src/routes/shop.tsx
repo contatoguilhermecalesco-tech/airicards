@@ -534,7 +534,8 @@ function DeckCard({
       <div className="mt-4 flex items-center justify-between">
         <span className="inline-flex items-center gap-1 text-base font-semibold text-violet-200">
           <Gem className="h-4 w-4" strokeWidth={2.25} />
-          {deck.price}
+          {deck.price}{" "}
+          <span className="text-[11px] font-medium text-muted-foreground">Arlys ✦</span>
         </span>
         <button
           onClick={onBuy}
