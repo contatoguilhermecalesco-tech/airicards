@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Gift,
   Sparkles,
@@ -15,20 +15,27 @@ import {
   Trophy,
   HelpCircle,
   Flame,
+  BarChart3,
+  GraduationCap,
+  Skull,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
   useSentGifts,
   useActivityFeed,
+  useUnifiedFeed,
+  useReactionsForEvent,
+  toggleReaction,
   useDuelScore,
   useWeeklyDuel,
   otherProfile,
   profileMeta,
   type ProfileId,
+  type ActivityEvent,
 } from "@/lib/social-store";
+import { startSocialStatsSync } from "@/lib/social-stats";
 import { GiftInbox } from "@/components/GiftInbox";
-import { PresenceCard } from "@/components/PresenceCard";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/social")({
