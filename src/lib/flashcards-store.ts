@@ -394,7 +394,7 @@ export function updateCard(
     }),
   };
   emit();
-  scheduleSave();
+  void flushSave();
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";
