@@ -39,16 +39,16 @@ import { listPublishedDecks, type PublishedDeckRow } from "@/lib/marketplace";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Loja airi — Lumens ✦" },
+      { title: "Loja airi — Arlys ✦" },
       {
         name: "description",
         content:
-          "Troque Lumens por decks premium, packs temáticos, cosméticos e power-ups. Ganhe Lumens mantendo streak, subindo de rank e vencendo duelos.",
+          "Troque Arlys por decks premium, packs temáticos, cosméticos e power-ups. Ganhe Arlys mantendo streak, subindo de rank e vencendo duelos.",
       },
-      { property: "og:title", content: "Loja airi — Lumens ✦" },
+      { property: "og:title", content: "Loja airi — Arlys ✦" },
       {
         property: "og:description",
-        content: "Lumens: a economia do seu inglês.",
+        content: "Arlys: a economia do seu inglês.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -150,7 +150,7 @@ function ShopPage() {
       toast(
         "err",
         r.reason === "insufficient"
-          ? "Lumens insuficientes."
+          ? "Arlys insuficientes."
           : r.reason === "already_owned"
             ? "Você já tem este item."
             : "Não foi possível comprar.",
@@ -168,7 +168,7 @@ function ShopPage() {
     } else {
       toast(
         "err",
-        r.reason === "insufficient" ? "Lumens insuficientes." : "Não foi possível comprar.",
+        r.reason === "insufficient" ? "Arlys insuficientes." : "Não foi possível comprar.",
       );
     }
   }
@@ -192,10 +192,10 @@ function ShopPage() {
               Loja airi
             </p>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Troque Lumens por conquistas
+              Troque Arlys por conquistas
             </h1>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              Ganhe Lumens ✦ mantendo streak, subindo de rank e vencendo duelos. Gaste em decks
+              Ganhe Arlys ✦ mantendo streak, subindo de rank e vencendo duelos. Gaste em decks
               premium, packs, cosméticos e power-ups.
             </p>
             <button
@@ -214,7 +214,7 @@ function ShopPage() {
               </p>
               <p className="text-lg font-semibold tabular-nums">
                 {wallet.crystals}{" "}
-                <span className="text-[11px] font-medium text-muted-foreground">Lumens ✦</span>
+                <span className="text-[11px] font-medium text-muted-foreground">Arlys ✦</span>
               </p>
             </div>
           </div>
@@ -305,7 +305,7 @@ function ShopPage() {
       </section>
 
       <p className="mt-8 text-center text-[11px] text-muted-foreground">
-        Como ganhar Lumens? Streak diário, subir de rank, vencer duelos, tirar boas notas na prova
+        Como ganhar Arlys? Streak diário, subir de rank, vencer duelos, tirar boas notas na prova
         mensal.
       </p>
 
@@ -335,16 +335,16 @@ function HelpDialog({ onClose }: { onClose: () => void }) {
           </button>
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-200">
             <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Lumens ✦
+            Arlys ✦
           </p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">Como funciona a Loja</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sua consistência em inglês vira Lumens. Gaste em decks, cosméticos e power-ups.
+            Sua consistência em inglês vira Arlys. Gaste em decks, cosméticos e power-ups.
           </p>
         </div>
 
         <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
-          <Section title="1 · Como ganhar Lumens" tone="violet">
+          <Section title="1 · Como ganhar Arlys" tone="violet">
             <RewardRow
               icon={<Flame className="h-4 w-4" strokeWidth={2.5} />}
               label="Streak diário"
@@ -375,7 +375,7 @@ function HelpDialog({ onClose }: { onClose: () => void }) {
               icon={<Star className="h-4 w-4" strokeWidth={2.5} />}
               label="Prova mensal"
               value="+120 a +160 ✦"
-              hint="Quanto melhor a nota, mais Lumens."
+              hint="Quanto melhor a nota, mais Arlys."
               accent="emerald"
             />
           </Section>
@@ -394,7 +394,7 @@ function HelpDialog({ onClose }: { onClose: () => void }) {
             <Tile
               icon={<Shield className="h-4 w-4" strokeWidth={2.5} />}
               title="Power-ups"
-              text="Escudo de streak, congelamento inimigo, boost de revisão e Dobrador de Lumens."
+              text="Escudo de streak, congelamento inimigo, boost de revisão e Dobrador de Arlys."
             />
           </Section>
 
@@ -546,7 +546,7 @@ function DeckCard({
           ) : canAfford ? (
             "Comprar"
           ) : (
-            "Sem Lumens"
+            "Sem Arlys"
           )}
         </button>
       </div>
@@ -609,7 +609,7 @@ function ItemCard({
           ) : canAfford ? (
             "Comprar"
           ) : (
-            "Sem Lumens"
+            "Sem Arlys"
           )}
         </button>
       </div>

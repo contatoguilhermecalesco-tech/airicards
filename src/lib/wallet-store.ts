@@ -1,4 +1,4 @@
-// Lumens ✦ — moeda virtual do app. Sincronizada via Supabase (tabela `wallets`).
+// Arlys ✦ — moeda virtual do app. Sincronizada via Supabase (tabela `wallets`).
 // Foco em consistência: ganho vem de streak, rank, duelos e exames.
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";

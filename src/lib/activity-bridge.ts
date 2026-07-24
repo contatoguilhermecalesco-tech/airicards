@@ -1,4 +1,4 @@
-// Emite activity_events a partir dos eventos internos existentes, e concede Lumens ✦.
+// Emite activity_events a partir dos eventos internos existentes, e concede Arlys ✦.
 import { onRankPromotion } from "@/lib/rank-store";
 import { onStreakMilestone } from "@/lib/flashcards-store";
 import { getCurrentProfile } from "@/lib/profile";
