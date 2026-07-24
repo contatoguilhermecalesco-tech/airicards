@@ -29,6 +29,7 @@ import {
 } from "@/lib/social-store";
 import { GiftInbox } from "@/components/GiftInbox";
 import { PresenceCard } from "@/components/PresenceCard";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/social")({
   head: () => ({
