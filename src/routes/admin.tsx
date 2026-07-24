@@ -1168,12 +1168,25 @@ function ChangelogSection() {
     <section className="space-y-4">
       {/* Editorial header — same language as /novidades */}
       <div className="flex items-center gap-3">
-        <span className="h-4 w-1 rounded-sm bg-primary" />
+        <span
+          className="h-4 w-1 rounded-sm"
+          style={{ backgroundColor: isEditing ? activeMeta.color : undefined }}
+        />
         <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
-          Publicar patch notes
+          {isEditing ? "Editando patch" : "Publicar patch notes"}
         </h2>
         <div className="h-px flex-1 bg-white/[0.06]" />
+        {isEditing && (
+          <button
+            onClick={resetForm}
+            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.2em] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground"
+          >
+            <X className="h-3 w-3" strokeWidth={2.5} />
+            Cancelar
+          </button>
+        )}
       </div>
+
 
       {/* LIVE PREVIEW — mirrors the /novidades hero */}
       <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#0a0a0f]">
