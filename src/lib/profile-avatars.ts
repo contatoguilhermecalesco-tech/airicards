@@ -3,7 +3,7 @@
 // wallet-store so UI updates instantly when they upload a new photo.
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { subscribeWallet, loadWallet } from "@/lib/wallet-store";
+import { subscribeWallet, getWallet } from "@/lib/wallet-store";
 
 type Cache = Record<string, string | null>;
 const cache: Cache = {};
