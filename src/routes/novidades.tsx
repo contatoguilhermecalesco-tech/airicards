@@ -229,10 +229,18 @@ function NovidadesPage() {
 
                       <div className="mt-6 flex items-center gap-3">
                         <div
-                          className="h-[3px] flex-1 max-w-[120px] rounded-full"
+                          className="h-[3px] flex-1 max-w-[80px] rounded-full"
                           style={{ backgroundColor: featuredMeta.color }}
                         />
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50 transition group-hover:text-foreground">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] transition group-hover:-translate-y-0.5"
+                          style={{
+                            borderColor: `${featuredMeta.color}66`,
+                            color: featuredMeta.color,
+                            backgroundColor: `${featuredMeta.color}1a`,
+                            boxShadow: `0 8px 24px -12px ${featuredMeta.color}88`,
+                          }}
+                        >
                           Ler notas completas
                           <ArrowUpRight
                             className="h-3.5 w-3.5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -240,6 +248,7 @@ function NovidadesPage() {
                           />
                         </span>
                       </div>
+
                     </div>
                   </div>
                 </Link>
