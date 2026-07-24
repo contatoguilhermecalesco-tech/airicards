@@ -669,7 +669,7 @@ function PerfilPage() {
       {partner && (
         <section className="mt-6">
           <Link
-            to="/perfil_/$id"
+            to="/perfil/$id"
             params={{ id: partner.id }}
             className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:bg-white/[0.05]"
           >
