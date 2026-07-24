@@ -355,3 +355,48 @@
   animation: defeat-ring 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+
+/* ---- Cosmetic (Discord-style) animations ---- */
+@keyframes cosmetic-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes cosmetic-shimmer {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  60%, 100% { transform: translateX(220%) skewX(-18deg); }
+}
+@keyframes cosmetic-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes cosmetic-pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.1); }
+}
+@keyframes cosmetic-banner-pan {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes cosmetic-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.6); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@utility cosmetic-ring-spin {
+  animation: cosmetic-spin 8s linear infinite;
+}
+@utility cosmetic-avatar-float {
+  animation: cosmetic-float 3.2s ease-in-out infinite;
+}
+@utility cosmetic-glow-pulse {
+  animation: cosmetic-pulse-glow 2.8s ease-in-out infinite;
+}
+@utility cosmetic-banner-animated {
+  background-size: 200% 200%;
+  animation: cosmetic-banner-pan 6s linear infinite;
+}
+@utility cosmetic-shimmer {
+  animation: cosmetic-shimmer 3.5s ease-in-out infinite;
+}
+@utility cosmetic-sparkle {
+  animation: cosmetic-sparkle 2.2s ease-in-out infinite;
+}
