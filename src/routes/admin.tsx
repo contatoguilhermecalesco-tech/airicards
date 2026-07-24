@@ -3,20 +3,29 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Bell,
+  Bell as BellIcon,
+  Coins,
+  Crown,
+  GraduationCap,
+  KeyRound,
   Loader2,
   LogOut,
   Plus,
   RefreshCw,
   RotateCcw,
+  ScrollText,
   Send,
   Shield,
   Sparkles,
+  Swords,
   Tag as TagIcon,
   Trash2,
   Pencil,
+  Users,
   X,
   Wand2,
   Wrench,
+  ChevronRight,
 } from "lucide-react";
 import {
   createChangelogEntry,
@@ -73,6 +82,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import {
   createNotification,
   createTag,
   deleteNotification,
@@ -121,11 +138,46 @@ function AdminGate() {
   return <AdminPage />;
 }
 
+type PanelKey =
+  | "sessions"
+  | "rank-self"
+  | "rank-all"
+  | "exam"
+  | "arlys"
+  | "duels"
+  | "pin"
+  | "tags"
+  | "notifications"
+  | "changelog";
+
+type PanelDef = {
+  key: PanelKey;
+  label: string;
+  hint: string;
+  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  color: string;
+  wide?: boolean;
+};
+
+const ADMIN_PANELS: PanelDef[] = [
+  { key: "sessions", label: "Sessões", hint: "Zerar contadores por perfil", Icon: Users, color: "#a78bfa" },
+  { key: "rank-self", label: "Meu rank", hint: "Ver / zerar o seu progresso", Icon: Crown, color: "#f5b301" },
+  { key: "rank-all", label: "Ranks", hint: "Overview de todos os perfis", Icon: Trophy, color: "#fb923c" },
+  { key: "exam", label: "Provas", hint: "Habilitar e resetar prova mensal", Icon: GraduationCap, color: "#22d3ee" },
+  { key: "arlys", label: "Arlys ✦", hint: "Conceder / ajustar saldo", Icon: Coins, color: "#e879f9" },
+  { key: "duels", label: "Duelos", hint: "Encerrar por WO / cancelar", Icon: Swords, color: "#f87171", wide: true },
+  { key: "pin", label: "PIN", hint: "Redefinir / desvincular perfis", Icon: KeyRound, color: "#94a3b8" },
+  { key: "tags", label: "Tags", hint: "Criar tags de notificação", Icon: TagIcon, color: "#60a5fa" },
+  { key: "notifications", label: "Notificações", hint: "Enviar avisos e alertas", Icon: BellIcon, color: "#34d399" },
+  { key: "changelog", label: "Patch notes", hint: "Publicar / editar novidades", Icon: ScrollText, color: "#c084fc", wide: true },
+];
+
 function AdminPage() {
   const [rows, setRows] = useState<ProfileSessionInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [openPanel, setOpenPanel] = useState<PanelKey | null>(null);
 
   async function load() {
     setLoading(true);
@@ -169,6 +221,8 @@ function AdminPage() {
     }
   }
 
+  const activePanel = ADMIN_PANELS.find((p) => p.key === openPanel) ?? null;
+
   return (
     <main className="mx-auto max-w-3xl px-5 pt-8 pb-24 sm:pt-14">
       <div className="mb-6 flex items-center justify-between">
@@ -179,7 +233,7 @@ function AdminPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Admin</h1>
             <p className="text-sm text-muted-foreground">
-              Sessões, tags e notificações
+              Painel de controle
             </p>
           </div>
         </div>
@@ -192,90 +246,106 @@ function AdminPage() {
         </Link>
       </div>
 
-      <section className="ios-card rounded-3xl p-4 sm:p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-            Perfis
-          </h2>
+      {/* Grid compacto de tiles — cada tile abre um modal com o painel completo */}
+      <section className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+        {ADMIN_PANELS.map((p) => (
           <button
-            onClick={() => void load()}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            key={p.key}
+            onClick={() => setOpenPanel(p.key)}
+            className="group relative flex min-h-[92px] flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 text-left transition hover:border-white/15 hover:bg-white/[0.05] active:scale-[0.98]"
           >
-            <RefreshCw className="h-3.5 w-3.5" strokeWidth={2.25} />
-            Atualizar
-          </button>
-        </div>
-
-        {loading ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            Carregando…
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {merged.map((r) => (
-              <li
-                key={r.profileId}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3"
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-70"
+              style={{ background: `linear-gradient(90deg, transparent, ${p.color}66, transparent)` }}
+            />
+            <div className="flex items-center justify-between">
+              <span
+                className="grid h-8 w-8 place-items-center rounded-xl border"
+                style={{
+                  backgroundColor: `${p.color}18`,
+                  borderColor: `${p.color}3d`,
+                  color: p.color,
+                }}
               >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    aria-hidden
-                    className="h-10 w-10 shrink-0 rounded-full ring-1 ring-white/10"
-                    style={{ backgroundImage: gradientFor(r.profileId) }}
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">
-                      {nameFor(r.profileId)}
-                    </p>
-                    <p className="text-xs text-muted-foreground tabular-nums">
-                      {r.count} sessões
-                      {" · "}
-                      {r.reviewed} revisadas
-                      {r.day ? ` · ${r.day}` : ""}
-                    </p>
-
-                  </div>
-                </div>
-                <button
-                  disabled={busyId === r.profileId}
-                  onClick={() => setConfirmId(r.profileId)}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 disabled:opacity-50"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
-                  Zerar
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+                <p.Icon className="h-4 w-4" strokeWidth={2.25} />
+              </span>
+              <ChevronRight className="h-3.5 w-3.5 text-foreground/25 transition group-hover:translate-x-0.5 group-hover:text-foreground/60" strokeWidth={2.5} />
+            </div>
+            <div className="mt-2">
+              <p className="text-[13px] font-semibold tracking-tight text-foreground">
+                {p.label}
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-[10.5px] leading-snug text-foreground/45">
+                {p.hint}
+              </p>
+            </div>
+          </button>
+        ))}
       </section>
 
-      <div className="h-6" />
-      <ProfilesRankOverview />
+      {/* Modal genérico — conteúdo depende do painel ativo */}
+      <Dialog
+        open={openPanel !== null}
+        onOpenChange={(o) => !o && setOpenPanel(null)}
+      >
+        <DialogContent
+          className={cn(
+            "gap-3 p-0 sm:max-w-2xl",
+            activePanel?.wide && "sm:max-w-3xl",
+          )}
+        >
+          {activePanel && (
+            <>
+              <DialogHeader className="border-b border-white/[0.06] px-5 pb-3 pt-5">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border"
+                    style={{
+                      backgroundColor: `${activePanel.color}18`,
+                      borderColor: `${activePanel.color}3d`,
+                      color: activePanel.color,
+                    }}
+                  >
+                    <activePanel.Icon className="h-4 w-4" strokeWidth={2.25} />
+                  </span>
+                  <div className="min-w-0 flex-1 pr-8 text-left">
+                    <DialogTitle className="truncate text-[15px] font-semibold">
+                      {activePanel.label}
+                    </DialogTitle>
+                    <DialogDescription className="mt-0.5 truncate text-[11.5px] text-foreground/50">
+                      {activePanel.hint}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
 
-      <div className="h-6" />
-      <ExamAdminSection />
-
-      <div className="h-6" />
-      <ArlysAdminSection />
-
-      <div className="h-6" />
-      <DuelsAdminSection />
-
-      <div className="h-6" />
-      <PinAdminSection />
-
-      <div className="h-6" />
-      <TagsSection />
-
-      <div className="h-6" />
-      <NotificationsSection />
-
-      <div className="h-6" />
-      <ChangelogSection />
-
-
-
+              <div className="px-5 pb-5">
+                {openPanel === "sessions" && (
+                  <SessionsPanel
+                    merged={merged}
+                    loading={loading}
+                    load={load}
+                    busyId={busyId}
+                    onAskReset={setConfirmId}
+                    nameFor={nameFor}
+                    gradientFor={gradientFor}
+                  />
+                )}
+                {openPanel === "rank-self" && <RankAdminSection />}
+                {openPanel === "rank-all" && <ProfilesRankOverview />}
+                {openPanel === "exam" && <ExamAdminSection />}
+                {openPanel === "arlys" && <ArlysAdminSection />}
+                {openPanel === "duels" && <DuelsAdminSection />}
+                {openPanel === "pin" && <PinAdminSection />}
+                {openPanel === "tags" && <TagsSection />}
+                {openPanel === "notifications" && <NotificationsSection />}
+                {openPanel === "changelog" && <ChangelogSection />}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog
         open={confirmId !== null}
@@ -288,7 +358,6 @@ function AdminPage() {
               O contador de sessões de{" "}
               <strong>{confirmId ? nameFor(confirmId) : ""}</strong> volta para
               zero. As cartas em si não são afetadas.
-
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -301,9 +370,81 @@ function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <RankAdminSection />
     </main>
+  );
+}
+
+function SessionsPanel({
+  merged,
+  loading,
+  load,
+  busyId,
+  onAskReset,
+  nameFor,
+  gradientFor,
+}: {
+  merged: ProfileSessionInfo[];
+  loading: boolean;
+  load: () => void;
+  busyId: string | null;
+  onAskReset: (id: string) => void;
+  nameFor: (id: string) => string;
+  gradientFor: (id: string) => string;
+}) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center justify-end">
+        <button
+          onClick={() => void load()}
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-muted-foreground transition hover:bg-accent hover:text-foreground"
+        >
+          <RefreshCw className="h-3.5 w-3.5" strokeWidth={2.25} />
+          Atualizar
+        </button>
+      </div>
+
+      {loading ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">
+          Carregando…
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {merged.map((r) => (
+            <li
+              key={r.profileId}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] px-4 py-3"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  aria-hidden
+                  className="h-10 w-10 shrink-0 rounded-full ring-1 ring-white/10"
+                  style={{ backgroundImage: gradientFor(r.profileId) }}
+                />
+                <div className="min-w-0">
+                  <p className="truncate font-medium">
+                    {nameFor(r.profileId)}
+                  </p>
+                  <p className="text-xs text-muted-foreground tabular-nums">
+                    {r.count} sessões
+                    {" · "}
+                    {r.reviewed} revisadas
+                    {r.day ? ` · ${r.day}` : ""}
+                  </p>
+                </div>
+              </div>
+              <button
+                disabled={busyId === r.profileId}
+                onClick={() => onAskReset(r.profileId)}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 disabled:opacity-50"
+              >
+                <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Zerar
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -1648,7 +1789,7 @@ import {
   type AdminDuelRow,
 } from "@/lib/admin-actions";
 import { loadWallet, currentProfileForWallet } from "@/lib/wallet-store";
-import { Coins, Gem, Minus, Swords, X as XIcon, Trophy } from "lucide-react";
+import { Gem, Minus, X as XIcon, Trophy } from "lucide-react";
 
 const QUICK_GRANTS = [50, 100, 250, 500, 1000];
 
