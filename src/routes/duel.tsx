@@ -110,12 +110,13 @@ function DuelPage() {
               className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3.5"
             >
               <div className="flex items-center gap-2.5">
-                <div
-                  className="grid h-9 w-9 place-items-center rounded-full text-[13px] font-semibold text-white"
-                  style={{ background: p.gradient }}
-                >
-                  {p.initial}
-                </div>
+                <ProfileAvatar
+                  profileId={p.id}
+                  initial={p.initial}
+                  gradient={p.gradient}
+                  size={36}
+                  fontScale={0.36}
+                />
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     Vitórias
