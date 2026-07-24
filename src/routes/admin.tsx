@@ -24,6 +24,8 @@ import {
   type ChangelogCategory,
 } from "@/lib/changelog-store";
 import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
+import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
+
 import {
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
