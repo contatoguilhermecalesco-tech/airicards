@@ -239,7 +239,28 @@ function SettingsPage() {
         )}
       </Group>
 
+      {/* About */}
+      <Group label="Sobre o app">
+        <Link to="/novidades" className="block">
+          <Row
+            icon={<Sparkles className="h-4 w-4" strokeWidth={2.25} />}
+            title="Novidades"
+            subtitle="Veja o que chegou de novo no airi."
+          >
+            <div className="flex items-center gap-2">
+              {unreadNews > 0 && (
+                <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">
+                  {unreadNews}
+                </span>
+              )}
+              <ChevronRight className="h-4 w-4 text-foreground/40" strokeWidth={2.25} />
+            </div>
+          </Row>
+        </Link>
+      </Group>
+
       <div className="mt-4 flex items-center justify-between px-1">
+
         <p className="text-[11px] text-foreground/45">
           Preferências salvas neste dispositivo.
         </p>
