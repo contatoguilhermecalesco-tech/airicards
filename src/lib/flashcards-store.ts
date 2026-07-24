@@ -312,7 +312,8 @@ export function deleteDeck(id: string) {
     cards: state.cards.filter((c) => c.deckId !== id),
   };
   emit();
-  scheduleSave();
+  // Persistência imediata — evita eco/pull que "traz" o deck de volta.
+  void flushSave();
 }
 
 export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "description" | "color">>) {
