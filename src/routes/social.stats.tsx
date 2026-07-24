@@ -218,12 +218,15 @@ function PlayerHeader({
         style={{ background: profile.gradient }}
       />
       <div className="relative flex items-center gap-3">
-        <div
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-[16px] font-bold text-white shadow-lg"
-          style={{ background: profile.gradient }}
-        >
-          {profile.initial}
-        </div>
+        <ProfileAvatar
+          profileId={profile.id}
+          initial={profile.initial}
+          gradient={profile.gradient}
+          size={44}
+          radius={16}
+          fontScale={0.36}
+          className="shadow-lg"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold text-foreground">
             {profile.name}
