@@ -8,6 +8,7 @@ import {
   type Profile,
   type ProfileMeta,
 } from "@/lib/profile";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import airiLogo from "@/assets/airi-horizontal.png.asset.json";
 
 const HEADING_FONT = { fontFamily: "'Sora', 'Inter', sans-serif" };
@@ -158,12 +159,15 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
                 i > 0 ? "border-t border-white/[0.06]" : ""
               }`}
             >
-              <span
-                aria-hidden
-                className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
-                style={{ backgroundImage: p.gradient, ...HEADING_FONT }}
-              >
-                {initial}
+              <span aria-hidden className="relative">
+                <ProfileAvatar
+                  profileId={p.id}
+                  initial={initial}
+                  gradient={p.gradient}
+                  size={48}
+                  fontScale={0.36}
+                  ring="rgba(255,255,255,0.15)"
+                />
                 {meta?.hasPin && (
                   <span
                     aria-hidden
@@ -330,13 +334,16 @@ function PinPad({
       <div className="flex flex-col items-center">
         <Logo size="md" />
 
-        <span
-          aria-hidden
-          className="mt-10 grid h-[76px] w-[76px] place-items-center rounded-full text-[24px] font-semibold text-white ring-1 ring-inset ring-white/15"
-          style={{ backgroundImage: profile.gradient, ...HEADING_FONT }}
-        >
-          {initial}
-        </span>
+        <div className="mt-10">
+          <ProfileAvatar
+            profileId={profile.id}
+            initial={initial}
+            gradient={profile.gradient}
+            size={76}
+            fontScale={0.32}
+            ring="rgba(255,255,255,0.15)"
+          />
+        </div>
         <h1
           className="mt-5 text-center text-[24px] font-semibold tracking-tight text-white"
           style={HEADING_FONT}
@@ -476,13 +483,15 @@ function ProfileLoading({ profile }: { profile: Profile }) {
     >
       <div className="flex w-full max-w-sm flex-col items-center">
         <Logo size="md" />
-        <span
-          aria-hidden
-          className="mt-10 grid h-16 w-16 place-items-center rounded-full text-xl font-semibold text-white"
-          style={{ backgroundImage: profile.gradient, ...HEADING_FONT }}
-        >
-          {profile.name.charAt(0).toUpperCase()}
-        </span>
+        <div className="mt-10">
+          <ProfileAvatar
+            profileId={profile.id}
+            initial={profile.name.charAt(0).toUpperCase()}
+            gradient={profile.gradient}
+            size={64}
+            fontScale={0.32}
+          />
+        </div>
         <div className="mt-6 h-[2px] w-32 overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full w-1/3 rounded-full bg-white/70"

@@ -45,6 +45,7 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -835,13 +836,14 @@ function PerfilPage() {
             params={{ id: partner.id }}
             className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:bg-white/[0.05]"
           >
-            <span
-              aria-hidden
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
-              style={{ backgroundImage: partner.gradient }}
-            >
-              {partner.name.charAt(0).toUpperCase()}
-            </span>
+            <ProfileAvatar
+              profileId={partner.id}
+              initial={partner.name.charAt(0).toUpperCase()}
+              gradient={partner.gradient}
+              size={48}
+              fontScale={0.36}
+              ring="rgba(255,255,255,0.15)"
+            />
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
                 Perfil do parceiro

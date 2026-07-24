@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Gift, Check, X, Sparkles } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
@@ -65,12 +66,13 @@ export function GiftInbox() {
               className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4"
             >
               <div className="flex items-start gap-3">
-                <div
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[13px] font-semibold text-white"
-                  style={{ background: sender.gradient }}
-                >
-                  {sender.initial}
-                </div>
+                <ProfileAvatar
+                  profileId={g.fromProfile}
+                  initial={sender.initial}
+                  gradient={sender.gradient}
+                  size={36}
+                  fontScale={0.36}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     De {sender.name} · <Sparkles className="inline h-3 w-3" /> nova carta

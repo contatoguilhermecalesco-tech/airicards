@@ -51,6 +51,10 @@ function subscribe(cb: () => void) {
   };
 }
 
+export function subscribeWallet(cb: () => void) {
+  return subscribe(cb);
+}
+
 export function useWallet(): WalletState {
   return useSyncExternalStore(subscribe, () => state, () => empty());
 }

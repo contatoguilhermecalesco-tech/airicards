@@ -19,6 +19,7 @@ import {
   GraduationCap,
   Skull,
 } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
@@ -340,7 +341,7 @@ function Fighter({
   winning,
   align,
 }: {
-  profile: { name: string; initial: string; gradient: string };
+  profile: { id: string; name: string; initial: string; gradient: string };
   score: number;
   winning: boolean;
   align: "left" | "right";
@@ -352,14 +353,15 @@ function Fighter({
       } sm:items-center`}
     >
       <div className="relative">
-        <div
-          className={`grid h-16 w-16 place-items-center rounded-3xl text-[22px] font-bold text-white shadow-lg transition ${
-            winning ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""
-          }`}
-          style={{ background: profile.gradient }}
-        >
-          {profile.initial}
-        </div>
+        <ProfileAvatar
+          profileId={profile.id}
+          initial={profile.initial}
+          gradient={profile.gradient}
+          size={64}
+          radius={22}
+          fontScale={0.34}
+          className={winning ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background shadow-lg" : "shadow-lg"}
+        />
         {winning && (
           <div className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-primary text-primary-foreground shadow">
             <Trophy className="h-3 w-3" strokeWidth={2.5} />
@@ -618,12 +620,14 @@ function FeedRow({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <div
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white shadow-sm"
-          style={{ background: actor.gradient }}
-        >
-          {actor.initial}
-        </div>
+        <ProfileAvatar
+          profileId={event.profileId}
+          initial={actor.initial}
+          gradient={actor.gradient}
+          size={36}
+          fontScale={0.36}
+          className="shadow-sm"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13.5px] font-medium text-foreground">
             {labelForEvent(event, actorName)}

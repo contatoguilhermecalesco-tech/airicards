@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle, TimerReset, ShieldAlert } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile, PROFILES } from "@/lib/profile";
 import { useStore } from "@/lib/flashcards-store";
 import {
@@ -109,12 +110,13 @@ function DuelPage() {
               className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3.5"
             >
               <div className="flex items-center gap-2.5">
-                <div
-                  className="grid h-9 w-9 place-items-center rounded-full text-[13px] font-semibold text-white"
-                  style={{ background: p.gradient }}
-                >
-                  {p.initial}
-                </div>
+                <ProfileAvatar
+                  profileId={p.id}
+                  initial={p.initial}
+                  gradient={p.gradient}
+                  size={36}
+                  fontScale={0.36}
+                />
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     Vitórias
@@ -274,12 +276,13 @@ function DuelPage() {
                   </div>
                   {winner ? (
                     <div className="flex items-center gap-1.5">
-                      <div
-                        className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold text-white"
-                        style={{ background: winner.gradient }}
-                      >
-                        {winner.initial}
-                      </div>
+                      <ProfileAvatar
+                        profileId={winner.id}
+                        initial={winner.initial}
+                        gradient={winner.gradient}
+                        size={24}
+                        fontScale={0.42}
+                      />
                       {wo ? (
                         <ShieldAlert className="h-3.5 w-3.5 text-amber-300" />
                       ) : (
@@ -356,12 +359,13 @@ function PlayerStatus({
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
       <div className="flex items-center gap-2">
-        <div
-          className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-semibold text-white"
-          style={{ background: profile.gradient }}
-        >
-          {profile.initial}
-        </div>
+        <ProfileAvatar
+          profileId={profile.id}
+          initial={profile.initial}
+          gradient={profile.gradient}
+          size={28}
+          fontScale={0.42}
+        />
         <p className="text-[12px] font-semibold text-foreground">
           {isMe ? "Você" : profile.name}
         </p>
