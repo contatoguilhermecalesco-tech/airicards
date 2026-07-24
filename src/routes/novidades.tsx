@@ -14,9 +14,16 @@ export const Route = createFileRoute("/novidades")({
   head: () => ({
     meta: [
       { title: "Novidades — airi" },
-      { name: "description", content: "Tudo o que chegou de novo no airi: novidades, melhorias e ajustes recentes." },
+      {
+        name: "description",
+        content:
+          "Tudo o que chegou de novo no airi: novidades, melhorias e ajustes recentes.",
+      },
       { property: "og:title", content: "Novidades do airi" },
-      { property: "og:description", content: "Descubra o que há de novo no seu app de estudo de inglês." },
+      {
+        property: "og:description",
+        content: "Descubra o que há de novo no seu app de estudo de inglês.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -33,7 +40,21 @@ const CATEGORY_META: Record<
   fix: { label: "Ajuste", color: "#34d399", Icon: Wrench },
 };
 
-function formatDate(iso: string) {
+function formatShortDate(iso: string) {
+  try {
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "short",
+    })
+      .format(new Date(iso))
+      .replace(".", "")
+      .toUpperCase();
+  } catch {
+    return "";
+  }
+}
+
+function formatLongDate(iso: string) {
   try {
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
@@ -66,50 +87,38 @@ function NovidadesPage() {
 
   useEffect(() => {
     void initChangelog().then(() => {
-      // marca como visto após ver a tela
       window.setTimeout(() => markAllChangelogSeen(), 600);
     });
   }, []);
 
-  const grouped = useMemo(() => groupByMonth(entries), [entries]);
+  const [featured, ...rest] = entries;
+  const grouped = useMemo(() => groupByMonth(rest), [rest]);
+  const featuredMeta = featured
+    ? CATEGORY_META[featured.category] ?? CATEGORY_META.feature
+    : null;
+  const featuredIsNew =
+    featured && new Date(featured.created_at).getTime() > lastSeen;
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
+    <main className="mx-auto max-w-2xl px-5 pb-24 pt-6 sm:px-8 sm:pt-10">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-3">
-        <Link
-          to="/"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/70 transition hover:bg-white/[0.06] hover:text-foreground"
-          aria-label="Voltar"
-        >
-          <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
-        </Link>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/50">
+      <header className="mb-8 flex flex-col gap-1 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <Link
+            to="/"
+            aria-label="Voltar"
+            className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
+          >
+            <ChevronLeft className="h-4 w-4" strokeWidth={2.25} />
+          </Link>
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">
             airi
-          </p>
-          <h1 className="text-[26px] font-semibold tracking-tight text-foreground">
-            Novidades
-          </h1>
+          </span>
         </div>
-      </div>
-
-      {/* Hero */}
-      <section className="mb-6 overflow-hidden rounded-3xl border border-white/[0.06] bg-gradient-to-br from-primary/[0.14] via-white/[0.02] to-transparent p-5">
-        <div className="flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/20 text-primary">
-            <Sparkles className="h-5 w-5" strokeWidth={2.25} />
-          </div>
-          <div>
-            <p className="text-[15px] font-semibold text-foreground">
-              O que há de novo
-            </p>
-            <p className="mt-0.5 text-[12px] text-foreground/60">
-              Melhorias, correções e recursos que chegaram ao seu app.
-            </p>
-          </div>
-        </div>
-      </section>
+        <h1 className="text-[30px] font-semibold tracking-tight text-foreground">
+          Novidades
+        </h1>
+      </header>
 
       {entries.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
@@ -121,78 +130,143 @@ function NovidadesPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-8">
-          {grouped.map(([month, list]) => (
-            <section key={month}>
-              <h2 className="mb-3 px-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/45">
-                {month}
-              </h2>
-              <ul className="space-y-3">
-                {list.map((e) => {
-                  const meta = CATEGORY_META[e.category] ?? CATEGORY_META.feature;
-                  const isNew = new Date(e.created_at).getTime() > lastSeen;
-                  const Icon = e.icon
-                    ? resolveNotificationIcon(e.icon, null, e.title)
-                    : meta.Icon;
-                  return (
-                    <li
-                      key={e.id}
-                      className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.02] p-4 sm:p-5"
-                    >
-                      {isNew && (
-                        <span
-                          className="absolute right-4 top-4 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                          style={{
-                            backgroundColor: `${meta.color}22`,
-                            color: meta.color,
-                            border: `1px solid ${meta.color}55`,
-                          }}
-                        >
-                          Novo
-                        </span>
-                      )}
-                      <div className="flex items-start gap-3">
+        <>
+          {/* Featured hero — latest entry */}
+          {featured && featuredMeta && (
+            <section className="relative mb-10 animate-fade-in">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-0.5 rounded-[28px] opacity-25 blur-xl"
+                style={{
+                  background: `linear-gradient(120deg, ${featuredMeta.color}, #6366f1)`,
+                }}
+              />
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <span
+                    className="rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: `${featuredMeta.color}26`,
+                      borderColor: `${featuredMeta.color}55`,
+                      color: featuredMeta.color,
+                    }}
+                  >
+                    {featuredIsNew ? "Destaque" : featuredMeta.label}
+                  </span>
+                  <span className="text-xs text-foreground/40">
+                    {formatLongDate(featured.created_at)}
+                  </span>
+                </div>
+                <h2 className="mb-2 text-xl font-semibold leading-tight text-foreground">
+                  {featured.title}
+                </h2>
+                <p className="text-[13.5px] leading-relaxed text-foreground/60">
+                  {featured.body}
+                </p>
+                <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                  <div
+                    className="h-full w-1/3 rounded-full"
+                    style={{ backgroundColor: featuredMeta.color }}
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Timeline groups */}
+          <div className="space-y-10">
+            {grouped.map(([month, list]) => (
+              <section key={month} className="flex flex-col gap-6 animate-fade-in">
+                <div className="flex items-center gap-4">
+                  <h3 className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/35">
+                    {month}
+                  </h3>
+                  <div className="h-px w-full bg-white/[0.06]" />
+                </div>
+
+                <div className="relative space-y-8">
+                  {/* Vertical spine */}
+                  <div
+                    aria-hidden
+                    className="absolute left-[11px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/40 via-white/[0.06] to-transparent"
+                  />
+
+                  {list.map((e) => {
+                    const meta =
+                      CATEGORY_META[e.category] ?? CATEGORY_META.feature;
+                    const isNew =
+                      new Date(e.created_at).getTime() > lastSeen;
+                    const Icon = e.icon
+                      ? resolveNotificationIcon(e.icon, null, e.title)
+                      : meta.Icon;
+
+                    return (
+                      <article
+                        key={e.id}
+                        className="relative pl-8 transition hover:-translate-y-px"
+                      >
+                        {/* Timeline node */}
                         <div
-                          className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border"
-                          style={{
-                            backgroundColor: `${meta.color}1c`,
-                            borderColor: `${meta.color}44`,
-                            color: meta.color,
-                          }}
+                          aria-hidden
+                          className="absolute left-0 top-1 grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-background"
                         >
-                          <Icon className="h-4.5 w-4.5" strokeWidth={2.25} />
+                          <span
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{
+                              backgroundColor: isNew
+                                ? meta.color
+                                : "rgba(255,255,255,0.2)",
+                              boxShadow: isNew
+                                ? `0 0 10px ${meta.color}99`
+                                : undefined,
+                              animation: isNew
+                                ? "pulse 2.4s ease-in-out infinite"
+                                : undefined,
+                            }}
+                          />
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
+
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
                             <span
-                              className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                              style={{
-                                backgroundColor: `${meta.color}18`,
-                                color: meta.color,
-                                border: `1px solid ${meta.color}33`,
-                              }}
+                              className="text-[9.5px] font-bold uppercase tracking-[0.14em]"
+                              style={{ color: meta.color }}
                             >
                               {meta.label}
                             </span>
-                            <span className="text-[11px] text-foreground/45">
-                              {formatDate(e.created_at)}
+                            <span className="text-[10px] tabular-nums text-foreground/30">
+                              {formatShortDate(e.created_at)}
                             </span>
+                            {isNew && (
+                              <span
+                                aria-label="Nova"
+                                className="ml-0.5 h-1 w-1 rounded-full"
+                                style={{ backgroundColor: meta.color }}
+                              />
+                            )}
                           </div>
-                          <h3 className="mt-1.5 text-[15px] font-semibold leading-snug text-foreground">
-                            {e.title}
-                          </h3>
-                          <p className="mt-1 text-[13px] leading-relaxed text-foreground/70">
+                          <div className="flex items-start gap-2">
+                            <Icon
+                              className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                              strokeWidth={2.25}
+                              style={{ color: meta.color, opacity: 0.75 }}
+                            />
+                            <h4 className="text-[15px] font-semibold leading-snug text-foreground/95">
+                              {e.title}
+                            </h4>
+                          </div>
+                          <p className="text-[12.5px] leading-relaxed text-foreground/55">
                             {e.body}
                           </p>
                         </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
-        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        </>
       )}
     </main>
   );
