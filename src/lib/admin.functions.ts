@@ -206,3 +206,63 @@ export const adminUnlinkProfileFn = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true as const };
   });
+
+const resetSchema = z.object({ profileId: z.string().min(1).max(64) });
+
+export const adminResetHomeSessionsFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => resetSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const today = new Date().toISOString().slice(0, 10);
+    const { error } = await supabaseAdmin
+      .from("profile_data")
+      .update({
+        home_sessions: { day: today, count: 0, reviewed: 0 },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("profile_id", data.profileId);
+    if (error) throw error;
+    return { ok: true as const };
+  });
+
+export const adminResetExamsFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => resetSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { error } = await supabaseAdmin
+      .from("profile_data")
+      .update({
+        exams: { history: [], nextEligibleAt: null },
+        updated_at: new Date().toISOString(),
+      })
+      .eq("profile_id", data.profileId);
+    if (error) throw error;
+    return { ok: true as const };
+  });
+
+export type ProfileSessionRow = {
+  profile_id: string;
+  home_sessions: unknown;
+};
+
+export const adminFetchAllProfileSessionsFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ProfileSessionRow[]> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data, error } = await supabaseAdmin
+      .from("profile_data")
+      .select("profile_id, home_sessions");
+    if (error) throw error;
+    return (data ?? []) as ProfileSessionRow[];
+  });
