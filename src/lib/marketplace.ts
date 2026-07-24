@@ -41,6 +41,7 @@ export async function publishDeck(input: {
   ownerName: string;
   deck: Deck;
   cards: Card[];
+  price?: number;
 }): Promise<PublishedDeckRow> {
   const payload: PublishedCard[] = input.cards.map((c) => ({
     front: c.front,
@@ -59,6 +60,7 @@ export async function publishDeck(input: {
     color_key: input.deck.color ?? "lavender",
     card_count: payload.length,
     cards: payload,
+    price: Math.max(0, Math.floor(input.price ?? 0)),
   };
 
   const { data, error } = await supabase
@@ -68,7 +70,7 @@ export async function publishDeck(input: {
     .single();
 
   if (error || !data) throw error ?? new Error("Falha ao publicar deck");
-  return data as PublishedDeckRow;
+  return data as unknown as PublishedDeckRow;
 }
 
 export async function unpublishDeck(ownerId: string, deckName: string) {
