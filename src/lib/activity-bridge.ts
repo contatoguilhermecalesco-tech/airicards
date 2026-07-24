@@ -1,8 +1,9 @@
-// Emite activity_events a partir dos eventos internos existentes.
+// Emite activity_events a partir dos eventos internos existentes, e concede Cristais airi ✦.
 import { onRankPromotion } from "@/lib/rank-store";
 import { onStreakMilestone } from "@/lib/flashcards-store";
 import { getCurrentProfile } from "@/lib/profile";
 import { emitActivity, type ProfileId } from "@/lib/social-store";
+import { earn, amountFor } from "@/lib/wallet-store";
 
 let started = false;
 
@@ -20,6 +21,8 @@ export function startActivityBridge() {
       toTier: e.toTier,
       toDivision: e.toDivision,
     });
+    const amount = amountFor({ kind: e.kind === "tier" ? "rank_tier" : "rank_division" });
+    void earn(amount, e.kind === "tier" ? "Subiu de tier no rank" : "Subiu de divisão");
   });
 
   onStreakMilestone((e) => {
@@ -29,5 +32,6 @@ export function startActivityBridge() {
       days: e.days,
       lpGained: e.lpGained,
     });
+    void earn(amountFor({ kind: "streak", days: e.days }), `Streak de ${e.days} dias`);
   });
 }

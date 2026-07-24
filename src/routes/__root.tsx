@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, Gem } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -26,6 +26,7 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../li
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 import { useSocialSync } from "../lib/social-store";
 import { startActivityBridge } from "../lib/activity-bridge";
+import { loadWallet, useWallet } from "../lib/wallet-store";
 
 
 function NotFoundComponent() {
@@ -209,6 +210,14 @@ function RankPill() {
 }
 
 const MORE_ITEMS = [
+  {
+    to: "/shop",
+    label: "Loja",
+    description: "Cristais airi ✦, decks, packs e mais",
+    icon: ShoppingBag,
+    color: "#c084fc",
+    matcher: (p: string) => p.startsWith("/shop"),
+  },
   {
     to: "/enemies",
     label: "Inimigas",
@@ -577,10 +586,14 @@ function ProfileMenu() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const profile = useCurrentProfile();
   useSocialSync();
   useEffect(() => {
     startActivityBridge();
   }, []);
+  useEffect(() => {
+    if (profile) void loadWallet(profile.id);
+  }, [profile?.id]);
 
   return (
     <QueryClientProvider client={queryClient}>
