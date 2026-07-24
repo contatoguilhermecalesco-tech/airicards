@@ -26,16 +26,19 @@ import {
   Zap,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
+import { PROFILES } from "@/lib/profile";
 import {
   useWallet,
   loadWallet,
   equipCosmetic,
   unequipSlot,
   slotOf,
+  setBio,
   type CosmeticSlot,
 } from "@/lib/wallet-store";
 import { listShopItems, type ShopItem } from "@/lib/shop";
 import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+
 
 export const Route = createFileRoute("/perfil")({
   head: () => ({
