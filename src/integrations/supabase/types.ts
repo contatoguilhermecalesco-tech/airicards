@@ -176,7 +176,10 @@ export type Database = {
           created_by: string
           deck_name: string
           deck_source_id: string | null
+          expires_at: string
+          forfeit_by: string | null
           id: string
+          reminded_at: string | null
           status: string
           week_key: string
           winner: string | null
@@ -188,7 +191,10 @@ export type Database = {
           created_by: string
           deck_name: string
           deck_source_id?: string | null
+          expires_at?: string
+          forfeit_by?: string | null
           id?: string
+          reminded_at?: string | null
           status?: string
           week_key: string
           winner?: string | null
@@ -200,7 +206,10 @@ export type Database = {
           created_by?: string
           deck_name?: string
           deck_source_id?: string | null
+          expires_at?: string
+          forfeit_by?: string | null
           id?: string
+          reminded_at?: string | null
           status?: string
           week_key?: string
           winner?: string | null
