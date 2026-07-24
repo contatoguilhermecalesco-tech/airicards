@@ -66,8 +66,8 @@ function normalize(row: WalletRow, profileId: string): WalletState {
 let currentProfileId: string | null = null;
 let loadPromise: Promise<void> | null = null;
 
-export async function loadWallet(profileId: string) {
-  if (currentProfileId === profileId && state.loaded) return;
+export async function loadWallet(profileId: string, force = false) {
+  if (!force && currentProfileId === profileId && state.loaded) return;
   currentProfileId = profileId;
   loadPromise = (async () => {
     const { data } = await supabase
