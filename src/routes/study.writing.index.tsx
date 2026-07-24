@@ -403,7 +403,7 @@ function SaveToDeckPanel({
     setPickedIssues(next);
   }
 
-  function save() {
+  async function save() {
     if (!selectedDeck || totalToSave === 0) return;
     let n = 0;
     if (saveCorrected && feedback.correctedText) {
@@ -427,6 +427,7 @@ function SaveToDeckPanel({
     });
     setSavedCount(n);
     setPickedIssues({});
+    await flushSave();
   }
 
   return (
