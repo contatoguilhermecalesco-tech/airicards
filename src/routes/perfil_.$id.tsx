@@ -29,6 +29,7 @@ import { listShopItems, type ShopItem } from "@/lib/shop";
 import { slotOf, type CosmeticSlot } from "@/lib/wallet-store";
 import { TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
+import { formatPresence } from "@/lib/presence";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
@@ -201,6 +202,25 @@ function PerfilViewer() {
                   <span className="relative">{badgePalette.tag.toUpperCase()}</span>
                 </span>
               )}
+              {(() => {
+                const pres = formatPresence(snapshot?.lastSeenAt);
+                return (
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                      pres.online
+                        ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                        : "border-white/10 bg-white/[0.04] text-white/50"
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        pres.online ? "bg-emerald-400 animate-pulse" : "bg-white/40"
+                      }`}
+                    />
+                    {loading ? "…" : pres.label}
+                  </span>
+                );
+              })()}
             </div>
             <p className="text-[13px] leading-tight text-white/60">
               <span className="text-white/80">{handleUser}</span>
