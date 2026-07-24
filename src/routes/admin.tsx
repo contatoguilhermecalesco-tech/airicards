@@ -51,7 +51,8 @@ export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
   { path: "/settings", label: "Configurações" },
 ];
 
-import { PROFILES, getCurrentProfile } from "@/lib/profile";
+import { PROFILES, getCurrentProfile, useCurrentProfile, useIsAdmin, useProfileHydrated, listProfilesMeta, type ProfileMeta } from "@/lib/profile";
+import { adminSetProfilePin, adminUnlinkProfile } from "@/lib/admin-actions";
 import {
   AlertDialog,
   AlertDialogAction,
