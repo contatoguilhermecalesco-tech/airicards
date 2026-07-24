@@ -702,6 +702,7 @@ function RootComponent() {
             <StreakMilestoneOverlay />
             <StreakChangeOverlay />
             <OnboardingTour />
+            <GiftReceivedOverlay />
           </Suspense>
         </div>
       </ProfileGate>
