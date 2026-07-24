@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Gift, Check, X, Sparkles } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
