@@ -12,7 +12,17 @@ import {
   Sparkles,
   Tag as TagIcon,
   Trash2,
+  Wand2,
+  Wrench,
 } from "lucide-react";
+import {
+  createChangelogEntry,
+  deleteChangelogEntry,
+  initChangelog,
+  useChangelog,
+  type ChangelogCategory,
+} from "@/lib/changelog-store";
+import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
 import {
   fetchAllProfileSessions,
   resetHomeSessionsForProfile,
@@ -37,6 +47,7 @@ export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
   { path: "/enemies", label: "Cartas inimigas" },
   { path: "/rank", label: "Rank" },
   { path: "/exam", label: "Prova mensal" },
+  { path: "/novidades", label: "Novidades" },
   { path: "/settings", label: "Configurações" },
 ];
 
@@ -103,6 +114,7 @@ function AdminPage() {
   useEffect(() => {
     void load();
     void initNotifications();
+    void initChangelog();
   }, []);
 
   function nameFor(profileId: string) {
@@ -226,6 +238,11 @@ function AdminPage() {
 
       <div className="h-6" />
       <NotificationsSection />
+
+      <div className="h-6" />
+      <ChangelogSection />
+
+
 
 
       <AlertDialog
