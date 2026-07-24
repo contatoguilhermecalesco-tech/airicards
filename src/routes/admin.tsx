@@ -88,15 +88,28 @@ const TAG_COLORS = [
 ];
 
 export const Route = createFileRoute("/admin")({
-  beforeLoad: () => {
-    if (typeof window === "undefined") return;
-    const p = getCurrentProfile();
-    if (!p || p.id !== ADMIN_PROFILE_ID) {
-      throw redirect({ to: "/" });
-    }
-  },
-  component: AdminPage,
+  component: AdminGate,
 });
+
+function AdminGate() {
+  const hydrated = useProfileHydrated();
+  const isAdmin = useIsAdmin();
+  const profile = useCurrentProfile();
+  if (!hydrated) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6 text-sm text-muted-foreground">
+        Carregando…
+      </main>
+    );
+  }
+  if (!profile || !isAdmin) {
+    if (typeof window !== "undefined") {
+      window.location.replace("/");
+    }
+    return null;
+  }
+  return <AdminPage />;
+}
 
 function AdminPage() {
   const [rows, setRows] = useState<ProfileSessionInfo[]>([]);
