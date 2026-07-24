@@ -1,3 +1,4 @@
+import { ArlysIcon } from "@/components/StatChip";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
