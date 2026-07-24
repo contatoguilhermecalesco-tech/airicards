@@ -95,7 +95,7 @@ export async function loadWallet(profileId: string, force = false) {
         .insert({
           profile_id: profileId,
           crystals: WELCOME_BONUS,
-          inventory: { cosmetics: [], powerups: {} },
+          inventory: { cosmetics: [], equipped: {}, powerups: {} },
         })
         .select("profile_id, crystals, inventory")
         .maybeSingle();
