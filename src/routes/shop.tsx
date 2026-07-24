@@ -740,22 +740,25 @@ function DiscordAvatar({
   ring,
   showDecoration,
   initial = "G",
+  auraKey,
 }: {
   size?: number;
   ring: string;
   showDecoration: boolean;
   initial?: string;
+  auraKey?: string | null;
 }) {
   const profile = useCurrentProfile();
   const avatarUrl = useProfileAvatar(profile?.id);
+  const auraProfile = showDecoration && auraKey ? (AURA_PROFILES[auraKey] ?? null) : null;
   const inner = size - (showDecoration ? 10 : 0);
   const displayInitial = profile?.name?.charAt(0)?.toUpperCase() ?? initial;
-  return (
+  const inside = (
     <div
       className="relative grid place-items-center"
       style={{ width: size, height: size }}
     >
-      {showDecoration && (
+      {showDecoration && !auraProfile && (
         <>
           <span
             className="cosmetic-ring-spin absolute inset-0 rounded-full"
@@ -776,6 +779,12 @@ function DiscordAvatar({
             style={{ background: "#1e1f22" }}
           />
         </>
+      )}
+      {showDecoration && auraProfile && (
+        <span
+          className="absolute inset-[3px] rounded-full"
+          style={{ background: "#1e1f22" }}
+        />
       )}
       <div
         className="relative grid place-items-center overflow-hidden rounded-full text-white font-semibold"
@@ -806,6 +815,14 @@ function DiscordAvatar({
       />
     </div>
   );
+  if (auraProfile) {
+    return (
+      <AuraRing size={size} profile={auraProfile}>
+        {inside}
+      </AuraRing>
+    );
+  }
+  return inside;
 }
 
 // Compact profile card used inside the shop tile
