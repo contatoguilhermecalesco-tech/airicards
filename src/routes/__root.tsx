@@ -208,9 +208,100 @@ function RankPill() {
   );
 }
 
-function TopBar() {
+const MORE_ITEMS = [
+  { to: "/enemies", label: "Inimigas", icon: Swords, matcher: (p: string) => p.startsWith("/enemies") },
+  { to: "/rank", label: "Rank", icon: Trophy, matcher: (p: string) => p.startsWith("/rank") },
+  { to: "/novidades", label: "Novidades", icon: Sparkles, matcher: (p: string) => p.startsWith("/novidades") },
+  { to: "/settings", label: "Configurações", icon: Settings2, matcher: (p: string) => p.startsWith("/settings") },
+] as const;
+
+function useMoreState() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isMoreActive = MORE_ITEMS.some((i) => i.matcher(pathname));
+  return { pathname, isMoreActive };
+}
+
+function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const unreadNews = useChangelogUnread();
+  useEffect(() => {
+    if (open) void initChangelog();
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mais opções"
+    >
+      <button
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150"
+      />
+      <div className="relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.08] bg-[hsl(var(--background))]/95 backdrop-blur-xl sm:rounded-3xl sm:mx-4 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-5 pt-4 pb-2">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/45">
+              airi
+            </p>
+            <h2 className="text-[18px] font-semibold tracking-tight">Mais</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/60 transition hover:bg-white/[0.06] hover:text-foreground"
+            aria-label="Fechar"
+          >
+            <X className="h-4 w-4" strokeWidth={2.5} />
+          </button>
+        </div>
+        <div className="px-3 pb-4 pt-2 sm:px-4 sm:pb-5">
+          <div className="grid grid-cols-2 gap-2">
+            {MORE_ITEMS.map(({ to, label, icon: Icon }) => {
+              const isNews = to === "/novidades";
+              const badge = isNews && unreadNews > 0 ? unreadNews : 0;
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  onClick={onClose}
+                  className="group relative flex flex-col items-start gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition hover:border-primary/40 hover:bg-white/[0.04]"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/15 text-primary transition group-hover:bg-primary/25">
+                    <Icon className="h-4.5 w-4.5" strokeWidth={2.25} />
+                  </div>
+                  <span className="text-[14px] font-semibold text-foreground">
+                    {label}
+                  </span>
+                  {badge > 0 && (
+                    <span className="absolute right-3 top-3 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[10.5px] font-semibold text-primary-foreground">
+                      {badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+        <div className="safe-bottom" />
+      </div>
+    </div>
+  );
+}
+
+function TopBar() {
+  const { pathname, isMoreActive } = useMoreState();
   const isReview = pathname.startsWith("/review");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const unreadNews = useChangelogUnread();
   if (isReview) return null;
 
   const linkClass = (active: boolean) =>
@@ -225,7 +316,6 @@ function TopBar() {
     { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
     { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
     { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
-    { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
   ] as const;
 
   return (
@@ -249,10 +339,24 @@ function TopBar() {
             {navItems.map(({ to, label, icon: Icon, active }) => (
               <Link key={to} to={to} className={linkClass(active)}>
                 <Icon className="h-4 w-4" strokeWidth={2.25} />
-                <span className="hidden lg:inline">{label}</span>
-                <span className="lg:hidden">{label}</span>
+                <span>{label}</span>
               </Link>
             ))}
+            <button
+              type="button"
+              onClick={() => setMoreOpen(true)}
+              className={`${linkClass(isMoreActive)} relative`}
+              aria-haspopup="dialog"
+              aria-expanded={moreOpen}
+            >
+              <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
+              <span>Mais</span>
+              {unreadNews > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                  {unreadNews}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Direita: rank + notificações + perfil */}
@@ -263,18 +367,19 @@ function TopBar() {
           </div>
         </nav>
       </div>
+      <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
     </header>
   );
 }
 
 /**
  * Barra inferior fixa (mobile). Escondida em ≥sm.
- * Grid de 4 colunas iguais para hierarquia visual previsível independente
- * do tamanho do texto (fluid), sempre com área de toque ≥44px.
  */
 function BottomBar() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { pathname, isMoreActive } = useMoreState();
   const isReview = pathname.startsWith("/review");
+  const [moreOpen, setMoreOpen] = useState(false);
+  const unreadNews = useChangelogUnread();
   if (isReview) return null;
 
   const items = [
@@ -282,39 +387,63 @@ function BottomBar() {
     { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
     { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
     { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
-    { to: "/enemies", label: "Inimigas", icon: Swords, active: pathname.startsWith("/enemies") },
-    { to: "/rank", label: "Rank", icon: Trophy, active: pathname.startsWith("/rank") },
   ] as const;
 
   return (
-    <nav
-      aria-label="Navegação principal"
-      className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
-    >
-      <div className="glass-panel border-t safe-bottom">
-        <ul className="mx-auto grid max-w-3xl grid-cols-6 gap-1 px-2 pt-1.5">
-          {items.map(({ to, label, icon: Icon, active }) => (
-            <li key={to}>
-              <Link
-                to={to}
-                className={`tap-target flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
-                  active ? "text-foreground" : "text-muted-foreground"
+    <>
+      <nav
+        aria-label="Navegação principal"
+        className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
+      >
+        <div className="glass-panel border-t safe-bottom">
+          <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1 px-2 pt-1.5">
+            {items.map(({ to, label, icon: Icon, active }) => (
+              <li key={to}>
+                <Link
+                  to={to}
+                  className={`tap-target flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
+                    active ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon
+                    className={`h-[22px] w-[22px] transition ${active ? "text-primary" : ""}`}
+                    strokeWidth={2.25}
+                  />
+                  <span className="truncate">{label}</span>
+                </Link>
+              </li>
+            ))}
+            <li>
+              <button
+                type="button"
+                onClick={() => setMoreOpen(true)}
+                className={`tap-target relative flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
+                  isMoreActive ? "text-foreground" : "text-muted-foreground"
                 }`}
-                aria-current={active ? "page" : undefined}
+                aria-haspopup="dialog"
+                aria-expanded={moreOpen}
               >
-                <Icon
-                  className={`h-[22px] w-[22px] transition ${active ? "text-primary" : ""}`}
+                <MoreHorizontal
+                  className={`h-[22px] w-[22px] transition ${isMoreActive ? "text-primary" : ""}`}
                   strokeWidth={2.25}
                 />
-                <span className="truncate">{label}</span>
-              </Link>
+                <span className="truncate">Mais</span>
+                {unreadNews > 0 && (
+                  <span className="absolute right-1 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                    {unreadNews}
+                  </span>
+                )}
+              </button>
             </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
+          </ul>
+        </div>
+      </nav>
+      <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
+    </>
   );
 }
+
 
 function ProfileMenu() {
   const profile = useCurrentProfile();
