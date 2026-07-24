@@ -131,10 +131,19 @@ async function persist() {
         cosmetics: state.cosmetics,
         equipped: state.equipped,
         powerups: state.powerups,
+        bio: state.bio,
       },
     })
     .eq("profile_id", currentProfileId);
 }
+
+export async function setBio(bio: string) {
+  if (!currentProfileId) return;
+  state.bio = bio.slice(0, 180);
+  emit();
+  await persist();
+}
+
 
 export async function earn(amount: number, reason: string) {
   if (!currentProfileId || amount <= 0) return;
