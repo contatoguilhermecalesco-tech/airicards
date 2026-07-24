@@ -25,6 +25,7 @@ import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
+import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
 import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
@@ -124,6 +125,11 @@ const SocialStatsRoute = SocialStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => SocialRoute,
+} as any)
+const NovidadesIdRoute = NovidadesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => NovidadesRoute,
 } as any)
 const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   id: '/library/$deckId',
@@ -232,13 +238,14 @@ export interface FileRoutesByFullPath {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
-  '/novidades': typeof NovidadesRoute
+  '/novidades': typeof NovidadesRouteWithChildren
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/novidades/$id': typeof NovidadesIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/social/': typeof SocialIndexRoute
@@ -269,12 +276,13 @@ export interface FileRoutesByTo {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
-  '/novidades': typeof NovidadesRoute
+  '/novidades': typeof NovidadesRouteWithChildren
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/novidades/$id': typeof NovidadesIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library': typeof LibraryIndexRoute
   '/social': typeof SocialIndexRoute
@@ -302,13 +310,14 @@ export interface FileRoutesById {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
-  '/novidades': typeof NovidadesRoute
+  '/novidades': typeof NovidadesRouteWithChildren
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/novidades/$id': typeof NovidadesIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/social/': typeof SocialIndexRoute
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
+    | '/novidades/$id'
     | '/social/stats'
     | '/library/'
     | '/social/'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/library/$deckId'
+    | '/novidades/$id'
     | '/social/stats'
     | '/library'
     | '/social'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
+    | '/novidades/$id'
     | '/social/stats'
     | '/library/'
     | '/social/'
@@ -448,7 +460,7 @@ export interface RootRouteChildren {
   EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
   MarketplaceRoute: typeof MarketplaceRoute
-  NovidadesRoute: typeof NovidadesRoute
+  NovidadesRoute: typeof NovidadesRouteWithChildren
   RankRoute: typeof RankRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
@@ -582,6 +594,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/stats'
       preLoaderRoute: typeof SocialStatsRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/novidades/$id': {
+      id: '/novidades/$id'
+      path: '/$id'
+      fullPath: '/novidades/$id'
+      preLoaderRoute: typeof NovidadesIdRouteImport
+      parentRoute: typeof NovidadesRoute
     }
     '/library/$deckId': {
       id: '/library/$deckId'
@@ -719,6 +738,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface NovidadesRouteChildren {
+  NovidadesIdRoute: typeof NovidadesIdRoute
+}
+
+const NovidadesRouteChildren: NovidadesRouteChildren = {
+  NovidadesIdRoute: NovidadesIdRoute,
+}
+
+const NovidadesRouteWithChildren = NovidadesRoute._addFileChildren(
+  NovidadesRouteChildren,
+)
+
 interface SocialRouteChildren {
   SocialStatsRoute: typeof SocialStatsRoute
   SocialIndexRoute: typeof SocialIndexRoute
@@ -793,7 +824,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
   MarketplaceRoute: MarketplaceRoute,
-  NovidadesRoute: NovidadesRoute,
+  NovidadesRoute: NovidadesRouteWithChildren,
   RankRoute: RankRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
