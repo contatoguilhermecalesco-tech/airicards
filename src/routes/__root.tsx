@@ -621,6 +621,7 @@ function ProfileMenu() {
               gradient={profile.gradient}
               avatarUrl={wallet.avatarUrl}
               ring={ring}
+              profile={auraProfile}
             />
             <div className="min-w-0">
               <p className="text-[11px] text-muted-foreground">Conectado como</p>
