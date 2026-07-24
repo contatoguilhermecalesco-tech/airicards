@@ -1014,6 +1014,20 @@ const CHANGELOG_CATEGORIES: {
   { key: "fix", label: "Ajuste", color: "#34d399", Icon: Wrench },
 ];
 
+function fmtPatchDay(iso: string) {
+  try {
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "short",
+    })
+      .format(new Date(iso))
+      .replace(".", "")
+      .toUpperCase();
+  } catch {
+    return "";
+  }
+}
+
 function ChangelogSection() {
   const { entries } = useChangelog();
   const generate = useServerFn(generateChangelogEntry);
@@ -1027,6 +1041,9 @@ function ChangelogSection() {
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+
+  const activeMeta =
+    CHANGELOG_CATEGORIES.find((c) => c.key === category) ?? CHANGELOG_CATEGORIES[0];
 
   async function handleGenerate() {
     if (!idea.trim()) return;
@@ -1068,94 +1085,214 @@ function ChangelogSection() {
     }
   }
 
+  const canPublish = !!title.trim() && !!body.trim();
+  const nextPatchIdx = String(entries.length + 1).padStart(2, "0");
+  const nowDate = new Date();
+  const patchPreview = `${String(nowDate.getFullYear()).slice(-2)}.${String(
+    nowDate.getMonth() + 1,
+  ).padStart(2, "0")}.${nextPatchIdx}`;
+
   return (
-    <section className="ios-card rounded-3xl p-4 sm:p-5">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 text-primary">
-          <Sparkles className="h-4 w-4" strokeWidth={2.25} />
-        </span>
-        <div>
-          <h2 className="text-sm font-semibold">Novidades do app</h2>
-          <p className="text-xs text-muted-foreground">
-            Publique o que mudou. Aparece em <code className="rounded bg-white/[0.06] px-1 py-0.5 text-[10px]">/novidades</code> para todos.
+    <section className="space-y-4">
+      {/* Editorial header — same language as /novidades */}
+      <div className="flex items-center gap-3">
+        <span className="h-4 w-1 rounded-sm bg-primary" />
+        <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+          Publicar patch notes
+        </h2>
+        <div className="h-px flex-1 bg-white/[0.06]" />
+      </div>
+
+      {/* LIVE PREVIEW — mirrors the /novidades hero */}
+      <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#0a0a0f]">
+        <div
+          aria-hidden
+          className="absolute inset-0 transition-[background] duration-500"
+          style={{
+            background: `radial-gradient(120% 90% at 85% 0%, ${activeMeta.color}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.16] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: "38px 38px",
+            maskImage: "radial-gradient(70% 60% at 70% 30%, black, transparent)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="absolute -right-10 top-4 h-[220%] w-[2px] rotate-12"
+          style={{
+            background: `linear-gradient(180deg, transparent, ${activeMeta.color}, transparent)`,
+          }}
+        />
+
+        <div className="relative px-5 pb-6 pt-6 sm:px-7">
+          <div className="flex items-center gap-2">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+              style={{
+                borderColor: `${activeMeta.color}66`,
+                color: activeMeta.color,
+                backgroundColor: `${activeMeta.color}18`,
+              }}
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  backgroundColor: activeMeta.color,
+                  boxShadow: `0 0 8px ${activeMeta.color}`,
+                }}
+              />
+              {activeMeta.label}
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/40">
+              {fmtPatchDay(nowDate.toISOString())}
+            </span>
+          </div>
+
+          <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/40">
+            Patch {patchPreview} · Prévia
           </p>
+          <h3 className="mt-1.5 text-[22px] font-semibold leading-[1.05] tracking-tight text-foreground sm:text-[26px]">
+            {title.trim() || "Título da novidade"}
+          </h3>
+          <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-foreground/65">
+            {body.trim() || "A descrição aparece aqui — do jeitinho que vai aparecer em /novidades."}
+          </p>
+
+          <div className="mt-5 flex items-center gap-3">
+            <div
+              className="h-[3px] w-[80px] rounded-full"
+              style={{ backgroundColor: activeMeta.color }}
+            />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/45">
+              Prévia ao vivo
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Category picker */}
-      <div className="mb-3 grid grid-cols-3 gap-2">
+      {/* Category picker — editorial pills */}
+      <div className="grid grid-cols-3 gap-2">
         {CHANGELOG_CATEGORIES.map(({ key, label, color, Icon }) => {
           const active = category === key;
           return (
             <button
               key={key}
               onClick={() => setCategory(key)}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition"
+              className="group relative flex flex-col items-start gap-1 overflow-hidden rounded-2xl border px-3 py-2.5 text-left transition"
               style={{
-                backgroundColor: active ? `${color}22` : "rgba(255,255,255,0.02)",
-                borderColor: active ? `${color}88` : "rgba(255,255,255,0.06)",
-                color: active ? color : undefined,
+                backgroundColor: active ? `${color}18` : "rgba(255,255,255,0.02)",
+                borderColor: active ? `${color}66` : "rgba(255,255,255,0.06)",
               }}
             >
-              <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />
-              {label}
+              <span
+                aria-hidden
+                className="absolute left-0 top-2 bottom-2 w-[2px] rounded-r-full transition"
+                style={{
+                  backgroundColor: color,
+                  opacity: active ? 1 : 0.35,
+                  boxShadow: active ? `0 0 10px ${color}88` : undefined,
+                }}
+              />
+              <div className="flex items-center gap-1.5 pl-1.5">
+                <Icon
+                  className="h-3.5 w-3.5"
+                  strokeWidth={2.25}
+                  style={{ color }}
+                />
+                <span
+                  className="text-[9.5px] font-bold uppercase tracking-[0.2em]"
+                  style={{ color: active ? color : "rgba(255,255,255,0.5)" }}
+                >
+                  {label}
+                </span>
+              </div>
             </button>
           );
         })}
       </div>
 
-      {/* AI input */}
-      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-        <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+      {/* AI composer */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-px"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${activeMeta.color}66, transparent)`,
+          }}
+        />
+        <label className="mb-2 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-foreground/55">
           <Sparkles className="h-3 w-3" strokeWidth={2.5} />
-          Ideia para a IA
+          Prompt para IA
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
-            placeholder="ex: adicionamos uma aba de novidades no app"
-            className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+            placeholder="ex: refinamos o desing da aba de novidades"
+            className="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-sm outline-none transition focus:border-primary/60"
           />
           <button
             onClick={() => void handleGenerate()}
             disabled={genBusy || !idea.trim()}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition disabled:opacity-50"
+            style={{
+              borderColor: `${activeMeta.color}55`,
+              color: activeMeta.color,
+              backgroundColor: `${activeMeta.color}14`,
+            }}
           >
             {genBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.5} />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
             ) : (
-              <Sparkles className="h-4 w-4" strokeWidth={2.5} />
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            Gerar com IA
+            Gerar
           </button>
         </div>
       </div>
 
-      {/* Manual form */}
-      <div className="mt-3 space-y-2">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título"
-          className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
-        />
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Descrição curta"
-          rows={3}
-          className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
-        />
+      {/* Manual fields */}
+      <div className="space-y-2.5 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
+        <div>
+          <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
+            Título
+          </p>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ex: Novidades ganharam um novo visual"
+            className="w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-sm outline-none transition focus:border-primary/60"
+          />
+        </div>
+        <div>
+          <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
+            Corpo da nota
+          </p>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Conte o que mudou. Parágrafos curtos funcionam melhor."
+            rows={4}
+            className="w-full resize-none rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-sm leading-relaxed outline-none transition focus:border-primary/60"
+          />
+        </div>
 
         {/* Icon picker */}
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Ícone (opcional)</span>
+            <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
+              Ícone (opcional)
+            </p>
             {iconKey && (
               <button
                 onClick={() => setIconKey("")}
-                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+                className="text-[10px] uppercase tracking-[0.18em] text-foreground/45 transition hover:text-foreground"
               >
                 Limpar
               </button>
@@ -1164,19 +1301,26 @@ function ChangelogSection() {
           <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-12">
             {NOTIFICATION_ICONS.map(({ key, Icon, label }) => {
               const active = iconKey === key;
-              const catColor = CHANGELOG_CATEGORIES.find((c) => c.key === category)?.color ?? "#a78bfa";
               return (
                 <button
                   key={key}
                   onClick={() => setIconKey(active ? "" : key)}
                   title={label}
                   aria-label={label}
-                  className={`flex aspect-square items-center justify-center rounded-xl border transition ${
+                  className="flex aspect-square items-center justify-center rounded-xl border transition"
+                  style={
                     active
-                      ? "border-primary/60 bg-primary/15"
-                      : "border-white/5 bg-white/[0.02] text-muted-foreground hover:border-white/15 hover:text-foreground"
-                  }`}
-                  style={active ? { color: catColor, borderColor: `${catColor}88`, backgroundColor: `${catColor}22` } : undefined}
+                      ? {
+                          color: activeMeta.color,
+                          borderColor: `${activeMeta.color}88`,
+                          backgroundColor: `${activeMeta.color}22`,
+                        }
+                      : {
+                          borderColor: "rgba(255,255,255,0.06)",
+                          backgroundColor: "rgba(255,255,255,0.02)",
+                          color: "rgba(255,255,255,0.55)",
+                        }
+                  }
                 >
                   <Icon className="h-4 w-4" strokeWidth={2.25} />
                 </button>
@@ -1185,71 +1329,112 @@ function ChangelogSection() {
           </div>
         </div>
 
-        <div className="flex items-center justify-end pt-1">
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <div className="min-h-[16px] flex-1 text-[11px]">
+            {err && <span className="text-red-400">{err}</span>}
+            {ok && <span className="text-emerald-400">{ok}</span>}
+          </div>
           <button
             onClick={() => void handleSend()}
-            disabled={sendBusy || !title.trim() || !body.trim()}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+            disabled={sendBusy || !canPublish}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.2em] text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
+            style={{
+              background: canPublish
+                ? `linear-gradient(135deg, ${activeMeta.color}, #6366f1)`
+                : "rgba(255,255,255,0.08)",
+              boxShadow: canPublish
+                ? `0 10px 30px -12px ${activeMeta.color}88`
+                : undefined,
+            }}
           >
             {sendBusy ? (
-              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.5} />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
             ) : (
-              <Send className="h-4 w-4" strokeWidth={2.5} />
+              <Send className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            Publicar
+            Publicar patch
           </button>
         </div>
-        {err && <p className="text-xs text-red-400">{err}</p>}
-        {ok && <p className="text-xs text-emerald-400">{ok}</p>}
       </div>
 
-      {/* Historic */}
+      {/* Archive — mirrors /novidades timeline row */}
       {entries.length > 0 && (
-        <>
-          <div className="my-4 h-px bg-border" />
-          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            Últimas publicadas
-          </p>
-          <ul className="space-y-2">
-            {entries.slice(0, 8).map((n) => {
-              const meta = CHANGELOG_CATEGORIES.find((c) => c.key === n.category) ?? CHANGELOG_CATEGORIES[0];
+        <div className="pt-2">
+          <div className="mb-3 flex items-end justify-between border-b border-white/10 pb-2">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/40">
+                Arquivo
+              </p>
+              <h3 className="mt-0.5 text-[15px] font-semibold tracking-tight text-foreground">
+                Publicadas
+              </h3>
+            </div>
+            <span className="pb-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/35">
+              {entries.length} {entries.length === 1 ? "nota" : "notas"}
+            </span>
+          </div>
+
+          <ul className="space-y-2.5">
+            {entries.slice(0, 8).map((n, idx) => {
+              const meta =
+                CHANGELOG_CATEGORIES.find((c) => c.key === n.category) ??
+                CHANGELOG_CATEGORIES[0];
               const Icon = n.icon
                 ? resolveNotificationIcon(n.icon, null, n.title)
                 : meta.Icon;
+              const d = new Date(n.created_at);
+              const patch = `${String(d.getFullYear()).slice(-2)}.${String(
+                d.getMonth() + 1,
+              ).padStart(2, "0")}.${String(idx + 1).padStart(2, "0")}`;
               return (
                 <li
                   key={n.id}
-                  className="flex items-start gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
+                  className="relative flex items-start gap-3 overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3 pl-4"
                 >
-                  <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border"
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-3 bottom-3 w-[2px] rounded-r-full"
                     style={{
-                      backgroundColor: `${meta.color}22`,
-                      borderColor: `${meta.color}44`,
+                      backgroundColor: meta.color,
+                      opacity: 0.7,
+                    }}
+                  />
+                  <div
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border"
+                    style={{
+                      backgroundColor: `${meta.color}18`,
+                      borderColor: `${meta.color}3d`,
                       color: meta.color,
                     }}
                   >
                     <Icon className="h-4 w-4" strokeWidth={2.25} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate text-sm font-medium">{n.title}</p>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                       <span
-                        className="rounded-full px-2 py-0.5 text-[10px] font-medium"
-                        style={{
-                          backgroundColor: `${meta.color}22`,
-                          color: meta.color,
-                          border: `1px solid ${meta.color}44`,
-                        }}
+                        className="text-[9px] font-bold uppercase tracking-[0.2em]"
+                        style={{ color: meta.color }}
                       >
                         {meta.label}
                       </span>
+                      <span className="text-[9.5px] font-semibold tabular-nums uppercase tracking-[0.14em] text-foreground/35">
+                        {patch}
+                      </span>
+                      <span className="text-foreground/20">•</span>
+                      <span className="text-[9.5px] font-semibold uppercase tracking-[0.14em] text-foreground/35">
+                        {fmtPatchDay(n.created_at)}
+                      </span>
                     </div>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>
+                    <p className="mt-1 truncate text-[13px] font-semibold text-foreground">
+                      {n.title}
+                    </p>
+                    <p className="mt-0.5 line-clamp-2 text-[11.5px] leading-relaxed text-foreground/55">
+                      {n.body}
+                    </p>
                   </div>
                   <button
                     onClick={() => void deleteChangelogEntry(n.id)}
-                    className="rounded-full p-1.5 text-muted-foreground opacity-70 transition hover:bg-accent hover:text-foreground hover:opacity-100"
+                    className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-red-400"
                     aria-label="Excluir"
                   >
                     <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
@@ -1258,7 +1443,7 @@ function ChangelogSection() {
               );
             })}
           </ul>
-        </>
+        </div>
       )}
     </section>
   );
