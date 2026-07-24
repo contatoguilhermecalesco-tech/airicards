@@ -38,7 +38,7 @@ import { startSocialStatsSync } from "@/lib/social-stats";
 import { GiftInbox } from "@/components/GiftInbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/social")({
+export const Route = createFileRoute("/social/")({
   head: () => ({
     meta: [
       { title: "Social — airi" },
