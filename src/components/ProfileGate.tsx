@@ -9,7 +9,7 @@ import {
   type ProfileMeta,
 } from "@/lib/profile";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
-import airiLogo from "@/assets/airi-horizontal.png.asset.json";
+import airiLogo from "@/assets/airi-horizontal-transparent.png.asset.json";
 
 const HEADING_FONT = { fontFamily: "'Sora', 'Inter', sans-serif" };
 const BODY_FONT = { fontFamily: "'Manrope', 'Inter', sans-serif" };
