@@ -1054,6 +1054,7 @@ function ChangelogSection() {
       const draft = await generate({ data: { prompt: idea, category } });
       setTitle(draft.title);
       setBody(draft.body);
+      setNotes(draft.notes ?? "");
     } catch (e) {
       setErr((e as Error).message);
     } finally {
