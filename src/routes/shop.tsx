@@ -744,10 +744,17 @@ function DiscordAvatar({
       {showDecoration && (
         <>
           <span
-            className="absolute inset-0 rounded-full"
+            className="cosmetic-ring-spin absolute inset-0 rounded-full"
             style={{
-              background: `conic-gradient(from 210deg, ${ring}, transparent 40%, ${ring} 70%, transparent)`,
+              background: `conic-gradient(from 0deg, ${ring}, transparent 35%, ${ring} 65%, transparent 100%)`,
               filter: "blur(0.5px)",
+            }}
+          />
+          <span
+            className="cosmetic-glow-pulse absolute -inset-1 rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${ring}55, transparent 65%)`,
+              filter: "blur(6px)",
             }}
           />
           <span
@@ -798,16 +805,29 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
     >
       {/* Banner */}
       <div
-        className="h-14 w-full"
+        className={`relative h-14 w-full overflow-hidden ${
+          showBanner ? "cosmetic-banner-animated" : ""
+        }`}
         style={{
           background: showBanner ? v.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
         }}
-      />
+      >
+        {showBanner && (
+          <span
+            aria-hidden
+            className="cosmetic-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/3"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+            }}
+          />
+        )}
+      </div>
       {/* Body */}
       <div className="relative px-3 pb-3 pt-0">
         <div className="-mt-6 flex items-end justify-between gap-2">
           <div
-            className="rounded-full"
+            className={`rounded-full ${showDecoration ? "cosmetic-avatar-float" : ""}`}
             style={{
               padding: 3,
               background: "#232428",
@@ -817,11 +837,19 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
           </div>
           {isBadge && (
             <span
-              className="mb-1 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white shadow"
+              className="relative mb-1 inline-flex items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white shadow"
               style={{ background: v.gradient }}
             >
-              <Icon className="h-3 w-3" strokeWidth={2.75} />
-              {v.tag}
+              <span
+                aria-hidden
+                className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+                }}
+              />
+              <Icon className="relative h-3 w-3" strokeWidth={2.75} />
+              <span className="relative">{v.tag}</span>
             </span>
           )}
         </div>
@@ -850,13 +878,13 @@ function CosmeticCard({
   const v = visualFor(item);
   return (
     <li
-      className="relative overflow-hidden rounded-3xl border border-white/10 p-4"
+      className="group relative overflow-hidden rounded-3xl border border-white/10 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.6)]"
       style={{ background: "#1e1f22" }}
     >
       {/* Subtle glow */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
+        className="cosmetic-glow-pulse pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-30 blur-3xl transition-opacity duration-300 group-hover:opacity-60"
         style={{ background: v.ring }}
       />
 
@@ -943,21 +971,48 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
 
         {/* Banner */}
         <div
-          className="relative h-[110px] w-full"
+          className={`relative h-[110px] w-full overflow-hidden ${
+            showBanner ? "cosmetic-banner-animated" : ""
+          }`}
           style={{
             background: showBanner
               ? v.gradient
               : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
           }}
         >
+          {showBanner && (
+            <span
+              aria-hidden
+              className="cosmetic-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/2"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+              }}
+            />
+          )}
           {v.slot === "effect" && (
             <>
               <span
-                className="pointer-events-none absolute inset-0"
+                className="cosmetic-glow-pulse pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 40%), radial-gradient(circle at 80% 60%, rgba(255,255,255,0.18), transparent 45%)",
+                    "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28), transparent 40%), radial-gradient(circle at 80% 60%, rgba(255,255,255,0.2), transparent 45%)",
                 }}
+              />
+              <span
+                aria-hidden
+                className="cosmetic-sparkle pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-white"
+                style={{ top: "22%", left: "70%", animationDelay: "0.2s" }}
+              />
+              <span
+                aria-hidden
+                className="cosmetic-sparkle pointer-events-none absolute h-1 w-1 rounded-full bg-white"
+                style={{ top: "55%", left: "18%", animationDelay: "0.9s" }}
+              />
+              <span
+                aria-hidden
+                className="cosmetic-sparkle pointer-events-none absolute h-1 w-1 rounded-full bg-white"
+                style={{ top: "35%", left: "45%", animationDelay: "1.6s" }}
               />
               <span
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
@@ -970,7 +1025,9 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
         {/* Avatar */}
         <div className="relative px-4">
           <div
-            className="absolute -top-[46px] left-4 rounded-full"
+            className={`absolute -top-[46px] left-4 rounded-full ${
+              showDecoration ? "cosmetic-avatar-float" : ""
+            }`}
             style={{ padding: 5, background: "#232428" }}
           >
             <DiscordAvatar size={84} ring={v.ring} showDecoration={showDecoration} />
@@ -984,11 +1041,19 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
               <p className="text-[17px] font-bold text-white leading-tight">Guilherme</p>
               {showBadge && (
                 <span
-                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
+                  className="relative inline-flex items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
                   style={{ background: v.gradient }}
                 >
-                  <Icon className="h-3 w-3" strokeWidth={2.75} />
-                  {v.tag.toUpperCase()}
+                  <span
+                    aria-hidden
+                    className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                    style={{
+                      background:
+                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
+                    }}
+                  />
+                  <Icon className="relative h-3 w-3" strokeWidth={2.75} />
+                  <span className="relative">{v.tag.toUpperCase()}</span>
                 </span>
               )}
             </div>
