@@ -665,6 +665,42 @@ function PerfilPage() {
         </ul>
       </section>
 
+      {/* ============ PARTNER LINK ============ */}
+      {partner && (
+        <section className="mt-6">
+          <Link
+            to="/perfil/$id"
+            params={{ id: partner.id }}
+            className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:bg-white/[0.05]"
+          >
+            <span
+              aria-hidden
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
+              style={{ backgroundImage: partner.gradient }}
+            >
+              {partner.name.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
+                Perfil do parceiro
+              </p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-white">
+                Ver perfil de {partner.name}
+              </p>
+              <p className="mt-0.5 truncate text-[12px] text-white/50">
+                Cosméticos equipados, rank, streak e bio
+              </p>
+            </div>
+            <ArrowLeft
+              className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
+              strokeWidth={2.5}
+            />
+          </Link>
+        </section>
+      )}
+
+
+
       {/* ============ HELP FOOTER ============ */}
       <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
         <div className="flex items-start gap-3">
