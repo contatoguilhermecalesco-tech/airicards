@@ -108,6 +108,7 @@ function ShopPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [preview, setPreview] = useState<ShopItem | null>(null);
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
