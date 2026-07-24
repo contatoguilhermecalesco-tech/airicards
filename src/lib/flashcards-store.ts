@@ -165,7 +165,13 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
     if (activeProfile !== profileId) return; // profile switched meanwhile
     state = remote;
-    home = remoteHome.day === todayKey() ? remoteHome : { day: todayKey(), count: 0 };
+    // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
+    // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
+    // zeramos os contadores diários e mantemos o resto.
+    home =
+      remoteHome.day === todayKey()
+        ? remoteHome
+        : { ...remoteHome, day: todayKey(), count: 0, reviewed: 0 };
     saveCache(profileId, state, home);
     emit();
     emitHome();
@@ -240,7 +246,10 @@ export function setActiveProfileId(profileId: string | null) {
   // Instant paint from local cache.
   const cached = loadCache(profileId);
   state = cached.state;
-  home = cached.home.day === todayKey() ? cached.home : { ...cached.home, day: todayKey(), count: 0 };
+  home =
+    cached.home.day === todayKey()
+      ? cached.home
+      : { ...cached.home, day: todayKey(), count: 0, reviewed: 0 };
   emit();
   emitHome();
   // Punições diárias com base no estado carregado.
@@ -727,7 +736,15 @@ export const HOME_DAILY_LIMIT = Infinity;
 function refreshHomeDay() {
   const today = todayKey();
   if (home.day !== today) {
-    home = { day: today, count: 0, reviewed: 0 };
+    // BUGFIX: virava o dia e sobrescrevia `home` inteiro, apagando `streak`
+    // e `punishments`. Agora só zeramos os contadores diários e preservamos
+    // o restante do estado (streak, milestones, punishments).
+    home = {
+      ...home,
+      day: today,
+      count: 0,
+      reviewed: 0,
+    };
     scheduleSave();
     emitHome();
   }
