@@ -359,12 +359,13 @@ function PlayerStatus({
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
       <div className="flex items-center gap-2">
-        <div
-          className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-semibold text-white"
-          style={{ background: profile.gradient }}
-        >
-          {profile.initial}
-        </div>
+        <ProfileAvatar
+          profileId={profile.id}
+          initial={profile.initial}
+          gradient={profile.gradient}
+          size={28}
+          fontScale={0.42}
+        />
         <p className="text-[12px] font-semibold text-foreground">
           {isMe ? "Você" : profile.name}
         </p>
