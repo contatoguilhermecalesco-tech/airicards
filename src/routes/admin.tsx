@@ -1074,6 +1074,34 @@ function ChangelogSection() {
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const isEditing = editingId !== null;
+
+  function resetForm() {
+    setTitle("");
+    setBody("");
+    setNotes("");
+    setIdea("");
+    setIconKey("");
+    setEditingId(null);
+    setErr(null);
+  }
+
+  function startEditing(entry: ChangelogEntry) {
+    setEditingId(entry.id);
+    setTitle(entry.title);
+    setBody(entry.body);
+    setNotes(entry.notes ?? "");
+    setCategory(entry.category);
+    setIconKey((entry.icon as NotificationIconKey | null) ?? "");
+    setIdea("");
+    setErr(null);
+    setOk(null);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   const activeMeta =
     CHANGELOG_CATEGORIES.find((c) => c.key === category) ?? CHANGELOG_CATEGORIES[0];
