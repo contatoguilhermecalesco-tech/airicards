@@ -16,6 +16,7 @@ export type WalletState = {
   cosmetics: string[];
   equipped: EquippedMap;
   powerups: Record<string, number>;
+  bio: string;
   loaded: boolean;
 };
 
@@ -25,8 +26,10 @@ const empty = (id = ""): WalletState => ({
   cosmetics: [],
   equipped: {},
   powerups: {},
+  bio: "",
   loaded: false,
 });
+
 
 let state: WalletState = empty();
 const listeners = new Set<() => void>();
@@ -59,6 +62,7 @@ type WalletRow = {
     cosmetics?: string[];
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
+    bio?: string;
   } | null;
 };
 
@@ -70,9 +74,11 @@ function normalize(row: WalletRow, profileId: string): WalletState {
     cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
     equipped: inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
+    bio: typeof inv.bio === "string" ? inv.bio : "",
     loaded: true,
   };
 }
+
 
 let currentProfileId: string | null = null;
 let loadPromise: Promise<void> | null = null;
@@ -125,10 +131,19 @@ async function persist() {
         cosmetics: state.cosmetics,
         equipped: state.equipped,
         powerups: state.powerups,
+        bio: state.bio,
       },
     })
     .eq("profile_id", currentProfileId);
 }
+
+export async function setBio(bio: string) {
+  if (!currentProfileId) return;
+  state.bio = bio.slice(0, 180);
+  emit();
+  await persist();
+}
+
 
 export async function earn(amount: number, reason: string) {
   if (!currentProfileId || amount <= 0) return;

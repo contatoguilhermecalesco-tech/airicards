@@ -26,16 +26,19 @@ import {
   Zap,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
+import { PROFILES } from "@/lib/profile";
 import {
   useWallet,
   loadWallet,
   equipCosmetic,
   unequipSlot,
   slotOf,
+  setBio,
   type CosmeticSlot,
 } from "@/lib/wallet-store";
 import { listShopItems, type ShopItem } from "@/lib/shop";
 import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+
 
 export const Route = createFileRoute("/perfil")({
   head: () => ({
@@ -221,6 +224,16 @@ function PerfilPage() {
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
+  const [bioDraft, setBioDraft] = useState("");
+  const [editingBio, setEditingBio] = useState(false);
+  const [savingBio, setSavingBio] = useState(false);
+
+  useEffect(() => {
+    setBioDraft(wallet.bio ?? "");
+  }, [wallet.bio, wallet.profileId]);
+
+  const partner = profile ? PROFILES.find((p) => p.id !== profile.id) ?? null : null;
+
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
@@ -424,12 +437,64 @@ function PerfilPage() {
 
             <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
 
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
-              Sobre mim
-            </p>
-            <p className="mt-1 text-[13px] leading-snug text-white/80">
-              Estudando inglês todo dia com airi. 🔥 Streak em andamento.
-            </p>
+            <div className="mt-3 flex items-center justify-between">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-white/80">
+                Sobre mim
+              </p>
+              {!editingBio && (
+                <button
+                  onClick={() => setEditingBio(true)}
+                  className="text-[11px] font-semibold text-violet-300 transition hover:text-violet-200"
+                >
+                  Editar
+                </button>
+              )}
+            </div>
+            {editingBio ? (
+              <div className="mt-1.5 space-y-2">
+                <textarea
+                  value={bioDraft}
+                  onChange={(e) => setBioDraft(e.target.value.slice(0, 180))}
+                  rows={3}
+                  placeholder="Conte algo sobre você — estudando, metas, curiosidades…"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[13px] leading-snug text-white outline-none focus:border-violet-400/50"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/40">{bioDraft.length}/180</span>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        setBioDraft(wallet.bio ?? "");
+                        setEditingBio(false);
+                      }}
+                      disabled={savingBio}
+                      className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setSavingBio(true);
+                        await setBio(bioDraft);
+                        setSavingBio(false);
+                        setEditingBio(false);
+                        setFlash("Bio atualizada.");
+                        setTimeout(() => setFlash(null), 1400);
+                      }}
+                      disabled={savingBio}
+                      className="rounded-lg bg-violet-500 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-violet-400 disabled:opacity-50"
+                    >
+                      {savingBio ? "Salvando…" : "Salvar"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-snug text-white/80">
+                {wallet.bio?.trim() || "Toque em editar para adicionar sua bio."}
+              </p>
+            )}
+
 
             <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
               Membro airi
@@ -599,6 +664,42 @@ function PerfilPage() {
           })}
         </ul>
       </section>
+
+      {/* ============ PARTNER LINK ============ */}
+      {partner && (
+        <section className="mt-6">
+          <Link
+            to="/perfil_/$id"
+            params={{ id: partner.id }}
+            className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:bg-white/[0.05]"
+          >
+            <span
+              aria-hidden
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
+              style={{ backgroundImage: partner.gradient }}
+            >
+              {partner.name.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
+                Perfil do parceiro
+              </p>
+              <p className="mt-0.5 truncate text-[15px] font-semibold text-white">
+                Ver perfil de {partner.name}
+              </p>
+              <p className="mt-0.5 truncate text-[12px] text-white/50">
+                Cosméticos equipados, rank, streak e bio
+              </p>
+            </div>
+            <ArrowLeft
+              className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
+              strokeWidth={2.5}
+            />
+          </Link>
+        </section>
+      )}
+
+
 
       {/* ============ HELP FOOTER ============ */}
       <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">

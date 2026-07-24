@@ -28,6 +28,7 @@ import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as NovidadesIndexRouteImport } from './routes/novidades.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
+import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
 import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
@@ -143,6 +144,11 @@ const SocialStatsRoute = SocialStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => SocialRoute,
+} as any)
+const PerfilIdRoute = PerfilIdRouteImport.update({
+  id: '/perfil_/$id',
+  path: '/perfil/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const NovidadesIdRoute = NovidadesIdRouteImport.update({
   id: '/$id',
@@ -266,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
+  '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
@@ -305,6 +312,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
+  '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library': typeof LibraryIndexRoute
   '/novidades': typeof NovidadesIndexRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
+  '/perfil_/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/library/$deckId'
     | '/novidades/$id'
+    | '/perfil/$id'
     | '/social/stats'
     | '/library/'
     | '/novidades/'
@@ -425,6 +435,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/library/$deckId'
     | '/novidades/$id'
+    | '/perfil/$id'
     | '/social/stats'
     | '/library'
     | '/novidades'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/social'
     | '/library/$deckId'
     | '/novidades/$id'
+    | '/perfil_/$id'
     | '/social/stats'
     | '/library/'
     | '/novidades/'
@@ -503,6 +515,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
+  PerfilIdRoute: typeof PerfilIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
@@ -651,6 +664,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/stats'
       preLoaderRoute: typeof SocialStatsRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/perfil_/$id': {
+      id: '/perfil_/$id'
+      path: '/perfil/$id'
+      fullPath: '/perfil/$id'
+      preLoaderRoute: typeof PerfilIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/novidades/$id': {
       id: '/novidades/$id'
@@ -892,6 +912,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
+  PerfilIdRoute: PerfilIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
