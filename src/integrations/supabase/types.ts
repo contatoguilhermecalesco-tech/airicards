@@ -383,6 +383,7 @@ export type Database = {
           name: string
           owner_name: string
           owner_profile_id: string
+          price: number
           slug: string
           updated_at: string
         }
@@ -398,6 +399,7 @@ export type Database = {
           name: string
           owner_name: string
           owner_profile_id: string
+          price?: number
           slug: string
           updated_at?: string
         }
@@ -413,7 +415,118 @@ export type Database = {
           name?: string
           owner_name?: string
           owner_profile_id?: string
+          price?: number
           slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shop_items: {
+        Row: {
+          accent: string
+          active: boolean
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          kind: string
+          name: string
+          payload: Json
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          accent?: string
+          active?: boolean
+          created_at?: string
+          description?: string
+          icon?: string
+          id: string
+          kind: string
+          name: string
+          payload?: Json
+          price: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          accent?: string
+          active?: boolean
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          kind?: string
+          name?: string
+          payload?: Json
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      shop_purchases: {
+        Row: {
+          buyer_profile_id: string
+          created_at: string
+          deck_id: string | null
+          id: string
+          item_id: string | null
+          item_kind: string
+          payload: Json
+          price_paid: number
+        }
+        Insert: {
+          buyer_profile_id: string
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          item_id?: string | null
+          item_kind: string
+          payload?: Json
+          price_paid: number
+        }
+        Update: {
+          buyer_profile_id?: string
+          created_at?: string
+          deck_id?: string | null
+          id?: string
+          item_id?: string | null
+          item_kind?: string
+          payload?: Json
+          price_paid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_purchases_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "published_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          created_at: string
+          crystals: number
+          inventory: Json
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          crystals?: number
+          inventory?: Json
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          crystals?: number
+          inventory?: Json
+          profile_id?: string
           updated_at?: string
         }
         Relationships: []

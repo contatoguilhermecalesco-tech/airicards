@@ -6,16 +6,19 @@ import {
   Check,
   Compass,
   Download,
+  Gem,
   Heart,
   Search,
+  ShoppingBag,
   Sparkles,
 } from "lucide-react";
 import {
-  importPublishedDeck,
   likePublishedDeck,
   listPublishedDecks,
   type PublishedDeckRow,
 } from "@/lib/marketplace";
+import { buyPublishedDeck } from "@/lib/shop";
+import { useWallet, loadWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 
 export const Route = createFileRoute("/marketplace")({
@@ -41,12 +44,18 @@ export const Route = createFileRoute("/marketplace")({
 
 function MarketplacePage() {
   const profile = useCurrentProfile();
+  const wallet = useWallet();
   const [decks, setDecks] = useState<PublishedDeckRow[] | null>(null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "mine">("all");
   const [importing, setImporting] = useState<string | null>(null);
   const [imported, setImported] = useState<Record<string, string>>({});
   const [liked, setLiked] = useState<Record<string, number>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile) void loadWallet(profile.id);
+  }, [profile?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,15 +82,20 @@ function MarketplacePage() {
   }, [decks, q, filter, profile]);
 
   async function handleImport(row: PublishedDeckRow) {
-    if (importing) return;
+    if (importing || !profile) return;
     setImporting(row.id);
-    try {
-      const newDeckId = await importPublishedDeck(row);
-      setImported((s) => ({ ...s, [row.id]: newDeckId }));
-    } catch {
-      /* ignore */
-    } finally {
-      setImporting(null);
+    setError(null);
+    const r = await buyPublishedDeck(profile.id, row);
+    setImporting(null);
+    if (r.ok && r.deckId) {
+      setImported((s) => ({ ...s, [row.id]: r.deckId! }));
+    } else if (!r.ok) {
+      setError(
+        r.reason === "insufficient"
+          ? `Você precisa de ${row.price} ✦ para este deck.`
+          : "Não foi possível adquirir o deck.",
+      );
+      setTimeout(() => setError(null), 2500);
     }
   }
 
@@ -103,7 +117,7 @@ function MarketplacePage() {
         Biblioteca
       </Link>
 
-      <header className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
             <Compass className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -113,10 +127,29 @@ function MarketplacePage() {
             Decks da comunidade
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Explore, curta e importe para sua biblioteca.
+            Explore, curta e importe. Decks premium usam Cristais airi ✦.
           </p>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-200">
+            <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
+            {wallet.crystals} ✦
+          </div>
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow"
+          >
+            <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Loja
+          </Link>
+        </div>
       </header>
+
+      {error && (
+        <div className="mb-4 rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-200">
+          {error}
+        </div>
+      )}
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <label className="relative flex flex-1 min-w-[220px] items-center">
@@ -185,21 +218,29 @@ function MarketplacePage() {
                 </p>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <button
-                    onClick={() => handleLike(row)}
-                    disabled={iLiked}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                      iLiked
-                        ? "border-rose-400/40 bg-rose-500/15 text-rose-300"
-                        : "border-white/10 bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
-                    }`}
-                  >
-                    <Heart
-                      className={`h-3.5 w-3.5 ${iLiked ? "fill-current" : ""}`}
-                      strokeWidth={2.5}
-                    />
-                    {likeCount}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleLike(row)}
+                      disabled={iLiked}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                        iLiked
+                          ? "border-rose-400/40 bg-rose-500/15 text-rose-300"
+                          : "border-white/10 bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
+                      }`}
+                    >
+                      <Heart
+                        className={`h-3.5 w-3.5 ${iLiked ? "fill-current" : ""}`}
+                        strokeWidth={2.5}
+                      />
+                      {likeCount}
+                    </button>
+                    {row.price > 0 && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-200">
+                        <Gem className="h-3 w-3" strokeWidth={2.5} />
+                        {row.price}
+                      </span>
+                    )}
+                  </div>
 
                   {newDeckId ? (
                     <Link
@@ -213,7 +254,7 @@ function MarketplacePage() {
                   ) : (
                     <button
                       onClick={() => handleImport(row)}
-                      disabled={isImporting}
+                      disabled={isImporting || !profile}
                       className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-50"
                     >
                       {isImporting ? (
@@ -223,8 +264,17 @@ function MarketplacePage() {
                         </>
                       ) : (
                         <>
-                          <Download className="h-3.5 w-3.5" strokeWidth={2.75} />
-                          Adicionar
+                          {row.price > 0 ? (
+                            <>
+                              <Gem className="h-3.5 w-3.5" strokeWidth={2.75} />
+                              Comprar · {row.price} ✦
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-3.5 w-3.5" strokeWidth={2.75} />
+                              Adicionar
+                            </>
+                          )}
                         </>
                       )}
                     </button>

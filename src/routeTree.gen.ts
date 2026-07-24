@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RankRouteImport } from './routes/rank'
@@ -55,6 +56,11 @@ const SocialRoute = SocialRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
@@ -286,6 +293,7 @@ export interface FileRoutesByTo {
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
+  '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/review'
     | '/settings'
+    | '/shop'
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/review'
     | '/settings'
+    | '/shop'
     | '/sitemap.xml'
     | '/library/$deckId'
     | '/novidades/$id'
@@ -434,6 +445,7 @@ export interface FileRouteTypes {
     | '/rank'
     | '/review'
     | '/settings'
+    | '/shop'
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   RankRoute: typeof RankRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
+  ShopRoute: typeof ShopRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -847,6 +867,7 @@ const rootRouteChildren: RootRouteChildren = {
   RankRoute: RankRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
+  ShopRoute: ShopRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
   LibraryDeckIdRoute: LibraryDeckIdRoute,

@@ -20,6 +20,7 @@ export type PublishedDeckRow = {
   cards: PublishedCard[];
   likes: number;
   imports: number;
+  price: number;
   created_at: string;
   updated_at: string;
 };
@@ -40,6 +41,7 @@ export async function publishDeck(input: {
   ownerName: string;
   deck: Deck;
   cards: Card[];
+  price?: number;
 }): Promise<PublishedDeckRow> {
   const payload: PublishedCard[] = input.cards.map((c) => ({
     front: c.front,
@@ -58,6 +60,7 @@ export async function publishDeck(input: {
     color_key: input.deck.color ?? "lavender",
     card_count: payload.length,
     cards: payload,
+    price: Math.max(0, Math.floor(input.price ?? 0)),
   };
 
   const { data, error } = await supabase
@@ -67,7 +70,7 @@ export async function publishDeck(input: {
     .single();
 
   if (error || !data) throw error ?? new Error("Falha ao publicar deck");
-  return data as PublishedDeckRow;
+  return data as unknown as PublishedDeckRow;
 }
 
 export async function unpublishDeck(ownerId: string, deckName: string) {
@@ -92,7 +95,7 @@ export async function findPublishedDeck(
     .eq("slug", slug)
     .maybeSingle();
   if (error) return null;
-  return (data as PublishedDeckRow | null) ?? null;
+  return (data as unknown as PublishedDeckRow | null) ?? null;
 }
 
 export async function listPublishedDecks(): Promise<PublishedDeckRow[]> {
@@ -103,7 +106,7 @@ export async function listPublishedDecks(): Promise<PublishedDeckRow[]> {
     .order("created_at", { ascending: false })
     .limit(120);
   if (error || !data) return [];
-  return data as PublishedDeckRow[];
+  return data as unknown as PublishedDeckRow[];
 }
 
 /** Incrementa curtidas atomicamente via read+update (RLS permissiva). */
