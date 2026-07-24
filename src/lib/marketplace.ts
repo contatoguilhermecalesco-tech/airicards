@@ -138,6 +138,9 @@ export async function importPublishedDeck(row: PublishedDeckRow): Promise<string
       source: c.source,
     });
   }
+  // Persistência imediata: garante que o deck importado ficou salvo em
+  // profile_data antes de retornar, evitando corrida com pullFromCloud.
+  await flushSave();
   // best-effort: bump imports counter
   try {
     await supabase
@@ -149,3 +152,4 @@ export async function importPublishedDeck(row: PublishedDeckRow): Promise<string
   }
   return newDeck.id;
 }
+
