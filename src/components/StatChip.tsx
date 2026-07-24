@@ -1,41 +1,32 @@
 import React from "react";
 
-/** Custom Arlys crystal icon — faceted diamond with inner sparkle */
+/** Custom Arlys crystal — V-facet diamond, matches the profile chip system */
 export function ArlysIcon({ className, strokeWidth: _sw }: { className?: string; strokeWidth?: number }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden>
       <defs>
-        <linearGradient id="arlys-body" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e9d5ff" />
-          <stop offset="45%" stopColor="#c4b5fd" />
-          <stop offset="100%" stopColor="#7c3aed" />
+        <linearGradient id="arlys-outer" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.15" />
         </linearGradient>
-        <linearGradient id="arlys-shine" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        <linearGradient id="arlys-core" x1="0.5" y1="0" x2="0.5" y2="1">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+          <stop offset="55%" stopColor="currentColor" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.85" />
         </linearGradient>
       </defs>
-      {/* Diamond body */}
+      {/* Outer diamond silhouette */}
       <path
-        d="M12 2.5 L20.5 9.2 L12 21.5 L3.5 9.2 Z"
-        fill="url(#arlys-body)"
-        stroke="#ffffff"
-        strokeOpacity="0.35"
-        strokeWidth="0.6"
+        d="M12 2 L4.5 12 L12 22 L19.5 12 Z"
+        fill="url(#arlys-outer)"
+        stroke="currentColor"
+        strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      {/* Facet lines */}
-      <path
-        d="M3.5 9.2 H20.5 M12 2.5 L8.5 9.2 L12 21.5 M12 2.5 L15.5 9.2 L12 21.5"
-        stroke="#ffffff"
-        strokeOpacity="0.4"
-        strokeWidth="0.5"
-        strokeLinejoin="round"
-      />
-      {/* Highlight */}
-      <path d="M12 3.4 L15 9 L12 9 Z" fill="url(#arlys-shine)" />
-      {/* Sparkle */}
-      <circle cx="9.2" cy="6.2" r="0.7" fill="#ffffff" opacity="0.95" />
+      {/* Inner V-facet core */}
+      <path d="M12 2 L9 12 L12 22 L15 12 Z" fill="url(#arlys-core)" />
+      {/* Top specular highlight */}
+      <path d="M12 3.2 L10.2 11 L12 11 Z" fill="#ffffff" fillOpacity="0.55" />
     </svg>
   );
 }
@@ -58,38 +49,43 @@ export function StatChip({
 }) {
   return (
     <div
-      className="group relative flex items-center gap-2 overflow-hidden rounded-xl px-2.5 py-2 transition"
+      className="group relative flex flex-col gap-2 rounded-xl p-1.5 shadow-xl transition-colors"
       style={{
-        background:
-          "linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
-        border: `1px solid ${accent ? `${color}55` : "rgba(255,255,255,0.06)"}`,
-        boxShadow: accent
-          ? `inset 0 0 0 1px ${color}10, 0 6px 18px -12px ${color}80`
-          : "inset 0 1px 0 rgba(255,255,255,0.03)",
+        background: "rgba(255,255,255,0.05)",
+        border: `1px solid ${accent ? `${color}44` : "rgba(255,255,255,0.10)"}`,
       }}
     >
-      {/* Ambient glow */}
-      <span
-        className="pointer-events-none absolute -left-4 -top-4 h-14 w-14 rounded-full opacity-40 blur-2xl transition group-hover:opacity-60"
-        style={{ background: color }}
-        aria-hidden
-      />
-      <span
-        className="relative grid h-8 w-8 shrink-0 place-items-center rounded-lg"
+      {/* Icon tile */}
+      <div
+        className="relative aspect-square w-full overflow-hidden rounded-lg flex items-center justify-center"
         style={{
-          background: `radial-gradient(120% 120% at 30% 20%, ${color}40 0%, ${color}18 55%, transparent 100%)`,
-          border: `1px solid ${color}35`,
-          color,
-          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 10px -6px ${color}90`,
+          background: `linear-gradient(135deg, ${color}33 0%, ${color}14 100%)`,
+          boxShadow: "inset 0 1px 1px rgba(255,255,255,0.10)",
         }}
       >
-        <Icon className="h-4 w-4" strokeWidth={2.4} />
-      </span>
-      <div className="relative min-w-0">
-        <p className="truncate text-[10px] font-bold uppercase tracking-[0.09em] text-white/55">
+        {/* Ambient inner glow */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 blur-md"
+          style={{ background: `${color}1a` }}
+        />
+        <Icon
+          className="relative z-10 h-5 w-5 transition-transform duration-300 group-hover:scale-105"
+          strokeWidth={2}
+          // @ts-expect-error — allow inline style for filter/color
+          style={{ color, filter: `drop-shadow(0 0 8px ${color}80)` }}
+        />
+      </div>
+
+      {/* Text */}
+      <div className="space-y-0.5 px-0.5">
+        <p
+          className="truncate text-[8px] font-bold uppercase leading-none tracking-widest"
+          style={{ color: `${color}cc` }}
+        >
           {label}
         </p>
-        <p className="truncate text-[13px] font-semibold leading-tight text-white">
+        <p className="truncate text-[13px] font-extrabold leading-none text-white">
           {value || "—"}
         </p>
       </div>
