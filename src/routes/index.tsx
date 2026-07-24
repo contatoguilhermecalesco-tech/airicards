@@ -347,36 +347,36 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quick actions — atalhos premium */}
+      {/* Atalhos — pills discretas estilo iOS */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
       >
-        <QuickAction
+        <QuickPill
           to="/social"
           label="Duelo"
-          icon={<Swords className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-fuchsia-400/25 to-fuchsia-500/5 border-fuchsia-300/25 text-fuchsia-200"
+          icon={<Swords className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-fuchsia-200"
         />
-        <QuickAction
+        <QuickPill
           to="/enemies"
           label="Chefões"
           badge={enemies.length > 0 ? enemies.length : undefined}
-          icon={<Skull className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-rose-400/25 to-rose-500/5 border-rose-300/25 text-rose-200"
+          icon={<Skull className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-rose-200"
         />
-        <QuickAction
+        <QuickPill
           to="/rank"
           label={isElite(rank.tier) ? TIER_LABEL[rank.tier] : `${TIER_LABEL[rank.tier]} ${DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}`}
-          icon={<Crown className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint={`border-white/10 text-white`}
-          crestColor={TIER_COLORS[rank.tier]}
+          icon={<Crown className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-white"
+          dotColor={TIER_COLORS[rank.tier].glow}
         />
-        <QuickAction
+        <QuickPill
           to="/shop"
           label="Loja"
-          icon={<ShoppingBag className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-amber-400/25 to-amber-500/5 border-amber-300/25 text-amber-200"
+          icon={<ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-amber-200"
         />
       </section>
 
