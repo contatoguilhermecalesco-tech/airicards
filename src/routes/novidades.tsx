@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import {
   ChevronLeft,
+  ChevronRight,
   Sparkles,
   Wrench,
   Wand2,
