@@ -347,18 +347,103 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Quick actions — atalhos premium */}
+      <section
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
+      >
+        <QuickAction
+          to="/social"
+          label="Duelo"
+          icon={<Swords className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-fuchsia-400/25 to-fuchsia-500/5 border-fuchsia-300/25 text-fuchsia-200"
+        />
+        <QuickAction
+          to="/enemies"
+          label="Chefões"
+          badge={enemies.length > 0 ? enemies.length : undefined}
+          icon={<Skull className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-rose-400/25 to-rose-500/5 border-rose-300/25 text-rose-200"
+        />
+        <QuickAction
+          to="/rank"
+          label={isElite(rank.tier) ? TIER_LABEL[rank.tier] : `${TIER_LABEL[rank.tier]} ${DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}`}
+          icon={<Crown className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint={`border-white/10 text-white`}
+          crestColor={TIER_COLORS[rank.tier]}
+        />
+        <QuickAction
+          to="/shop"
+          label="Loja"
+          icon={<ShoppingBag className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-amber-400/25 to-amber-500/5 border-amber-300/25 text-amber-200"
+        />
+      </section>
+
       {/* Streak — sequência de dias */}
       <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
 
+      {/* Chefões pendentes — alerta gamificado */}
+      {enemies.length > 0 && (
+        <section
+          className="animate-fade-in mt-6"
+          style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
+        >
+          <Link
+            to="/enemies"
+            className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30`}
+          >
+            <GlassHighlight />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-rose-500/20 opacity-70 blur-2xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -left-8 -bottom-10 h-32 w-32 rounded-full bg-fuchsia-500/10 opacity-60 blur-2xl"
+            />
+            <div className="relative flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-rose-300/30 bg-gradient-to-b from-rose-400/25 to-rose-600/10 text-rose-200 shadow-[0_0_24px_-6px_rgba(244,63,94,0.55)]">
+                <Skull className="h-5 w-5" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-rose-300/90">
+                    Arena · chefões ativos
+                  </p>
+                  {enemyDue > 0 && (
+                    <span className="rounded-full bg-rose-500/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-rose-100">
+                      {enemyDue} agora
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 truncate text-[14px] font-medium text-foreground">
+                  {enemies.length} carta{enemies.length === 1 ? "" : "s"} inimiga{enemies.length === 1 ? "" : "s"} te encarando
+                </p>
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  Derrote-as para reconquistar seu domínio
+                </p>
+              </div>
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-rose-200/60 transition-all group-hover:translate-x-0.5 group-hover:text-rose-100"
+                strokeWidth={2.25}
+              />
+            </div>
+          </Link>
+        </section>
+      )}
 
       {/* Stats — glass chips */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-2 gap-3"
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
+        <StatChip label="Revisadas" value={reviewedToday} accent />
+        <StatChip label="Recorde" value={streak.longest} />
       </section>
+
 
 
       {/* Método RRSLG */}
