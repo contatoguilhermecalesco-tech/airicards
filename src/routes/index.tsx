@@ -180,12 +180,20 @@ function Home() {
             {eyebrow}
           </span>
           <span className="shrink-0">{icon}</span>
+          <span
+            aria-hidden
+            className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/40"
+          />
+          <span className="truncate text-[11px] font-medium tabular-nums text-muted-foreground/70">
+            {timeLabel}
+          </span>
         </div>
         <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
           {salute}
           {name ? `, ${name}` : ""}
         </h1>
       </header>
+
 
       {/* Hero — Liquid Glass */}
       <section
