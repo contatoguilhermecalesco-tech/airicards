@@ -289,7 +289,7 @@ function PerfilViewer() {
             Últimos passos de {profile.name} no airi.
           </p>
         </div>
-        <ProfileActivityFeed profileId={profileId} />
+        <ProfileActivityFeed profileId={id} />
       </section>
 
 
