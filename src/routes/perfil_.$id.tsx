@@ -280,6 +280,20 @@ function PerfilViewer() {
         </ul>
       </section>
 
+      <section className="mt-6">
+        <div className="mb-3">
+          <h2 className="text-[18px] font-semibold tracking-tight text-foreground sm:text-[20px]">
+            Atividade recente
+          </h2>
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
+            Últimos passos de {profile.name} no airi.
+          </p>
+        </div>
+        <ProfileActivityFeed profileId={profileId} />
+      </section>
+
+
+
       <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
         <div className="flex items-start gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
