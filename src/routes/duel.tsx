@@ -276,12 +276,13 @@ function DuelPage() {
                   </div>
                   {winner ? (
                     <div className="flex items-center gap-1.5">
-                      <div
-                        className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold text-white"
-                        style={{ background: winner.gradient }}
-                      >
-                        {winner.initial}
-                      </div>
+                      <ProfileAvatar
+                        profileId={winner.id}
+                        initial={winner.initial}
+                        gradient={winner.gradient}
+                        size={24}
+                        fontScale={0.42}
+                      />
                       {wo ? (
                         <ShieldAlert className="h-3.5 w-3.5 text-amber-300" />
                       ) : (
