@@ -655,8 +655,8 @@ function QuickAction({
 }) {
   return (
     <Link
-      // @ts-expect-error — dynamic to prop
-      to={to}
+      to={to as "/social"}
+
       className={`${GLASS_BASE} group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]`}
     >
       <GlassHighlight />
