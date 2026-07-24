@@ -574,7 +574,10 @@ function PerfilPage() {
                 </span>
               )}
             </div>
-            <p className="text-[13px] leading-tight text-white/60">{handle}</p>
+            <p className="text-[13px] leading-tight text-white/60">
+              <span className="text-white/80">{handleUser}</span>
+              <span className="text-white/40">{handleSuffix}</span>
+            </p>
 
             <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
 
