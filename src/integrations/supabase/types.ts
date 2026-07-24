@@ -127,6 +127,33 @@ export type Database = {
         }
         Relationships: []
       }
+      changelog_entries: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          icon: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       duel_results: {
         Row: {
           accuracy: number

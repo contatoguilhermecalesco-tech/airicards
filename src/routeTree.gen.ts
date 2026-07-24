@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RankRouteImport } from './routes/rank'
+import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ExamRouteImport } from './routes/exam'
 import { Route as EnemiesRouteImport } from './routes/enemies'
@@ -67,6 +68,11 @@ const ReviewRoute = ReviewRouteImport.update({
 const RankRoute = RankRouteImport.update({
   id: '/rank',
   path: '/rank',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NovidadesRoute = NovidadesRouteImport.update({
+  id: '/novidades',
+  path: '/novidades',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
+  '/novidades': typeof NovidadesRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByTo {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
+  '/novidades': typeof NovidadesRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/enemies': typeof EnemiesRoute
   '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
+  '/novidades': typeof NovidadesRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/exam'
     | '/marketplace'
+    | '/novidades'
     | '/rank'
     | '/review'
     | '/settings'
@@ -368,6 +378,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/exam'
     | '/marketplace'
+    | '/novidades'
     | '/rank'
     | '/review'
     | '/settings'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/exam'
     | '/marketplace'
+    | '/novidades'
     | '/rank'
     | '/review'
     | '/settings'
@@ -436,6 +448,7 @@ export interface RootRouteChildren {
   EnemiesRoute: typeof EnemiesRoute
   ExamRoute: typeof ExamRoute
   MarketplaceRoute: typeof MarketplaceRoute
+  NovidadesRoute: typeof NovidadesRoute
   RankRoute: typeof RankRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
@@ -491,6 +504,13 @@ declare module '@tanstack/react-router' {
       path: '/rank'
       fullPath: '/rank'
       preLoaderRoute: typeof RankRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/novidades': {
+      id: '/novidades'
+      path: '/novidades'
+      fullPath: '/novidades'
+      preLoaderRoute: typeof NovidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -773,6 +793,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnemiesRoute: EnemiesRoute,
   ExamRoute: ExamRoute,
   MarketplaceRoute: MarketplaceRoute,
+  NovidadesRoute: NovidadesRoute,
   RankRoute: RankRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,

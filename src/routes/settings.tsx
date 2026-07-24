@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, Volume2, Smartphone, Star, Moon, Bell, Play } from "lucide-react";
+import { useEffect } from "react";
+import { ChevronLeft, Volume2, Smartphone, Star, Moon, Bell, Play, Sparkles, ChevronRight } from "lucide-react";
 import {
   DEFAULT_PREFS,
   setPrefs,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/notification-prefs";
 import { playChime, vibratePulse } from "@/lib/notification-sound";
 import { useCurrentProfile } from "@/lib/profile";
+import { initChangelog, useChangelogUnread } from "@/lib/changelog-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -96,6 +98,10 @@ function SettingsPage() {
   const profile = useCurrentProfile();
   const prefs = useNotificationPrefs();
   const quiet = isQuietNow(prefs);
+  const unreadNews = useChangelogUnread();
+  useEffect(() => {
+    void initChangelog();
+  }, []);
 
   const testNotification = () => {
     if (prefs.sound) playChime();
@@ -233,7 +239,28 @@ function SettingsPage() {
         )}
       </Group>
 
+      {/* About */}
+      <Group label="Sobre o app">
+        <Link to="/novidades" className="block">
+          <Row
+            icon={<Sparkles className="h-4 w-4" strokeWidth={2.25} />}
+            title="Novidades"
+            subtitle="Veja o que chegou de novo no airi."
+          >
+            <div className="flex items-center gap-2">
+              {unreadNews > 0 && (
+                <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground">
+                  {unreadNews}
+                </span>
+              )}
+              <ChevronRight className="h-4 w-4 text-foreground/40" strokeWidth={2.25} />
+            </div>
+          </Row>
+        </Link>
+      </Group>
+
       <div className="mt-4 flex items-center justify-between px-1">
+
         <p className="text-[11px] text-foreground/45">
           Preferências salvas neste dispositivo.
         </p>
