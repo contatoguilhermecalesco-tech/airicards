@@ -21,6 +21,7 @@ import { Route as DuelRouteImport } from './routes/duel'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
+import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
@@ -102,6 +103,11 @@ const StudyIndexRoute = StudyIndexRouteImport.update({
   id: '/study/',
   path: '/study/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SocialIndexRoute = SocialIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SocialRoute,
 } as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
+  '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
@@ -259,10 +266,10 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library': typeof LibraryIndexRoute
+  '/social': typeof SocialIndexRoute
   '/study': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/grammar': typeof StudyGrammarIndexRoute
@@ -295,6 +302,7 @@ export interface FileRoutesById {
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
+  '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
@@ -332,6 +340,7 @@ export interface FileRouteTypes {
     | '/library/$deckId'
     | '/social/stats'
     | '/library/'
+    | '/social/'
     | '/study/'
     | '/deck/$owner/$slug'
     | '/study/listening/history'
@@ -363,10 +372,10 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/sitemap.xml'
-    | '/social'
     | '/library/$deckId'
     | '/social/stats'
     | '/library'
+    | '/social'
     | '/study'
     | '/deck/$owner/$slug'
     | '/study/grammar'
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
     | '/library/$deckId'
     | '/social/stats'
     | '/library/'
+    | '/social/'
     | '/study/'
     | '/deck/$owner/$slug'
     | '/study/listening/history'
@@ -531,6 +541,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/study/'
       preLoaderRoute: typeof StudyIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/social/': {
+      id: '/social/'
+      path: '/'
+      fullPath: '/social/'
+      preLoaderRoute: typeof SocialIndexRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/library/': {
       id: '/library/'
@@ -684,10 +701,12 @@ declare module '@tanstack/react-router' {
 
 interface SocialRouteChildren {
   SocialStatsRoute: typeof SocialStatsRoute
+  SocialIndexRoute: typeof SocialIndexRoute
 }
 
 const SocialRouteChildren: SocialRouteChildren = {
   SocialStatsRoute: SocialStatsRoute,
+  SocialIndexRoute: SocialIndexRoute,
 }
 
 const SocialRouteWithChildren =
