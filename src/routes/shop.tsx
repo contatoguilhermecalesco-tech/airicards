@@ -809,12 +809,7 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
           showBanner ? "cosmetic-banner-animated" : ""
         }`}
         style={{
-          background: showBanner
-            ? `${v.gradient}, ${v.gradient}`
-            : "linear-gradient(135deg,#2b2d31,#1e1f22)",
-          backgroundImage: showBanner
-            ? `${v.gradient.replace("135deg", "110deg")}`
-            : undefined,
+          background: showBanner ? v.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
         }}
       >
         {showBanner && (
