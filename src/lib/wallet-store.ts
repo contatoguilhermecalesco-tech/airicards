@@ -62,6 +62,7 @@ type WalletRow = {
     cosmetics?: string[];
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
+    bio?: string;
   } | null;
 };
 
@@ -73,9 +74,11 @@ function normalize(row: WalletRow, profileId: string): WalletState {
     cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
     equipped: inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
+    bio: typeof inv.bio === "string" ? inv.bio : "",
     loaded: true,
   };
 }
+
 
 let currentProfileId: string | null = null;
 let loadPromise: Promise<void> | null = null;
