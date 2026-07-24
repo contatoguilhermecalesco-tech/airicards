@@ -26,8 +26,10 @@ export function GiftReceivedOverlay() {
 
   const storageKey = me ? `airi.giftsSeen.${me.id}` : null;
 
-  // Semeia "vistos" com pendentes atuais na primeira vez que carrega o perfil,
-  // para não bombardear presentes antigos como se fossem novos.
+  // Carrega o conjunto "vistos" do localStorage ao trocar de perfil.
+  // Não marca pendentes atuais como vistos — se o presente ainda não foi
+  // exibido antes (não está no localStorage), ele deve disparar a animação
+  // mesmo que já estivesse pendente quando o app abriu.
   useEffect(() => {
     if (!me || !storageKey) return;
     if (seededRef.current === me.id) return;
@@ -40,14 +42,7 @@ export function GiftReceivedOverlay() {
     } catch {
       seen = new Set<string>();
     }
-    // Marca todos os pendentes atuais como vistos (não são "recém-chegados").
-    for (const g of pending) seen.add(g.id);
     seenRef.current = seen;
-    try {
-      localStorage.setItem(storageKey, JSON.stringify([...seen]));
-    } catch {
-      /* ignore */
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [me?.id]);
 
