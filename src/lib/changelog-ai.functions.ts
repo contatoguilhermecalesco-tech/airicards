@@ -31,15 +31,32 @@ export const generateChangelogEntry = createServerFn({ method: "POST" })
         : "É uma novidade — enfatize algo novo que o usuário pode experimentar.";
 
     const system = [
-      "Você escreve entradas de 'novidades' (changelog / release notes) em português brasileiro para um app de estudo de inglês chamado airi.",
-      "Tom: elegante, direto e humano — inspirado nas release notes da Apple no iOS e nos patch notes da Riot. Nada de emojis em excesso, nada de jargão técnico, nada de 'agora com IA'.",
-      "Título: até 52 caracteres, sem ponto final, sem prefixos como 'Novo:' ou 'Atualização:'. Só o nome/essência da mudança.",
-      "Resumo (body): 1 a 2 frases, até 240 caracteres, explicando o que muda — é o texto que aparece no card da lista.",
-      "Notas completas (notes): texto mais longo (200–600 palavras) que aparece ao clicar em 'Ler notas completas'. Separe em 2 a 4 parágrafos com linhas em branco entre eles. Explique o contexto, o que mudou, o benefício para o usuário e detalhes finos quando relevantes. Sem títulos markdown, sem bullets — só parágrafos fluídos.",
+      "Você escreve entradas de 'novidades' (patch notes) em português brasileiro para um app de estudo de inglês chamado airi.",
+      "Tom: editorial, direto e humano — inspirado nos patch notes da Riot para League of Legends. Sem emojis, sem jargão técnico, sem 'agora com IA'.",
+      "",
+      "Título: até 52 caracteres, sem ponto final, sem prefixos como 'Novo:' ou 'Atualização:'. Só a essência da mudança.",
+      "",
+      "Resumo (body): 1 a 2 frases, até 240 caracteres — texto do card na listagem.",
+      "",
+      "Notas completas (notes): DEVE usar a sintaxe leve abaixo (é renderizada como patch notes da Riot):",
+      "- Comece com UM parágrafo de abertura (vira uma citação em serifa itálica, o 'olá jogador' do patch). Sem título.",
+      "- Use '## Nome da Seção' para agrupar (ex.: '## Estudo', '## Social', '## Cartas Inimigas', '## Correções').",
+      "- Use '### Subitem' para o nome do recurso/tela dentro da seção (opcional).",
+      "- Use bullets com '- ' para listar mudanças concretas.",
+      "- Dentro dos bullets, use '**Rótulo:**' em negrito seguido do detalhe.",
+      "- Para valores que mudaram, use '=>' entre antigo e novo (ex.: '**Tempo de recarga:** 120s => 90s').",
+      "- Use tags inline em MAIÚSCULAS entre colchetes no início do bullet quando fizer sentido: [NOVO] para adições, [REMOVIDO] para remoções, [BUG] para correção de bug, [AJUSTE] para tuning.",
+      "- Use '---' em uma linha para inserir um divisor antes do parágrafo de fechamento (opcional).",
+      "- Feche com um parágrafo curto celebrando a mudança ou pedindo feedback.",
+      "",
+      "Extensão: 250–600 palavras, 2 a 4 seções '##'. Não invente features que não estão no prompt do usuário — se o prompt for curto, mantenha o texto proporcionalmente curto.",
+      "",
       categoryHint,
-      "Responda SOMENTE JSON válido, sem markdown, no formato:",
+      "",
+      "Responda SOMENTE JSON válido, sem markdown wrapper, no formato:",
       `{"title": string, "body": string, "notes": string}`,
-    ].join(" ");
+    ].join("\n");
+
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
