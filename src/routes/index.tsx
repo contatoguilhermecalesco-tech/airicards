@@ -111,10 +111,30 @@ function Home() {
 
   const hour = new Date().getHours();
   const { salute, icon, eyebrow } = greetingFor(hour);
+  const timeLabel = useMemo(() => {
+    const d = new Date();
+    const hh = d.getHours().toString().padStart(2, "0");
+    const mm = d.getMinutes().toString().padStart(2, "0");
+    const weekday = d.toLocaleDateString("pt-BR", { weekday: "long" });
+    return `${hh}:${mm} · ${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`;
+  }, [now]);
   const name = profile?.name ?? "";
   const cycle = useCycleWeek();
   const todayFocus = getTodayFocus();
   const ankiPending = due > 0 && reviewedToday === 0;
+
+  // Enemies (chefões ativos)
+  const enemies = useMemo(
+    () => cards.filter((c) => isEnemy(c) && !isDefeated(c)),
+    [cards],
+  );
+  const enemyDue = useMemo(
+    () => enemies.filter((c) => c.dueAt <= now).length,
+    [enemies, now],
+  );
+
+  // Rank do perfil
+  const rank = useRank();
 
   // Prova mensal
   const examState = useExamState();
@@ -128,7 +148,9 @@ function Home() {
   const ringC = 2 * Math.PI * RING_R;
   const dailyTarget = Math.max(1, due + reviewedToday);
   const reviewedPct = Math.min(1, reviewedToday / dailyTarget);
+  const pendingPct = Math.min(1, due / dailyTarget);
   const pctLabel = Math.round(reviewedPct * 100);
+
 
   return (
     <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
