@@ -401,9 +401,32 @@ function DuelSummary({
       <div className="mt-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
         {winner ? (
           <>
-            <Trophy className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            {duel.forfeitBy ? (
+              <ShieldAlert className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            ) : (
+              <Trophy className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            )}
             <p className="mt-2 text-[18px] font-semibold text-foreground">
-              {iWon ? "Você venceu!" : `${winner.name} venceu`}
+              {duel.forfeitBy
+                ? `${winner.name} venceu por WO`
+                : iWon
+                  ? "Você venceu!"
+                  : `${winner.name} venceu`}
+            </p>
+            {duel.forfeitBy && (
+              <p className="mt-1 text-[12px] text-muted-foreground">
+                {profileMeta(duel.forfeitBy).name} não jogou a tempo · −1 no placar
+              </p>
+            )}
+          </>
+        ) : duel.forfeitBy ? (
+          <>
+            <ShieldAlert className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            <p className="mt-2 text-[15px] font-semibold text-foreground">
+              Duelo expirado sem jogadas
+            </p>
+            <p className="mt-1 text-[12px] text-muted-foreground">
+              {profileMeta(duel.forfeitBy).name} criou e não terminou · −1 no placar
             </p>
           </>
         ) : (
