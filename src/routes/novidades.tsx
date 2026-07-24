@@ -151,87 +151,97 @@ function NovidadesPage() {
             {/* HERO — Patch cover, Riot-style */}
             {featured && featuredMeta && (
               <section className="relative mt-6 animate-fade-in">
-                <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0f]">
-                  {/* Editorial gradient art */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0"
-                    style={{
-                      background: `radial-gradient(120% 90% at 85% 0%, ${featuredMeta.color}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
-                    }}
-                  />
-                  {/* Grid overlay */}
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 opacity-[0.18] mix-blend-overlay"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-                      backgroundSize: "44px 44px",
-                      maskImage:
-                        "radial-gradient(70% 60% at 70% 30%, black, transparent)",
-                    }}
-                  />
-                  {/* Diagonal accent line */}
-                  <div
-                    aria-hidden
-                    className="absolute -right-16 top-6 h-[220%] w-[3px] rotate-12"
-                    style={{
-                      background: `linear-gradient(180deg, transparent, ${featuredMeta.color}, transparent)`,
-                    }}
-                  />
+                <Link
+                  to="/novidades/$id"
+                  params={{ id: featured.id }}
+                  className="group block"
+                >
+                  <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0f] transition group-hover:border-white/20">
+                    {/* Editorial gradient art */}
+                    <div
+                      aria-hidden
+                      className="absolute inset-0"
+                      style={{
+                        background: `radial-gradient(120% 90% at 85% 0%, ${featuredMeta.color}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
+                      }}
+                    />
+                    {/* Grid overlay */}
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 opacity-[0.18] mix-blend-overlay"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+                        backgroundSize: "44px 44px",
+                        maskImage:
+                          "radial-gradient(70% 60% at 70% 30%, black, transparent)",
+                      }}
+                    />
+                    {/* Diagonal accent line */}
+                    <div
+                      aria-hidden
+                      className="absolute -right-16 top-6 h-[220%] w-[3px] rotate-12"
+                      style={{
+                        background: `linear-gradient(180deg, transparent, ${featuredMeta.color}, transparent)`,
+                      }}
+                    />
 
-                  <div className="relative px-6 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
-                        style={{
-                          borderColor: `${featuredMeta.color}66`,
-                          color: featuredMeta.color,
-                          backgroundColor: `${featuredMeta.color}18`,
-                        }}
-                      >
-                        {featuredIsNew ? (
-                          <>
-                            <span
-                              className="h-1.5 w-1.5 rounded-full"
-                              style={{
-                                backgroundColor: featuredMeta.color,
-                                boxShadow: `0 0 8px ${featuredMeta.color}`,
-                              }}
-                            />
-                            Novo
-                          </>
-                        ) : (
-                          featuredMeta.label
-                        )}
-                      </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/40">
-                        {fmtDay(featured.created_at)}
-                      </span>
-                    </div>
+                    <div className="relative px-6 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                          style={{
+                            borderColor: `${featuredMeta.color}66`,
+                            color: featuredMeta.color,
+                            backgroundColor: `${featuredMeta.color}18`,
+                          }}
+                        >
+                          {featuredIsNew ? (
+                            <>
+                              <span
+                                className="h-1.5 w-1.5 rounded-full"
+                                style={{
+                                  backgroundColor: featuredMeta.color,
+                                  boxShadow: `0 0 8px ${featuredMeta.color}`,
+                                }}
+                              />
+                              Novo
+                            </>
+                          ) : (
+                            featuredMeta.label
+                          )}
+                        </span>
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/40">
+                          {fmtDay(featured.created_at)}
+                        </span>
+                      </div>
 
-                    <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.3em] text-foreground/40">
-                      Patch {featuredPatch}
-                    </p>
-                    <h1 className="mt-2 text-[34px] font-semibold leading-[1.02] tracking-tight text-foreground sm:text-[44px]">
-                      {featured.title}
-                    </h1>
-                    <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-foreground/65 sm:text-[15px]">
-                      {featured.body}
-                    </p>
+                      <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.3em] text-foreground/40">
+                        Patch {featuredPatch}
+                      </p>
+                      <h1 className="mt-2 text-[34px] font-semibold leading-[1.02] tracking-tight text-foreground sm:text-[44px]">
+                        {featured.title}
+                      </h1>
+                      <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-foreground/65 sm:text-[15px]">
+                        {featured.body}
+                      </p>
 
-                    <div className="mt-6 flex items-center gap-3">
-                      <div
-                        className="h-[3px] flex-1 max-w-[120px] rounded-full"
-                        style={{ backgroundColor: featuredMeta.color }}
-                      />
-                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40">
-                        Notas da atualização
-                      </span>
+                      <div className="mt-6 flex items-center gap-3">
+                        <div
+                          className="h-[3px] flex-1 max-w-[120px] rounded-full"
+                          style={{ backgroundColor: featuredMeta.color }}
+                        />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50 transition group-hover:text-foreground">
+                          Ler notas completas
+                          <ArrowUpRight
+                            className="h-3.5 w-3.5 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                            strokeWidth={2.5}
+                          />
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </section>
             )}
 
