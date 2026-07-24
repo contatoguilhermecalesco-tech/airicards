@@ -241,18 +241,6 @@ function MarketplacePage() {
                       </span>
                     )}
                   </div>
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                      iLiked
-                        ? "border-rose-400/40 bg-rose-500/15 text-rose-300"
-                        : "border-white/10 bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
-                    }`}
-                  >
-                    <Heart
-                      className={`h-3.5 w-3.5 ${iLiked ? "fill-current" : ""}`}
-                      strokeWidth={2.5}
-                    />
-                    {likeCount}
-                  </button>
 
                   {newDeckId ? (
                     <Link
