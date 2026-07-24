@@ -9,7 +9,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2 } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X } from "lucide-react";
+import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
