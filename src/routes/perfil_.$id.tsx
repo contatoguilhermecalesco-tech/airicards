@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Flame,
-  Gem,
+  
   Sparkles,
   Star,
   Swords,
