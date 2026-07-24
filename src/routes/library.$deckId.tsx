@@ -378,6 +378,70 @@ function DeckDetail() {
           onCancel={() => setDeleteDeckOpen(false)}
         />
       )}
+      {publishOpen && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setPublishOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-3xl border border-white/10 bg-[oklch(0.14_0.02_285)] p-6 shadow-2xl"
+          >
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-300">
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
+              Publicar no marketplace
+            </p>
+            <h3 className="mt-1 text-lg font-semibold">Defina um preço</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Deixe em <b>0</b> para publicar gratuitamente. Compradores pagam em Cristais airi ✦.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {[0, 50, 100, 200, 400].map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setPriceInput(v)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    priceInput === v
+                      ? "border-violet-400/60 bg-violet-500/20 text-violet-100"
+                      : "border-white/10 bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {v === 0 ? "Grátis" : `${v} ✦`}
+                </button>
+              ))}
+            </div>
+            <label className="mt-4 block">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Preço customizado
+              </span>
+              <input
+                type="number"
+                min={0}
+                max={5000}
+                step={10}
+                value={priceInput}
+                onChange={(e) => setPriceInput(Math.max(0, Number(e.target.value) || 0))}
+                className="mt-1.5 w-full rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm focus:border-primary/40 focus:outline-none"
+              />
+            </label>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={() => setPublishOpen(false)}
+                className="flex-1 rounded-full border border-white/10 bg-white/[0.03] py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handlePublish(priceInput)}
+                disabled={publishState !== "idle"}
+                className="flex-1 rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:opacity-50"
+              >
+                {publishState === "publishing" ? "Publicando…" : "Publicar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
