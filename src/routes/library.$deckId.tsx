@@ -47,20 +47,27 @@ function DeckDetail() {
   const [copied, setCopied] = useState(false);
   const [publishState, setPublishState] = useState<"idle" | "publishing" | "published" | "unpublishing">("idle");
   const [isPublished, setIsPublished] = useState(false);
+  const [publishedPrice, setPublishedPrice] = useState(0);
+  const [publishOpen, setPublishOpen] = useState(false);
+  const [priceInput, setPriceInput] = useState(0);
   const currentProfile = useCurrentProfile();
 
   useEffect(() => {
     let cancel = false;
     if (!deck || !currentProfile) return;
     findPublishedDeck(currentProfile.id, deck.name).then((row) => {
-      if (!cancel) setIsPublished(!!row);
+      if (!cancel) {
+        setIsPublished(!!row);
+        setPublishedPrice(row?.price ?? 0);
+        setPriceInput(row?.price ?? 0);
+      }
     });
     return () => {
       cancel = true;
     };
   }, [deck?.name, currentProfile?.id]);
 
-  async function handlePublish() {
+  async function handlePublish(price: number) {
     if (!deck || !currentProfile || publishState !== "idle") return;
     if (cards.length === 0) return;
     try {
@@ -70,9 +77,12 @@ function DeckDetail() {
         ownerName: currentProfile.name,
         deck,
         cards,
+        price,
       });
       setIsPublished(true);
+      setPublishedPrice(price);
       setPublishState("published");
+      setPublishOpen(false);
       setTimeout(() => setPublishState("idle"), 1800);
     } catch {
       setPublishState("idle");
