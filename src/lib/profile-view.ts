@@ -41,12 +41,13 @@ function normalizeWallet(row: {
 export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSnapshot | null> {
   const [walletRes, dataRes] = await Promise.all([
     supabase.from("wallets").select("crystals, inventory").eq("profile_id", profileId).maybeSingle(),
-    supabase.from("profile_data").select("data, home_sessions, rank_state").eq("profile_id", profileId).maybeSingle(),
+    supabase.from("profile_data").select("data, home_sessions, rank").eq("profile_id", profileId).maybeSingle(),
   ]);
   if (walletRes.error && dataRes.error) return null;
   const wallet = walletRes.data
-    ? normalizeWallet(walletRes.data as { crystals: number; inventory: WalletState["equipped"] extends infer _ ? { cosmetics?: string[]; equipped?: EquippedMap; powerups?: Record<string, number>; bio?: string } | null : never }, profileId)
+    ? normalizeWallet(walletRes.data as { crystals: number; inventory: { cosmetics?: string[]; equipped?: EquippedMap; powerups?: Record<string, number>; bio?: string } | null }, profileId)
     : normalizeWallet({ crystals: 0, inventory: null }, profileId);
+
 
   const d = (dataRes.data ?? {}) as {
     data?: { decks?: unknown[]; cards?: Card[] } | null;
