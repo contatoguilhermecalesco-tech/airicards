@@ -266,7 +266,9 @@ function NovidadesPage() {
                       new Date(e.created_at).getTime() > lastSeen;
                     return (
                       <li key={e.id}>
-                        <article
+                        <Link
+                          to="/novidades/$id"
+                          params={{ id: e.id }}
                           className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 transition hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]"
                           style={{
                             boxShadow: isNew
@@ -302,7 +304,7 @@ function NovidadesPage() {
                           <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-foreground/55">
                             {e.body}
                           </p>
-                        </article>
+                        </Link>
                       </li>
                     );
                   })}
