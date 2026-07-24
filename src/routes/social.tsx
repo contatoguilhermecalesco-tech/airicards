@@ -49,6 +49,9 @@ function SocialPage() {
   const me = useCurrentProfile();
   const [tab, setTab] = useState<Tab>("inbox");
 
+  // Pre-carrega stats para comparação lado a lado.
+  useEffect(() => { startSocialStatsSync(); }, []);
+
   if (!me) return null;
   const meId = me.id as ProfileId;
   const oppId = otherProfile(meId);
@@ -62,7 +65,7 @@ function SocialPage() {
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
-    { id: "activity", label: "Atividade", icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />, badge: feed.length || undefined },
+    { id: "activity", label: "Feed", icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />, badge: feed.length || undefined },
     { id: "duel", label: "Duelo", icon: <Swords className="h-4 w-4" strokeWidth={2.25} /> },
   ];
 
@@ -73,9 +76,18 @@ function SocialPage() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Social
         </p>
-        <h1 className="mt-1 text-[28px] font-semibold tracking-tight text-foreground">
-          Você & {opp.name}
-        </h1>
+        <div className="mt-1 flex items-center justify-between gap-3">
+          <h1 className="text-[28px] font-semibold tracking-tight text-foreground">
+            Você & {opp.name}
+          </h1>
+          <Link
+            to="/social/stats"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
+          >
+            <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
+            Comparar
+          </Link>
+        </div>
         <p className="mt-1 text-[14px] text-muted-foreground">
           Presentes, feed e o duelo da semana.
         </p>
@@ -181,15 +193,7 @@ function SocialPage() {
 
       {tab === "activity" && (
         <div className="animate-fade-in">
-          {feed.length === 0 ? (
-            <EmptyState
-              icon={<Sparkles className="h-5 w-5 text-primary" strokeWidth={2.25} />}
-              title={`${opp.name} ainda não tem novidades`}
-              body="Conquistas, sequências e duelos aparecem aqui em tempo real."
-            />
-          ) : (
-            <PresenceCard />
-          )}
+          <UnifiedFeed meId={meId} />
         </div>
       )}
 
@@ -511,5 +515,132 @@ function EmptyState({
       <p className="mt-3 text-[15px] font-semibold text-foreground">{title}</p>
       <p className="mt-1 text-[13px] text-muted-foreground">{body}</p>
     </div>
+  );
+}
+
+// ============================================================
+// Feed unificado — eventos dos dois perfis em uma timeline só.
+// ============================================================
+
+const FEED_REACTIONS = ["🔥", "😂", "💀", "🎯", "👏"];
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.round(diff / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return `${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h`;
+  const d = Math.round(h / 24);
+  return `${d}d`;
+}
+
+function iconForKind(kind: ActivityEvent["kind"]) {
+  switch (kind) {
+    case "rank_up":
+      return <Trophy className="h-4 w-4 text-amber-300" strokeWidth={2.25} />;
+    case "streak_milestone":
+      return <Flame className="h-4 w-4 text-orange-400" strokeWidth={2.25} />;
+    case "exam_done":
+      return <GraduationCap className="h-4 w-4 text-primary" strokeWidth={2.25} />;
+    case "duel_won":
+      return <Swords className="h-4 w-4 text-primary" strokeWidth={2.25} />;
+    case "enemy_defeated":
+      return <Skull className="h-4 w-4 text-destructive" strokeWidth={2.25} />;
+  }
+}
+
+function labelForEvent(e: ActivityEvent, actorName: string): string {
+  const p = e.payload as Record<string, unknown>;
+  switch (e.kind) {
+    case "rank_up":
+      return `${actorName} subiu para ${String(p.toTier ?? "")} ${String(p.toDivision ?? "")}`.trim();
+    case "streak_milestone":
+      return `${actorName} atingiu ${String(p.days ?? "")} dias de sequência`;
+    case "exam_done":
+      return `${actorName} concluiu a prova mensal · ${String(p.level ?? "")}`.trim();
+    case "duel_won":
+      return `${actorName} venceu o duelo da semana${p.byForfeit ? " por WO" : ""}`;
+    case "enemy_defeated":
+      return `${actorName} derrotou uma carta inimiga`;
+  }
+}
+
+function UnifiedFeed({ meId }: { meId: ProfileId }) {
+  const events = useUnifiedFeed(30);
+
+  if (events.length === 0) {
+    return (
+      <EmptyState
+        icon={<Sparkles className="h-5 w-5 text-primary" strokeWidth={2.25} />}
+        title="Nenhuma novidade ainda"
+        body="Conquistas, sequências, provas e duelos aparecem aqui — dos dois perfis, em tempo real."
+      />
+    );
+  }
+
+  return (
+    <ul className="space-y-2">
+      {events.map((e) => (
+        <FeedRow key={e.id} event={e} meId={meId} />
+      ))}
+    </ul>
+  );
+}
+
+function FeedRow({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
+  const actor = profileMeta(event.profileId);
+  const isMe = event.profileId === meId;
+  const actorName = isMe ? "Você" : actor.name;
+  const reactions = useReactionsForEvent(event.id);
+
+  const grouped = FEED_REACTIONS.map((emoji) => {
+    const list = reactions.filter((r) => r.emoji === emoji);
+    const mine = list.some((r) => r.profileId === meId);
+    return { emoji, count: list.length, mine };
+  });
+
+  return (
+    <li
+      className={`rounded-2xl border p-3 transition ${
+        isMe
+          ? "border-primary/20 bg-primary/[0.04]"
+          : "border-white/[0.06] bg-white/[0.03]"
+      }`}
+    >
+      <div className="flex items-center gap-2.5">
+        <div
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white shadow-sm"
+          style={{ background: actor.gradient }}
+        >
+          {actor.initial}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13.5px] font-medium text-foreground">
+            {labelForEvent(event, actorName)}
+          </p>
+          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            {iconForKind(event.kind)}
+            <span>{timeAgo(event.createdAt)}</span>
+          </p>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {grouped.map((r) => (
+          <button
+            key={r.emoji}
+            onClick={() => toggleReaction(event.id, meId, r.emoji)}
+            className={`flex items-center gap-1 rounded-full border px-2 py-1 text-[12px] tabular-nums transition ${
+              r.mine
+                ? "border-primary/40 bg-primary/15 text-foreground"
+                : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:text-foreground"
+            }`}
+          >
+            <span>{r.emoji}</span>
+            {r.count > 0 && <span className="text-[11px]">{r.count}</span>}
+          </button>
+        ))}
+      </div>
+    </li>
   );
 }

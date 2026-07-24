@@ -11,7 +11,7 @@ import {
   type ActivityEvent,
 } from "@/lib/social-store";
 
-const REACTIONS = ["🔥", "❤️", "👏"];
+const REACTIONS = ["🔥", "😂", "💀", "🎯", "👏"];
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
