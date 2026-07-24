@@ -15,6 +15,7 @@ export type ProfileSnapshot = {
   mastered: number;
   enemies: number;
   decksCount: number;
+  lastSeenAt: string | null;
 };
 
 function normalizeWallet(row: {
@@ -43,7 +44,7 @@ function normalizeWallet(row: {
 export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSnapshot | null> {
   const [walletRes, dataRes] = await Promise.all([
     supabase.from("wallets").select("crystals, inventory").eq("profile_id", profileId).maybeSingle(),
-    supabase.from("profile_data").select("data, home_sessions, rank").eq("profile_id", profileId).maybeSingle(),
+    supabase.from("profile_data").select("data, home_sessions, rank, updated_at").eq("profile_id", profileId).maybeSingle(),
   ]);
   if (walletRes.error && dataRes.error) return null;
   const wallet = walletRes.data
@@ -55,6 +56,7 @@ export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSn
     data?: { decks?: unknown[]; cards?: Card[] } | null;
     home_sessions?: { streak?: Streak } | null;
     rank?: RankState | null;
+    updated_at?: string | null;
   };
 
   const cards = (d.data?.cards ?? []) as Card[];
@@ -76,6 +78,7 @@ export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSn
     mastered,
     enemies,
     decksCount: (d.data?.decks ?? []).length,
+    lastSeenAt: d.updated_at ?? null,
   };
 }
 
