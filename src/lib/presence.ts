@@ -13,12 +13,14 @@ async function ping() {
   const p = getCurrentProfile();
   if (!p) return;
   if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-  await supabase
-    .from("profile_data")
-    .upsert(
-      { profile_id: p.id, updated_at: new Date().toISOString() },
-      { onConflict: "profile_id" },
-    );
+  try {
+    await supabase
+      .from("profile_data")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("profile_id", p.id);
+  } catch {
+    /* silent — presença é best-effort */
+  }
 }
 
 function start() {
