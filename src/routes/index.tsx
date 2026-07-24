@@ -620,19 +620,72 @@ function Home() {
   );
 }
 
-function StatChip({ label, value }: { label: string; value: number }) {
+function StatChip({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className={`${GLASS_BASE} p-4 transition-colors hover:bg-white/[0.055]`}>
+    <div
+      className={`${GLASS_BASE} p-3 transition-colors hover:bg-white/[0.055] ${
+        accent ? "border-primary/25 bg-primary/[0.06]" : ""
+      }`}
+    >
       <GlassHighlight />
-      <p className="relative text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+      <p className={`relative text-[10px] font-semibold uppercase tracking-[0.14em] ${accent ? "text-primary/90" : "text-muted-foreground"}`}>
         {label}
       </p>
-      <p className="relative mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
+      <p className={`relative mt-1 text-[20px] font-semibold leading-none tabular-nums ${accent ? "text-primary-foreground" : "text-foreground"}`}>
         {value}
       </p>
     </div>
   );
 }
+
+function QuickAction({
+  to,
+  label,
+  icon,
+  tint,
+  badge,
+  crestColor,
+}: {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  tint: string;
+  badge?: number;
+  crestColor?: { from: string; to: string; ring: string; glow: string };
+}) {
+  return (
+    <Link
+      // @ts-expect-error — dynamic to prop
+      to={to}
+      className={`${GLASS_BASE} group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]`}
+    >
+      <GlassHighlight />
+      {badge !== undefined && (
+        <span className="absolute -right-1 -top-1 z-10 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+          {badge}
+        </span>
+      )}
+      <div
+        className={`grid h-9 w-9 place-items-center rounded-xl border bg-gradient-to-b ${tint}`}
+        style={
+          crestColor
+            ? {
+                background: `linear-gradient(180deg, ${crestColor.from}, ${crestColor.to})`,
+                borderColor: crestColor.ring,
+                boxShadow: `0 0 18px -6px ${crestColor.glow}`,
+              }
+            : undefined
+        }
+      >
+        {icon}
+      </div>
+      <p className="max-w-full truncate text-[10.5px] font-semibold tracking-tight text-foreground/90">
+        {label}
+      </p>
+    </Link>
+  );
+}
+
 
 // ---- Streak card ---------------------------------------------------------
 
