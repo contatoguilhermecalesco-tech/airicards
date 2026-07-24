@@ -13,15 +13,19 @@ import {
   Sparkles,
   Tag as TagIcon,
   Trash2,
+  Pencil,
+  X,
   Wand2,
   Wrench,
 } from "lucide-react";
 import {
   createChangelogEntry,
+  updateChangelogEntry,
   deleteChangelogEntry,
   initChangelog,
   useChangelog,
   type ChangelogCategory,
+  type ChangelogEntry,
 } from "@/lib/changelog-store";
 import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
 import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
