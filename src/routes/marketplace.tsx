@@ -264,8 +264,17 @@ function MarketplacePage() {
                         </>
                       ) : (
                         <>
-                          <Download className="h-3.5 w-3.5" strokeWidth={2.75} />
-                          Adicionar
+                          {row.price > 0 ? (
+                            <>
+                              <Gem className="h-3.5 w-3.5" strokeWidth={2.75} />
+                              Comprar · {row.price} ✦
+                            </>
+                          ) : (
+                            <>
+                              <Download className="h-3.5 w-3.5" strokeWidth={2.75} />
+                              Adicionar
+                            </>
+                          )}
                         </>
                       )}
                     </button>
