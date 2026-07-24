@@ -98,6 +98,10 @@ function SettingsPage() {
   const profile = useCurrentProfile();
   const prefs = useNotificationPrefs();
   const quiet = isQuietNow(prefs);
+  const unreadNews = useChangelogUnread();
+  useEffect(() => {
+    void initChangelog();
+  }, []);
 
   const testNotification = () => {
     if (prefs.sound) playChime();
