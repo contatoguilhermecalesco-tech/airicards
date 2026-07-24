@@ -165,7 +165,13 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
     if (activeProfile !== profileId) return; // profile switched meanwhile
     state = remote;
-    home = remoteHome.day === todayKey() ? remoteHome : { day: todayKey(), count: 0 };
+    // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
+    // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
+    // zeramos os contadores diários e mantemos o resto.
+    home =
+      remoteHome.day === todayKey()
+        ? remoteHome
+        : { ...remoteHome, day: todayKey(), count: 0, reviewed: 0 };
     saveCache(profileId, state, home);
     emit();
     emitHome();
