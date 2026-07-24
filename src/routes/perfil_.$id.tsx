@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Flame,
-  Gem,
+  
   Sparkles,
   Star,
   Swords,
@@ -23,6 +23,7 @@ import {
   Heart,
   Gift,
 } from "lucide-react";
+import { StatChip, ArlysIcon } from "@/components/StatChip";
 import { PROFILES } from "@/lib/profile";
 import { useProfileSnapshot } from "@/lib/profile-view";
 import { listShopItems, type ShopItem } from "@/lib/shop";
@@ -242,7 +243,7 @@ function PerfilViewer() {
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
                 color="#fbbf24"
               />
-              <StatChip icon={Gem} label="Arlys ✦" value={(snapshot?.wallet.crystals ?? 0).toString()} color="#a78bfa" />
+              <StatChip icon={ArlysIcon} label="Arlys ✦" value={(snapshot?.wallet.crystals ?? 0).toString()} color="#a78bfa" accent />
               <StatChip
                 icon={Flame}
                 label="Streak"
@@ -336,29 +337,8 @@ function PerfilViewer() {
   );
 }
 
-function StatChip({
-  icon: Icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  label: string;
-  value: string;
-  color: string;
-}) {
-  return (
-    <div className="flex items-center gap-2 rounded-lg border border-white/5 px-2.5 py-2" style={{ background: "rgba(255,255,255,0.02)" }}>
-      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md" style={{ background: `${color}22`, color }}>
-        <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-      </span>
-      <div className="min-w-0">
-        <p className="truncate text-[10px] font-bold uppercase tracking-wider text-white/50">{label}</p>
-        <p className="truncate text-[13px] font-semibold text-white">{value || "—"}</p>
-      </div>
-    </div>
-  );
-}
+
+
 
 function MiniStat({
   icon: Icon,
