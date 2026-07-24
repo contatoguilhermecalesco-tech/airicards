@@ -20,6 +20,7 @@ import { NotificationsBell } from "../components/NotificationsBell";
 import { RankEmblem } from "../components/RankBadge";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
+import { auraRingFromEquipped } from "../lib/aura";
 import "@/lib/presence";
 
 // Overlays só aparecem sob eventos raros (subiu de rank, streak milestone,
@@ -536,11 +537,72 @@ function BottomBar() {
 }
 
 
+function AuraAvatar({
+  size,
+  gradient,
+  avatarUrl,
+  ring,
+}: {
+  size: number;
+  gradient: string;
+  avatarUrl?: string | null;
+  ring: string | null;
+}) {
+  const showAura = !!ring;
+  const inner = showAura ? size - 6 : size;
+  return (
+    <span
+      aria-hidden
+      className="relative inline-grid shrink-0 place-items-center"
+      style={{ width: size, height: size }}
+    >
+      {showAura && (
+        <>
+          <span
+            className="cosmetic-ring-spin absolute inset-0 rounded-full"
+            style={{
+              background: `conic-gradient(from 0deg, ${ring}, transparent 35%, ${ring} 65%, transparent 100%)`,
+              filter: "blur(0.4px)",
+            }}
+          />
+          <span
+            className="cosmetic-glow-pulse pointer-events-none absolute -inset-1 rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${ring}55, transparent 65%)`,
+              filter: "blur(6px)",
+            }}
+          />
+        </>
+      )}
+      <span
+        className="relative block overflow-hidden rounded-full ring-1 ring-white/15"
+        style={{
+          width: inner,
+          height: inner,
+          backgroundImage: avatarUrl ? undefined : gradient,
+          background: avatarUrl ? "#000" : undefined,
+          boxShadow: showAura ? `0 0 10px ${ring}55` : undefined,
+        }}
+      >
+        {avatarUrl && (
+          <img
+            src={avatarUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        )}
+      </span>
+    </span>
+  );
+}
+
 function ProfileMenu() {
   const profile = useCurrentProfile();
   const wallet = useWallet();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const ring = auraRingFromEquipped(wallet.equipped);
 
   useEffect(() => {
     if (!open) return;
@@ -560,40 +622,23 @@ function ProfileMenu() {
         className="tap-target flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-2 text-sm font-medium text-foreground transition hover:bg-accent sm:pr-3"
         aria-label={`Perfil de ${profile.name}`}
       >
-        <span
-          aria-hidden
-          className="relative block h-7 w-7 overflow-hidden rounded-full ring-1 ring-white/15"
-          style={{
-            backgroundImage: wallet.avatarUrl ? undefined : profile.gradient,
-            background: wallet.avatarUrl ? "#000" : undefined,
-          }}
-        >
-          {wallet.avatarUrl && (
-            <img
-              src={wallet.avatarUrl}
-              alt=""
-              className="h-full w-full object-cover"
-              draggable={false}
-            />
-          )}
-        </span>
+        <AuraAvatar
+          size={28}
+          gradient={profile.gradient}
+          avatarUrl={wallet.avatarUrl}
+          ring={ring}
+        />
         <span className="hidden sm:inline">{profile.name}</span>
       </button>
       {open && (
         <div className="glass-panel absolute right-0 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-2xl p-1.5 shadow-card">
           <div className="flex items-center gap-3 px-3 py-2">
-            <span
-              aria-hidden
-              className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15"
-              style={{
-                backgroundImage: wallet.avatarUrl ? undefined : profile.gradient,
-                background: wallet.avatarUrl ? "#000" : undefined,
-              }}
-            >
-              {wallet.avatarUrl && (
-                <img src={wallet.avatarUrl} alt="" className="h-full w-full object-cover" draggable={false} />
-              )}
-            </span>
+            <AuraAvatar
+              size={40}
+              gradient={profile.gradient}
+              avatarUrl={wallet.avatarUrl}
+              ring={ring}
+            />
             <div className="min-w-0">
               <p className="text-[11px] text-muted-foreground">Conectado como</p>
               <p className="truncate text-sm font-medium">{profile.name}</p>
