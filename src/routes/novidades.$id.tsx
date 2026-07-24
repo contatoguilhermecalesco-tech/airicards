@@ -103,14 +103,8 @@ function NovidadeDetailPage() {
     return (entry.notes && entry.notes.trim()) || entry.body;
   }, [entry]);
 
-  const paragraphs = useMemo(
-    () =>
-      fullText
-        .split(/\n\s*\n/)
-        .map((p) => p.trim())
-        .filter(Boolean),
-    [fullText],
-  );
+
+
 
   async function share() {
     if (!entry) return;
