@@ -24,6 +24,8 @@ import {
   type ChangelogCategory,
 } from "@/lib/changelog-store";
 import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
+import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
+
 import {
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
@@ -1315,23 +1317,82 @@ function ChangelogSection() {
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
-              Notas completas (opcional)
+              Notas completas (Riot style)
             </p>
             <span className="text-[9.5px] uppercase tracking-[0.18em] text-foreground/35">
-              exibido em "Ler notas completas"
+              renderizado em "Ler notas completas"
             </span>
           </div>
+
+          {/* Cheatsheet de sintaxe */}
+          <div className="mb-2 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2">
+            <p className="text-[9.5px] font-bold uppercase tracking-[0.2em] text-foreground/50">
+              Sintaxe
+            </p>
+            <ul className="mt-1.5 grid gap-1 text-[11px] leading-snug text-foreground/60 sm:grid-cols-2">
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">## Título</code>{" "}
+                seção
+              </li>
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">### Sub</code>{" "}
+                subtítulo
+              </li>
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">- item</code>{" "}
+                bullet
+              </li>
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">**bold**</code>{" "}
+                rótulo
+              </li>
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">a =&gt; b</code>{" "}
+                seta antigo ⇒ novo
+              </li>
+              <li>
+                <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">[NOVO] [REMOVIDO] [BUG] [AJUSTE]</code>
+              </li>
+            </ul>
+          </div>
+
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder={`Texto longo do patch note — separe parágrafos com linhas em branco.\n\nEx.:\nRedesenhamos a aba Novidades do zero, inspirados nos patch notes da Riot.\n\nAgora cada nota tem sua própria página com detalhes completos, meta strip e navegação anterior/próximo.`}
-            rows={7}
-            className="w-full resize-y rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-[13px] leading-relaxed outline-none transition focus:border-primary/60"
+            placeholder={RIOT_NOTES_PLACEHOLDER}
+            rows={10}
+            className="w-full resize-y rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 font-mono text-[12.5px] leading-relaxed outline-none transition focus:border-primary/60"
           />
           <p className="mt-1 text-[10px] text-foreground/40">
             Se deixar em branco, o resumo acima será usado como conteúdo da página de detalhe.
           </p>
+
+          {/* Live preview do corpo renderizado */}
+          {notes.trim() && (
+            <div className="mt-3 overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0f]">
+              <div
+                className="flex items-center justify-between border-b border-white/[0.06] px-4 py-2"
+                style={{
+                  background: `linear-gradient(90deg, ${activeMeta.color}18, transparent)`,
+                }}
+              >
+                <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/60">
+                  Prévia · notas completas
+                </span>
+                <span
+                  className="text-[9.5px] font-bold uppercase tracking-[0.2em]"
+                  style={{ color: activeMeta.color }}
+                >
+                  {activeMeta.label}
+                </span>
+              </div>
+              <div className="max-h-[420px] overflow-y-auto px-4 py-4">
+                <RiotPatchBody text={notes} accent={activeMeta.color} compact />
+              </div>
+            </div>
+          )}
         </div>
+
 
 
         {/* Icon picker */}
