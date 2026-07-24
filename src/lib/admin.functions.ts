@@ -250,7 +250,11 @@ export const adminResetExamsFn = createServerFn({ method: "POST" })
 
 export type ProfileSessionRow = {
   profile_id: string;
-  home_sessions: unknown;
+  home_sessions: {
+    day?: string;
+    count?: number;
+    reviewed?: number;
+  } | null;
 };
 
 export const adminFetchAllProfileSessionsFn = createServerFn({ method: "GET" })
