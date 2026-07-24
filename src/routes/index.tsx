@@ -347,36 +347,36 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quick actions — atalhos premium */}
+      {/* Atalhos — pills discretas estilo iOS */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
       >
-        <QuickAction
+        <QuickPill
           to="/social"
           label="Duelo"
-          icon={<Swords className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-fuchsia-400/25 to-fuchsia-500/5 border-fuchsia-300/25 text-fuchsia-200"
+          icon={<Swords className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-fuchsia-200"
         />
-        <QuickAction
+        <QuickPill
           to="/enemies"
           label="Chefões"
           badge={enemies.length > 0 ? enemies.length : undefined}
-          icon={<Skull className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-rose-400/25 to-rose-500/5 border-rose-300/25 text-rose-200"
+          icon={<Skull className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-rose-200"
         />
-        <QuickAction
+        <QuickPill
           to="/rank"
           label={isElite(rank.tier) ? TIER_LABEL[rank.tier] : `${TIER_LABEL[rank.tier]} ${DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}`}
-          icon={<Crown className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint={`border-white/10 text-white`}
-          crestColor={TIER_COLORS[rank.tier]}
+          icon={<Crown className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-white"
+          dotColor={TIER_COLORS[rank.tier].glow}
         />
-        <QuickAction
+        <QuickPill
           to="/shop"
           label="Loja"
-          icon={<ShoppingBag className="h-[18px] w-[18px]" strokeWidth={2.25} />}
-          tint="from-amber-400/25 to-amber-500/5 border-amber-300/25 text-amber-200"
+          icon={<ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-amber-200"
         />
       </section>
 
@@ -638,50 +638,41 @@ function StatChip({ label, value, accent = false }: { label: string; value: numb
   );
 }
 
-function QuickAction({
+function QuickPill({
   to,
   label,
   icon,
-  tint,
+  accent,
   badge,
-  crestColor,
+  dotColor,
 }: {
   to: string;
   label: string;
   icon: React.ReactNode;
-  tint: string;
+  accent: string;
   badge?: number;
-  crestColor?: { from: string; to: string; ring: string; glow: string };
+  dotColor?: string;
 }) {
   return (
     <Link
       to={to as "/social"}
-
-      className={`${GLASS_BASE} group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]`}
+      className="group relative inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 backdrop-blur-xl transition-all duration-200 hover:border-white/[0.14] hover:bg-white/[0.07] active:scale-[0.97]"
     >
-      <GlassHighlight />
+      {dotColor && (
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ background: dotColor, boxShadow: `0 0 6px ${dotColor}` }}
+        />
+      )}
+      <span className={accent}>{icon}</span>
+      <span className="text-[11.5px] font-semibold tracking-tight text-foreground/90">
+        {label}
+      </span>
       {badge !== undefined && (
-        <span className="absolute -right-1 -top-1 z-10 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+        <span className="ml-0.5 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500/90 px-1 text-[9px] font-bold text-white">
           {badge}
         </span>
       )}
-      <div
-        className={`grid h-9 w-9 place-items-center rounded-xl border bg-gradient-to-b ${tint}`}
-        style={
-          crestColor
-            ? {
-                background: `linear-gradient(180deg, ${crestColor.from}, ${crestColor.to})`,
-                borderColor: crestColor.ring,
-                boxShadow: `0 0 18px -6px ${crestColor.glow}`,
-              }
-            : undefined
-        }
-      >
-        {icon}
-      </div>
-      <p className="max-w-full truncate text-[10.5px] font-semibold tracking-tight text-foreground/90">
-        {label}
-      </p>
     </Link>
   );
 }
