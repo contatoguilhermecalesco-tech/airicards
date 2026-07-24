@@ -8,6 +8,7 @@ import {
   type Profile,
   type ProfileMeta,
 } from "@/lib/profile";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import airiLogo from "@/assets/airi-horizontal.png.asset.json";
 
 const HEADING_FONT = { fontFamily: "'Sora', 'Inter', sans-serif" };
