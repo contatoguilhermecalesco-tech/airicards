@@ -554,6 +554,8 @@ function iconForKind(kind: ActivityEvent["kind"]) {
       return <Swords className="h-4 w-4 text-primary" strokeWidth={2.25} />;
     case "enemy_defeated":
       return <Skull className="h-4 w-4 text-destructive" strokeWidth={2.25} />;
+    default:
+      return <Sparkles className="h-4 w-4 text-primary" strokeWidth={2.25} />;
   }
 }
 
