@@ -638,50 +638,41 @@ function StatChip({ label, value, accent = false }: { label: string; value: numb
   );
 }
 
-function QuickAction({
+function QuickPill({
   to,
   label,
   icon,
-  tint,
+  accent,
   badge,
-  crestColor,
+  dotColor,
 }: {
   to: string;
   label: string;
   icon: React.ReactNode;
-  tint: string;
+  accent: string;
   badge?: number;
-  crestColor?: { from: string; to: string; ring: string; glow: string };
+  dotColor?: string;
 }) {
   return (
     <Link
       to={to as "/social"}
-
-      className={`${GLASS_BASE} group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]`}
+      className="group relative inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 backdrop-blur-xl transition-all duration-200 hover:border-white/[0.14] hover:bg-white/[0.07] active:scale-[0.97]"
     >
-      <GlassHighlight />
+      {dotColor && (
+        <span
+          className="h-1.5 w-1.5 rounded-full"
+          style={{ background: dotColor, boxShadow: `0 0 6px ${dotColor}` }}
+        />
+      )}
+      <span className={accent}>{icon}</span>
+      <span className="text-[11.5px] font-semibold tracking-tight text-foreground/90">
+        {label}
+      </span>
       {badge !== undefined && (
-        <span className="absolute -right-1 -top-1 z-10 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+        <span className="ml-0.5 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500/90 px-1 text-[9px] font-bold text-white">
           {badge}
         </span>
       )}
-      <div
-        className={`grid h-9 w-9 place-items-center rounded-xl border bg-gradient-to-b ${tint}`}
-        style={
-          crestColor
-            ? {
-                background: `linear-gradient(180deg, ${crestColor.from}, ${crestColor.to})`,
-                borderColor: crestColor.ring,
-                boxShadow: `0 0 18px -6px ${crestColor.glow}`,
-              }
-            : undefined
-        }
-      >
-        {icon}
-      </div>
-      <p className="max-w-full truncate text-[10.5px] font-semibold tracking-tight text-foreground/90">
-        {label}
-      </p>
     </Link>
   );
 }
