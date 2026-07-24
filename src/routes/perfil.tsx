@@ -352,7 +352,8 @@ function PerfilPage() {
   const BadgeIcon = badge ? (ICONS[badge.icon] ?? Sparkles) : Sparkles;
 
   const initial = (profile?.name ?? "?").trim().charAt(0).toUpperCase() || "?";
-  const handle = profile ? `${profile.name.toLowerCase().replace(/\s+/g, "")}.airi` : "";
+  const handleUser = profile ? profile.name.toLowerCase().replace(/\s+/g, "") : "";
+  const handleSuffix = ".airi.com.br";
 
   const statusLabel = useMemo(() => {
     const hour = new Date().getHours();
