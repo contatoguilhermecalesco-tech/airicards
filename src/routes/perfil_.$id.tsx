@@ -28,6 +28,7 @@ import { useProfileSnapshot } from "@/lib/profile-view";
 import { listShopItems, type ShopItem } from "@/lib/shop";
 import { slotOf, type CosmeticSlot } from "@/lib/wallet-store";
 import { TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
@@ -163,16 +164,26 @@ function PerfilViewer() {
                 </>
               )}
               <div
-                className="relative grid place-items-center rounded-full text-white font-semibold ring-4"
+                className="relative grid place-items-center overflow-hidden rounded-full text-white font-semibold ring-4"
                 style={{
                   width: showDecoration ? 78 : 88,
                   height: showDecoration ? 78 : 88,
-                  backgroundImage: profile.gradient,
+                  backgroundImage: snapshot?.wallet.avatarUrl ? undefined : profile.gradient,
+                  background: snapshot?.wallet.avatarUrl ? "#000" : undefined,
                   fontSize: 34,
                   boxShadow: showDecoration ? `0 0 14px ${decorationPalette.ring}55` : "none",
                 }}
               >
-                {initial}
+                {snapshot?.wallet.avatarUrl ? (
+                  <img
+                    src={snapshot.wallet.avatarUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    draggable={false}
+                  />
+                ) : (
+                  initial
+                )}
               </div>
             </div>
           </div>

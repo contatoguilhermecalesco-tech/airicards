@@ -17,6 +17,7 @@ export type WalletState = {
   equipped: EquippedMap;
   powerups: Record<string, number>;
   bio: string;
+  avatarUrl: string;
   loaded: boolean;
 };
 
@@ -27,6 +28,7 @@ const empty = (id = ""): WalletState => ({
   equipped: {},
   powerups: {},
   bio: "",
+  avatarUrl: "",
   loaded: false,
 });
 
@@ -63,6 +65,7 @@ type WalletRow = {
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
     bio?: string;
+    avatarUrl?: string;
   } | null;
 };
 
@@ -75,6 +78,7 @@ function normalize(row: WalletRow, profileId: string): WalletState {
     equipped: inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
     bio: typeof inv.bio === "string" ? inv.bio : "",
+    avatarUrl: typeof inv.avatarUrl === "string" ? inv.avatarUrl : "",
     loaded: true,
   };
 }
@@ -132,6 +136,7 @@ async function persist() {
         equipped: state.equipped,
         powerups: state.powerups,
         bio: state.bio,
+        avatarUrl: state.avatarUrl,
       },
     })
     .eq("profile_id", currentProfileId);
@@ -140,6 +145,13 @@ async function persist() {
 export async function setBio(bio: string) {
   if (!currentProfileId) return;
   state.bio = bio.slice(0, 180);
+  emit();
+  await persist();
+}
+
+export async function setAvatarUrl(dataUrl: string) {
+  if (!currentProfileId) return;
+  state.avatarUrl = dataUrl;
   emit();
   await persist();
 }

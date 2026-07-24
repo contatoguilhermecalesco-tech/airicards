@@ -24,6 +24,7 @@ function normalizeWallet(row: {
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
     bio?: string;
+    avatarUrl?: string;
   } | null;
 }, id: string): WalletState {
   const inv = row.inventory ?? {};
@@ -34,6 +35,7 @@ function normalizeWallet(row: {
     equipped: (inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {}) as Partial<Record<CosmeticSlot, string>>,
     powerups: (inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {}) as Record<string, number>,
     bio: typeof inv.bio === "string" ? inv.bio : "",
+    avatarUrl: typeof inv.avatarUrl === "string" ? inv.avatarUrl : "",
     loaded: true,
   };
 }
@@ -45,7 +47,7 @@ export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSn
   ]);
   if (walletRes.error && dataRes.error) return null;
   const wallet = walletRes.data
-    ? normalizeWallet(walletRes.data as { crystals: number; inventory: { cosmetics?: string[]; equipped?: EquippedMap; powerups?: Record<string, number>; bio?: string } | null }, profileId)
+    ? normalizeWallet(walletRes.data as { crystals: number; inventory: { cosmetics?: string[]; equipped?: EquippedMap; powerups?: Record<string, number>; bio?: string; avatarUrl?: string } | null }, profileId)
     : normalizeWallet({ crystals: 0, inventory: null }, profileId);
 
 
