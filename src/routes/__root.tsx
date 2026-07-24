@@ -41,6 +41,9 @@ const StreakChangeOverlay = lazy(() =>
 const OnboardingTour = lazy(() =>
   import("../components/OnboardingTour").then((m) => ({ default: m.OnboardingTour })),
 );
+const GiftReceivedOverlay = lazy(() =>
+  import("../components/GiftReceivedOverlay").then((m) => ({ default: m.GiftReceivedOverlay })),
+);
 import { useSocialSync } from "../lib/social-store";
 import { startActivityBridge } from "../lib/activity-bridge";
 import { loadWallet, useWallet } from "../lib/wallet-store";
@@ -699,6 +702,7 @@ function RootComponent() {
             <StreakMilestoneOverlay />
             <StreakChangeOverlay />
             <OnboardingTour />
+            <GiftReceivedOverlay />
           </Suspense>
         </div>
       </ProfileGate>
