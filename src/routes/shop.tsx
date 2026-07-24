@@ -863,7 +863,10 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
           )}
         </div>
         <p className="mt-1.5 text-[13px] font-semibold text-white leading-tight">Guilherme</p>
-        <p className="text-[11px] text-white/50 leading-tight">guilherme.airi</p>
+        <p className="text-[11px] text-white/50 leading-tight">
+          <span className="text-white/70">guilherme</span>
+          <span className="text-white/40">.airi.com.br</span>
+        </p>
       </div>
     </div>
   );
@@ -1066,7 +1069,10 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
                 </span>
               )}
             </div>
-            <p className="text-[13px] text-white/60 leading-tight">guilherme.airi</p>
+            <p className="text-[13px] text-white/60 leading-tight">
+              <span className="text-white/80">guilherme</span>
+              <span className="text-white/40">.airi.com.br</span>
+            </p>
 
             <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
 
