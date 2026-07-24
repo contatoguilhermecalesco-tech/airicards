@@ -109,66 +109,101 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
     );
   }
 
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 5
+      ? "Boa madrugada"
+      : hour < 12
+        ? "Bom dia"
+        : hour < 18
+          ? "Boa tarde"
+          : "Boa noite";
+
   return (
     <Shell>
       <div className="flex flex-col items-center">
         <Logo size="lg" />
         <p
-          className="mt-8 text-[13px] font-medium tracking-wide text-white/50"
+          className="mt-10 text-[12px] font-medium uppercase tracking-[0.24em] text-white/40"
           style={BODY_FONT}
         >
-          Quem está estudando?
+          {greeting}
         </p>
         <h1
-          className="mt-1 text-[26px] font-semibold text-white"
+          className="mt-2 text-center text-[28px] font-semibold leading-tight tracking-tight text-white"
           style={HEADING_FONT}
         >
-          Escolha seu perfil
+          Quem está estudando?
         </h1>
+        <p className="mt-2 text-center text-[14px] text-white/45">
+          Toque no perfil para continuar.
+        </p>
       </div>
 
-      <div className="mt-10 space-y-3">
-        {PROFILES.map((p) => {
+      <div className="mt-8 overflow-hidden rounded-[22px] border border-white/[0.07] bg-[#0f0f12]">
+        {PROFILES.map((p, i) => {
           const meta = metas?.find((m) => m.id === p.id);
           const subtitle = !meta
             ? "Carregando…"
             : meta.hasPin
-              ? "Toque para entrar"
-              : "Criar PIN de acesso";
+              ? "PIN configurado"
+              : "Novo perfil · criar PIN";
           const initial = p.name.charAt(0).toUpperCase();
           return (
             <button
               key={p.id}
               onClick={() => setChosen(p)}
               disabled={!metas}
-              className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.08] bg-[#111114] px-4 py-3.5 text-left transition active:scale-[0.98] hover:border-white/15 hover:bg-[#17171b] disabled:opacity-50"
+              className={`group relative flex w-full items-center gap-4 px-4 py-4 text-left transition active:bg-white/[0.04] hover:bg-white/[0.025] disabled:opacity-50 ${
+                i > 0 ? "border-t border-white/[0.06]" : ""
+              }`}
             >
               <span
                 aria-hidden
-                className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-lg font-semibold text-white"
+                className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
                 style={{ backgroundImage: p.gradient, ...HEADING_FONT }}
               >
                 {initial}
+                {meta?.hasPin && (
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-black ring-2 ring-black"
+                  >
+                    <svg
+                      width="9"
+                      height="9"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#a78bfa"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="4" y="11" width="16" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                    </svg>
+                  </span>
+                )}
               </span>
-              <span className="flex-1">
+              <span className="flex-1 min-w-0">
                 <span
-                  className="block text-[17px] font-semibold text-white"
+                  className="block truncate text-[17px] font-semibold text-white"
                   style={HEADING_FONT}
                 >
                   {p.name}
                 </span>
-                <span className="mt-0.5 block text-[13px] text-white/45">
+                <span className="mt-0.5 block truncate text-[13px] text-white/45">
                   {subtitle}
                 </span>
               </span>
               <svg
-                className="text-white/30 transition group-hover:translate-x-0.5 group-hover:text-white/60"
-                width="18"
-                height="18"
+                className="shrink-0 text-white/25 transition group-hover:translate-x-0.5 group-hover:text-white/60"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden
@@ -180,9 +215,23 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
         })}
       </div>
 
-      <p className="mt-8 text-center text-[11px] text-white/30">
-        PIN protegido com bcrypt · nunca sai do servidor
-      </p>
+      <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/35">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+        <span>Protegido por PIN · criptografia bcrypt</span>
+      </div>
     </Shell>
   );
 }
