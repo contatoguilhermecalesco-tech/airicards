@@ -1,4 +1,6 @@
 import { ArlysIcon } from "@/components/StatChip";
+import { AuraRing } from "@/components/AuraRing";
+import { AURA_PROFILES } from "@/lib/aura";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
