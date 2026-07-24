@@ -291,7 +291,17 @@ function ShopPage() {
                 it.kind === "powerup"
                   ? (wallet.powerups[String(it.payload.effect ?? it.id)] ?? 0)
                   : 0;
-              return (
+              return it.kind === "cosmetic" ? (
+                <CosmeticCard
+                  key={it.id}
+                  item={it}
+                  owned={owned}
+                  canAfford={wallet.crystals >= it.price}
+                  busy={busy === it.id}
+                  onBuy={() => handleBuyItem(it)}
+                  onPreview={() => setPreview(it)}
+                />
+              ) : (
                 <ItemCard
                   key={it.id}
                   item={it}
@@ -300,7 +310,6 @@ function ShopPage() {
                   canAfford={wallet.crystals >= it.price}
                   busy={busy === it.id}
                   onBuy={() => handleBuyItem(it)}
-                  onPreview={it.kind === "cosmetic" ? () => setPreview(it) : undefined}
                 />
               );
             })}
