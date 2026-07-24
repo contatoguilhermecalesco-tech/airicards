@@ -51,7 +51,7 @@ export function refreshAvatar(profileId: string) {
 // Keep current profile's avatar in sync with the local wallet store.
 if (typeof window !== "undefined") {
   subscribeWallet(() => {
-    const w = loadWallet();
+    const w = getWallet();
     if (w.profileId && w.loaded) {
       setAvatarCache(w.profileId, w.avatarUrl || null);
     }
