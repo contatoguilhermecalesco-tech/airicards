@@ -234,6 +234,12 @@ function AdminPage() {
       <ExamAdminSection />
 
       <div className="h-6" />
+      <ArlysAdminSection />
+
+      <div className="h-6" />
+      <DuelsAdminSection />
+
+      <div className="h-6" />
       <TagsSection />
 
       <div className="h-6" />
