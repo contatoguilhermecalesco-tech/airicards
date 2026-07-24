@@ -543,38 +543,18 @@ function AuraAvatar({
   gradient,
   avatarUrl,
   ring,
+  profile,
 }: {
   size: number;
   gradient: string;
   avatarUrl?: string | null;
   ring: string | null;
+  profile: ReturnType<typeof auraProfileFromEquipped>;
 }) {
   const showAura = !!ring;
   const inner = showAura ? size - 6 : size;
   return (
-    <span
-      aria-hidden
-      className="relative inline-grid shrink-0 place-items-center"
-      style={{ width: size, height: size }}
-    >
-      {showAura && (
-        <>
-          <span
-            className="cosmetic-ring-spin absolute inset-0 rounded-full"
-            style={{
-              background: `conic-gradient(from 0deg, ${ring}, transparent 35%, ${ring} 65%, transparent 100%)`,
-              filter: "blur(0.4px)",
-            }}
-          />
-          <span
-            className="cosmetic-glow-pulse pointer-events-none absolute -inset-1 rounded-full"
-            style={{
-              background: `radial-gradient(circle, ${ring}55, transparent 65%)`,
-              filter: "blur(6px)",
-            }}
-          />
-        </>
-      )}
+    <AuraRing size={size} profile={showAura ? profile : null}>
       <span
         className="relative block overflow-hidden rounded-full ring-1 ring-white/15"
         style={{
@@ -582,7 +562,7 @@ function AuraAvatar({
           height: inner,
           backgroundImage: avatarUrl ? undefined : gradient,
           background: avatarUrl ? "#000" : undefined,
-          boxShadow: showAura ? `0 0 10px ${ring}55` : undefined,
+          boxShadow: showAura && ring ? `0 0 10px ${ring}55` : undefined,
         }}
       >
         {avatarUrl && (
@@ -594,7 +574,7 @@ function AuraAvatar({
           />
         )}
       </span>
-    </span>
+    </AuraRing>
   );
 }
 
