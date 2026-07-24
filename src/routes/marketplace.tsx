@@ -117,7 +117,7 @@ function MarketplacePage() {
         Biblioteca
       </Link>
 
-      <header className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
             <Compass className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -127,10 +127,29 @@ function MarketplacePage() {
             Decks da comunidade
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Explore, curta e importe para sua biblioteca.
+            Explore, curta e importe. Decks premium usam Cristais airi ✦.
           </p>
         </div>
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-200">
+            <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
+            {wallet.crystals} ✦
+          </div>
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow"
+          >
+            <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Loja
+          </Link>
+        </div>
       </header>
+
+      {error && (
+        <div className="mb-4 rounded-2xl border border-rose-400/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-200">
+          {error}
+        </div>
+      )}
 
       <div className="mb-5 flex flex-wrap items-center gap-2">
         <label className="relative flex flex-1 min-w-[220px] items-center">
