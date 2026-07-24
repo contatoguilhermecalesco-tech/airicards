@@ -29,6 +29,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
+import { useProfileAvatar } from "@/lib/profile-avatars";
 import { useWallet, loadWallet } from "@/lib/wallet-store";
 import {
   buyPublishedDeck,
