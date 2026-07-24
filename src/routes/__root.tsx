@@ -580,9 +580,23 @@ function ProfileMenu() {
       </button>
       {open && (
         <div className="glass-panel absolute right-0 mt-2 w-56 max-w-[calc(100vw-1.5rem)] rounded-2xl p-1.5 shadow-card">
-          <div className="px-3 py-2">
-            <p className="text-xs text-muted-foreground">Conectado como</p>
-            <p className="text-sm font-medium">{profile.name}</p>
+          <div className="flex items-center gap-3 px-3 py-2">
+            <span
+              aria-hidden
+              className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15"
+              style={{
+                backgroundImage: wallet.avatarUrl ? undefined : profile.gradient,
+                background: wallet.avatarUrl ? "#000" : undefined,
+              }}
+            >
+              {wallet.avatarUrl && (
+                <img src={wallet.avatarUrl} alt="" className="h-full w-full object-cover" draggable={false} />
+              )}
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] text-muted-foreground">Conectado como</p>
+              <p className="truncate text-sm font-medium">{profile.name}</p>
+            </div>
           </div>
           <div className="my-1 h-px bg-border" />
           <Link
