@@ -17,7 +17,7 @@ import {
 } from "@/lib/changelog-store";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 
-export const Route = createFileRoute("/novidades")({
+export const Route = createFileRoute("/novidades/")({
   head: () => ({
     meta: [
       { title: "Novidades — airi" },
