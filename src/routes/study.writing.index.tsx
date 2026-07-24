@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   PenLine,
   Sparkles,
@@ -10,10 +10,15 @@ import {
   AlertCircle,
   Loader2,
   History,
+  Library,
+  ChevronDown,
+  ChevronUp,
+  Plus,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
 import { addWriting } from "@/lib/writing-store";
+import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/writing/")({
   component: WritingPage,
