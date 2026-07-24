@@ -39,9 +39,16 @@ export type Duel = {
   createdBy: ProfileId;
   status: "active" | "completed";
   winner: ProfileId | null;
+  forfeitBy: ProfileId | null;
+  expiresAt: string;
+  remindedAt: string | null;
   createdAt: string;
   completedAt: string | null;
 };
+
+/** Prazo da rodada (horas) e antecedência do lembrete. */
+export const DUEL_WINDOW_HOURS = 48;
+export const DUEL_REMIND_HOURS = 24;
 
 export type DuelResult = {
   id: string;
