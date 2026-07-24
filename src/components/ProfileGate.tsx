@@ -334,13 +334,16 @@ function PinPad({
       <div className="flex flex-col items-center">
         <Logo size="md" />
 
-        <span
-          aria-hidden
-          className="mt-10 grid h-[76px] w-[76px] place-items-center rounded-full text-[24px] font-semibold text-white ring-1 ring-inset ring-white/15"
-          style={{ backgroundImage: profile.gradient, ...HEADING_FONT }}
-        >
-          {initial}
-        </span>
+        <div className="mt-10">
+          <ProfileAvatar
+            profileId={profile.id}
+            initial={initial}
+            gradient={profile.gradient}
+            size={76}
+            fontScale={0.32}
+            ring="rgba(255,255,255,0.15)"
+          />
+        </div>
         <h1
           className="mt-5 text-center text-[24px] font-semibold tracking-tight text-white"
           style={HEADING_FONT}
