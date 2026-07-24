@@ -159,12 +159,15 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
                 i > 0 ? "border-t border-white/[0.06]" : ""
               }`}
             >
-              <span
-                aria-hidden
-                className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
-                style={{ backgroundImage: p.gradient, ...HEADING_FONT }}
-              >
-                {initial}
+              <span aria-hidden className="relative">
+                <ProfileAvatar
+                  profileId={p.id}
+                  initial={initial}
+                  gradient={p.gradient}
+                  size={48}
+                  fontScale={0.36}
+                  ring="rgba(255,255,255,0.15)"
+                />
                 {meta?.hasPin && (
                   <span
                     aria-hidden
