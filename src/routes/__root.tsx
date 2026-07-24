@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -209,10 +209,38 @@ function RankPill() {
 }
 
 const MORE_ITEMS = [
-  { to: "/enemies", label: "Inimigas", icon: Swords, matcher: (p: string) => p.startsWith("/enemies") },
-  { to: "/rank", label: "Rank", icon: Trophy, matcher: (p: string) => p.startsWith("/rank") },
-  { to: "/novidades", label: "Novidades", icon: Sparkles, matcher: (p: string) => p.startsWith("/novidades") },
-  { to: "/settings", label: "Configurações", icon: Settings2, matcher: (p: string) => p.startsWith("/settings") },
+  {
+    to: "/enemies",
+    label: "Inimigas",
+    description: "Cartas que você mais erra",
+    icon: Swords,
+    color: "#f87171",
+    matcher: (p: string) => p.startsWith("/enemies"),
+  },
+  {
+    to: "/rank",
+    label: "Rank",
+    description: "Seu elo e progressão",
+    icon: Trophy,
+    color: "#fbbf24",
+    matcher: (p: string) => p.startsWith("/rank"),
+  },
+  {
+    to: "/novidades",
+    label: "Novidades",
+    description: "O que há de novo no app",
+    icon: Sparkles,
+    color: "#a78bfa",
+    matcher: (p: string) => p.startsWith("/novidades"),
+  },
+  {
+    to: "/settings",
+    label: "Configurações",
+    description: "Preferências e conta",
+    icon: Settings2,
+    color: "#60a5fa",
+    matcher: (p: string) => p.startsWith("/settings"),
+  },
 ] as const;
 
 function useMoreState() {
@@ -245,51 +273,82 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <button
         aria-label="Fechar"
         onClick={onClose}
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150"
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-150"
       />
-      <div className="relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.08] bg-[hsl(var(--background))]/95 backdrop-blur-xl sm:rounded-3xl sm:mx-4 animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
-        <div className="flex items-center justify-between px-5 pt-4 pb-2">
+      <div className="relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.09] bg-[hsl(var(--background))]/95 backdrop-blur-2xl shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.6)] sm:rounded-3xl sm:mx-4 sm:shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+        {/* Grabber (mobile) */}
+        <div className="flex justify-center pt-2.5 sm:hidden">
+          <span className="h-1 w-9 rounded-full bg-white/15" />
+        </div>
+
+        <div className="flex items-center justify-between px-5 pt-4 pb-3 sm:pt-5">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/45">
+            <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-primary/80">
               airi
             </p>
-            <h2 className="text-[18px] font-semibold tracking-tight">Mais</h2>
+            <h2 className="mt-0.5 text-[20px] font-semibold tracking-tight text-foreground">
+              Mais
+            </h2>
           </div>
           <button
             onClick={onClose}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground/60 transition hover:bg-white/[0.06] hover:text-foreground"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
             aria-label="Fechar"
           >
             <X className="h-4 w-4" strokeWidth={2.5} />
           </button>
         </div>
-        <div className="px-3 pb-4 pt-2 sm:px-4 sm:pb-5">
-          <div className="grid grid-cols-2 gap-2">
-            {MORE_ITEMS.map(({ to, label, icon: Icon }) => {
+
+        <div className="px-4 pb-5 pt-1 sm:px-5 sm:pb-6">
+          <ul className="flex flex-col gap-2">
+            {MORE_ITEMS.map(({ to, label, description, icon: Icon, color }) => {
               const isNews = to === "/novidades";
               const badge = isNews && unreadNews > 0 ? unreadNews : 0;
               return (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={onClose}
-                  className="group relative flex flex-col items-start gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 transition hover:border-primary/40 hover:bg-white/[0.04]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/15 text-primary transition group-hover:bg-primary/25">
-                    <Icon className="h-4.5 w-4.5" strokeWidth={2.25} />
-                  </div>
-                  <span className="text-[14px] font-semibold text-foreground">
-                    {label}
-                  </span>
-                  {badge > 0 && (
-                    <span className="absolute right-3 top-3 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1.5 text-[10.5px] font-semibold text-primary-foreground">
-                      {badge}
-                    </span>
-                  )}
-                </Link>
+                <li key={to}>
+                  <Link
+                    to={to}
+                    onClick={onClose}
+                    className="group relative flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5 transition hover:-translate-y-px hover:border-white/[0.14] hover:bg-white/[0.06]"
+                  >
+                    <div
+                      className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl border"
+                      style={{
+                        backgroundColor: `${color}1f`,
+                        borderColor: `${color}40`,
+                        color,
+                        boxShadow: `0 6px 20px -8px ${color}55`,
+                      }}
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={2.25} />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-2 text-[15px] font-semibold text-foreground">
+                        <span className="truncate">{label}</span>
+                        {badge > 0 && (
+                          <span
+                            className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-primary-foreground"
+                            style={{ backgroundColor: color }}
+                          >
+                            {badge}
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-0.5 truncate text-[12px] text-foreground/55">
+                        {description}
+                      </p>
+                    </div>
+
+                    <ChevronRight
+                      className="h-4 w-4 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/70"
+                      strokeWidth={2.25}
+                    />
+                  </Link>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
         <div className="safe-bottom" />
       </div>
