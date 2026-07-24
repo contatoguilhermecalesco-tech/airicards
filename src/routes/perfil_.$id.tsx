@@ -337,29 +337,8 @@ function PerfilViewer() {
   );
 }
 
-function StatChip({
-  icon: Icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-  label: string;
-  value: string;
-  color: string;
-}) {
-  return (
-    <div className="flex items-center gap-2 rounded-lg border border-white/5 px-2.5 py-2" style={{ background: "rgba(255,255,255,0.02)" }}>
-      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md" style={{ background: `${color}22`, color }}>
-        <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-      </span>
-      <div className="min-w-0">
-        <p className="truncate text-[10px] font-bold uppercase tracking-wider text-white/50">{label}</p>
-        <p className="truncate text-[13px] font-semibold text-white">{value || "—"}</p>
-      </div>
-    </div>
-  );
-}
+
+
 
 function MiniStat({
   icon: Icon,
