@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,12 +16,16 @@ import {
   useCardsReviewedToday,
   useStreak,
   nextStreakMilestone,
+  isEnemy,
+  isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
+import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
+
 
 export const Route = createFileRoute("/")({
   component: Home,
