@@ -870,7 +870,7 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
               background: "#232428",
             }}
           >
-            <DiscordAvatar size={44} ring={v.ring} showDecoration={showDecoration} />
+            <DiscordAvatar size={44} ring={v.ring} showDecoration={showDecoration} auraKey={String(item.payload.key ?? "")} />
           </div>
           {isBadge && (
             <span
