@@ -621,10 +621,12 @@ function RootComponent() {
           <TopBar />
           <Outlet />
           <BottomBar />
-          <RankPromotionOverlay />
-          <StreakMilestoneOverlay />
-          <StreakChangeOverlay />
-          <OnboardingTour />
+          <Suspense fallback={null}>
+            <RankPromotionOverlay />
+            <StreakMilestoneOverlay />
+            <StreakChangeOverlay />
+            <OnboardingTour />
+          </Suspense>
         </div>
       </ProfileGate>
 
