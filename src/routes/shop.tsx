@@ -113,6 +113,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [affordableOnly, setAffordableOnly] = useState(false);
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
@@ -133,13 +134,19 @@ function ShopPage() {
   }, []);
 
   const filteredItems = useMemo(
-    () => (items ?? []).filter((i) => i.kind === tab),
-    [items, tab],
+    () =>
+      (items ?? []).filter(
+        (i) => i.kind === tab && (!affordableOnly || wallet.crystals >= i.price),
+      ),
+    [items, tab, affordableOnly, wallet.crystals],
   );
 
   const paidDecks = useMemo(
-    () => (decks ?? []).filter((d) => (d.price ?? 0) > 0),
-    [decks],
+    () =>
+      (decks ?? []).filter(
+        (d) => (d.price ?? 0) > 0 && (!affordableOnly || wallet.crystals >= d.price),
+      ),
+    [decks, affordableOnly, wallet.crystals],
   );
 
   function toast(kind: "ok" | "err", msg: string) {
@@ -252,6 +259,31 @@ function ShopPage() {
           </button>
         ))}
       </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5">
+        <div className="min-w-0 leading-tight">
+          <p className="text-[13px] font-semibold text-foreground">Só o que posso comprar</p>
+          <p className="text-[11px] text-muted-foreground">
+            Filtra itens até {wallet.crystals} ✦
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={affordableOnly}
+          onClick={() => setAffordableOnly((v) => !v)}
+          className={`relative h-7 w-12 shrink-0 rounded-full transition ${
+            affordableOnly ? "bg-primary" : "bg-white/10"
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all ${
+              affordableOnly ? "left-[22px]" : "left-0.5"
+            }`}
+          />
+        </button>
+      </div>
+
 
       {flash && (
         <div
