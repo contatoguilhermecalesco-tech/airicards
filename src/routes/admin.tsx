@@ -1037,6 +1037,7 @@ function ChangelogSection() {
   const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [notes, setNotes] = useState("");
   const [genBusy, setGenBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -1053,6 +1054,7 @@ function ChangelogSection() {
       const draft = await generate({ data: { prompt: idea, category } });
       setTitle(draft.title);
       setBody(draft.body);
+      setNotes(draft.notes ?? "");
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -1069,11 +1071,13 @@ function ChangelogSection() {
       await createChangelogEntry({
         title,
         body,
+        notes: notes.trim() || null,
         category,
         icon: iconKey || null,
       });
       setTitle("");
       setBody("");
+      setNotes("");
       setIdea("");
       setIconKey("");
       setOk("Novidade publicada.");
@@ -1272,16 +1276,37 @@ function ChangelogSection() {
         </div>
         <div>
           <p className="mb-1.5 text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
-            Corpo da nota
+            Resumo (aparece na listagem)
           </p>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Conte o que mudou. Parágrafos curtos funcionam melhor."
-            rows={4}
+            placeholder="Resumo curto — 1 a 2 frases que aparecem no card da lista."
+            rows={3}
             className="w-full resize-none rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-sm leading-relaxed outline-none transition focus:border-primary/60"
           />
         </div>
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <p className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/45">
+              Notas completas (opcional)
+            </p>
+            <span className="text-[9.5px] uppercase tracking-[0.18em] text-foreground/35">
+              exibido em "Ler notas completas"
+            </span>
+          </div>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder={`Texto longo do patch note — separe parágrafos com linhas em branco.\n\nEx.:\nRedesenhamos a aba Novidades do zero, inspirados nos patch notes da Riot.\n\nAgora cada nota tem sua própria página com detalhes completos, meta strip e navegação anterior/próximo.`}
+            rows={7}
+            className="w-full resize-y rounded-xl border border-white/10 bg-black/25 px-3 py-2.5 text-[13px] leading-relaxed outline-none transition focus:border-primary/60"
+          />
+          <p className="mt-1 text-[10px] text-foreground/40">
+            Se deixar em branco, o resumo acima será usado como conteúdo da página de detalhe.
+          </p>
+        </div>
+
 
         {/* Icon picker */}
         <div>
