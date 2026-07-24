@@ -98,15 +98,18 @@ function NovidadeDetailPage() {
       : meta.Icon;
   }, [entry, meta]);
 
+  const fullText = useMemo(() => {
+    if (!entry) return "";
+    return (entry.notes && entry.notes.trim()) || entry.body;
+  }, [entry]);
+
   const paragraphs = useMemo(
     () =>
-      entry
-        ? entry.body
-            .split(/\n\s*\n/)
-            .map((p) => p.trim())
-            .filter(Boolean)
-        : [],
-    [entry],
+      fullText
+        .split(/\n\s*\n/)
+        .map((p) => p.trim())
+        .filter(Boolean),
+    [fullText],
   );
 
   async function share() {
