@@ -1,6 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Gift, Sparkles, Swords, Send, Check, X as XIcon, ChevronRight } from "lucide-react";
+import {
+  Gift,
+  Sparkles,
+  Swords,
+  Send,
+  Check,
+  X as XIcon,
+  ChevronRight,
+  Info,
+  Users,
+  Target,
+  Zap,
+  Trophy,
+} from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
