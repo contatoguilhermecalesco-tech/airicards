@@ -53,10 +53,28 @@ function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 function Shell({ children }: { children: ReactNode }) {
   return (
     <main
-      className="flex min-h-screen w-full items-center justify-center bg-black px-5 py-10"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black px-5 py-10"
       style={BODY_FONT}
     >
-      <div className="w-full max-w-[420px]">{children}</div>
+      {/* Subtle top spotlight — no blur, just gradient */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[60vh]"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 0%, rgba(139,125,255,0.10) 0%, rgba(139,125,255,0) 70%)",
+        }}
+      />
+      {/* Hairline grid vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.04), transparent 70%)",
+        }}
+      />
+      <div className="relative w-full max-w-[420px]">{children}</div>
     </main>
   );
 }
@@ -91,66 +109,101 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
     );
   }
 
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 5
+      ? "Boa madrugada"
+      : hour < 12
+        ? "Bom dia"
+        : hour < 18
+          ? "Boa tarde"
+          : "Boa noite";
+
   return (
     <Shell>
       <div className="flex flex-col items-center">
         <Logo size="lg" />
         <p
-          className="mt-8 text-[13px] font-medium tracking-wide text-white/50"
+          className="mt-10 text-[12px] font-medium uppercase tracking-[0.24em] text-white/40"
           style={BODY_FONT}
         >
-          Quem está estudando?
+          {greeting}
         </p>
         <h1
-          className="mt-1 text-[26px] font-semibold text-white"
+          className="mt-2 text-center text-[28px] font-semibold leading-tight tracking-tight text-white"
           style={HEADING_FONT}
         >
-          Escolha seu perfil
+          Quem está estudando?
         </h1>
+        <p className="mt-2 text-center text-[14px] text-white/45">
+          Toque no perfil para continuar.
+        </p>
       </div>
 
-      <div className="mt-10 space-y-3">
-        {PROFILES.map((p) => {
+      <div className="mt-8 overflow-hidden rounded-[22px] border border-white/[0.07] bg-[#0f0f12]">
+        {PROFILES.map((p, i) => {
           const meta = metas?.find((m) => m.id === p.id);
           const subtitle = !meta
             ? "Carregando…"
             : meta.hasPin
-              ? "Toque para entrar"
-              : "Criar PIN de acesso";
+              ? "PIN configurado"
+              : "Novo perfil · criar PIN";
           const initial = p.name.charAt(0).toUpperCase();
           return (
             <button
               key={p.id}
               onClick={() => setChosen(p)}
               disabled={!metas}
-              className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.08] bg-[#111114] px-4 py-3.5 text-left transition active:scale-[0.98] hover:border-white/15 hover:bg-[#17171b] disabled:opacity-50"
+              className={`group relative flex w-full items-center gap-4 px-4 py-4 text-left transition active:bg-white/[0.04] hover:bg-white/[0.025] disabled:opacity-50 ${
+                i > 0 ? "border-t border-white/[0.06]" : ""
+              }`}
             >
               <span
                 aria-hidden
-                className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-lg font-semibold text-white"
+                className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full text-[17px] font-semibold text-white ring-1 ring-inset ring-white/15"
                 style={{ backgroundImage: p.gradient, ...HEADING_FONT }}
               >
                 {initial}
+                {meta?.hasPin && (
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-black ring-2 ring-black"
+                  >
+                    <svg
+                      width="9"
+                      height="9"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#a78bfa"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="4" y="11" width="16" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                    </svg>
+                  </span>
+                )}
               </span>
-              <span className="flex-1">
+              <span className="flex-1 min-w-0">
                 <span
-                  className="block text-[17px] font-semibold text-white"
+                  className="block truncate text-[17px] font-semibold text-white"
                   style={HEADING_FONT}
                 >
                   {p.name}
                 </span>
-                <span className="mt-0.5 block text-[13px] text-white/45">
+                <span className="mt-0.5 block truncate text-[13px] text-white/45">
                   {subtitle}
                 </span>
               </span>
               <svg
-                className="text-white/30 transition group-hover:translate-x-0.5 group-hover:text-white/60"
-                width="18"
-                height="18"
+                className="shrink-0 text-white/25 transition group-hover:translate-x-0.5 group-hover:text-white/60"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2.2"
+                strokeWidth="2.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden
@@ -162,9 +215,23 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
         })}
       </div>
 
-      <p className="mt-8 text-center text-[11px] text-white/30">
-        PIN protegido com bcrypt · nunca sai do servidor
-      </p>
+      <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/35">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <rect x="4" y="11" width="16" height="10" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </svg>
+        <span>Protegido por PIN · criptografia bcrypt</span>
+      </div>
     </Shell>
   );
 }
@@ -254,6 +321,10 @@ function PinPad({
         : "Digite o mesmo PIN novamente";
   const initial = profile.name.charAt(0).toUpperCase();
 
+  const filled = value.length;
+  const targetLen = Math.max(4, pin.length || 4);
+  const dots = Array.from({ length: 6 }, (_, i) => i);
+
   return (
     <Shell>
       <div className="flex flex-col items-center">
@@ -261,61 +332,138 @@ function PinPad({
 
         <span
           aria-hidden
-          className="mt-10 grid h-20 w-20 place-items-center rounded-full text-2xl font-semibold text-white"
+          className="mt-10 grid h-[76px] w-[76px] place-items-center rounded-full text-[24px] font-semibold text-white ring-1 ring-inset ring-white/15"
           style={{ backgroundImage: profile.gradient, ...HEADING_FONT }}
         >
           {initial}
         </span>
         <h1
-          className="mt-5 text-[24px] font-semibold tracking-tight text-white"
+          className="mt-5 text-center text-[24px] font-semibold tracking-tight text-white"
           style={HEADING_FONT}
         >
           {title}
         </h1>
-        <p className="mt-1 text-[14px] text-white/50">{subtitle}</p>
+        <p className="mt-1.5 text-center text-[14px] text-white/50">
+          {subtitle}
+        </p>
       </div>
 
-      <div className="mt-8 flex w-full flex-col items-center gap-4">
-        <input
-          ref={inputRef}
-          type="password"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern="[0-9]*"
-          value={value}
-          maxLength={8}
-          disabled={busy}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={onKey}
-          aria-label="PIN"
-          className="w-full rounded-2xl border border-white/10 bg-[#111114] px-5 py-4 text-center text-2xl font-semibold tracking-[0.6em] text-white outline-none transition focus:border-white/25 disabled:opacity-60"
-          style={HEADING_FONT}
-        />
-        {error && (
-          <p className="text-center text-[13px] text-rose-300" role="alert">
-            {error}
-          </p>
-        )}
-        {stage === "enter" && (
+      {/* Dot indicator */}
+      <div
+        className="mt-8 flex items-center justify-center gap-3"
+        onClick={() => inputRef.current?.focus()}
+        role="presentation"
+      >
+        {dots.map((i) => {
+          const active = i < filled;
+          const inRange = i < targetLen;
+          return (
+            <span
+              key={i}
+              className={`h-3 w-3 rounded-full transition-all duration-200 ${
+                active
+                  ? "bg-white scale-110"
+                  : inRange
+                    ? "bg-white/15"
+                    : "bg-white/[0.06]"
+              }`}
+            />
+          );
+        })}
+      </div>
+
+      {/* Hidden input capturing keyboard */}
+      <input
+        ref={inputRef}
+        type="password"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        pattern="[0-9]*"
+        value={value}
+        maxLength={8}
+        disabled={busy}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKey}
+        aria-label="PIN"
+        className="sr-only"
+      />
+
+      {error && (
+        <p
+          className="mt-5 text-center text-[13px] text-rose-300"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
+
+      {/* Numeric keypad — iOS style */}
+      <div className="mt-8 grid grid-cols-3 gap-3">
+        {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((n) => (
           <button
+            key={n}
             type="button"
-            onClick={() => submit(pin)}
-            disabled={busy || pin.length < 4}
-            className="mt-1 inline-flex w-full items-center justify-center rounded-2xl bg-white px-8 py-3.5 text-[15px] font-semibold text-black transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={busy}
+            onClick={() => onChange(value + n)}
+            className="h-16 rounded-2xl border border-white/[0.07] bg-[#111114] text-[26px] font-medium text-white transition active:scale-[0.96] active:bg-white/[0.06] hover:bg-white/[0.03] disabled:opacity-50"
             style={HEADING_FONT}
           >
-            {busy ? "Entrando…" : "Entrar"}
+            {n}
           </button>
-        )}
+        ))}
+        <div />
         <button
           type="button"
-          onClick={onCancel}
           disabled={busy}
-          className="mt-1 text-[13px] font-medium text-white/45 transition hover:text-white/80"
+          onClick={() => onChange(value + "0")}
+          className="h-16 rounded-2xl border border-white/[0.07] bg-[#111114] text-[26px] font-medium text-white transition active:scale-[0.96] active:bg-white/[0.06] hover:bg-white/[0.03] disabled:opacity-50"
+          style={HEADING_FONT}
         >
-          Voltar
+          0
+        </button>
+        <button
+          type="button"
+          disabled={busy || value.length === 0}
+          onClick={() => onChange(value.slice(0, -1))}
+          className="grid h-16 place-items-center rounded-2xl text-white/60 transition active:scale-[0.96] active:bg-white/[0.04] hover:text-white disabled:opacity-30"
+          aria-label="Apagar"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M22 5H10L3 12l7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
+            <path d="M18 9l-6 6M12 9l6 6" />
+          </svg>
         </button>
       </div>
+
+      {stage === "enter" && (
+        <button
+          type="button"
+          onClick={() => submit(pin)}
+          disabled={busy || pin.length < 4}
+          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-8 py-4 text-[15px] font-semibold text-black transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-30"
+          style={HEADING_FONT}
+        >
+          {busy ? "Entrando…" : "Entrar"}
+        </button>
+      )}
+
+      <button
+        type="button"
+        onClick={onCancel}
+        disabled={busy}
+        className="mx-auto mt-5 block text-[13px] font-medium text-white/45 transition hover:text-white/80"
+      >
+        ← Trocar de perfil
+      </button>
     </Shell>
   );
 }
