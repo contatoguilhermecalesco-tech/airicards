@@ -344,6 +344,13 @@ function FeedbackView({
         </section>
       )}
 
+      <SaveToDeckPanel
+        originalText={originalText}
+        prompt={prompt}
+        feedback={feedback}
+      />
+
+
       <div className="flex flex-wrap gap-2 pt-2">
         <button
           onClick={onRestart}
