@@ -75,12 +75,13 @@ export function PresenceCard() {
       <div className="mb-3 flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <div className="relative">
-            <div
-              className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold text-white"
-              style={{ background: other.gradient }}
-            >
-              {other.initial}
-            </div>
+            <ProfileAvatar
+              profileId={otherId}
+              initial={other.initial}
+              gradient={other.gradient}
+              size={24}
+              fontScale={0.42}
+            />
             {presence.online && (
               <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-background" />
             )}
