@@ -113,6 +113,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [affordableOnly, setAffordableOnly] = useState(false);
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
