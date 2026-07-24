@@ -6,11 +6,16 @@ import type { ProfileId } from "@/lib/social-store";
 
 export type Cosmetic = string; // key identifier (e.g. "deck_frame:aurora")
 
+export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect";
+
+export type EquippedMap = Partial<Record<CosmeticSlot, string>>;
+
 export type WalletState = {
   profileId: string;
   crystals: number;
   cosmetics: string[];
-  powerups: Record<string, number>; // effect -> stack count
+  equipped: EquippedMap;
+  powerups: Record<string, number>;
   loaded: boolean;
 };
 
@@ -18,6 +23,7 @@ const empty = (id = ""): WalletState => ({
   profileId: id,
   crystals: 0,
   cosmetics: [],
+  equipped: {},
   powerups: {},
   loaded: false,
 });
@@ -49,7 +55,11 @@ const WELCOME_BONUS = 150;
 type WalletRow = {
   profile_id: string;
   crystals: number;
-  inventory: { cosmetics?: string[]; powerups?: Record<string, number> } | null;
+  inventory: {
+    cosmetics?: string[];
+    equipped?: EquippedMap;
+    powerups?: Record<string, number>;
+  } | null;
 };
 
 function normalize(row: WalletRow, profileId: string): WalletState {
@@ -58,6 +68,7 @@ function normalize(row: WalletRow, profileId: string): WalletState {
     profileId,
     crystals: row.crystals ?? 0,
     cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
+    equipped: inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
     loaded: true,
   };
