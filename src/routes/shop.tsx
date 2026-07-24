@@ -805,16 +805,34 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
     >
       {/* Banner */}
       <div
-        className="h-14 w-full"
+        className={`relative h-14 w-full overflow-hidden ${
+          showBanner ? "cosmetic-banner-animated" : ""
+        }`}
         style={{
-          background: showBanner ? v.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
+          background: showBanner
+            ? `${v.gradient}, ${v.gradient}`
+            : "linear-gradient(135deg,#2b2d31,#1e1f22)",
+          backgroundImage: showBanner
+            ? `${v.gradient.replace("135deg", "110deg")}`
+            : undefined,
         }}
-      />
+      >
+        {showBanner && (
+          <span
+            aria-hidden
+            className="cosmetic-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/3"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+            }}
+          />
+        )}
+      </div>
       {/* Body */}
       <div className="relative px-3 pb-3 pt-0">
         <div className="-mt-6 flex items-end justify-between gap-2">
           <div
-            className="rounded-full"
+            className={`rounded-full ${showDecoration ? "cosmetic-avatar-float" : ""}`}
             style={{
               padding: 3,
               background: "#232428",
@@ -824,11 +842,19 @@ function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: bool
           </div>
           {isBadge && (
             <span
-              className="mb-1 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white shadow"
+              className="relative mb-1 inline-flex items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white shadow"
               style={{ background: v.gradient }}
             >
-              <Icon className="h-3 w-3" strokeWidth={2.75} />
-              {v.tag}
+              <span
+                aria-hidden
+                className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+                }}
+              />
+              <Icon className="relative h-3 w-3" strokeWidth={2.75} />
+              <span className="relative">{v.tag}</span>
             </span>
           )}
         </div>
