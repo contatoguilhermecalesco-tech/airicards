@@ -23,6 +23,7 @@ import {
   Heart,
   Gift,
 } from "lucide-react";
+import { StatChip, ArlysIcon } from "@/components/StatChip";
 import { PROFILES } from "@/lib/profile";
 import { useProfileSnapshot } from "@/lib/profile-view";
 import { listShopItems, type ShopItem } from "@/lib/shop";
