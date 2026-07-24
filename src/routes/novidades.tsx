@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-import { ChevronLeft, Sparkles, Wrench, Wand2 } from "lucide-react";
+import {
+  ChevronLeft,
+  Sparkles,
+  Wrench,
+  Wand2,
+  ArrowUpRight,
+} from "lucide-react";
 import {
   initChangelog,
   markAllChangelogSeen,
@@ -31,16 +37,15 @@ export const Route = createFileRoute("/novidades")({
   component: NovidadesPage,
 });
 
-const CATEGORY_META: Record<
-  ChangelogCategory,
-  { label: string; color: string; Icon: typeof Sparkles }
-> = {
+type Meta = { label: string; color: string; Icon: typeof Sparkles };
+
+const CATEGORY_META: Record<ChangelogCategory, Meta> = {
   feature: { label: "Novo", color: "#a78bfa", Icon: Sparkles },
   improvement: { label: "Melhoria", color: "#60a5fa", Icon: Wand2 },
   fix: { label: "Ajuste", color: "#34d399", Icon: Wrench },
 };
 
-function formatShortDate(iso: string) {
+function fmtDay(iso: string) {
   try {
     return new Intl.DateTimeFormat("pt-BR", {
       day: "2-digit",
@@ -54,30 +59,35 @@ function formatShortDate(iso: string) {
   }
 }
 
-function formatLongDate(iso: string) {
+function fmtMonthTitle(iso: string) {
   try {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "short",
+    const d = new Date(iso);
+    const label = new Intl.DateTimeFormat("pt-BR", {
+      month: "long",
       year: "numeric",
-    }).format(new Date(iso));
+    }).format(d);
+    return label.charAt(0).toUpperCase() + label.slice(1);
   } catch {
     return "";
   }
 }
 
+/** Deterministic "patch" number based on entry id/date. */
+function patchNumberFor(entry: ChangelogEntry, index: number) {
+  const d = new Date(entry.created_at);
+  const y = String(d.getFullYear()).slice(-2);
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const seq = String(index + 1).padStart(2, "0");
+  return `${y}.${m}.${seq}`;
+}
+
 function groupByMonth(entries: ChangelogEntry[]) {
   const groups = new Map<string, ChangelogEntry[]>();
   for (const e of entries) {
-    const d = new Date(e.created_at);
-    const key = new Intl.DateTimeFormat("pt-BR", {
-      month: "long",
-      year: "numeric",
-    }).format(d);
-    const label = key.charAt(0).toUpperCase() + key.slice(1);
-    const list = groups.get(label) ?? [];
+    const key = fmtMonthTitle(e.created_at);
+    const list = groups.get(key) ?? [];
     list.push(e);
-    groups.set(label, list);
+    groups.set(key, list);
   }
   return Array.from(groups.entries());
 }
@@ -92,182 +102,322 @@ function NovidadesPage() {
   }, []);
 
   const [featured, ...rest] = entries;
-  const grouped = useMemo(() => groupByMonth(rest), [rest]);
-  const featuredMeta = featured
-    ? CATEGORY_META[featured.category] ?? CATEGORY_META.feature
-    : null;
+  const highlights = useMemo(() => rest.slice(0, 3), [rest]);
+  const restAfterHighlights = useMemo(() => rest.slice(3), [rest]);
+  const grouped = useMemo(
+    () => groupByMonth(restAfterHighlights),
+    [restAfterHighlights],
+  );
+  const featuredMeta = featured ? CATEGORY_META[featured.category] : null;
+  const featuredPatch = featured ? patchNumberFor(featured, 0) : "";
   const featuredIsNew =
     featured && new Date(featured.created_at).getTime() > lastSeen;
 
   return (
-    <main className="mx-auto max-w-2xl px-5 pb-24 pt-6 sm:px-8 sm:pt-10">
-      {/* Header */}
-      <header className="mb-8 flex flex-col gap-1 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
+    <main className="relative min-h-screen bg-background pb-24">
+      {/* Sticky header */}
+      <div className="sticky top-0 z-30 border-b border-white/[0.06] bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-5 py-3.5 sm:px-8">
           <Link
             to="/"
             aria-label="Voltar"
-            className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
           >
-            <ChevronLeft className="h-4 w-4" strokeWidth={2.25} />
+            <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </Link>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/80">
-            airi
-          </span>
+          <div className="flex flex-1 items-baseline gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary/80">
+              airi
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.24em] text-foreground/30">
+              / patch notes
+            </span>
+          </div>
         </div>
-        <h1 className="text-[30px] font-semibold tracking-tight text-foreground">
-          Novidades
-        </h1>
-      </header>
+      </div>
 
-      {entries.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
-          <p className="text-sm text-foreground/70">
-            Ainda sem novidades por aqui.
-          </p>
-          <p className="mt-1 text-xs text-foreground/45">
-            Assim que algo novo chegar, aparece nesta lista.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* Featured hero — latest entry */}
-          {featured && featuredMeta && (
-            <section className="relative mb-10 animate-fade-in">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -inset-0.5 rounded-[28px] opacity-25 blur-xl"
-                style={{
-                  background: `linear-gradient(120deg, ${featuredMeta.color}, #6366f1)`,
-                }}
-              />
-              <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <span
-                    className="rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
-                    style={{
-                      backgroundColor: `${featuredMeta.color}26`,
-                      borderColor: `${featuredMeta.color}55`,
-                      color: featuredMeta.color,
-                    }}
-                  >
-                    {featuredIsNew ? "Destaque" : featuredMeta.label}
-                  </span>
-                  <span className="text-xs text-foreground/40">
-                    {formatLongDate(featured.created_at)}
-                  </span>
-                </div>
-                <h2 className="mb-2 text-xl font-semibold leading-tight text-foreground">
-                  {featured.title}
-                </h2>
-                <p className="text-[13.5px] leading-relaxed text-foreground/60">
-                  {featured.body}
-                </p>
-                <div className="mt-5 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                  <div
-                    className="h-full w-1/3 rounded-full"
-                    style={{ backgroundColor: featuredMeta.color }}
-                  />
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Timeline groups */}
-          <div className="space-y-10">
-            {grouped.map(([month, list]) => (
-              <section key={month} className="flex flex-col gap-6 animate-fade-in">
-                <div className="flex items-center gap-4">
-                  <h3 className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.28em] text-foreground/35">
-                    {month}
-                  </h3>
-                  <div className="h-px w-full bg-white/[0.06]" />
-                </div>
-
-                <div className="relative space-y-8">
-                  {/* Vertical spine */}
+      <div className="mx-auto max-w-3xl px-5 sm:px-8">
+        {entries.length === 0 ? (
+          <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <p className="text-sm text-foreground/70">
+              Ainda sem novidades por aqui.
+            </p>
+            <p className="mt-1 text-xs text-foreground/45">
+              Assim que algo novo chegar, aparece nesta lista.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* HERO — Patch cover, Riot-style */}
+            {featured && featuredMeta && (
+              <section className="relative mt-6 animate-fade-in">
+                <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0f]">
+                  {/* Editorial gradient art */}
                   <div
                     aria-hidden
-                    className="absolute left-[11px] top-2 bottom-2 w-px bg-gradient-to-b from-primary/40 via-white/[0.06] to-transparent"
+                    className="absolute inset-0"
+                    style={{
+                      background: `radial-gradient(120% 90% at 85% 0%, ${featuredMeta.color}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
+                    }}
+                  />
+                  {/* Grid overlay */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 opacity-[0.18] mix-blend-overlay"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+                      backgroundSize: "44px 44px",
+                      maskImage:
+                        "radial-gradient(70% 60% at 70% 30%, black, transparent)",
+                    }}
+                  />
+                  {/* Diagonal accent line */}
+                  <div
+                    aria-hidden
+                    className="absolute -right-16 top-6 h-[220%] w-[3px] rotate-12"
+                    style={{
+                      background: `linear-gradient(180deg, transparent, ${featuredMeta.color}, transparent)`,
+                    }}
                   />
 
-                  {list.map((e) => {
-                    const meta =
-                      CATEGORY_META[e.category] ?? CATEGORY_META.feature;
-                    const isNew =
-                      new Date(e.created_at).getTime() > lastSeen;
+                  <div className="relative px-6 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                        style={{
+                          borderColor: `${featuredMeta.color}66`,
+                          color: featuredMeta.color,
+                          backgroundColor: `${featuredMeta.color}18`,
+                        }}
+                      >
+                        {featuredIsNew ? (
+                          <>
+                            <span
+                              className="h-1.5 w-1.5 rounded-full"
+                              style={{
+                                backgroundColor: featuredMeta.color,
+                                boxShadow: `0 0 8px ${featuredMeta.color}`,
+                              }}
+                            />
+                            Novo
+                          </>
+                        ) : (
+                          featuredMeta.label
+                        )}
+                      </span>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/40">
+                        {fmtDay(featured.created_at)}
+                      </span>
+                    </div>
+
+                    <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.3em] text-foreground/40">
+                      Patch {featuredPatch}
+                    </p>
+                    <h1 className="mt-2 text-[34px] font-semibold leading-[1.02] tracking-tight text-foreground sm:text-[44px]">
+                      {featured.title}
+                    </h1>
+                    <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-foreground/65 sm:text-[15px]">
+                      {featured.body}
+                    </p>
+
+                    <div className="mt-6 flex items-center gap-3">
+                      <div
+                        className="h-[3px] flex-1 max-w-[120px] rounded-full"
+                        style={{ backgroundColor: featuredMeta.color }}
+                      />
+                      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/40">
+                        Notas da atualização
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* HIGHLIGHTS strip */}
+            {highlights.length > 0 && (
+              <section className="mt-10 animate-fade-in">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="h-4 w-1 rounded-sm bg-primary" />
+                  <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+                    Destaques da versão
+                  </h2>
+                  <div className="h-px flex-1 bg-white/[0.06]" />
+                </div>
+
+                <ul className="grid gap-3 sm:grid-cols-3">
+                  {highlights.map((e) => {
+                    const meta = CATEGORY_META[e.category] ?? CATEGORY_META.feature;
                     const Icon = e.icon
                       ? resolveNotificationIcon(e.icon, null, e.title)
                       : meta.Icon;
-
+                    const isNew =
+                      new Date(e.created_at).getTime() > lastSeen;
                     return (
-                      <article
-                        key={e.id}
-                        className="relative pl-8 transition hover:-translate-y-px"
-                      >
-                        {/* Timeline node */}
-                        <div
-                          aria-hidden
-                          className="absolute left-0 top-1 grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-background"
+                      <li key={e.id}>
+                        <article
+                          className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 transition hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]"
+                          style={{
+                            boxShadow: isNew
+                              ? `inset 3px 0 0 0 ${meta.color}`
+                              : undefined,
+                          }}
                         >
-                          <span
-                            className="h-1.5 w-1.5 rounded-full"
-                            style={{
-                              backgroundColor: isNew
-                                ? meta.color
-                                : "rgba(255,255,255,0.2)",
-                              boxShadow: isNew
-                                ? `0 0 10px ${meta.color}99`
-                                : undefined,
-                              animation: isNew
-                                ? "pulse 2.4s ease-in-out infinite"
-                                : undefined,
-                            }}
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className="text-[9.5px] font-bold uppercase tracking-[0.14em]"
-                              style={{ color: meta.color }}
+                          <div className="flex items-start justify-between">
+                            <div
+                              className="grid h-9 w-9 place-items-center rounded-xl border"
+                              style={{
+                                backgroundColor: `${meta.color}18`,
+                                borderColor: `${meta.color}3d`,
+                                color: meta.color,
+                              }}
                             >
-                              {meta.label}
-                            </span>
-                            <span className="text-[10px] tabular-nums text-foreground/30">
-                              {formatShortDate(e.created_at)}
-                            </span>
-                            {isNew && (
-                              <span
-                                aria-label="Nova"
-                                className="ml-0.5 h-1 w-1 rounded-full"
-                                style={{ backgroundColor: meta.color }}
-                              />
-                            )}
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <Icon
-                              className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                              <Icon className="h-4 w-4" strokeWidth={2.25} />
+                            </div>
+                            <ArrowUpRight
+                              className="h-4 w-4 text-foreground/25 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground/60"
                               strokeWidth={2.25}
-                              style={{ color: meta.color, opacity: 0.75 }}
                             />
-                            <h4 className="text-[15px] font-semibold leading-snug text-foreground/95">
-                              {e.title}
-                            </h4>
                           </div>
-                          <p className="text-[12.5px] leading-relaxed text-foreground/55">
+                          <p
+                            className="mt-3 text-[9.5px] font-bold uppercase tracking-[0.2em]"
+                            style={{ color: meta.color }}
+                          >
+                            {meta.label}
+                          </p>
+                          <h3 className="mt-1 text-[15px] font-semibold leading-snug text-foreground">
+                            {e.title}
+                          </h3>
+                          <p className="mt-1.5 line-clamp-2 text-[12px] leading-relaxed text-foreground/55">
                             {e.body}
                           </p>
-                        </div>
-                      </article>
+                        </article>
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               </section>
-            ))}
-          </div>
-        </>
-      )}
+            )}
+
+            {/* PATCH NOTES — grouped by month */}
+            {grouped.length > 0 && (
+              <div className="mt-12 space-y-14">
+                {grouped.map(([month, list]) => (
+                  <section key={month} className="animate-fade-in">
+                    {/* Section headline — Riot editorial style */}
+                    <div className="mb-6 flex items-end justify-between border-b border-white/10 pb-3">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-foreground/40">
+                          Arquivo
+                        </p>
+                        <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-foreground sm:text-[26px]">
+                          {month}
+                        </h2>
+                      </div>
+                      <span className="pb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/35">
+                        {list.length}{" "}
+                        {list.length === 1 ? "nota" : "notas"}
+                      </span>
+                    </div>
+
+                    <ul className="space-y-4">
+                      {list.map((e, idx) => {
+                        const meta =
+                          CATEGORY_META[e.category] ?? CATEGORY_META.feature;
+                        const Icon = e.icon
+                          ? resolveNotificationIcon(e.icon, null, e.title)
+                          : meta.Icon;
+                        const isNew =
+                          new Date(e.created_at).getTime() > lastSeen;
+                        const patch = patchNumberFor(e, idx + highlights.length + 1);
+
+                        return (
+                          <li key={e.id}>
+                            <article
+                              className="group relative flex gap-4 overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 pl-5 transition hover:border-white/[0.14] hover:bg-white/[0.045] sm:p-5 sm:pl-6"
+                            >
+                              {/* Left accent bar (category color) */}
+                              <span
+                                aria-hidden
+                                className="absolute left-0 top-4 bottom-4 w-[3px] rounded-r-full"
+                                style={{
+                                  backgroundColor: meta.color,
+                                  opacity: isNew ? 1 : 0.55,
+                                  boxShadow: isNew
+                                    ? `0 0 12px ${meta.color}88`
+                                    : undefined,
+                                }}
+                              />
+
+                              <div
+                                className="hidden sm:grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
+                                style={{
+                                  backgroundColor: `${meta.color}15`,
+                                  borderColor: `${meta.color}33`,
+                                  color: meta.color,
+                                }}
+                              >
+                                <Icon className="h-4.5 w-4.5" strokeWidth={2.25} />
+                              </div>
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                                  <span
+                                    className="text-[9.5px] font-bold uppercase tracking-[0.2em]"
+                                    style={{ color: meta.color }}
+                                  >
+                                    {meta.label}
+                                  </span>
+                                  <span className="text-[10px] font-semibold tabular-nums uppercase tracking-[0.14em] text-foreground/35">
+                                    {patch}
+                                  </span>
+                                  <span className="text-foreground/20">•</span>
+                                  <span className="text-[10px] font-semibold tabular-nums uppercase tracking-[0.14em] text-foreground/35">
+                                    {fmtDay(e.created_at)}
+                                  </span>
+                                  {isNew && (
+                                    <span
+                                      className="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
+                                      style={{
+                                        backgroundColor: `${meta.color}22`,
+                                        color: meta.color,
+                                        border: `1px solid ${meta.color}55`,
+                                      }}
+                                    >
+                                      Novo
+                                    </span>
+                                  )}
+                                </div>
+
+                                <h3 className="mt-1.5 text-[16px] font-semibold leading-snug text-foreground sm:text-[17px]">
+                                  {e.title}
+                                </h3>
+                                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/60 sm:text-[13.5px]">
+                                  {e.body}
+                                </p>
+                              </div>
+                            </article>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            )}
+
+            {/* Footer signature */}
+            <div className="mt-16 flex items-center justify-center gap-3 text-foreground/25">
+              <span className="h-px w-10 bg-white/10" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em]">
+                airi · patch notes
+              </span>
+              <span className="h-px w-10 bg-white/10" />
+            </div>
+          </>
+        )}
+      </div>
     </main>
   );
 }
