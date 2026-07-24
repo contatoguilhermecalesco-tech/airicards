@@ -246,7 +246,10 @@ export function setActiveProfileId(profileId: string | null) {
   // Instant paint from local cache.
   const cached = loadCache(profileId);
   state = cached.state;
-  home = cached.home.day === todayKey() ? cached.home : { ...cached.home, day: todayKey(), count: 0 };
+  home =
+    cached.home.day === todayKey()
+      ? cached.home
+      : { ...cached.home, day: todayKey(), count: 0, reviewed: 0 };
   emit();
   emitHome();
   // Punições diárias com base no estado carregado.
