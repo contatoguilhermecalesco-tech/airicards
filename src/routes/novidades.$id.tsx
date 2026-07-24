@@ -252,23 +252,11 @@ function NovidadeDetailPage() {
           </div>
         </section>
 
-        {/* Body */}
-        <article className="prose prose-invert mt-8 max-w-none animate-fade-in">
-          {paragraphs.length === 0 ? (
-            <p className="text-[15px] leading-relaxed text-foreground/75">
-              {entry.body}
-            </p>
-          ) : (
-            paragraphs.map((p, i) => (
-              <p
-                key={i}
-                className="mt-0 mb-4 text-[15px] leading-relaxed text-foreground/75 sm:text-[16px]"
-              >
-                {p}
-              </p>
-            ))
-          )}
+        {/* Body — Riot-style patch notes */}
+        <article className="mt-10 animate-fade-in patch-notes">
+          <RiotPatchBody text={fullText || entry.body} accent={meta.color} />
         </article>
+
 
         {/* Meta strip */}
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
