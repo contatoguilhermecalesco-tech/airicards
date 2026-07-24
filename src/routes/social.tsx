@@ -423,6 +423,12 @@ function HowItWorksDialog({
           <Step
             n={4}
             icon={<Trophy className="h-3.5 w-3.5" />}
+            title="Prazo de 48h · WO"
+            body="Faltando 24h avisamos por notificação. Se um não jogar no prazo, perde por WO (−1) e o outro vence. Se ninguém jogar, quem criou leva o −1."
+          />
+          <Step
+            n={5}
+            icon={<Trophy className="h-3.5 w-3.5" />}
             title="Nova rodada toda semana"
             body="Toda segunda, qualquer um pode criar um novo desafio."
           />
