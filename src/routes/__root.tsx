@@ -561,9 +561,21 @@ function ProfileMenu() {
       >
         <span
           aria-hidden
-          className="h-6 w-9 rounded-full ring-1 ring-white/10 sm:w-10"
-          style={{ backgroundImage: profile.gradient }}
-        />
+          className="relative block h-7 w-7 overflow-hidden rounded-full ring-1 ring-white/15"
+          style={{
+            backgroundImage: wallet.avatarUrl ? undefined : profile.gradient,
+            background: wallet.avatarUrl ? "#000" : undefined,
+          }}
+        >
+          {wallet.avatarUrl && (
+            <img
+              src={wallet.avatarUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+          )}
+        </span>
         <span className="hidden sm:inline">{profile.name}</span>
       </button>
       {open && (
