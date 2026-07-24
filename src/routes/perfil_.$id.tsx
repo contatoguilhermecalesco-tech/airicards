@@ -118,7 +118,8 @@ function PerfilViewer() {
   const BadgeIcon = badge ? (ICONS[badge.icon] ?? Sparkles) : Sparkles;
 
   const initial = profile.name.charAt(0).toUpperCase();
-  const handle = `${profile.name.toLowerCase().replace(/\s+/g, "")}.airi`;
+  const handleUser = profile.name.toLowerCase().replace(/\s+/g, "");
+  const handleSuffix = ".airi.com.br";
   const rank = snapshot?.rank;
   const streak = snapshot?.streak;
   const bio = snapshot?.wallet.bio?.trim();
