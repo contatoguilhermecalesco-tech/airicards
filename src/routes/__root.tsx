@@ -573,6 +573,14 @@ function ProfileMenu() {
           </div>
           <div className="my-1 h-px bg-border" />
           <Link
+            to="/perfil"
+            onClick={() => setOpen(false)}
+            className="tap-target flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
+          >
+            <UserRound className="h-4 w-4" strokeWidth={2.25} />
+            Meu perfil
+          </Link>
+          <Link
             to="/settings"
             onClick={() => setOpen(false)}
             className="tap-target flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-accent"
