@@ -134,13 +134,19 @@ function ShopPage() {
   }, []);
 
   const filteredItems = useMemo(
-    () => (items ?? []).filter((i) => i.kind === tab),
-    [items, tab],
+    () =>
+      (items ?? []).filter(
+        (i) => i.kind === tab && (!affordableOnly || wallet.crystals >= i.price),
+      ),
+    [items, tab, affordableOnly, wallet.crystals],
   );
 
   const paidDecks = useMemo(
-    () => (decks ?? []).filter((d) => (d.price ?? 0) > 0),
-    [decks],
+    () =>
+      (decks ?? []).filter(
+        (d) => (d.price ?? 0) > 0 && (!affordableOnly || wallet.crystals >= d.price),
+      ),
+    [decks, affordableOnly, wallet.crystals],
   );
 
   function toast(kind: "ok" | "err", msg: string) {
