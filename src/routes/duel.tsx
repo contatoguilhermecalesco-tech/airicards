@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle } from "lucide-react";
+import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle, TimerReset, ShieldAlert } from "lucide-react";
 import { useCurrentProfile, PROFILES } from "@/lib/profile";
 import { useStore } from "@/lib/flashcards-store";
 import {
@@ -13,6 +13,8 @@ import {
   otherProfile,
   profileMeta,
   currentWeekKey,
+  duelDeadline,
+  DUEL_WINDOW_HOURS,
   type ProfileId,
   type Duel,
   type DuelCardSnapshot,
@@ -217,6 +219,8 @@ function DuelPage() {
               {duel.cardsSnapshot.length} cartas · criado por {profileMeta(duel.createdBy).name}
             </p>
 
+            <DeadlinePill duel={duel} />
+
             <div className="mt-4 grid grid-cols-2 gap-2.5">
               <PlayerStatus profile={me} result={myResult} isMe />
               <PlayerStatus profile={opp} result={oppResult} />
@@ -232,7 +236,7 @@ function DuelPage() {
               </button>
             ) : !oppResult ? (
               <div className="mt-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 text-center text-[13px] text-muted-foreground">
-                Você jogou. Aguardando {opp.name}…
+                Você jogou. Aguardando {opp.name}… Se ela não jogar no prazo, você vence por WO.
               </div>
             ) : null}
           </>
@@ -249,6 +253,7 @@ function DuelPage() {
           <ul className="space-y-2">
             {history.map((d) => {
               const winner = d.winner ? profileMeta(d.winner) : null;
+              const wo = !!d.forfeitBy;
               return (
                 <li
                   key={d.id}
@@ -261,6 +266,11 @@ function DuelPage() {
                     <p className="truncate text-[13.5px] font-medium text-foreground">
                       {d.deckName}
                     </p>
+                    {wo && (
+                      <p className="text-[11px] text-amber-300/90">
+                        WO · {profileMeta(d.forfeitBy!).name} não jogou
+                      </p>
+                    )}
                   </div>
                   {winner ? (
                     <div className="flex items-center gap-1.5">
@@ -270,8 +280,14 @@ function DuelPage() {
                       >
                         {winner.initial}
                       </div>
-                      <Trophy className="h-3.5 w-3.5 text-amber-300" />
+                      {wo ? (
+                        <ShieldAlert className="h-3.5 w-3.5 text-amber-300" />
+                      ) : (
+                        <Trophy className="h-3.5 w-3.5 text-amber-300" />
+                      )}
                     </div>
+                  ) : wo ? (
+                    <span className="text-[11px] text-amber-300/90">expirado</span>
                   ) : (
                     <span className="text-[11px] text-muted-foreground">empate</span>
                   )}
@@ -282,6 +298,49 @@ function DuelPage() {
         </section>
       )}
     </main>
+  );
+}
+
+function DeadlinePill({ duel }: { duel: Duel }) {
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => tick((n) => n + 1), 60_000);
+    return () => clearInterval(t);
+  }, []);
+  const dl = duelDeadline(duel);
+  if (!dl) return null;
+
+  if (dl.expired) {
+    return (
+      <div className="mt-3 flex items-center gap-2 rounded-2xl border border-amber-400/25 bg-amber-400/[0.06] px-3 py-2 text-[12.5px] text-amber-200">
+        <TimerReset className="h-3.5 w-3.5" />
+        Prazo esgotado — resolvendo por WO…
+      </div>
+    );
+  }
+
+  const totalMin = Math.floor(dl.msLeft / 60_000);
+  const hours = Math.floor(totalMin / 60);
+  const mins = totalMin % 60;
+  const label = hours >= 1 ? `${hours}h ${mins}min` : `${mins}min`;
+  const urgent = dl.msLeft <= 6 * 3600_000;
+
+  return (
+    <div
+      className={`mt-3 flex items-center justify-between gap-2 rounded-2xl border px-3 py-2 text-[12.5px] ${
+        urgent
+          ? "border-destructive/40 bg-destructive/10 text-destructive"
+          : "border-white/[0.08] bg-white/[0.03] text-muted-foreground"
+      }`}
+    >
+      <span className="inline-flex items-center gap-1.5">
+        <Clock className="h-3.5 w-3.5" />
+        Termina em <span className="tabular-nums font-semibold">{label}</span>
+      </span>
+      <span className="text-[10.5px] uppercase tracking-[0.14em] opacity-80">
+        Prazo · {DUEL_WINDOW_HOURS}h
+      </span>
+    </div>
   );
 }
 
@@ -342,9 +401,32 @@ function DuelSummary({
       <div className="mt-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 text-center">
         {winner ? (
           <>
-            <Trophy className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            {duel.forfeitBy ? (
+              <ShieldAlert className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            ) : (
+              <Trophy className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            )}
             <p className="mt-2 text-[18px] font-semibold text-foreground">
-              {iWon ? "Você venceu!" : `${winner.name} venceu`}
+              {duel.forfeitBy
+                ? `${winner.name} venceu por WO`
+                : iWon
+                  ? "Você venceu!"
+                  : `${winner.name} venceu`}
+            </p>
+            {duel.forfeitBy && (
+              <p className="mt-1 text-[12px] text-muted-foreground">
+                {profileMeta(duel.forfeitBy).name} não jogou a tempo · −1 no placar
+              </p>
+            )}
+          </>
+        ) : duel.forfeitBy ? (
+          <>
+            <ShieldAlert className="mx-auto h-6 w-6 text-amber-300" strokeWidth={2.25} />
+            <p className="mt-2 text-[15px] font-semibold text-foreground">
+              Duelo expirado sem jogadas
+            </p>
+            <p className="mt-1 text-[12px] text-muted-foreground">
+              {profileMeta(duel.forfeitBy).name} criou e não terminou · −1 no placar
             </p>
           </>
         ) : (
