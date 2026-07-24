@@ -197,7 +197,7 @@ function DeckDetail() {
             )}
           </button>
           <button
-            onClick={isPublished ? handleUnpublish : handlePublish}
+            onClick={() => (isPublished ? handleUnpublish() : setPublishOpen(true))}
             disabled={cards.length === 0 || publishState !== "idle"}
             className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition sm:flex-none ${
               isPublished
@@ -230,7 +230,7 @@ function DeckDetail() {
             ) : isPublished ? (
               <>
                 <Globe className="h-4 w-4" strokeWidth={2.5} />
-                No marketplace
+                {publishedPrice > 0 ? `${publishedPrice} ✦ no marketplace` : "No marketplace"}
               </>
             ) : (
               <>
