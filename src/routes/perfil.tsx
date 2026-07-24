@@ -438,7 +438,7 @@ function PerfilPage() {
               <StatChip
                 icon={Trophy}
                 label={rank ? TIER_LABEL[rank.tier] : "—"}
-                value={rank ? DIVISION_ROMAN[rank.division] : ""}
+                value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
                 color="#fbbf24"
               />
               <StatChip icon={Gem} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" />
