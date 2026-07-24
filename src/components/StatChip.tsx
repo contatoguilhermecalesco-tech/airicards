@@ -39,27 +39,30 @@ export function StatChip({
   value,
   color,
   accent,
+  render,
 }: {
-  icon: IconType;
+  icon?: IconType;
   label: string;
   value: string;
   color: string;
   /** Optional highlight ring — used for premium chips like Arlys */
   accent?: boolean;
+  /** Optional custom visual (e.g. a RankEmblem SVG) rendered inside the icon tile */
+  render?: React.ReactNode;
 }) {
   return (
     <div
-      className="group relative flex flex-col gap-2 rounded-xl p-1.5 shadow-xl transition-colors"
+      className="group relative flex flex-col gap-1.5 rounded-xl p-2 shadow-lg transition-colors"
       style={{
         background: "rgba(255,255,255,0.05)",
         border: `1px solid ${accent ? `${color}44` : "rgba(255,255,255,0.10)"}`,
       }}
     >
-      {/* Icon tile */}
+      {/* Icon tile — compact, fixed height */}
       <div
-        className="relative aspect-square w-full overflow-hidden rounded-lg flex items-center justify-center"
+        className="relative flex h-11 w-full items-center justify-center overflow-hidden rounded-lg"
         style={{
-          background: `linear-gradient(135deg, ${color}33 0%, ${color}14 100%)`,
+          background: `linear-gradient(135deg, ${color}2e 0%, ${color}10 100%)`,
           boxShadow: "inset 0 1px 1px rgba(255,255,255,0.10)",
         }}
       >
@@ -69,12 +72,18 @@ export function StatChip({
           className="pointer-events-none absolute inset-0 blur-md"
           style={{ background: `${color}1a` }}
         />
-        <Icon
-          className="relative z-10 h-5 w-5 transition-transform duration-300 group-hover:scale-105"
-          strokeWidth={2}
-          // @ts-expect-error — allow inline style for filter/color
-          style={{ color, filter: `drop-shadow(0 0 8px ${color}80)` }}
-        />
+        {render ? (
+          <div className="relative z-10 flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
+            {render}
+          </div>
+        ) : Icon ? (
+          <Icon
+            className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:scale-105"
+            strokeWidth={2}
+            // @ts-expect-error — allow inline style for filter/color
+            style={{ color, filter: `drop-shadow(0 0 6px ${color}80)` }}
+          />
+        ) : null}
       </div>
 
       {/* Text */}

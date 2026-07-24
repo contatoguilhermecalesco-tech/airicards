@@ -28,7 +28,8 @@ import { PROFILES } from "@/lib/profile";
 import { useProfileSnapshot } from "@/lib/profile-view";
 import { listShopItems, type ShopItem } from "@/lib/shop";
 import { slotOf, type CosmeticSlot } from "@/lib/wallet-store";
-import { TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+import { TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-store";
+import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
 
@@ -238,10 +239,15 @@ function PerfilViewer() {
             <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">Membro airi</p>
             <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
               <StatChip
-                icon={Trophy}
-                label={rank ? TIER_LABEL[rank.tier] : "—"}
+                label={rank ? TIER_LABEL[rank.tier] : "Sem rank"}
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
-                color="#fbbf24"
+                color={rank ? TIER_COLORS[rank.tier].ring : "#fbbf24"}
+                accent
+                render={
+                  rank ? (
+                    <RankEmblem tier={rank.tier} division={rank.division} size={44} />
+                  ) : null
+                }
               />
               <StatChip icon={ArlysIcon} label="Arlys ✦" value={(snapshot?.wallet.crystals ?? 0).toString()} color="#a78bfa" accent />
               <StatChip

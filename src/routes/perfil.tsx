@@ -41,7 +41,8 @@ import {
   type CosmeticSlot,
 } from "@/lib/wallet-store";
 import { listShopItems, type ShopItem } from "@/lib/shop";
-import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-store";
+import { RankEmblem } from "@/components/RankBadge";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
@@ -647,10 +648,15 @@ function PerfilPage() {
             </p>
             <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
               <StatChip
-                icon={Trophy}
-                label={rank ? TIER_LABEL[rank.tier] : "—"}
+                label={rank ? TIER_LABEL[rank.tier] : "Sem rank"}
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
-                color="#fbbf24"
+                color={rank ? TIER_COLORS[rank.tier].ring : "#fbbf24"}
+                accent
+                render={
+                  rank ? (
+                    <RankEmblem tier={rank.tier} division={rank.division} size={44} />
+                  ) : null
+                }
               />
               <StatChip icon={ArlysIcon} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" accent />
               <StatChip
