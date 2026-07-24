@@ -651,7 +651,7 @@ function PerfilPage() {
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
                 color="#fbbf24"
               />
-              <StatChip icon={Gem} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" />
+              <StatChip icon={ArlysIcon} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" accent />
               <StatChip
                 icon={Sparkles}
                 label="Cosméticos"
