@@ -8,7 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, useRef, type ReactNode } from "react";
+import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
 import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, Gem } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
@@ -17,13 +17,27 @@ import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
-import { RankPromotionOverlay } from "../components/RankPromotionOverlay";
-import { StreakMilestoneOverlay } from "../components/StreakMilestoneOverlay";
-import { StreakChangeOverlay } from "../components/StreakChangeOverlay";
 import { RankEmblem } from "../components/RankBadge";
-import { OnboardingTour } from "../components/OnboardingTour";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
+
+// Overlays só aparecem sob eventos raros (subiu de rank, streak milestone,
+// primeiro acesso). Lazy-load remove ~586 linhas + suas deps do chunk inicial,
+// reduzindo TTI da primeira navegação. Wrapping em Suspense com fallback null
+// evita hydration mismatch — o servidor renderiza nada, o cliente carrega
+// depois do primeiro paint.
+const RankPromotionOverlay = lazy(() =>
+  import("../components/RankPromotionOverlay").then((m) => ({ default: m.RankPromotionOverlay })),
+);
+const StreakMilestoneOverlay = lazy(() =>
+  import("../components/StreakMilestoneOverlay").then((m) => ({ default: m.StreakMilestoneOverlay })),
+);
+const StreakChangeOverlay = lazy(() =>
+  import("../components/StreakChangeOverlay").then((m) => ({ default: m.StreakChangeOverlay })),
+);
+const OnboardingTour = lazy(() =>
+  import("../components/OnboardingTour").then((m) => ({ default: m.OnboardingTour })),
+);
 import { useSocialSync } from "../lib/social-store";
 import { startActivityBridge } from "../lib/activity-bridge";
 import { loadWallet, useWallet } from "../lib/wallet-store";
@@ -607,10 +621,12 @@ function RootComponent() {
           <TopBar />
           <Outlet />
           <BottomBar />
-          <RankPromotionOverlay />
-          <StreakMilestoneOverlay />
-          <StreakChangeOverlay />
-          <OnboardingTour />
+          <Suspense fallback={null}>
+            <RankPromotionOverlay />
+            <StreakMilestoneOverlay />
+            <StreakChangeOverlay />
+            <OnboardingTour />
+          </Suspense>
         </div>
       </ProfileGate>
 
