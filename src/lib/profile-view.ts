@@ -52,8 +52,9 @@ export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSn
   const d = (dataRes.data ?? {}) as {
     data?: { decks?: unknown[]; cards?: Card[] } | null;
     home_sessions?: { streak?: Streak } | null;
-    rank_state?: RankState | null;
+    rank?: RankState | null;
   };
+
   const cards = (d.data?.cards ?? []) as Card[];
   let mastered = 0;
   let enemies = 0;
