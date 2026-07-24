@@ -1070,7 +1070,7 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
             }`}
             style={{ padding: 5, background: "#232428" }}
           >
-            <DiscordAvatar size={84} ring={v.ring} showDecoration={showDecoration} />
+            <DiscordAvatar size={84} ring={v.ring} showDecoration={showDecoration} auraKey={String(item.payload.key ?? "")} />
           </div>
         </div>
 
