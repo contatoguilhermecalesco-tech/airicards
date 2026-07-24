@@ -9,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, Gem } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, Gem, UserRound } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -224,6 +224,14 @@ function RankPill() {
 }
 
 const MORE_ITEMS = [
+  {
+    to: "/perfil",
+    label: "Meu perfil",
+    description: "Cosméticos equipados e vitrine",
+    icon: UserRound,
+    color: "#a78bfa",
+    matcher: (p: string) => p.startsWith("/perfil"),
+  },
   {
     to: "/shop",
     label: "Loja",

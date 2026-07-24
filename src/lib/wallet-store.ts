@@ -6,11 +6,16 @@ import type { ProfileId } from "@/lib/social-store";
 
 export type Cosmetic = string; // key identifier (e.g. "deck_frame:aurora")
 
+export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect";
+
+export type EquippedMap = Partial<Record<CosmeticSlot, string>>;
+
 export type WalletState = {
   profileId: string;
   crystals: number;
   cosmetics: string[];
-  powerups: Record<string, number>; // effect -> stack count
+  equipped: EquippedMap;
+  powerups: Record<string, number>;
   loaded: boolean;
 };
 
@@ -18,6 +23,7 @@ const empty = (id = ""): WalletState => ({
   profileId: id,
   crystals: 0,
   cosmetics: [],
+  equipped: {},
   powerups: {},
   loaded: false,
 });
@@ -49,7 +55,11 @@ const WELCOME_BONUS = 150;
 type WalletRow = {
   profile_id: string;
   crystals: number;
-  inventory: { cosmetics?: string[]; powerups?: Record<string, number> } | null;
+  inventory: {
+    cosmetics?: string[];
+    equipped?: EquippedMap;
+    powerups?: Record<string, number>;
+  } | null;
 };
 
 function normalize(row: WalletRow, profileId: string): WalletState {
@@ -58,6 +68,7 @@ function normalize(row: WalletRow, profileId: string): WalletState {
     profileId,
     crystals: row.crystals ?? 0,
     cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
+    equipped: inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
     loaded: true,
   };
@@ -84,7 +95,7 @@ export async function loadWallet(profileId: string, force = false) {
         .insert({
           profile_id: profileId,
           crystals: WELCOME_BONUS,
-          inventory: { cosmetics: [], powerups: {} },
+          inventory: { cosmetics: [], equipped: {}, powerups: {} },
         })
         .select("profile_id, crystals, inventory")
         .maybeSingle();
@@ -110,7 +121,11 @@ async function persist() {
     .from("wallets")
     .update({
       crystals: state.crystals,
-      inventory: { cosmetics: state.cosmetics, powerups: state.powerups },
+      inventory: {
+        cosmetics: state.cosmetics,
+        equipped: state.equipped,
+        powerups: state.powerups,
+      },
     })
     .eq("profile_id", currentProfileId);
 }
@@ -139,6 +154,40 @@ export async function grantCosmetic(key: string) {
     emit();
     await persist();
   }
+}
+
+// Slot dentro da chave — formato "<slot>:<id>". Aceita apenas os 4 slots
+// canônicos; qualquer outro valor cai em "effect" para não perder o item.
+function slotFromKey(key: string): CosmeticSlot {
+  const raw = key.split(":")[0]?.toLowerCase() ?? "";
+  if (raw.includes("frame") || raw.includes("deck") || raw.includes("nameplate"))
+    return "nameplate";
+  if (raw.includes("aura") || raw.includes("decoration")) return "decoration";
+  if (raw.includes("badge") || raw.includes("emblem")) return "badge";
+  return "effect";
+}
+
+export function slotOf(cosmeticKey: string): CosmeticSlot {
+  return slotFromKey(cosmeticKey);
+}
+
+export async function equipCosmetic(key: string) {
+  if (!currentProfileId) return;
+  if (!state.cosmetics.includes(key)) return;
+  const slot = slotFromKey(key);
+  state.equipped = { ...state.equipped, [slot]: key };
+  emit();
+  await persist();
+}
+
+export async function unequipSlot(slot: CosmeticSlot) {
+  if (!currentProfileId) return;
+  if (!state.equipped[slot]) return;
+  const next = { ...state.equipped };
+  delete next[slot];
+  state.equipped = next;
+  emit();
+  await persist();
 }
 
 export async function grantPowerup(effect: string, uses = 1) {
