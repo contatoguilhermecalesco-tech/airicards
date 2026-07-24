@@ -13,6 +13,8 @@ import {
   Target,
   Zap,
   Trophy,
+  HelpCircle,
+  Flame,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
 import {
