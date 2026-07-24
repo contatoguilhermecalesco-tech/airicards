@@ -1037,6 +1037,7 @@ function ChangelogSection() {
   const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [notes, setNotes] = useState("");
   const [genBusy, setGenBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -1069,11 +1070,13 @@ function ChangelogSection() {
       await createChangelogEntry({
         title,
         body,
+        notes: notes.trim() || null,
         category,
         icon: iconKey || null,
       });
       setTitle("");
       setBody("");
+      setNotes("");
       setIdea("");
       setIconKey("");
       setOk("Novidade publicada.");
