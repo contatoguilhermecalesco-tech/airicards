@@ -609,6 +609,7 @@ function ProfileMenu() {
           gradient={profile.gradient}
           avatarUrl={wallet.avatarUrl}
           ring={ring}
+          profile={auraProfile}
         />
         <span className="hidden sm:inline">{profile.name}</span>
       </button>
