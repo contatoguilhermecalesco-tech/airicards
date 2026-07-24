@@ -346,8 +346,10 @@ function NovidadesPage() {
 
                         return (
                           <li key={e.id}>
-                            <article
-                              className="group relative flex gap-4 overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 pl-5 transition hover:border-white/[0.14] hover:bg-white/[0.045] sm:p-5 sm:pl-6"
+                            <Link
+                              to="/novidades/$id"
+                              params={{ id: e.id }}
+                              className="group relative flex gap-4 overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 pl-5 transition hover:-translate-y-px hover:border-white/[0.14] hover:bg-white/[0.045] sm:p-5 sm:pl-6"
                             >
                               {/* Left accent bar (category color) */}
                               <span
@@ -405,11 +407,16 @@ function NovidadesPage() {
                                 <h3 className="mt-1.5 text-[16px] font-semibold leading-snug text-foreground sm:text-[17px]">
                                   {e.title}
                                 </h3>
-                                <p className="mt-1.5 text-[13px] leading-relaxed text-foreground/60 sm:text-[13.5px]">
+                                <p className="mt-1.5 line-clamp-3 text-[13px] leading-relaxed text-foreground/60 sm:text-[13.5px]">
                                   {e.body}
                                 </p>
                               </div>
-                            </article>
+
+                              <ChevronRight
+                                className="mt-1 hidden h-4 w-4 shrink-0 self-center text-foreground/25 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 sm:block"
+                                strokeWidth={2.25}
+                              />
+                            </Link>
                           </li>
                         );
                       })}
