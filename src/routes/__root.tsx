@@ -537,6 +537,7 @@ function BottomBar() {
 
 function ProfileMenu() {
   const profile = useCurrentProfile();
+  const wallet = useWallet();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
