@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Flame, Trophy, GraduationCap, Swords, Skull, ChevronRight } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import { useProfileSnapshot } from "@/lib/profile-view";
 import { formatPresence } from "@/lib/presence";
