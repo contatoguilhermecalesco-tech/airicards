@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,12 +16,16 @@ import {
   useCardsReviewedToday,
   useStreak,
   nextStreakMilestone,
+  isEnemy,
+  isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
+import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
+
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -107,10 +111,30 @@ function Home() {
 
   const hour = new Date().getHours();
   const { salute, icon, eyebrow } = greetingFor(hour);
+  const timeLabel = useMemo(() => {
+    const d = new Date();
+    const hh = d.getHours().toString().padStart(2, "0");
+    const mm = d.getMinutes().toString().padStart(2, "0");
+    const weekday = d.toLocaleDateString("pt-BR", { weekday: "long" });
+    return `${hh}:${mm} · ${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`;
+  }, [now]);
   const name = profile?.name ?? "";
   const cycle = useCycleWeek();
   const todayFocus = getTodayFocus();
   const ankiPending = due > 0 && reviewedToday === 0;
+
+  // Enemies (chefões ativos)
+  const enemies = useMemo(
+    () => cards.filter((c) => isEnemy(c) && !isDefeated(c)),
+    [cards],
+  );
+  const enemyDue = useMemo(
+    () => enemies.filter((c) => c.dueAt <= now).length,
+    [enemies, now],
+  );
+
+  // Rank do perfil
+  const rank = useRank();
 
   // Prova mensal
   const examState = useExamState();
@@ -124,7 +148,9 @@ function Home() {
   const ringC = 2 * Math.PI * RING_R;
   const dailyTarget = Math.max(1, due + reviewedToday);
   const reviewedPct = Math.min(1, reviewedToday / dailyTarget);
+  const pendingPct = Math.min(1, due / dailyTarget);
   const pctLabel = Math.round(reviewedPct * 100);
+
 
   return (
     <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
@@ -154,12 +180,20 @@ function Home() {
             {eyebrow}
           </span>
           <span className="shrink-0">{icon}</span>
+          <span
+            aria-hidden
+            className="h-1 w-1 shrink-0 rounded-full bg-muted-foreground/40"
+          />
+          <span className="truncate text-[11px] font-medium tabular-nums text-muted-foreground/70">
+            {timeLabel}
+          </span>
         </div>
         <h1 className="text-[30px] font-semibold leading-[1.05] tracking-[-0.02em] text-foreground sm:text-[38px]">
           {salute}
           {name ? `, ${name}` : ""}
         </h1>
       </header>
+
 
       {/* Hero — Liquid Glass */}
       <section
@@ -216,6 +250,16 @@ function Home() {
                   cx="52" cy="52" r={RING_R}
                   stroke="rgba(255,255,255,0.07)" strokeWidth="9" fill="none"
                 />
+                {/* Pending faint arc (cartas voltando) */}
+                {pendingPct > 0 && (
+                  <circle
+                    cx="52" cy="52" r={RING_R}
+                    stroke="rgba(167,139,250,0.22)" strokeWidth="9" fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={`${ringC * pendingPct} ${ringC}`}
+                    strokeDashoffset={-ringC * reviewedPct}
+                  />
+                )}
                 <circle
                   cx="52" cy="52" r={RING_R}
                   stroke="url(#ringGrad)" strokeWidth="9" fill="none"
@@ -232,6 +276,7 @@ function Home() {
                     <stop offset="100%" stopColor="#7C6BD8" />
                   </linearGradient>
                 </defs>
+
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <p className="text-xl font-semibold leading-none tabular-nums text-foreground">
@@ -302,18 +347,103 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Quick actions — atalhos premium */}
+      <section
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
+      >
+        <QuickAction
+          to="/social"
+          label="Duelo"
+          icon={<Swords className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-fuchsia-400/25 to-fuchsia-500/5 border-fuchsia-300/25 text-fuchsia-200"
+        />
+        <QuickAction
+          to="/enemies"
+          label="Chefões"
+          badge={enemies.length > 0 ? enemies.length : undefined}
+          icon={<Skull className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-rose-400/25 to-rose-500/5 border-rose-300/25 text-rose-200"
+        />
+        <QuickAction
+          to="/rank"
+          label={isElite(rank.tier) ? TIER_LABEL[rank.tier] : `${TIER_LABEL[rank.tier]} ${DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}`}
+          icon={<Crown className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint={`border-white/10 text-white`}
+          crestColor={TIER_COLORS[rank.tier]}
+        />
+        <QuickAction
+          to="/shop"
+          label="Loja"
+          icon={<ShoppingBag className="h-[18px] w-[18px]" strokeWidth={2.25} />}
+          tint="from-amber-400/25 to-amber-500/5 border-amber-300/25 text-amber-200"
+        />
+      </section>
+
       {/* Streak — sequência de dias */}
       <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
 
+      {/* Chefões pendentes — alerta gamificado */}
+      {enemies.length > 0 && (
+        <section
+          className="animate-fade-in mt-6"
+          style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
+        >
+          <Link
+            to="/enemies"
+            className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30`}
+          >
+            <GlassHighlight />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-rose-500/20 opacity-70 blur-2xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -left-8 -bottom-10 h-32 w-32 rounded-full bg-fuchsia-500/10 opacity-60 blur-2xl"
+            />
+            <div className="relative flex items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-rose-300/30 bg-gradient-to-b from-rose-400/25 to-rose-600/10 text-rose-200 shadow-[0_0_24px_-6px_rgba(244,63,94,0.55)]">
+                <Skull className="h-5 w-5" strokeWidth={2.25} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-rose-300/90">
+                    Arena · chefões ativos
+                  </p>
+                  {enemyDue > 0 && (
+                    <span className="rounded-full bg-rose-500/20 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-rose-100">
+                      {enemyDue} agora
+                    </span>
+                  )}
+                </div>
+                <p className="mt-1 truncate text-[14px] font-medium text-foreground">
+                  {enemies.length} carta{enemies.length === 1 ? "" : "s"} inimiga{enemies.length === 1 ? "" : "s"} te encarando
+                </p>
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
+                  Derrote-as para reconquistar seu domínio
+                </p>
+              </div>
+              <ChevronRight
+                className="h-4 w-4 shrink-0 text-rose-200/60 transition-all group-hover:translate-x-0.5 group-hover:text-rose-100"
+                strokeWidth={2.25}
+              />
+            </div>
+          </Link>
+        </section>
+      )}
 
       {/* Stats — glass chips */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-2 gap-3"
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
+        <StatChip label="Revisadas" value={reviewedToday} accent />
+        <StatChip label="Recorde" value={streak.longest} />
       </section>
+
 
 
       {/* Método RRSLG */}
@@ -490,19 +620,72 @@ function Home() {
   );
 }
 
-function StatChip({ label, value }: { label: string; value: number }) {
+function StatChip({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className={`${GLASS_BASE} p-4 transition-colors hover:bg-white/[0.055]`}>
+    <div
+      className={`${GLASS_BASE} p-3 transition-colors hover:bg-white/[0.055] ${
+        accent ? "border-primary/25 bg-primary/[0.06]" : ""
+      }`}
+    >
       <GlassHighlight />
-      <p className="relative text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+      <p className={`relative text-[10px] font-semibold uppercase tracking-[0.14em] ${accent ? "text-primary/90" : "text-muted-foreground"}`}>
         {label}
       </p>
-      <p className="relative mt-1 text-[22px] font-semibold leading-none tabular-nums text-foreground">
+      <p className={`relative mt-1 text-[20px] font-semibold leading-none tabular-nums ${accent ? "text-primary-foreground" : "text-foreground"}`}>
         {value}
       </p>
     </div>
   );
 }
+
+function QuickAction({
+  to,
+  label,
+  icon,
+  tint,
+  badge,
+  crestColor,
+}: {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  tint: string;
+  badge?: number;
+  crestColor?: { from: string; to: string; ring: string; glow: string };
+}) {
+  return (
+    <Link
+      to={to as "/social"}
+
+      className={`${GLASS_BASE} group relative flex flex-col items-center justify-center gap-1.5 rounded-2xl px-2 py-3 transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]`}
+    >
+      <GlassHighlight />
+      {badge !== undefined && (
+        <span className="absolute -right-1 -top-1 z-10 grid h-4 min-w-[16px] place-items-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white shadow-[0_0_10px_rgba(244,63,94,0.6)]">
+          {badge}
+        </span>
+      )}
+      <div
+        className={`grid h-9 w-9 place-items-center rounded-xl border bg-gradient-to-b ${tint}`}
+        style={
+          crestColor
+            ? {
+                background: `linear-gradient(180deg, ${crestColor.from}, ${crestColor.to})`,
+                borderColor: crestColor.ring,
+                boxShadow: `0 0 18px -6px ${crestColor.glow}`,
+              }
+            : undefined
+        }
+      >
+        {icon}
+      </div>
+      <p className="max-w-full truncate text-[10.5px] font-semibold tracking-tight text-foreground/90">
+        {label}
+      </p>
+    </Link>
+  );
+}
+
 
 // ---- Streak card ---------------------------------------------------------
 
