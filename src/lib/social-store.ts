@@ -498,3 +498,128 @@ export async function toggleReaction(
     });
   }
 }
+
+// ============================================================
+// Manutenção automática de duelos (prazo + lembrete)
+// ============================================================
+
+let maintenanceRunning = false;
+
+/**
+ * Resolve duelos ativos que já expiraram e envia notificação
+ * quando o prazo está próximo do fim.
+ */
+export async function runDuelMaintenance(): Promise<void> {
+  if (maintenanceRunning) return;
+  maintenanceRunning = true;
+  try {
+    const now = Date.now();
+    const active = state.duels.filter((d) => d.status === "active");
+    for (const d of active) {
+      const expires = new Date(d.expiresAt).getTime();
+      const results = state.duelResults.filter((r) => r.duelId === d.id);
+
+      // Expirou → resolve por WO.
+      if (expires <= now) {
+        await resolveExpiredDuel(d, results);
+        continue;
+      }
+
+      // Faltam < 24h e ainda não jogaram todos → lembrete (uma vez).
+      const msLeft = expires - now;
+      if (!d.remindedAt && msLeft <= DUEL_REMIND_HOURS * 3600_000) {
+        await sendDuelReminder(d, results);
+      }
+    }
+  } finally {
+    maintenanceRunning = false;
+  }
+}
+
+async function resolveExpiredDuel(d: Duel, results: DuelResult[]): Promise<void> {
+  const anySb = supabase as any;
+  const played = new Set(results.map((r) => r.profileId));
+  const opponent: ProfileId = otherProfile(d.createdBy);
+  const gPlayed = played.has("guilherme");
+  const aPlayed = played.has("arlayne");
+
+  let winner: ProfileId | null = null;
+  let forfeit: ProfileId | null = null;
+
+  if (gPlayed && !aPlayed) {
+    winner = "guilherme";
+    forfeit = "arlayne";
+  } else if (aPlayed && !gPlayed) {
+    winner = "arlayne";
+    forfeit = "guilherme";
+  } else if (!gPlayed && !aPlayed) {
+    // Ninguém jogou — quem criou leva o WO, sem vencedor.
+    winner = null;
+    forfeit = d.createdBy;
+  } else {
+    // Ambos jogaram — cai na lógica normal em submitDuelResult, ignore.
+    return;
+  }
+
+  await anySb
+    .from("duels")
+    .update({
+      status: "completed",
+      winner,
+      forfeit_by: forfeit,
+      completed_at: new Date().toISOString(),
+    })
+    .eq("id", d.id)
+    .eq("status", "active");
+
+  // Notificação de encerramento.
+  const title = winner
+    ? `🏆 Duelo encerrado por WO`
+    : `⌛ Duelo expirado`;
+  const body = winner
+    ? `${profileMeta(winner).name} venceu — ${profileMeta(forfeit!).name} não jogou a tempo (−1 no placar).`
+    : `Ninguém jogou o duelo desta semana. ${profileMeta(forfeit!).name} leva −1 por abrir e não terminar.`;
+
+  await anySb.from("notifications").insert({
+    title,
+    body,
+    icon: "swords",
+    action_label: "Ver duelo",
+    action_route: "/duel",
+  });
+
+  if (winner) {
+    await emitActivity(winner, "duel_won", {
+      weekKey: d.weekKey,
+      deckName: d.deckName,
+      byForfeit: true,
+      opponent,
+    });
+  }
+}
+
+async function sendDuelReminder(d: Duel, results: DuelResult[]): Promise<void> {
+  const anySb = supabase as any;
+  const played = new Set(results.map((r) => r.profileId));
+  const missing: ProfileId[] = (["guilherme", "arlayne"] as ProfileId[]).filter(
+    (p) => !played.has(p),
+  );
+  if (missing.length === 0) return;
+
+  const hoursLeft = Math.max(1, Math.round((new Date(d.expiresAt).getTime() - Date.now()) / 3600_000));
+  const names = missing.map((p) => profileMeta(p).name).join(" e ");
+
+  await anySb.from("notifications").insert({
+    title: `⚔️ Duelo termina em ${hoursLeft}h`,
+    body: `${names} ${missing.length === 1 ? "ainda não jogou" : "ainda não jogaram"} o duelo desta semana. Jogue agora ou perde por WO.`,
+    icon: "swords",
+    action_label: "Jogar agora",
+    action_route: "/duel",
+  });
+
+  await anySb
+    .from("duels")
+    .update({ reminded_at: new Date().toISOString() })
+    .eq("id", d.id);
+}
+
