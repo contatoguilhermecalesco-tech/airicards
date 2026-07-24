@@ -123,7 +123,7 @@ function AdminPage() {
 
   async function load() {
     setLoading(true);
-    const data = await fetchAllProfileSessions();
+    const data = (await adminFetchAllProfileSessionsFn()).map((r) => ({ profileId: r.profile_id, day: r.home_sessions?.day ?? "", count: r.home_sessions?.count ?? 0, reviewed: r.home_sessions?.reviewed ?? 0 }));
     setRows(data);
     setLoading(false);
   }
@@ -155,7 +155,7 @@ function AdminPage() {
   async function handleReset(profileId: string) {
     setBusyId(profileId);
     try {
-      await resetHomeSessionsForProfile(profileId);
+      await adminResetHomeSessionsFn({ data: { profileId } });
       await load();
     } finally {
       setBusyId(null);
@@ -913,7 +913,7 @@ function ExamAdminSection() {
   async function handleReset(profileId: string) {
     setBusy(profileId);
     try {
-      await resetExamsForProfileId(profileId);
+      await adminResetExamsFn({ data: { profileId } });
     } catch (e) {
       console.error(e);
     } finally {
