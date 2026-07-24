@@ -197,6 +197,8 @@ function SocialPage() {
       )}
     </div>
   );
+}
+
 
 function DuelPanel({
   meId,
