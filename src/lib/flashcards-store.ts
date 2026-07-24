@@ -311,7 +311,7 @@ export function createDeck(name: string, description?: string, color?: string): 
   };
   state = { ...state, decks: [deck, ...state.decks] };
   emit();
-  scheduleSave();
+  void flushSave();
   return deck;
 }
 
@@ -356,7 +356,8 @@ export function createCard(
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
-  scheduleSave();
+  // Persistência imediata — evita que um pull/echo remoto sobrescreva a carta recém-criada.
+  void flushSave();
   return card;
 }
 
@@ -393,7 +394,7 @@ export function updateCard(
     }),
   };
   emit();
-  scheduleSave();
+  void flushSave();
 }
 
 export type Grade = "again" | "hard" | "good" | "easy";

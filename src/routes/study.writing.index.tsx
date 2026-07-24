@@ -18,7 +18,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
 import { addWriting } from "@/lib/writing-store";
-import { createCard, useStore } from "@/lib/flashcards-store";
+import { createCard, flushSave, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/writing/")({
   component: WritingPage,
@@ -403,7 +403,7 @@ function SaveToDeckPanel({
     setPickedIssues(next);
   }
 
-  function save() {
+  async function save() {
     if (!selectedDeck || totalToSave === 0) return;
     let n = 0;
     if (saveCorrected && feedback.correctedText) {
@@ -427,6 +427,7 @@ function SaveToDeckPanel({
     });
     setSavedCount(n);
     setPickedIssues({});
+    await flushSave();
   }
 
   return (
