@@ -41,10 +41,8 @@ export function ProfileGate({ children }: { children: ReactNode }) {
 function BrandPanel({ compact = false }: { compact?: boolean }) {
   return (
     <div
-      className={`relative flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1a1230] to-[#0b0714] ${
-        compact
-          ? "min-h-[180px] w-full p-6"
-          : "w-full p-10 md:min-h-full md:w-5/12 md:p-14 lg:p-16"
+      className={`relative flex w-full flex-col justify-between overflow-hidden bg-gradient-to-b from-[#1a1230] to-[#0b0714] ${
+        compact ? "min-h-[160px] p-6" : "p-10 md:p-14 lg:p-16"
       }`}
     >
       {/* Ambient glow */}
