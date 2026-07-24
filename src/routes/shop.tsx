@@ -644,158 +644,412 @@ function ItemCard({
   );
 }
 
-// ---- Cosmetic preview modal --------------------------------------------
-// Cosméticos ainda são conceituais (não aplicam visual real no app), então
-// aqui renderizamos um mock estilizado por "slot" para dar noção ao usuário.
-function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => void }) {
-  const Icon = ICONS[item.icon] ?? Sparkles;
-  const accent = ACCENTS[item.accent] ?? ACCENTS.lavender;
-  const slot = String(item.payload.slot ?? "cosmetic");
+// ---- Discord-inspired cosmetic system ---------------------------------
+// Cada cosmético é apresentado como um mini "cartão de perfil" no estilo
+// Discord: nameplate colorido, avatar com decoração (aura), badges e tema
+// aplicado atrás do card. O preview abre uma versão "grande" do perfil.
 
-  const glowMap: Record<string, string> = {
-    sky: "rgba(56,189,248,0.55)",
-    amber: "rgba(251,191,36,0.55)",
-    pink: "rgba(236,72,153,0.55)",
-    violet: "rgba(167,139,250,0.55)",
-    emerald: "rgba(52,211,153,0.55)",
-    lavender: "rgba(129,140,248,0.55)",
+type CosmeticVisual = {
+  slot: "nameplate" | "decoration" | "badge" | "effect" | "generic";
+  gradient: string; // css gradient string
+  ring: string; // hex/rgba for avatar ring & glow
+  chip: string; // small text/border color class
+  tag: string; // human label
+};
+
+const DISCORD_PALETTE: Record<string, { gradient: string; ring: string; tag: string }> = {
+  sky: {
+    gradient: "linear-gradient(135deg,#38bdf8 0%,#0ea5e9 45%,#1e3a8a 100%)",
+    ring: "#38bdf8",
+    tag: "Ártico",
+  },
+  amber: {
+    gradient: "linear-gradient(135deg,#fde68a 0%,#f59e0b 45%,#b45309 100%)",
+    ring: "#f59e0b",
+    tag: "Solar",
+  },
+  pink: {
+    gradient: "linear-gradient(135deg,#fbcfe8 0%,#ec4899 40%,#831843 100%)",
+    ring: "#f472b6",
+    tag: "Blossom",
+  },
+  violet: {
+    gradient: "linear-gradient(135deg,#c4b5fd 0%,#8b5cf6 40%,#4c1d95 100%)",
+    ring: "#a78bfa",
+    tag: "Nebulosa",
+  },
+  emerald: {
+    gradient: "linear-gradient(135deg,#a7f3d0 0%,#10b981 40%,#065f46 100%)",
+    ring: "#34d399",
+    tag: "Bosque",
+  },
+  lavender: {
+    gradient: "linear-gradient(135deg,#e0e7ff 0%,#818cf8 40%,#3730a3 100%)",
+    ring: "#a5b4fc",
+    tag: "Lilás",
+  },
+};
+
+function visualFor(item: ShopItem): CosmeticVisual {
+  const slotRaw = String(item.payload.slot ?? "cosmetic").toLowerCase();
+  const p = DISCORD_PALETTE[item.accent] ?? DISCORD_PALETTE.violet;
+  let slot: CosmeticVisual["slot"] = "generic";
+  if (slotRaw.includes("frame") || slotRaw.includes("deck") || slotRaw.includes("nameplate"))
+    slot = "nameplate";
+  else if (slotRaw.includes("aura") || slotRaw.includes("decoration")) slot = "decoration";
+  else if (slotRaw.includes("badge") || slotRaw.includes("emblem")) slot = "badge";
+  else if (slotRaw.includes("theme") || slotRaw.includes("effect")) slot = "effect";
+  return {
+    slot,
+    gradient: p.gradient,
+    ring: p.ring,
+    chip: "text-white/85",
+    tag: p.tag,
   };
-  const glow = glowMap[item.accent] ?? glowMap.lavender;
+}
+
+function slotLabel(v: CosmeticVisual["slot"]): string {
+  switch (v) {
+    case "nameplate":
+      return "Nameplate";
+    case "decoration":
+      return "Decoração de avatar";
+    case "badge":
+      return "Badge de perfil";
+    case "effect":
+      return "Efeito de perfil";
+    default:
+      return "Cosmético";
+  }
+}
+
+// Small avatar with optional decoration ring (Discord-style)
+function DiscordAvatar({
+  size = 48,
+  ring,
+  showDecoration,
+  initial = "G",
+}: {
+  size?: number;
+  ring: string;
+  showDecoration: boolean;
+  initial?: string;
+}) {
+  const inner = size - (showDecoration ? 10 : 0);
+  return (
+    <div
+      className="relative grid place-items-center"
+      style={{ width: size, height: size }}
+    >
+      {showDecoration && (
+        <>
+          <span
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `conic-gradient(from 210deg, ${ring}, transparent 40%, ${ring} 70%, transparent)`,
+              filter: "blur(0.5px)",
+            }}
+          />
+          <span
+            className="absolute inset-[3px] rounded-full"
+            style={{ background: "#1e1f22" }}
+          />
+        </>
+      )}
+      <div
+        className="relative grid place-items-center rounded-full text-white font-semibold"
+        style={{
+          width: inner,
+          height: inner,
+          background: "linear-gradient(135deg,#5865f2 0%,#7c3aed 100%)",
+          fontSize: inner * 0.42,
+          boxShadow: showDecoration ? `0 0 12px ${ring}55` : "none",
+        }}
+      >
+        {initial}
+      </div>
+      <span
+        className="absolute rounded-full border-2"
+        style={{
+          width: inner * 0.28,
+          height: inner * 0.28,
+          right: showDecoration ? 4 : 0,
+          bottom: showDecoration ? 4 : 0,
+          background: "#23a55a",
+          borderColor: "#1e1f22",
+        }}
+      />
+    </div>
+  );
+}
+
+// Compact profile card used inside the shop tile
+function MiniProfileCard({ item, showBadge }: { item: ShopItem; showBadge?: boolean }) {
+  const v = visualFor(item);
+  const Icon = ICONS[item.icon] ?? Sparkles;
+  const showBanner = v.slot === "nameplate" || v.slot === "effect";
+  const showDecoration = v.slot === "decoration";
+  const isBadge = v.slot === "badge" || showBadge;
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+      className="relative overflow-hidden rounded-2xl border border-white/5"
+      style={{ background: "#232428" }}
+    >
+      {/* Banner */}
+      <div
+        className="h-14 w-full"
+        style={{
+          background: showBanner ? v.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
+        }}
+      />
+      {/* Body */}
+      <div className="relative px-3 pb-3 pt-0">
+        <div className="-mt-6 flex items-end justify-between gap-2">
+          <div
+            className="rounded-full"
+            style={{
+              padding: 3,
+              background: "#232428",
+            }}
+          >
+            <DiscordAvatar size={44} ring={v.ring} showDecoration={showDecoration} />
+          </div>
+          {isBadge && (
+            <span
+              className="mb-1 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white shadow"
+              style={{ background: v.gradient }}
+            >
+              <Icon className="h-3 w-3" strokeWidth={2.75} />
+              {v.tag}
+            </span>
+          )}
+        </div>
+        <p className="mt-1.5 text-[13px] font-semibold text-white leading-tight">Guilherme</p>
+        <p className="text-[11px] text-white/50 leading-tight">guilherme.airi</p>
+      </div>
+    </div>
+  );
+}
+
+function CosmeticCard({
+  item,
+  owned,
+  canAfford,
+  busy,
+  onBuy,
+  onPreview,
+}: {
+  item: ShopItem;
+  owned: boolean;
+  canAfford: boolean;
+  busy: boolean;
+  onBuy: () => void;
+  onPreview: () => void;
+}) {
+  const v = visualFor(item);
+  return (
+    <li
+      className="relative overflow-hidden rounded-3xl border border-white/10 p-4"
+      style={{ background: "#1e1f22" }}
+    >
+      {/* Subtle glow */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -top-16 -right-10 h-40 w-40 rounded-full opacity-40 blur-3xl"
+        style={{ background: v.ring }}
+      />
+
+      <MiniProfileCard item={item} />
+
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <p className="truncate text-[15px] font-semibold text-white">{item.name}</p>
+          <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wider text-white/40">
+            {slotLabel(v.slot)}
+          </p>
+        </div>
+        <button
+          onClick={onPreview}
+          className="shrink-0 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1]"
+        >
+          <span className="inline-flex items-center gap-1">
+            <Eye className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Preview
+          </span>
+        </button>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/5 pt-3">
+        <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
+          <Gem className="h-3.5 w-3.5 text-violet-300" strokeWidth={2.5} />
+          {item.price}
+          <span className="text-[10px] font-medium text-white/40">Arlys ✦</span>
+        </span>
+        <button
+          onClick={onBuy}
+          disabled={busy || owned || !canAfford}
+          className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition disabled:opacity-40"
+          style={{
+            background: owned
+              ? "#248046"
+              : canAfford
+                ? "#5865f2"
+                : "#3f3f46",
+          }}
+        >
+          {busy ? (
+            "Comprando…"
+          ) : owned ? (
+            <span className="inline-flex items-center gap-1">
+              <Check className="h-3.5 w-3.5" strokeWidth={2.75} /> Adquirido
+            </span>
+          ) : canAfford ? (
+            "Comprar"
+          ) : (
+            "Sem Arlys"
+          )}
+        </button>
+      </div>
+    </li>
+  );
+}
+
+// ---- Full Discord-style profile preview --------------------------------
+function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => void }) {
+  const v = visualFor(item);
+  const Icon = ICONS[item.icon] ?? Sparkles;
+  const showBanner = v.slot === "nameplate" || v.slot === "effect";
+  const showDecoration = v.slot === "decoration";
+  const showBadge = v.slot === "badge";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 backdrop-blur-md"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-[oklch(0.14_0.02_285)] shadow-2xl"
+        className="relative w-full max-w-[340px] overflow-hidden rounded-2xl border border-black/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
+        style={{ background: "#232428" }}
       >
-        <div className="relative px-6 pt-5 pb-4">
-          <button
-            onClick={onClose}
-            className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-foreground/70 hover:bg-white/10 hover:text-foreground"
-            aria-label="Fechar"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            <Eye className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Preview · {slotLabel(slot)}
-          </p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight">{item.name}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+        <button
+          onClick={onClose}
+          className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-white/80 hover:bg-black/60"
+          aria-label="Fechar"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+
+        {/* Banner */}
+        <div
+          className="relative h-[110px] w-full"
+          style={{
+            background: showBanner
+              ? v.gradient
+              : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
+          }}
+        >
+          {v.slot === "effect" && (
+            <>
+              <span
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 40%), radial-gradient(circle at 80% 60%, rgba(255,255,255,0.18), transparent 45%)",
+                }}
+              />
+              <span
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)" }}
+              />
+            </>
+          )}
         </div>
 
-        <div className="px-6 pb-5">
-          <div className="relative grid min-h-[220px] place-items-center overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-6">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-70"
-              style={{
-                background: `radial-gradient(circle at 50% 40%, ${glow}, transparent 60%)`,
-              }}
-            />
-            <div className="relative">
-              {slot.includes("frame") || slot.includes("deck") ? (
-                <div
-                  className={`w-[220px] rounded-2xl border-2 bg-gradient-to-br p-4 shadow-2xl ${accent}`}
-                  style={{ boxShadow: `0 10px 40px -10px ${glow}` }}
+        {/* Avatar */}
+        <div className="relative px-4">
+          <div
+            className="absolute -top-[46px] left-4 rounded-full"
+            style={{ padding: 5, background: "#232428" }}
+          >
+            <DiscordAvatar size={84} ring={v.ring} showDecoration={showDecoration} />
+          </div>
+        </div>
+
+        {/* Info */}
+        <div className="px-4 pb-4 pt-12">
+          <div className="rounded-lg p-3" style={{ background: "#111214" }}>
+            <div className="flex items-center gap-2">
+              <p className="text-[17px] font-bold text-white leading-tight">Guilherme</p>
+              {showBadge && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
+                  style={{ background: v.gradient }}
                 >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
-                    Deck
-                  </p>
-                  <p className="mt-1 text-lg font-semibold text-foreground">Meu Deck</p>
-                  <p className="mt-2 text-xs text-muted-foreground">42 cartas · em revisão</p>
-                  <div className="mt-3 h-1.5 rounded-full bg-white/10">
-                    <div className="h-full w-2/3 rounded-full bg-white/60" />
-                  </div>
-                </div>
-              ) : slot.includes("badge") || slot.includes("emblem") ? (
-                <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3">
-                  <div className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-sm font-bold text-white">
-                    G
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">Guilherme</p>
-                    <span
-                      className={`mt-0.5 inline-flex items-center gap-1 rounded-full border bg-gradient-to-br px-2 py-0.5 text-[10px] font-semibold ${accent}`}
-                    >
-                      <Icon className="h-3 w-3" strokeWidth={2.5} />
-                      {item.name}
-                    </span>
-                  </div>
-                </div>
-              ) : slot.includes("aura") ? (
-                <div className="relative">
-                  <div
-                    className="absolute inset-0 -m-6 rounded-full blur-2xl"
-                    style={{ background: glow }}
-                  />
-                  <div className="relative grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-2xl font-bold text-white">
-                    G
-                  </div>
-                </div>
-              ) : slot.includes("theme") ? (
-                <div
-                  className={`w-[240px] overflow-hidden rounded-2xl border bg-gradient-to-br ${accent}`}
-                >
-                  <div className="p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
-                      Início
-                    </p>
-                    <p className="mt-1 text-base font-semibold">Bom dia, Guilherme</p>
-                    <div className="mt-3 flex gap-1.5">
-                      <div className="h-6 flex-1 rounded-lg bg-white/15" />
-                      <div className="h-6 flex-1 rounded-lg bg-white/10" />
-                      <div className="h-6 flex-1 rounded-lg bg-white/10" />
-                    </div>
-                  </div>
-                  <div className="border-t border-white/10 bg-black/20 px-4 py-2 text-[10px] text-muted-foreground">
-                    Tema aplicado à Home
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className={`grid h-24 w-24 place-items-center rounded-3xl border bg-gradient-to-br ${accent}`}
-                  style={{ boxShadow: `0 10px 40px -10px ${glow}` }}
-                >
-                  <Icon className="h-10 w-10" strokeWidth={2} />
-                </div>
+                  <Icon className="h-3 w-3" strokeWidth={2.75} />
+                  {v.tag.toUpperCase()}
+                </span>
               )}
             </div>
-          </div>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
-            Preview ilustrativo · o cosmético é permanente após a compra.
-          </p>
-        </div>
+            <p className="text-[13px] text-white/60 leading-tight">guilherme.airi</p>
 
-        <div className="border-t border-white/10 bg-black/20 px-6 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
-              <Gem className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
-              {item.price}{" "}
-              <span className="text-[11px] font-medium text-muted-foreground">Arlys ✦</span>
-            </span>
+            <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
+
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
+              Sobre mim
+            </p>
+            <p className="mt-1 text-[13px] leading-snug text-white/80">
+              Estudando inglês todo dia com airi. 🔥 Streak em andamento.
+            </p>
+
+            <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
+              Cosmético equipado
+            </p>
+            <div className="mt-1 flex items-center gap-2">
+              <span
+                className="grid h-8 w-8 place-items-center rounded-md text-white"
+                style={{ background: v.gradient }}
+              >
+                <Icon className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-semibold text-white">{item.name}</p>
+                <p className="truncate text-[11px] text-white/50">{slotLabel(v.slot)}</p>
+              </div>
+            </div>
+
             <button
-              onClick={onClose}
-              className="rounded-full border border-white/15 bg-white/[0.06] px-4 py-1.5 text-xs font-semibold text-foreground/90 transition hover:bg-white/[0.12]"
+              className="mt-3 w-full rounded-md py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
+              style={{ background: "#4e5058" }}
             >
-              Fechar
+              Enviar mensagem
             </button>
           </div>
+        </div>
+
+        {/* Price footer */}
+        <div
+          className="flex items-center justify-between border-t px-4 py-3"
+          style={{ borderColor: "#1a1b1e", background: "#2b2d31" }}
+        >
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
+            <Gem className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
+            {item.price}
+            <span className="text-[11px] font-medium text-white/50">Arlys ✦</span>
+          </span>
+          <button
+            onClick={onClose}
+            className="rounded-md border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/[0.12]"
+          >
+            Fechar
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-function slotLabel(slot: string): string {
-  if (slot.includes("frame") || slot.includes("deck")) return "Moldura de deck";
-  if (slot.includes("badge") || slot.includes("emblem")) return "Emblema de perfil";
-  if (slot.includes("aura")) return "Aura";
-  if (slot.includes("theme")) return "Tema";
-  return "Cosmético";
-}
 
 function SkeletonGrid() {
   return (
