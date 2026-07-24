@@ -356,7 +356,8 @@ export function createCard(
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
-  scheduleSave();
+  // Persistência imediata — evita que um pull/echo remoto sobrescreva a carta recém-criada.
+  void flushSave();
   return card;
 }
 
