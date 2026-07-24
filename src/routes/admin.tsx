@@ -25,11 +25,13 @@ import {
 } from "@/lib/changelog-store";
 import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
 import {
-  fetchAllProfileSessions,
-  resetHomeSessionsForProfile,
   type ProfileSessionInfo,
 } from "@/lib/flashcards-store";
-import { resetExamsForProfileId } from "@/lib/exam-store";
+import {
+  adminFetchAllProfileSessionsFn,
+  adminResetHomeSessionsFn,
+  adminResetExamsFn,
+} from "@/lib/admin.functions";
 import { useAppSettings, setSetting } from "@/lib/app-settings";
 import { useRank, resetRank, tierLabel, TIER_COLORS, readRankForProfile, subscribeAllRanks, type RankState } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
