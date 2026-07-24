@@ -1002,3 +1002,264 @@ function ExamAdminSection() {
     </section>
   );
 }
+
+const CHANGELOG_CATEGORIES: {
+  key: ChangelogCategory;
+  label: string;
+  color: string;
+  Icon: typeof Sparkles;
+}[] = [
+  { key: "feature", label: "Novo", color: "#a78bfa", Icon: Sparkles },
+  { key: "improvement", label: "Melhoria", color: "#60a5fa", Icon: Wand2 },
+  { key: "fix", label: "Ajuste", color: "#34d399", Icon: Wrench },
+];
+
+function ChangelogSection() {
+  const { entries } = useChangelog();
+  const generate = useServerFn(generateChangelogEntry);
+
+  const [idea, setIdea] = useState("");
+  const [category, setCategory] = useState<ChangelogCategory>("feature");
+  const [iconKey, setIconKey] = useState<NotificationIconKey | "">("");
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [genBusy, setGenBusy] = useState(false);
+  const [sendBusy, setSendBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [ok, setOk] = useState<string | null>(null);
+
+  async function handleGenerate() {
+    if (!idea.trim()) return;
+    setGenBusy(true);
+    setErr(null);
+    try {
+      const draft = await generate({ data: { prompt: idea, category } });
+      setTitle(draft.title);
+      setBody(draft.body);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setGenBusy(false);
+    }
+  }
+
+  async function handleSend() {
+    if (!title.trim() || !body.trim()) return;
+    setSendBusy(true);
+    setErr(null);
+    setOk(null);
+    try {
+      await createChangelogEntry({
+        title,
+        body,
+        category,
+        icon: iconKey || null,
+      });
+      setTitle("");
+      setBody("");
+      setIdea("");
+      setIconKey("");
+      setOk("Novidade publicada.");
+      setTimeout(() => setOk(null), 3000);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setSendBusy(false);
+    }
+  }
+
+  return (
+    <section className="ios-card rounded-3xl p-4 sm:p-5">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 text-primary">
+          <Sparkles className="h-4 w-4" strokeWidth={2.25} />
+        </span>
+        <div>
+          <h2 className="text-sm font-semibold">Novidades do app</h2>
+          <p className="text-xs text-muted-foreground">
+            Publique o que mudou. Aparece em <code className="rounded bg-white/[0.06] px-1 py-0.5 text-[10px]">/novidades</code> para todos.
+          </p>
+        </div>
+      </div>
+
+      {/* Category picker */}
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        {CHANGELOG_CATEGORIES.map(({ key, label, color, Icon }) => {
+          const active = category === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setCategory(key)}
+              className="flex items-center justify-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition"
+              style={{
+                backgroundColor: active ? `${color}22` : "rgba(255,255,255,0.02)",
+                borderColor: active ? `${color}88` : "rgba(255,255,255,0.06)",
+                color: active ? color : undefined,
+              }}
+            >
+              <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* AI input */}
+      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+        <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+          <Sparkles className="h-3 w-3" strokeWidth={2.5} />
+          Ideia para a IA
+        </label>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            placeholder="ex: adicionamos uma aba de novidades no app"
+            className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+          />
+          <button
+            onClick={() => void handleGenerate()}
+            disabled={genBusy || !idea.trim()}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/20 disabled:opacity-50"
+          >
+            {genBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.5} />
+            ) : (
+              <Sparkles className="h-4 w-4" strokeWidth={2.5} />
+            )}
+            Gerar com IA
+          </button>
+        </div>
+      </div>
+
+      {/* Manual form */}
+      <div className="mt-3 space-y-2">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Título"
+          className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+        />
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Descrição curta"
+          rows={3}
+          className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
+        />
+
+        {/* Icon picker */}
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">Ícone (opcional)</span>
+            {iconKey && (
+              <button
+                onClick={() => setIconKey("")}
+                className="text-[11px] text-muted-foreground transition hover:text-foreground"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-12">
+            {NOTIFICATION_ICONS.map(({ key, Icon, label }) => {
+              const active = iconKey === key;
+              const catColor = CHANGELOG_CATEGORIES.find((c) => c.key === category)?.color ?? "#a78bfa";
+              return (
+                <button
+                  key={key}
+                  onClick={() => setIconKey(active ? "" : key)}
+                  title={label}
+                  aria-label={label}
+                  className={`flex aspect-square items-center justify-center rounded-xl border transition ${
+                    active
+                      ? "border-primary/60 bg-primary/15"
+                      : "border-white/5 bg-white/[0.02] text-muted-foreground hover:border-white/15 hover:text-foreground"
+                  }`}
+                  style={active ? { color: catColor, borderColor: `${catColor}88`, backgroundColor: `${catColor}22` } : undefined}
+                >
+                  <Icon className="h-4 w-4" strokeWidth={2.25} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end pt-1">
+          <button
+            onClick={() => void handleSend()}
+            disabled={sendBusy || !title.trim() || !body.trim()}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+          >
+            {sendBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2.5} />
+            ) : (
+              <Send className="h-4 w-4" strokeWidth={2.5} />
+            )}
+            Publicar
+          </button>
+        </div>
+        {err && <p className="text-xs text-red-400">{err}</p>}
+        {ok && <p className="text-xs text-emerald-400">{ok}</p>}
+      </div>
+
+      {/* Historic */}
+      {entries.length > 0 && (
+        <>
+          <div className="my-4 h-px bg-border" />
+          <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+            Últimas publicadas
+          </p>
+          <ul className="space-y-2">
+            {entries.slice(0, 8).map((n) => {
+              const meta = CHANGELOG_CATEGORIES.find((c) => c.key === n.category) ?? CHANGELOG_CATEGORIES[0];
+              const Icon = n.icon
+                ? resolveNotificationIcon(n.icon, null, n.title)
+                : meta.Icon;
+              return (
+                <li
+                  key={n.id}
+                  className="flex items-start gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3"
+                >
+                  <div
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border"
+                    style={{
+                      backgroundColor: `${meta.color}22`,
+                      borderColor: `${meta.color}44`,
+                      color: meta.color,
+                    }}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={2.25} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-sm font-medium">{n.title}</p>
+                      <span
+                        className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                        style={{
+                          backgroundColor: `${meta.color}22`,
+                          color: meta.color,
+                          border: `1px solid ${meta.color}44`,
+                        }}
+                      >
+                        {meta.label}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>
+                  </div>
+                  <button
+                    onClick={() => void deleteChangelogEntry(n.id)}
+                    className="rounded-full p-1.5 text-muted-foreground opacity-70 transition hover:bg-accent hover:text-foreground hover:opacity-100"
+                    aria-label="Excluir"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
