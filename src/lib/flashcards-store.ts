@@ -727,7 +727,15 @@ export const HOME_DAILY_LIMIT = Infinity;
 function refreshHomeDay() {
   const today = todayKey();
   if (home.day !== today) {
-    home = { day: today, count: 0, reviewed: 0 };
+    // BUGFIX: virava o dia e sobrescrevia `home` inteiro, apagando `streak`
+    // e `punishments`. Agora só zeramos os contadores diários e preservamos
+    // o restante do estado (streak, milestones, punishments).
+    home = {
+      ...home,
+      day: today,
+      count: 0,
+      reviewed: 0,
+    };
     scheduleSave();
     emitHome();
   }
