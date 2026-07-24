@@ -121,7 +121,11 @@ async function persist() {
     .from("wallets")
     .update({
       crystals: state.crystals,
-      inventory: { cosmetics: state.cosmetics, powerups: state.powerups },
+      inventory: {
+        cosmetics: state.cosmetics,
+        equipped: state.equipped,
+        powerups: state.powerups,
+      },
     })
     .eq("profile_id", currentProfileId);
 }
@@ -150,6 +154,40 @@ export async function grantCosmetic(key: string) {
     emit();
     await persist();
   }
+}
+
+// Slot dentro da chave — formato "<slot>:<id>". Aceita apenas os 4 slots
+// canônicos; qualquer outro valor cai em "effect" para não perder o item.
+function slotFromKey(key: string): CosmeticSlot {
+  const raw = key.split(":")[0]?.toLowerCase() ?? "";
+  if (raw.includes("frame") || raw.includes("deck") || raw.includes("nameplate"))
+    return "nameplate";
+  if (raw.includes("aura") || raw.includes("decoration")) return "decoration";
+  if (raw.includes("badge") || raw.includes("emblem")) return "badge";
+  return "effect";
+}
+
+export function slotOf(cosmeticKey: string): CosmeticSlot {
+  return slotFromKey(cosmeticKey);
+}
+
+export async function equipCosmetic(key: string) {
+  if (!currentProfileId) return;
+  if (!state.cosmetics.includes(key)) return;
+  const slot = slotFromKey(key);
+  state.equipped = { ...state.equipped, [slot]: key };
+  emit();
+  await persist();
+}
+
+export async function unequipSlot(slot: CosmeticSlot) {
+  if (!currentProfileId) return;
+  if (!state.equipped[slot]) return;
+  const next = { ...state.equipped };
+  delete next[slot];
+  state.equipped = next;
+  emit();
+  await persist();
 }
 
 export async function grantPowerup(effect: string, uses = 1) {
