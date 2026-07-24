@@ -243,7 +243,7 @@ function PerfilViewer() {
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
                 color="#fbbf24"
               />
-              <StatChip icon={Gem} label="Arlys ✦" value={(snapshot?.wallet.crystals ?? 0).toString()} color="#a78bfa" />
+              <StatChip icon={ArlysIcon} label="Arlys ✦" value={(snapshot?.wallet.crystals ?? 0).toString()} color="#a78bfa" accent />
               <StatChip
                 icon={Flame}
                 label="Streak"
