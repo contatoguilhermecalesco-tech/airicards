@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Flame, Trophy, GraduationCap, Swords, Skull, ChevronRight } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
+import { useProfileSnapshot } from "@/lib/profile-view";
+import { formatPresence } from "@/lib/presence";
 import {
   useActivityFeed,
   useReactionsForEvent,
@@ -59,6 +61,8 @@ export function PresenceCard() {
   const me = useCurrentProfile();
   const otherId = me ? otherProfile(me.id as ProfileId) : undefined;
   const events = useActivityFeed(otherId, 4);
+  const { snapshot } = useProfileSnapshot(otherId);
+  const presence = formatPresence(snapshot?.lastSeenAt);
 
   if (!me) return null;
   const other = profileMeta(otherId!);
@@ -70,15 +74,27 @@ export function PresenceCard() {
     >
       <div className="mb-3 flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
-          <div
-            className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold text-white"
-            style={{ background: other.gradient }}
-          >
-            {other.initial}
+          <div className="relative">
+            <div
+              className="grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold text-white"
+              style={{ background: other.gradient }}
+            >
+              {other.initial}
+            </div>
+            {presence.online && (
+              <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-background" />
+            )}
           </div>
           <h2 className="text-[17px] font-semibold tracking-tight text-foreground">
             {other.name}
           </h2>
+          <span
+            className={`text-[11px] font-medium ${
+              presence.online ? "text-emerald-400" : "text-muted-foreground"
+            }`}
+          >
+            · {presence.label}
+          </span>
         </div>
         <Link
           to="/duel"
