@@ -152,6 +152,9 @@ function mapDuel(row: any): Duel {
     createdBy: row.created_by,
     status: row.status,
     winner: row.winner,
+    forfeitBy: row.forfeit_by ?? null,
+    expiresAt: row.expires_at,
+    remindedAt: row.reminded_at ?? null,
     createdAt: row.created_at,
     completedAt: row.completed_at,
   };
