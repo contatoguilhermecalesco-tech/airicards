@@ -9,6 +9,7 @@ import {
   Library,
   Target,
 } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { PROFILES, useCurrentProfile } from "@/lib/profile";
 import {
   readRankForProfile,
