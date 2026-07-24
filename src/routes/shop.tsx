@@ -29,7 +29,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
-import { useWallet, loadWallet } from "@/lib/wallet-store";
+import { useWallet, loadWallet, equipCosmetic } from "@/lib/wallet-store";
 import {
   buyPublishedDeck,
   buyShopItem,
