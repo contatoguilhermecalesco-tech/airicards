@@ -744,10 +744,17 @@ function DiscordAvatar({
       {showDecoration && (
         <>
           <span
-            className="absolute inset-0 rounded-full"
+            className="cosmetic-ring-spin absolute inset-0 rounded-full"
             style={{
-              background: `conic-gradient(from 210deg, ${ring}, transparent 40%, ${ring} 70%, transparent)`,
+              background: `conic-gradient(from 0deg, ${ring}, transparent 35%, ${ring} 65%, transparent 100%)`,
               filter: "blur(0.5px)",
+            }}
+          />
+          <span
+            className="cosmetic-glow-pulse absolute -inset-1 rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${ring}55, transparent 65%)`,
+              filter: "blur(6px)",
             }}
           />
           <span
