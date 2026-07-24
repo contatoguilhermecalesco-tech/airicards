@@ -437,12 +437,64 @@ function PerfilPage() {
 
             <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
 
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
-              Sobre mim
-            </p>
-            <p className="mt-1 text-[13px] leading-snug text-white/80">
-              Estudando inglês todo dia com airi. 🔥 Streak em andamento.
-            </p>
+            <div className="mt-3 flex items-center justify-between">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-white/80">
+                Sobre mim
+              </p>
+              {!editingBio && (
+                <button
+                  onClick={() => setEditingBio(true)}
+                  className="text-[11px] font-semibold text-violet-300 transition hover:text-violet-200"
+                >
+                  Editar
+                </button>
+              )}
+            </div>
+            {editingBio ? (
+              <div className="mt-1.5 space-y-2">
+                <textarea
+                  value={bioDraft}
+                  onChange={(e) => setBioDraft(e.target.value.slice(0, 180))}
+                  rows={3}
+                  placeholder="Conte algo sobre você — estudando, metas, curiosidades…"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-[13px] leading-snug text-white outline-none focus:border-violet-400/50"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/40">{bioDraft.length}/180</span>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        setBioDraft(wallet.bio ?? "");
+                        setEditingBio(false);
+                      }}
+                      disabled={savingBio}
+                      className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={async () => {
+                        setSavingBio(true);
+                        await setBio(bioDraft);
+                        setSavingBio(false);
+                        setEditingBio(false);
+                        setFlash("Bio atualizada.");
+                        setTimeout(() => setFlash(null), 1400);
+                      }}
+                      disabled={savingBio}
+                      className="rounded-lg bg-violet-500 px-3 py-1 text-[11px] font-semibold text-white transition hover:bg-violet-400 disabled:opacity-50"
+                    >
+                      {savingBio ? "Salvando…" : "Salvar"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1 whitespace-pre-wrap text-[13px] leading-snug text-white/80">
+                {wallet.bio?.trim() || "Toque em editar para adicionar sua bio."}
+              </p>
+            )}
+
 
             <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
               Membro airi
