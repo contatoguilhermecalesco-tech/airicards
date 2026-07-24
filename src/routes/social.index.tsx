@@ -19,6 +19,7 @@ import {
   GraduationCap,
   Skull,
 } from "lucide-react";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
