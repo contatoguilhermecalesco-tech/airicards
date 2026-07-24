@@ -317,7 +317,7 @@ function MiniStat({
   value,
   tone,
 }: {
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number; color?: string }>;
   label: string;
   value: number;
   tone: string;
@@ -325,13 +325,14 @@ function MiniStat({
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
       <div className="flex items-center gap-1.5">
-        <Icon className="h-3.5 w-3.5" strokeWidth={2.5} style={{ color: tone }} />
+        <Icon className="h-3.5 w-3.5" strokeWidth={2.5} color={tone} />
         <span className="text-[10px] font-bold uppercase tracking-wider text-white/50">{label}</span>
       </div>
       <p className="mt-1 text-[20px] font-semibold text-white">{value}</p>
     </div>
   );
 }
+
 
 // silence unused
 void slotOf;
