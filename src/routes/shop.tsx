@@ -6,6 +6,7 @@ import {
   Briefcase,
   Check,
   Crown,
+  Eye,
   Flame,
   Gem,
   Gift,
@@ -23,6 +24,7 @@ import {
   Swords,
   Target,
   Trophy,
+  User,
   X,
   Zap,
 } from "lucide-react";
