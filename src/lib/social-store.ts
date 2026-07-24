@@ -272,9 +272,25 @@ export function useDuelScore(): { g: number; a: number } {
     for (const d of s.duels) {
       if (d.winner === "guilherme") g++;
       else if (d.winner === "arlayne") a++;
+      if (d.forfeitBy === "guilherme") g--;
+      else if (d.forfeitBy === "arlayne") a--;
     }
     return { g, a };
   });
+}
+
+/** Estado do prazo do duelo. */
+export function duelDeadline(duel: Duel | null | undefined) {
+  if (!duel) return null;
+  const expires = new Date(duel.expiresAt).getTime();
+  const now = Date.now();
+  const msLeft = expires - now;
+  return {
+    expiresAt: expires,
+    msLeft,
+    expired: msLeft <= 0,
+    remindWindow: msLeft > 0 && msLeft <= DUEL_REMIND_HOURS * 3600_000,
+  };
 }
 
 /** Cria o duelo da semana com um baralho aleatório. */
