@@ -275,6 +275,36 @@ function SocialPage() {
   );
 }
 
+function Step({
+  n,
+  icon,
+  title,
+  body,
+}: {
+  n: number;
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <li className="flex gap-3">
+      <div className="flex flex-col items-center gap-1 pt-0.5">
+        <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-[11px] font-bold text-primary">
+          {n}
+        </div>
+        {n < 4 && <div className="h-full w-px bg-white/[0.06]" />}
+      </div>
+      <div className="flex-1 pb-4">
+        <div className="flex items-center gap-1.5">
+          <span className="text-primary">{icon}</span>
+          <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
+        </div>
+        <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{body}</p>
+      </div>
+    </li>
+  );
+}
+
 function StatChip({
   label,
   value,
