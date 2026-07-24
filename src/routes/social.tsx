@@ -459,7 +459,7 @@ function Step({
         <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-[11px] font-bold text-primary">
           {n}
         </div>
-        {n < 4 && <div className="h-full w-px bg-white/[0.06]" />}
+        {n < 5 && <div className="h-full w-px bg-white/[0.06]" />}
       </div>
       <div className="flex-1 pb-4">
         <div className="flex items-center gap-1.5">
