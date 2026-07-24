@@ -20,6 +20,7 @@ import { NotificationsBell } from "../components/NotificationsBell";
 import { RankEmblem } from "../components/RankBadge";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
+import { auraRingFromEquipped } from "../lib/aura";
 import "@/lib/presence";
 
 // Overlays só aparecem sob eventos raros (subiu de rank, streak milestone,
