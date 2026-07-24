@@ -1,6 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Gift, Sparkles, Swords, Send, Check, X as XIcon, ChevronRight } from "lucide-react";
+import {
+  Gift,
+  Sparkles,
+  Swords,
+  Send,
+  Check,
+  X as XIcon,
+  ChevronRight,
+  Info,
+  Users,
+  Target,
+  Zap,
+  Trophy,
+} from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
 import {
   usePendingGifts,
@@ -178,7 +191,8 @@ function SocialPage() {
       )}
 
       {tab === "duel" && (
-        <div className="animate-fade-in space-y-4">
+        <div className="animate-fade-in space-y-5">
+          {/* Status card */}
           <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-white/[0.04] p-5">
             <div className="flex items-center gap-3">
               <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15">
@@ -215,12 +229,79 @@ function SocialPage() {
             </Link>
           </div>
 
+          {/* How it works */}
+          <section className="rounded-3xl border border-white/[0.06] bg-white/[0.02] p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <Info className="h-4 w-4 text-primary" strokeWidth={2.25} />
+              <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
+                Como funciona o duelo
+              </h2>
+            </div>
+
+            <ol className="space-y-3">
+              <Step
+                n={1}
+                icon={<Users className="h-3.5 w-3.5" />}
+                title="Um de vocês cria o desafio"
+                body={`Quem abrir a sala escolhe um baralho próprio. O sistema sorteia 5 cartas daquele baralho — as mesmas 5 para os dois.`}
+              />
+              <Step
+                n={2}
+                icon={<Target className="h-3.5 w-3.5" />}
+                title="Cada um joga a sua rodada sozinho"
+                body="Você vira a carta, diz se acertou ou errou, e segue até o fim. Não dá para ver a resposta do outro antes da sua vez."
+              />
+              <Step
+                n={3}
+                icon={<Zap className="h-3.5 w-3.5" />}
+                title="Quem acerta mais, vence"
+                body="Em empate, quem terminou no menor tempo leva. O vencedor fica com +1 vitória no placar geral."
+              />
+              <Step
+                n={4}
+                icon={<Trophy className="h-3.5 w-3.5" />}
+                title="Nova rodada toda semana"
+                body="O duelo vale para a semana atual. Na próxima semana, qualquer um pode criar um novo desafio."
+              />
+            </ol>
+          </section>
+
           <p className="px-1 text-[12px] text-muted-foreground">
-            Mesmas 5 cartas, cronômetro, melhor acurácia vence a semana.
+            Dica: baralhos com mais cartas dão mais variedade ao sorteio. Quanto mais você revisa, melhor fica no duelo.
           </p>
         </div>
       )}
     </div>
+  );
+}
+
+function Step({
+  n,
+  icon,
+  title,
+  body,
+}: {
+  n: number;
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <li className="flex gap-3">
+      <div className="flex flex-col items-center gap-1 pt-0.5">
+        <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-[11px] font-bold text-primary">
+          {n}
+        </div>
+        {n < 4 && <div className="h-full w-px bg-white/[0.06]" />}
+      </div>
+      <div className="flex-1 pb-4">
+        <div className="flex items-center gap-1.5">
+          <span className="text-primary">{icon}</span>
+          <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
+        </div>
+        <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{body}</p>
+      </div>
+    </li>
   );
 }
 
