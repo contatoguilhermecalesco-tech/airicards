@@ -8,7 +8,7 @@ import {
   Check,
   Crown,
   Flame,
-  Gem,
+  
   Gift,
   Heart,
   Moon,
