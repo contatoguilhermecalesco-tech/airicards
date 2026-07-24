@@ -201,13 +201,22 @@ function ShopPage() {
               Ganhe Arlys ✦ mantendo streak, subindo de rank e vencendo duelos. Gaste em decks
               premium, packs, cosméticos e power-ups.
             </p>
-            <button
-              onClick={() => setHelpOpen(true)}
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-foreground/90 backdrop-blur transition hover:bg-white/[0.09]"
-            >
-              <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
-              Como funciona a loja?
-            </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => setHelpOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-foreground/90 backdrop-blur transition hover:bg-white/[0.09]"
+              >
+                <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Como funciona a loja?
+              </button>
+              <Link
+                to="/perfil"
+                className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/15 px-3 py-1.5 text-[11px] font-semibold text-violet-100 backdrop-blur transition hover:bg-violet-500/25"
+              >
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
+                Ver meu perfil
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
             <Gem className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
