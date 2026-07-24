@@ -53,10 +53,28 @@ function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 function Shell({ children }: { children: ReactNode }) {
   return (
     <main
-      className="flex min-h-screen w-full items-center justify-center bg-black px-5 py-10"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black px-5 py-10"
       style={BODY_FONT}
     >
-      <div className="w-full max-w-[420px]">{children}</div>
+      {/* Subtle top spotlight — no blur, just gradient */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[60vh]"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 0%, rgba(139,125,255,0.10) 0%, rgba(139,125,255,0) 70%)",
+        }}
+      />
+      {/* Hairline grid vignette */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.04), transparent 70%)",
+        }}
+      />
+      <div className="relative w-full max-w-[420px]">{children}</div>
     </main>
   );
 }
