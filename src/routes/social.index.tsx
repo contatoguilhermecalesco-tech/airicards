@@ -620,12 +620,14 @@ function FeedRow({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <div
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-semibold text-white shadow-sm"
-          style={{ background: actor.gradient }}
-        >
-          {actor.initial}
-        </div>
+        <ProfileAvatar
+          profileId={event.profileId}
+          initial={actor.initial}
+          gradient={actor.gradient}
+          size={36}
+          fontScale={0.36}
+          className="shadow-sm"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13.5px] font-medium text-foreground">
             {labelForEvent(event, actorName)}
