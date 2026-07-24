@@ -218,9 +218,29 @@ function MarketplacePage() {
                 </p>
 
                 <div className="mt-4 flex items-center justify-between gap-2">
-                  <button
-                    onClick={() => handleLike(row)}
-                    disabled={iLiked}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleLike(row)}
+                      disabled={iLiked}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                        iLiked
+                          ? "border-rose-400/40 bg-rose-500/15 text-rose-300"
+                          : "border-white/10 bg-white/[0.04] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground"
+                      }`}
+                    >
+                      <Heart
+                        className={`h-3.5 w-3.5 ${iLiked ? "fill-current" : ""}`}
+                        strokeWidth={2.5}
+                      />
+                      {likeCount}
+                    </button>
+                    {row.price > 0 && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-200">
+                        <Gem className="h-3 w-3" strokeWidth={2.5} />
+                        {row.price}
+                      </span>
+                    )}
+                  </div>
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                       iLiked
                         ? "border-rose-400/40 bg-rose-500/15 text-rose-300"
