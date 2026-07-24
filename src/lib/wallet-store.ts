@@ -16,6 +16,7 @@ export type WalletState = {
   cosmetics: string[];
   equipped: EquippedMap;
   powerups: Record<string, number>;
+  bio: string;
   loaded: boolean;
 };
 
@@ -25,8 +26,10 @@ const empty = (id = ""): WalletState => ({
   cosmetics: [],
   equipped: {},
   powerups: {},
+  bio: "",
   loaded: false,
 });
+
 
 let state: WalletState = empty();
 const listeners = new Set<() => void>();
