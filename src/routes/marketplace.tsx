@@ -6,16 +6,19 @@ import {
   Check,
   Compass,
   Download,
+  Gem,
   Heart,
   Search,
+  ShoppingBag,
   Sparkles,
 } from "lucide-react";
 import {
-  importPublishedDeck,
   likePublishedDeck,
   listPublishedDecks,
   type PublishedDeckRow,
 } from "@/lib/marketplace";
+import { buyPublishedDeck } from "@/lib/shop";
+import { useWallet, loadWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 
 export const Route = createFileRoute("/marketplace")({
