@@ -197,7 +197,241 @@ function SocialPage() {
       )}
     </div>
   );
+
+function DuelPanel({
+  meId,
+  oppId,
+  score,
+  duel,
+}: {
+  meId: ProfileId;
+  oppId: ProfileId;
+  score: { g: number; a: number };
+  duel: ReturnType<typeof useWeeklyDuel>;
+}) {
+  const [howOpen, setHowOpen] = useState(false);
+  const me = profileMeta(meId);
+  const opp = profileMeta(oppId);
+  const myScore = meId === "guilherme" ? score.g : score.a;
+  const oppScore = meId === "guilherme" ? score.a : score.g;
+  const isLeading = myScore > oppScore;
+  const isTied = myScore === oppScore;
+
+  const status = duel
+    ? duel.status === "completed"
+      ? { label: "Rodada encerrada", tone: "muted" as const }
+      : { label: "Rodada em andamento", tone: "live" as const }
+    : { label: "Sem duelo esta semana", tone: "idle" as const };
+
+  const cta =
+    duel && duel.status === "active"
+      ? "Entrar no duelo"
+      : duel && duel.status === "completed"
+        ? "Ver resultado da rodada"
+        : "Criar duelo desta semana";
+
+  return (
+    <div className="animate-fade-in space-y-5">
+      {/* Arena — hero card */}
+      <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-5">
+        {/* soft glows */}
+        <div
+          className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-40 blur-3xl"
+          style={{ background: me.gradient }}
+        />
+        <div
+          className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-30 blur-3xl"
+          style={{ background: opp.gradient }}
+        />
+
+        {/* Status pill */}
+        <div className="relative flex items-center justify-between">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                status.tone === "live"
+                  ? "animate-pulse bg-emerald-400"
+                  : status.tone === "muted"
+                    ? "bg-muted-foreground/60"
+                    : "bg-primary/70"
+              }`}
+            />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              {status.label}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setHowOpen(true)}
+            className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground"
+          >
+            <HelpCircle className="h-3 w-3" strokeWidth={2.25} />
+            Como funciona
+          </button>
+        </div>
+
+        {/* VS arena */}
+        <div className="relative mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <Fighter profile={me} score={myScore} winning={isLeading} align="left" />
+          <div className="flex flex-col items-center gap-1">
+            <div className="relative grid h-11 w-11 place-items-center rounded-2xl border border-white/[0.1] bg-background/60 backdrop-blur">
+              <Swords className="h-5 w-5 text-primary" strokeWidth={2.4} />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              vs
+            </span>
+          </div>
+          <Fighter profile={opp} score={oppScore} winning={!isTied && !isLeading} align="right" />
+        </div>
+
+        {/* Score summary */}
+        <div className="relative mt-5 flex items-center justify-center gap-2 text-[12px] text-muted-foreground">
+          <Trophy className="h-3.5 w-3.5 text-primary/80" strokeWidth={2.25} />
+          <span>
+            Placar geral{" "}
+            <span className="font-semibold tabular-nums text-foreground">
+              {score.g}–{score.a}
+            </span>{" "}
+            <span className="text-muted-foreground/70">· Guilherme vs Arlayne</span>
+          </span>
+        </div>
+
+        {/* CTA */}
+        <Link
+          to="/duel"
+          className="group relative mt-5 flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary/80 py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.7)] transition active:scale-[0.99]"
+        >
+          <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+          <Flame className="h-4 w-4" strokeWidth={2.5} />
+          {cta}
+          <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
+        </Link>
+      </div>
+
+      {/* Quick tips row */}
+      <div className="grid grid-cols-3 gap-2">
+        <MiniTip icon={<Users className="h-3.5 w-3.5" />} label="5 cartas" hint="mesmo baralho" />
+        <MiniTip icon={<Zap className="h-3.5 w-3.5" />} label="Tempo conta" hint="desempate" />
+        <MiniTip icon={<Trophy className="h-3.5 w-3.5" />} label="Semanal" hint="reset toda seg." />
+      </div>
+
+      <HowItWorksDialog open={howOpen} onOpenChange={setHowOpen} />
+    </div>
+  );
 }
+
+function Fighter({
+  profile,
+  score,
+  winning,
+  align,
+}: {
+  profile: { name: string; initial: string; gradient: string };
+  score: number;
+  winning: boolean;
+  align: "left" | "right";
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center gap-2 ${
+        align === "left" ? "items-start sm:items-center" : "items-end sm:items-center"
+      } sm:items-center`}
+    >
+      <div className="relative">
+        <div
+          className={`grid h-16 w-16 place-items-center rounded-3xl text-[22px] font-bold text-white shadow-lg transition ${
+            winning ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background" : ""
+          }`}
+          style={{ background: profile.gradient }}
+        >
+          {profile.initial}
+        </div>
+        {winning && (
+          <div className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-primary text-primary-foreground shadow">
+            <Trophy className="h-3 w-3" strokeWidth={2.5} />
+          </div>
+        )}
+      </div>
+      <div className="text-center">
+        <p className="text-[13px] font-semibold text-foreground">{profile.name}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
+          {score} {score === 1 ? "vitória" : "vitórias"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MiniTip({
+  icon,
+  label,
+  hint,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  hint: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
+      <div className="mx-auto grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <p className="mt-1.5 text-[12px] font-semibold text-foreground">{label}</p>
+      <p className="text-[10.5px] text-muted-foreground">{hint}</p>
+    </div>
+  );
+}
+
+function HowItWorksDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[420px] rounded-3xl border-white/[0.08] bg-background/95 backdrop-blur-xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-[16px]">
+            <Info className="h-4 w-4 text-primary" strokeWidth={2.25} />
+            Como funciona o duelo
+          </DialogTitle>
+        </DialogHeader>
+        <ol className="mt-2 space-y-3">
+          <Step
+            n={1}
+            icon={<Users className="h-3.5 w-3.5" />}
+            title="Um de vocês cria o desafio"
+            body="Quem abrir a sala escolhe um baralho próprio. O sistema sorteia 5 cartas — as mesmas para os dois."
+          />
+          <Step
+            n={2}
+            icon={<Target className="h-3.5 w-3.5" />}
+            title="Cada um joga sozinho"
+            body="Você vira a carta, diz se acertou e segue. Não dá para ver a jogada do outro antes da sua vez."
+          />
+          <Step
+            n={3}
+            icon={<Zap className="h-3.5 w-3.5" />}
+            title="Quem acerta mais, vence"
+            body="Em empate, o menor tempo leva. Vencedor ganha +1 vitória no placar geral."
+          />
+          <Step
+            n={4}
+            icon={<Trophy className="h-3.5 w-3.5" />}
+            title="Nova rodada toda semana"
+            body="Toda segunda, qualquer um pode criar um novo desafio."
+          />
+        </ol>
+        <p className="mt-3 rounded-xl bg-white/[0.03] px-3 py-2 text-[12px] text-muted-foreground">
+          Dica: baralhos com mais cartas dão mais variedade ao sorteio.
+        </p>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function Step({
   n,
