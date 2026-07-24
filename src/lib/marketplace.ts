@@ -2,11 +2,13 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   createCard,
   createDeck,
+  flushSave,
   type Card,
   type CardMode,
   type Deck,
 } from "@/lib/flashcards-store";
 import { slugify } from "@/lib/share";
+
 
 export type PublishedDeckRow = {
   id: string;
