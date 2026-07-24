@@ -1128,19 +1128,27 @@ function ChangelogSection() {
     setErr(null);
     setOk(null);
     try {
-      await createChangelogEntry({
-        title,
-        body,
-        notes: notes.trim() || null,
-        category,
-        icon: iconKey || null,
-      });
-      setTitle("");
-      setBody("");
-      setNotes("");
-      setIdea("");
-      setIconKey("");
-      setOk("Novidade publicada.");
+      if (editingId) {
+        await updateChangelogEntry(editingId, {
+          title,
+          body,
+          notes: notes.trim() || null,
+          category,
+          icon: iconKey || null,
+        });
+        resetForm();
+        setOk("Patch atualizado.");
+      } else {
+        await createChangelogEntry({
+          title,
+          body,
+          notes: notes.trim() || null,
+          category,
+          icon: iconKey || null,
+        });
+        resetForm();
+        setOk("Novidade publicada.");
+      }
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
       setErr((e as Error).message);
