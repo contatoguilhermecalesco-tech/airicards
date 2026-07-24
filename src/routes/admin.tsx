@@ -1514,10 +1514,12 @@ function ChangelogSection() {
           >
             {sendBusy ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
+            ) : isEditing ? (
+              <Pencil className="h-3.5 w-3.5" strokeWidth={2.5} />
             ) : (
               <Send className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            Publicar patch
+            {isEditing ? "Salvar edição" : "Publicar patch"}
           </button>
         </div>
       </div>
