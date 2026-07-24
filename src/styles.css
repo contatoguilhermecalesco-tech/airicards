@@ -400,3 +400,48 @@
 @utility cosmetic-sparkle {
   animation: cosmetic-sparkle 2.2s ease-in-out infinite;
 }
+
+/* ---- Epic aura animations ---- */
+@keyframes aura-spin-reverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes aura-hueshift {
+  from { filter: hue-rotate(0deg) saturate(1.1); }
+  to   { filter: hue-rotate(360deg) saturate(1.1); }
+}
+@keyframes aura-flicker {
+  0%, 100% { opacity: 0.85; transform: scale(1); filter: brightness(1); }
+  30%      { opacity: 1;    transform: scale(1.05); filter: brightness(1.25); }
+  55%      { opacity: 0.7;  transform: scale(0.98); filter: brightness(0.95); }
+  75%      { opacity: 1;    transform: scale(1.03); filter: brightness(1.2); }
+}
+@keyframes aura-ray {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50%      { transform: scale(1.25); opacity: 0.95; }
+}
+@keyframes aura-glitch {
+  0%, 100% { transform: translate(0,0); }
+  20%      { transform: translate(0.6px,-0.4px); }
+  40%      { transform: translate(-0.5px,0.5px); }
+  60%      { transform: translate(0.4px,0.3px); }
+  80%      { transform: translate(-0.3px,-0.4px); }
+}
+@keyframes aura-crystal {
+  0%, 100% { opacity: 0.6; filter: brightness(1); }
+  50%      { opacity: 1;   filter: brightness(1.3); }
+}
+@keyframes aura-orbit {
+  from { transform: rotate(0deg) translateX(var(--r, 20px)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--r, 20px)) rotate(-360deg); }
+}
+@utility aura-spin-slow { animation: cosmetic-spin 14s linear infinite; }
+@utility aura-spin-fast { animation: cosmetic-spin 4s linear infinite; }
+@utility aura-spin-reverse { animation: aura-spin-reverse 10s linear infinite; }
+@utility aura-hueshift { animation: aura-hueshift 6s linear infinite, cosmetic-spin 10s linear infinite; }
+@utility aura-flicker { animation: aura-flicker 1.4s ease-in-out infinite; }
+@utility aura-ray { animation: aura-ray 2.4s ease-in-out infinite; }
+@utility aura-glitch { animation: aura-glitch 0.35s steps(2) infinite; }
+@utility aura-crystal { animation: aura-crystal 3.6s ease-in-out infinite; }
+@utility aura-orbit { animation: aura-orbit 4s linear infinite; }
+@utility aura-orbit-slow { animation: aura-orbit 6.5s linear infinite; }
