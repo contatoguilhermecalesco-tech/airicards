@@ -311,7 +311,7 @@ export function createDeck(name: string, description?: string, color?: string): 
   };
   state = { ...state, decks: [deck, ...state.decks] };
   emit();
-  scheduleSave();
+  void flushSave();
   return deck;
 }
 
