@@ -219,6 +219,8 @@ function DuelPage() {
               {duel.cardsSnapshot.length} cartas · criado por {profileMeta(duel.createdBy).name}
             </p>
 
+            <DeadlinePill duel={duel} />
+
             <div className="mt-4 grid grid-cols-2 gap-2.5">
               <PlayerStatus profile={me} result={myResult} isMe />
               <PlayerStatus profile={opp} result={oppResult} />
@@ -234,7 +236,7 @@ function DuelPage() {
               </button>
             ) : !oppResult ? (
               <div className="mt-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 text-center text-[13px] text-muted-foreground">
-                Você jogou. Aguardando {opp.name}…
+                Você jogou. Aguardando {opp.name}… Se ela não jogar no prazo, você vence por WO.
               </div>
             ) : null}
           </>
