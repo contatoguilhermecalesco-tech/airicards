@@ -6,7 +6,7 @@ import {
   Check,
   Compass,
   Download,
-  Gem,
+
   Heart,
   Search,
   ShoppingBag,

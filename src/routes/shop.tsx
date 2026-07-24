@@ -8,7 +8,7 @@ import {
   Crown,
   Eye,
   Flame,
-  Gem,
+
   Gift,
   Heart,
   HelpCircle,

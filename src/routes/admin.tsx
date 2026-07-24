@@ -1789,7 +1789,7 @@ import {
   type AdminDuelRow,
 } from "@/lib/admin-actions";
 import { loadWallet, currentProfileForWallet } from "@/lib/wallet-store";
-import { Gem, Minus, X as XIcon, Trophy } from "lucide-react";
+import { Minus, X as XIcon, Trophy } from "lucide-react";
 
 const QUICK_GRANTS = [50, 100, 250, 500, 1000];
 
