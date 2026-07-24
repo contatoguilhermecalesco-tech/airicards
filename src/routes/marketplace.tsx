@@ -127,7 +127,7 @@ function MarketplacePage() {
             Decks da comunidade
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Explore, curta e importe. Decks premium usam Cristais airi ✦.
+            Explore, curta e importe. Decks premium usam Lumens ✦.
           </p>
         </div>
         <div className="flex items-center gap-2">
