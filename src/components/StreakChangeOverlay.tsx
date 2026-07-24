@@ -12,6 +12,15 @@ export function StreakChangeOverlay() {
 
   useEffect(() => {
     const off = onStreakChange((e) => {
+      // Só mostra 1x por dia por tipo (ganho/perda), mesmo se o store re-emitir.
+      try {
+        const today = new Date().toDateString();
+        const key = `airi.streakOverlay.${e.kind}.lastShown`;
+        if (typeof localStorage !== "undefined" && localStorage.getItem(key) === today) {
+          return;
+        }
+        if (typeof localStorage !== "undefined") localStorage.setItem(key, today);
+      } catch {}
       setEvent(e);
       window.setTimeout(() => {
         setEvent((cur) => (cur && cur.at === e.at ? null : cur));
@@ -21,6 +30,7 @@ export function StreakChangeOverlay() {
       off();
     };
   }, []);
+
 
   if (!event) return null;
 
