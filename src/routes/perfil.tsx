@@ -45,6 +45,7 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
 
 
 export const Route = createFileRoute("/perfil")({
