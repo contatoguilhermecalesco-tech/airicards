@@ -254,6 +254,9 @@ function AdminPage() {
       <DuelsAdminSection />
 
       <div className="h-6" />
+      <PinAdminSection />
+
+      <div className="h-6" />
       <TagsSection />
 
       <div className="h-6" />
