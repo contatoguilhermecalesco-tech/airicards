@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   PenLine,
   Sparkles,
@@ -10,10 +10,15 @@ import {
   AlertCircle,
   Loader2,
   History,
+  Library,
+  ChevronDown,
+  ChevronUp,
+  Plus,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
 import { addWriting } from "@/lib/writing-store";
+import { createCard, useStore } from "@/lib/flashcards-store";
 
 export const Route = createFileRoute("/study/writing/")({
   component: WritingPage,
@@ -162,6 +167,8 @@ function WritingPage() {
       {feedback && (
         <FeedbackView
           feedback={feedback}
+          originalText={text}
+          prompt={prompt}
           onRestart={() => {
             setFeedback(null);
           }}
@@ -178,10 +185,14 @@ function WritingPage() {
 
 function FeedbackView({
   feedback,
+  originalText,
+  prompt,
   onRestart,
   onNew,
 }: {
   feedback: WritingFeedback;
+  originalText: string;
+  prompt: string;
   onRestart: () => void;
   onNew: () => void;
 }) {
@@ -333,6 +344,13 @@ function FeedbackView({
         </section>
       )}
 
+      <SaveToDeckPanel
+        originalText={originalText}
+        prompt={prompt}
+        feedback={feedback}
+      />
+
+
       <div className="flex flex-wrap gap-2 pt-2">
         <button
           onClick={onRestart}
@@ -348,5 +366,208 @@ function FeedbackView({
         </button>
       </div>
     </div>
+  );
+}
+
+function SaveToDeckPanel({
+  originalText,
+  prompt,
+  feedback,
+}: {
+  originalText: string;
+  prompt: string;
+  feedback: WritingFeedback;
+}) {
+  const decks = useStore((s) => s.decks);
+  const [open, setOpen] = useState(false);
+  const [selectedDeck, setSelectedDeck] = useState<string>(decks[0]?.id ?? "");
+  const [saveCorrected, setSaveCorrected] = useState(true);
+  const [pickedIssues, setPickedIssues] = useState<Record<number, boolean>>({});
+  const [savedCount, setSavedCount] = useState<number | null>(null);
+
+  const source = useMemo(() => {
+    const base = "Writing";
+    return prompt.trim() ? `${base} · ${prompt.trim().slice(0, 60)}` : base;
+  }, [prompt]);
+
+  const issueCount = feedback.issues.length;
+  const pickedIssueCount = Object.values(pickedIssues).filter(Boolean).length;
+  const totalToSave = (saveCorrected && feedback.correctedText ? 1 : 0) + pickedIssueCount;
+
+  function toggleIssue(i: number) {
+    setPickedIssues((p) => ({ ...p, [i]: !p[i] }));
+  }
+  function selectAllIssues(v: boolean) {
+    const next: Record<number, boolean> = {};
+    feedback.issues.forEach((_, i) => (next[i] = v));
+    setPickedIssues(next);
+  }
+
+  function save() {
+    if (!selectedDeck || totalToSave === 0) return;
+    let n = 0;
+    if (saveCorrected && feedback.correctedText) {
+      createCard(selectedDeck, originalText.trim(), feedback.correctedText.trim(), {
+        mode: "sentence",
+        source,
+      });
+      n++;
+    }
+    feedback.issues.forEach((iss, i) => {
+      if (!pickedIssues[i]) return;
+      const back = iss.explanation
+        ? `${iss.correction}\n\n${iss.explanation}`
+        : iss.correction;
+      const isSentence = /\s/.test(iss.original) || iss.original.length > 24;
+      createCard(selectedDeck, iss.original, back, {
+        mode: isSentence ? "sentence" : "word",
+        source: `${source} · ${iss.type}`,
+      });
+      n++;
+    });
+    setSavedCount(n);
+    setPickedIssues({});
+  }
+
+  return (
+    <section className="glass-panel mt-4 rounded-3xl border p-5">
+      <button
+        onClick={() => setOpen((s) => !s)}
+        className="flex w-full items-center gap-2 text-left"
+      >
+        <Library className="h-4 w-4 text-sky-300" strokeWidth={2.25} />
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">
+          Salvar como cartas
+        </p>
+        <span className="ml-auto text-muted-foreground">
+          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-3">
+          {decks.length === 0 ? (
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm">
+              <p className="text-muted-foreground">
+                Você ainda não tem decks. Crie um na biblioteca para salvar
+                cartas a partir do seu texto.
+              </p>
+              <Link
+                to="/library"
+                className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-white/10 px-3 py-2 text-xs font-medium transition hover:bg-white/15"
+              >
+                <Plus className="h-3.5 w-3.5" /> Ir para biblioteca
+              </Link>
+            </div>
+          ) : (
+            <>
+              <label className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+                Deck
+              </label>
+              <select
+                value={selectedDeck}
+                onChange={(e) => {
+                  setSelectedDeck(e.target.value);
+                  setSavedCount(null);
+                }}
+                className="mt-2 w-full rounded-2xl border border-border bg-surface/40 px-4 py-2.5 text-sm outline-none focus:border-sky-400/40"
+              >
+                {decks.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+
+              {feedback.correctedText && (
+                <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                  <input
+                    type="checkbox"
+                    checked={saveCorrected}
+                    onChange={(e) => setSaveCorrected(e.target.checked)}
+                    className="mt-0.5 accent-sky-400"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13px] font-medium text-foreground/90">
+                      Texto completo (seu original → versão corrigida)
+                    </span>
+                    <span className="mt-0.5 block line-clamp-2 text-xs text-muted-foreground">
+                      {feedback.correctedText}
+                    </span>
+                  </span>
+                </label>
+              )}
+
+              {issueCount > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Correções ({issueCount})
+                    </p>
+                    <div className="flex gap-1 text-[11px]">
+                      <button
+                        onClick={() => selectAllIssues(true)}
+                        className="rounded-full px-2 py-1 text-sky-300 hover:bg-sky-400/10"
+                      >
+                        Todos
+                      </button>
+                      <button
+                        onClick={() => selectAllIssues(false)}
+                        className="rounded-full px-2 py-1 text-muted-foreground hover:bg-white/5"
+                      >
+                        Nenhum
+                      </button>
+                    </div>
+                  </div>
+                  <ul className="mt-2 space-y-1.5">
+                    {feedback.issues.map((iss, i) => (
+                      <li key={i}>
+                        <label className="flex cursor-pointer items-start gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 text-sm transition hover:bg-black/30">
+                          <input
+                            type="checkbox"
+                            checked={!!pickedIssues[i]}
+                            onChange={() => toggleIssue(i)}
+                            className="mt-0.5 accent-sky-400"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="flex flex-wrap items-baseline gap-1.5">
+                              <span className="rounded bg-red-500/10 px-1.5 py-0.5 font-mono text-[12px] text-red-200 line-through decoration-red-400/50">
+                                {iss.original}
+                              </span>
+                              <span className="text-muted-foreground">→</span>
+                              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[12px] text-emerald-200">
+                                {iss.correction}
+                              </span>
+                            </span>
+                          </span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <button
+                onClick={save}
+                disabled={totalToSave === 0}
+                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <Plus className="h-4 w-4" strokeWidth={2.25} />
+                {totalToSave === 0
+                  ? "Selecione ao menos 1 item"
+                  : `Salvar ${totalToSave} carta${totalToSave > 1 ? "s" : ""} no deck`}
+              </button>
+
+              {savedCount !== null && (
+                <div className="mt-3 flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+                  <Check className="h-4 w-4" strokeWidth={2.5} />
+                  {savedCount} {savedCount === 1 ? "carta adicionada" : "cartas adicionadas"} ao deck.
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </section>
   );
 }
