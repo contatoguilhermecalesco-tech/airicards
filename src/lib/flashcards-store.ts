@@ -183,6 +183,33 @@ function scheduleSave() {
   }, 400);
 }
 
+/**
+ * Força a persistência imediata do estado atual em profile_data, sem esperar
+ * o debounce. Útil em operações críticas (ex.: compra de deck) onde precisamos
+ * garantir que a mudança ficou salva antes de navegar ou notificar o usuário.
+ */
+export async function flushSave(): Promise<void> {
+  if (!activeProfile || !isBrowser()) return;
+  const profileId = activeProfile;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  saveCache(profileId, state, home);
+  const { error } = await supabase
+    .from("profile_data")
+    .upsert(
+      {
+        profile_id: profileId,
+        data: state as never,
+        home_sessions: home as never,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "profile_id" },
+    );
+  if (error) console.error("[airi] flush save failed", error);
+}
+
 export function setActiveProfileId(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
