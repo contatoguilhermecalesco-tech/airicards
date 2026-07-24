@@ -2,12 +2,96 @@ import { useEffect, useRef, useState } from "react";
 import { Gift, Sparkles, X } from "lucide-react";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
+import { getPrefs, isQuietNow } from "@/lib/notification-prefs";
 import {
   usePendingGifts,
   profileMeta,
   type CardGift,
   type ProfileId,
 } from "@/lib/social-store";
+
+/**
+ * Toca um "chime" mágico curto e discreto sintetizado via Web Audio API.
+ * Três notas harmônicas (E5-B5-E6) em sinos senoidais suaves, com uma
+ * "shimmer" superior. Respeita a preferência de som e o modo silencioso.
+ */
+let __audioCtx: AudioContext | null = null;
+function playGiftChime() {
+  if (typeof window === "undefined") return;
+  try {
+    const prefs = getPrefs();
+    if (!prefs.sound) return;
+    if (isQuietNow(prefs)) return;
+
+    const AC =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AC) return;
+    if (!__audioCtx) __audioCtx = new AC();
+    const ctx = __audioCtx;
+    if (ctx.state === "suspended") void ctx.resume();
+
+    const master = ctx.createGain();
+    master.gain.value = 0.0001;
+    master.connect(ctx.destination);
+
+    // Pequeno "swell" de entrada e cauda macia
+    const now = ctx.currentTime;
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.28, now + 0.04);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 1.9);
+
+    // Notas: E5, B5, E6 (arpejo cristalino ascendente)
+    const notes = [
+      { f: 659.25, t: 0.0 },
+      { f: 987.77, t: 0.09 },
+      { f: 1318.51, t: 0.2 },
+    ];
+
+    for (const n of notes) {
+      const t0 = now + n.t;
+      // Fundamental (senoidal, sino puro)
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(n.f, t0);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.9, t0 + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.4);
+      osc.connect(g).connect(master);
+      osc.start(t0);
+      osc.stop(t0 + 1.5);
+
+      // Harmônica superior sutil (brilho)
+      const osc2 = ctx.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(n.f * 2, t0);
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0.0001, t0);
+      g2.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02);
+      g2.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.9);
+      osc2.connect(g2).connect(master);
+      osc2.start(t0);
+      osc2.stop(t0 + 1.0);
+    }
+
+    // Shimmer aéreo (senoidal alta, quase inaudível mas dá "mágica")
+    const shimmer = ctx.createOscillator();
+    shimmer.type = "sine";
+    shimmer.frequency.setValueAtTime(2637.02, now + 0.25); // E7
+    const sg = ctx.createGain();
+    sg.gain.setValueAtTime(0.0001, now + 0.25);
+    sg.gain.exponentialRampToValueAtTime(0.08, now + 0.32);
+    sg.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+    shimmer.connect(sg).connect(master);
+    shimmer.start(now + 0.25);
+    shimmer.stop(now + 1.7);
+  } catch {
+    /* audio bloqueado ou indisponível — silencioso */
+  }
+}
+
 
 /**
  * Overlay cinematográfico estilo LoL — dispara quando o usuário recebe
@@ -74,6 +158,7 @@ export function GiftReceivedOverlay() {
   // Auto-dispensar depois de ~5.5s.
   useEffect(() => {
     if (!current) return;
+    playGiftChime();
     const t = window.setTimeout(() => setPhase("out"), 5000);
     const t2 = window.setTimeout(() => setCurrent(null), 5500);
     return () => {
