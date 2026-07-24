@@ -14,6 +14,8 @@ import {
   type ChangelogCategory,
 } from "@/lib/changelog-store";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
+import { RiotPatchBody } from "@/lib/patch-notes";
+
 
 export const Route = createFileRoute("/novidades/$id")({
   head: ({ params }) => ({
