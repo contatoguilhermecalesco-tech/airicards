@@ -141,8 +141,10 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
       style={BODY_FONT}
     >
       <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-[28px] border border-white/[0.06] bg-[#140c26] shadow-[0_40px_120px_-30px_rgba(109,92,255,0.35)] md:flex-row md:rounded-[32px]">
-        <BrandPanel compact />
-        <div className="hidden md:contents">
+        <div className="md:hidden">
+          <BrandPanel compact />
+        </div>
+        <div className="hidden md:flex md:w-5/12">
           <BrandPanel />
         </div>
 
