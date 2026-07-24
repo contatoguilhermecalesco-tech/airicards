@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, Volume2, Smartphone, Star, Moon, Bell, Play } from "lucide-react";
+import { useEffect } from "react";
+import { ChevronLeft, Volume2, Smartphone, Star, Moon, Bell, Play, Sparkles, ChevronRight } from "lucide-react";
 import {
   DEFAULT_PREFS,
   setPrefs,
@@ -8,6 +9,7 @@ import {
 } from "@/lib/notification-prefs";
 import { playChime, vibratePulse } from "@/lib/notification-sound";
 import { useCurrentProfile } from "@/lib/profile";
+import { initChangelog, useChangelogUnread } from "@/lib/changelog-store";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
