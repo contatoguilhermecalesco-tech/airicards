@@ -224,6 +224,16 @@ function PerfilPage() {
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
+  const [bioDraft, setBioDraft] = useState("");
+  const [editingBio, setEditingBio] = useState(false);
+  const [savingBio, setSavingBio] = useState(false);
+
+  useEffect(() => {
+    setBioDraft(wallet.bio ?? "");
+  }, [wallet.bio, wallet.profileId]);
+
+  const partner = profile ? PROFILES.find((p) => p.id !== profile.id) ?? null : null;
+
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
