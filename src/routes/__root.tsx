@@ -584,6 +584,7 @@ function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const ring = auraRingFromEquipped(wallet.equipped);
+  const auraProfile = auraProfileFromEquipped(wallet.equipped);
 
   useEffect(() => {
     if (!open) return;
