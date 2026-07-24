@@ -466,6 +466,27 @@ export function useReactionsForEvent(eventId: string): ActivityReaction[] {
   return useSocial((s) => s.reactions.filter((r) => r.eventId === eventId));
 }
 
+/** Timeline consolidada de um perfil (eventos + duelos + presentes). */
+export function useProfileTimeline(profileId: string | undefined) {
+  return useSocial((s) => {
+    if (!profileId) return { events: [], duels: [], gifts: [] };
+    return {
+      events: s.events.filter((e) => e.profileId === profileId),
+      duels: s.duels.filter(
+        (d) =>
+          d.status === "completed" &&
+          (d.createdBy === profileId ||
+            d.winner === profileId ||
+            d.forfeitBy === profileId ||
+            s.duelResults.some((r) => r.duelId === d.id && r.profileId === profileId)),
+      ),
+      gifts: s.gifts.filter(
+        (g) => g.fromProfile === profileId || g.toProfile === profileId,
+      ),
+    };
+  });
+}
+
 let lastEmit: { key: string; at: number } | null = null;
 export async function emitActivity(
   profileId: ProfileId,

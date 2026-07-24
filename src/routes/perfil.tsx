@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
   Briefcase,
+  Camera,
   Check,
   Crown,
   Flame,
@@ -21,6 +22,7 @@ import {
   Sun,
   Swords,
   Target,
+  Trash2,
   Trophy,
   UserRound,
   Zap,
@@ -34,10 +36,14 @@ import {
   unequipSlot,
   slotOf,
   setBio,
+  setAvatarUrl,
   type CosmeticSlot,
 } from "@/lib/wallet-store";
 import { listShopItems, type ShopItem } from "@/lib/shop";
 import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+import { useStreak } from "@/lib/flashcards-store";
+import { compressAvatarFile } from "@/lib/image-compress";
+import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -161,11 +167,13 @@ function DiscordAvatar({
   ring,
   showDecoration,
   initial = "G",
+  avatarUrl,
 }: {
   size: number;
   ring: string;
   showDecoration: boolean;
   initial?: string;
+  avatarUrl?: string;
 }) {
   const inner = size - (showDecoration ? 10 : 0);
   return (
@@ -190,16 +198,25 @@ function DiscordAvatar({
         </>
       )}
       <div
-        className="relative grid place-items-center rounded-full text-white font-semibold"
+        className="relative grid place-items-center overflow-hidden rounded-full text-white font-semibold"
         style={{
           width: inner,
           height: inner,
-          background: "linear-gradient(135deg,#5865f2 0%,#7c3aed 100%)",
+          background: avatarUrl ? "#000" : "linear-gradient(135deg,#5865f2 0%,#7c3aed 100%)",
           fontSize: inner * 0.42,
           boxShadow: showDecoration ? `0 0 12px ${ring}55` : "none",
         }}
       >
-        {initial}
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          initial
+        )}
       </div>
       <span
         className="absolute rounded-full border-2"
@@ -221,12 +238,53 @@ function PerfilPage() {
   const profile = useCurrentProfile();
   const wallet = useWallet();
   const rank = useRank();
+  const streak = useStreak();
   const [items, setItems] = useState<ShopItem[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const [bioDraft, setBioDraft] = useState("");
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Parallax suave — reagimos ao scroll do window.
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  async function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const dataUrl = await compressAvatarFile(file);
+      await setAvatarUrl(dataUrl);
+      setFlash("Foto atualizada.");
+      setTimeout(() => setFlash(null), 1600);
+    } catch (err) {
+      setFlash(err instanceof Error ? err.message : "Não foi possível ler a imagem.");
+      setTimeout(() => setFlash(null), 2200);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
+  async function onRemoveAvatar() {
+    if (!wallet.avatarUrl) return;
+    setUploadingAvatar(true);
+    try {
+      await setAvatarUrl("");
+      setFlash("Foto removida.");
+      setTimeout(() => setFlash(null), 1400);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   useEffect(() => {
     setBioDraft(wallet.bio ?? "");
@@ -296,6 +354,17 @@ function PerfilPage() {
   const initial = (profile?.name ?? "?").trim().charAt(0).toUpperCase() || "?";
   const handle = profile ? `${profile.name.toLowerCase().replace(/\s+/g, "")}.airi` : "";
 
+  const statusLabel = useMemo(() => {
+    const hour = new Date().getHours();
+    if (streak?.current && streak.current >= 1) {
+      return `Streak ${streak.current}d 🔥`;
+    }
+    if (hour >= 6 && hour < 12) return "Bom dia — pronto pra estudar";
+    if (hour >= 12 && hour < 18) return "Aprendendo airi ✨";
+    if (hour >= 18 && hour < 23) return "Foco da noite";
+    return "Modo coruja 🌙";
+  }, [streak?.current]);
+
   async function handleEquip(item: ShopItem) {
     if (busy) return;
     const k = keyOf(item);
@@ -333,22 +402,47 @@ function PerfilPage() {
         </div>
       )}
 
-      {/* ============ HERO (Discord-style big profile card) ============ */}
+      {/* ============ HERO (parallax + status) ============ */}
       <section
         className="relative overflow-hidden rounded-3xl border border-black/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
         style={{ background: "#232428" }}
       >
-        {/* Banner */}
+        {/* Banner com parallax suave (translateY em função do scroll) */}
         <div
-          className={`relative h-[160px] w-full overflow-hidden sm:h-[190px] ${
+          className={`relative h-[190px] w-full overflow-hidden sm:h-[220px] ${
             showBanner ? "cosmetic-banner-animated" : ""
           }`}
-          style={{
-            background: showBanner
-              ? heroPalette.gradient
-              : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
-          }}
+          style={{ background: "#1a1b1e" }}
         >
+          <div
+            aria-hidden
+            className="absolute inset-0 will-change-transform"
+            style={{
+              background: showBanner
+                ? heroPalette.gradient
+                : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
+              transform: `translate3d(0, ${scrollY * 0.35}px, 0) scale(${1 + Math.min(scrollY, 300) * 0.0006})`,
+            }}
+          />
+          {/* orbes de profundidade — reagem em direção oposta */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -left-16 -top-10 h-64 w-64 rounded-full opacity-70 will-change-transform"
+            style={{
+              background: `radial-gradient(circle, ${heroPalette.ring}66, transparent 65%)`,
+              filter: "blur(30px)",
+              transform: `translate3d(0, ${scrollY * -0.15}px, 0)`,
+            }}
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full opacity-60 will-change-transform"
+            style={{
+              background: `radial-gradient(circle, ${decorationPalette.ring}55, transparent 65%)`,
+              filter: "blur(24px)",
+              transform: `translate3d(0, ${scrollY * -0.08}px, 0)`,
+            }}
+          />
           {showBanner && (
             <span
               aria-hidden
@@ -361,13 +455,6 @@ function PerfilPage() {
           )}
           {effect && (
             <>
-              <span
-                className="cosmetic-glow-pulse pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.28), transparent 40%), radial-gradient(circle at 80% 60%, rgba(255,255,255,0.2), transparent 45%)",
-                }}
-              />
               <span
                 aria-hidden
                 className="cosmetic-sparkle pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-white"
@@ -386,27 +473,80 @@ function PerfilPage() {
             </>
           )}
           <span
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
-            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)" }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 60%, transparent)",
+            }}
           />
+
+          {/* Status pill flutuante (top-right) */}
+          <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 backdrop-blur-md">
+            <span
+              className="relative inline-flex h-1.5 w-1.5"
+              aria-hidden
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-white/90">
+              {statusLabel}
+            </span>
+          </div>
         </div>
 
-        {/* Avatar */}
+        {/* Avatar + upload */}
         <div className="relative px-5 sm:px-6">
           <div
-            className={`absolute -top-[54px] left-5 rounded-full sm:left-6 ${
+            className={`group absolute -top-[60px] left-5 rounded-full sm:left-6 ${
               showDecoration ? "cosmetic-avatar-float" : ""
             }`}
-            style={{ padding: 6, background: "#232428" }}
+            style={{
+              padding: 6,
+              background: "#232428",
+              boxShadow: `0 12px 30px -8px ${decorationPalette.ring}55`,
+            }}
           >
             <DiscordAvatar
-              size={104}
+              size={112}
               ring={decorationPalette.ring}
               showDecoration={showDecoration}
               initial={initial}
+              avatarUrl={wallet.avatarUrl || undefined}
             />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingAvatar}
+              aria-label="Trocar foto de perfil"
+              className="absolute inset-[6px] grid place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100 focus:opacity-100 disabled:opacity-40"
+            >
+              <span className="flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ring-1 ring-white/20">
+                <Camera className="h-3 w-3" strokeWidth={2.5} />
+                {uploadingAvatar ? "Enviando…" : wallet.avatarUrl ? "Trocar" : "Foto"}
+              </span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={onPickAvatar}
+            />
+            {wallet.avatarUrl && (
+              <button
+                type="button"
+                onClick={onRemoveAvatar}
+                disabled={uploadingAvatar}
+                aria-label="Remover foto"
+                className="absolute -right-1 -top-1 grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/70 text-white shadow-lg backdrop-blur transition hover:bg-red-500/80 disabled:opacity-40"
+              >
+                <Trash2 className="h-3 w-3" strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         </div>
+
 
         {/* Info */}
         <div className="px-5 pb-5 pt-14 sm:px-6 sm:pb-6 sm:pt-16">
@@ -664,6 +804,23 @@ function PerfilPage() {
           })}
         </ul>
       </section>
+
+      {/* ============ ACTIVITY TIMELINE ============ */}
+      {profile && (
+        <section className="mt-6">
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <h2 className="text-[18px] font-semibold tracking-tight text-foreground sm:text-[20px]">
+                Atividade recente
+              </h2>
+              <p className="mt-0.5 text-[12px] text-muted-foreground">
+                Linha do tempo dos seus últimos passos no airi.
+              </p>
+            </div>
+          </div>
+          <ProfileActivityFeed profileId={profile.id} />
+        </section>
+      )}
 
       {/* ============ PARTNER LINK ============ */}
       {partner && (
