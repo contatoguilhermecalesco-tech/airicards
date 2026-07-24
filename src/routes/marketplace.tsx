@@ -254,7 +254,7 @@ function MarketplacePage() {
                   ) : (
                     <button
                       onClick={() => handleImport(row)}
-                      disabled={isImporting}
+                      disabled={isImporting || !profile}
                       className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-50"
                     >
                       {isImporting ? (
