@@ -300,6 +300,7 @@ function ShopPage() {
                   canAfford={wallet.crystals >= it.price}
                   busy={busy === it.id}
                   onBuy={() => handleBuyItem(it)}
+                  onPreview={it.kind === "cosmetic" ? () => setPreview(it) : undefined}
                 />
               );
             })}
