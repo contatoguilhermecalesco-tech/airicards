@@ -95,7 +95,7 @@ export async function findPublishedDeck(
     .eq("slug", slug)
     .maybeSingle();
   if (error) return null;
-  return (data as PublishedDeckRow | null) ?? null;
+  return (data as unknown as PublishedDeckRow | null) ?? null;
 }
 
 export async function listPublishedDecks(): Promise<PublishedDeckRow[]> {
@@ -106,7 +106,7 @@ export async function listPublishedDecks(): Promise<PublishedDeckRow[]> {
     .order("created_at", { ascending: false })
     .limit(120);
   if (error || !data) return [];
-  return data as PublishedDeckRow[];
+  return data as unknown as PublishedDeckRow[];
 }
 
 /** Incrementa curtidas atomicamente via read+update (RLS permissiva). */
