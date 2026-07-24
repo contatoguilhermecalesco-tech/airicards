@@ -2,15 +2,28 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  BookOpen,
   Briefcase,
   Check,
   Crown,
+  Flame,
   Gem,
+  Gift,
+  Heart,
+  HelpCircle,
+  Moon,
+  Palette,
   Plane,
   Plus,
   ShoppingBag,
   Shield,
   Sparkles,
+  Star,
+  Sun,
+  Swords,
+  Target,
+  Trophy,
+  X,
   Zap,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
@@ -26,16 +39,16 @@ import { listPublishedDecks, type PublishedDeckRow } from "@/lib/marketplace";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Loja airi — Cristais ✦" },
+      { title: "Loja airi — Lumens ✦" },
       {
         name: "description",
         content:
-          "Troque Cristais airi por decks premium, packs temáticos, cosméticos e power-ups. Ganhe cristais mantendo streak, subindo de rank e vencendo duelos.",
+          "Troque Lumens por decks premium, packs temáticos, cosméticos e power-ups. Ganhe Lumens mantendo streak, subindo de rank e vencendo duelos.",
       },
-      { property: "og:title", content: "Loja airi — Cristais ✦" },
+      { property: "og:title", content: "Loja airi — Lumens ✦" },
       {
         property: "og:description",
-        content: "Cristais airi: a economia do seu inglês.",
+        content: "Lumens: a economia do seu inglês.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -61,6 +74,17 @@ const ICONS: Record<string, React.ComponentType<{ className?: string; strokeWidt
   shield: Shield,
   zap: Zap,
   plus: Plus,
+  palette: Palette,
+  flame: Flame,
+  moon: Moon,
+  sun: Sun,
+  book: BookOpen,
+  swords: Swords,
+  star: Star,
+  target: Target,
+  trophy: Trophy,
+  heart: Heart,
+  gift: Gift,
 };
 
 const ACCENTS: Record<string, string> = {
@@ -81,6 +105,7 @@ function ShopPage() {
   const [decks, setDecks] = useState<PublishedDeckRow[] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
     if (profile) void loadWallet(profile.id);
@@ -89,6 +114,15 @@ function ShopPage() {
   useEffect(() => {
     listShopItems().then(setItems);
     listPublishedDecks().then(setDecks);
+  }, []);
+
+  // Auto-abre o guia na primeira visita
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!localStorage.getItem("airi.shop.helpSeen")) {
+      setHelpOpen(true);
+      localStorage.setItem("airi.shop.helpSeen", "1");
+    }
   }, []);
 
   const filteredItems = useMemo(
@@ -116,7 +150,7 @@ function ShopPage() {
       toast(
         "err",
         r.reason === "insufficient"
-          ? "Cristais insuficientes."
+          ? "Lumens insuficientes."
           : r.reason === "already_owned"
             ? "Você já tem este item."
             : "Não foi possível comprar.",
@@ -134,7 +168,7 @@ function ShopPage() {
     } else {
       toast(
         "err",
-        r.reason === "insufficient" ? "Cristais insuficientes." : "Não foi possível comprar.",
+        r.reason === "insufficient" ? "Lumens insuficientes." : "Não foi possível comprar.",
       );
     }
   }
@@ -158,12 +192,19 @@ function ShopPage() {
               Loja airi
             </p>
             <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Troque Cristais por conquistas
+              Troque Lumens por conquistas
             </h1>
             <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-              Ganhe Cristais airi mantendo streak, subindo de rank e vencendo duelos. Gaste em
-              decks premium, packs, cosméticos e power-ups.
+              Ganhe Lumens ✦ mantendo streak, subindo de rank e vencendo duelos. Gaste em decks
+              premium, packs, cosméticos e power-ups.
             </p>
+            <button
+              onClick={() => setHelpOpen(true)}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-foreground/90 backdrop-blur transition hover:bg-white/[0.09]"
+            >
+              <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
+              Como funciona a loja?
+            </button>
           </div>
           <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
             <Gem className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
@@ -173,7 +214,7 @@ function ShopPage() {
               </p>
               <p className="text-lg font-semibold tabular-nums">
                 {wallet.crystals}{" "}
-                <span className="text-[11px] font-medium text-muted-foreground">✦</span>
+                <span className="text-[11px] font-medium text-muted-foreground">Lumens ✦</span>
               </p>
             </div>
           </div>
@@ -264,10 +305,195 @@ function ShopPage() {
       </section>
 
       <p className="mt-8 text-center text-[11px] text-muted-foreground">
-        Como ganhar Cristais? Streak diário, subir de rank, vencer duelos, tirar boas notas na
-        prova mensal.
+        Como ganhar Lumens? Streak diário, subir de rank, vencer duelos, tirar boas notas na prova
+        mensal.
       </p>
+
+      {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
     </main>
+  );
+}
+
+function HelpDialog({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-[oklch(0.14_0.02_285)] shadow-2xl"
+      >
+        <div className="relative overflow-hidden bg-gradient-to-br from-violet-500/25 via-fuchsia-500/15 to-indigo-500/25 px-6 pt-6 pb-5">
+          <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-violet-500/30 blur-3xl" />
+          <button
+            onClick={onClose}
+            className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-foreground/70 hover:bg-white/10 hover:text-foreground"
+            aria-label="Fechar"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-200">
+            <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Lumens ✦
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">Como funciona a Loja</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sua consistência em inglês vira Lumens. Gaste em decks, cosméticos e power-ups.
+          </p>
+        </div>
+
+        <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
+          <Section title="1 · Como ganhar Lumens" tone="violet">
+            <RewardRow
+              icon={<Flame className="h-4 w-4" strokeWidth={2.5} />}
+              label="Streak diário"
+              value="+20 base + 5 por dia"
+              hint="Estudou hoje? Recebe. Cada dia extra vale mais."
+              accent="amber"
+            />
+            <RewardRow
+              icon={<Trophy className="h-4 w-4" strokeWidth={2.5} />}
+              label="Subir divisão de rank"
+              value="+60 ✦"
+              accent="sky"
+            />
+            <RewardRow
+              icon={<Crown className="h-4 w-4" strokeWidth={2.5} />}
+              label="Subir de tier"
+              value="+200 ✦"
+              hint="Bronze → Prata, Prata → Ouro, etc."
+              accent="violet"
+            />
+            <RewardRow
+              icon={<Swords className="h-4 w-4" strokeWidth={2.5} />}
+              label="Vitória em duelo"
+              value="+40 ✦"
+              accent="pink"
+            />
+            <RewardRow
+              icon={<Star className="h-4 w-4" strokeWidth={2.5} />}
+              label="Prova mensal"
+              value="+120 a +160 ✦"
+              hint="Quanto melhor a nota, mais Lumens."
+              accent="emerald"
+            />
+          </Section>
+
+          <Section title="2 · O que você pode comprar" tone="pink">
+            <Tile
+              icon={<BookOpen className="h-4 w-4" strokeWidth={2.5} />}
+              title="Decks premium"
+              text="Decks curados da comunidade e da equipe airi. Prontos para estudar."
+            />
+            <Tile
+              icon={<Palette className="h-4 w-4" strokeWidth={2.5} />}
+              title="Cosméticos"
+              text="Molduras de deck, emblemas de perfil e auras — sem impacto no aprendizado, só estilo."
+            />
+            <Tile
+              icon={<Shield className="h-4 w-4" strokeWidth={2.5} />}
+              title="Power-ups"
+              text="Escudo de streak, congelamento inimigo, boost de revisão e Dobrador de Lumens."
+            />
+          </Section>
+
+          <Section title="3 · Boas práticas" tone="emerald">
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li>• Cosméticos são permanentes: comprou uma vez, é seu.</li>
+              <li>• Power-ups são consumíveis e empilham no inventário.</li>
+              <li>• Decks comprados viram cópias na sua biblioteca — edite à vontade.</li>
+              <li>• Você começa com 150 ✦ de boas-vindas.</li>
+            </ul>
+          </Section>
+        </div>
+
+        <div className="border-t border-white/10 bg-black/20 px-6 py-4">
+          <button
+            onClick={onClose}
+            className="w-full rounded-full bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95"
+          >
+            Entendi, bora comprar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  tone,
+  children,
+}: {
+  title: string;
+  tone: "violet" | "pink" | "emerald";
+  children: React.ReactNode;
+}) {
+  const dot =
+    tone === "violet" ? "bg-violet-400" : tone === "pink" ? "bg-pink-400" : "bg-emerald-400";
+  return (
+    <div>
+      <h3 className="mb-2 inline-flex items-center gap-2 text-[13px] font-semibold text-foreground">
+        <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+        {title}
+      </h3>
+      <div className="space-y-1.5">{children}</div>
+    </div>
+  );
+}
+
+function RewardRow({
+  icon,
+  label,
+  value,
+  hint,
+  accent,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  hint?: string;
+  accent: keyof typeof ACCENTS;
+}) {
+  const acc = ACCENTS[accent] ?? ACCENTS.lavender;
+  return (
+    <div
+      className={`flex items-start justify-between gap-3 rounded-2xl border bg-gradient-to-br p-3 ${acc}`}
+    >
+      <div className="flex items-start gap-2.5">
+        <div className="grid h-8 w-8 place-items-center rounded-xl bg-white/10 ring-1 ring-white/10">
+          {icon}
+        </div>
+        <div className="leading-tight">
+          <p className="text-sm font-semibold text-foreground">{label}</p>
+          {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+        </div>
+      </div>
+      <span className="shrink-0 text-sm font-semibold tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+function Tile({
+  icon,
+  title,
+  text,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="flex items-start gap-2.5 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/10 ring-1 ring-white/10">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-semibold">{title}</p>
+        <p className="text-[12px] text-muted-foreground">{text}</p>
+      </div>
+    </div>
   );
 }
 
@@ -320,7 +546,7 @@ function DeckCard({
           ) : canAfford ? (
             "Comprar"
           ) : (
-            "Sem cristais"
+            "Sem Lumens"
           )}
         </button>
       </div>
@@ -383,7 +609,7 @@ function ItemCard({
           ) : canAfford ? (
             "Comprar"
           ) : (
-            "Sem cristais"
+            "Sem Lumens"
           )}
         </button>
       </div>
