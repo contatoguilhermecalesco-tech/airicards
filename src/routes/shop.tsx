@@ -314,6 +314,7 @@ function ShopPage() {
       </p>
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
+      {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
     </main>
   );
 }
