@@ -393,7 +393,7 @@ function DeckDetail() {
             </p>
             <h3 className="mt-1 text-lg font-semibold">Defina um preço</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Deixe em <b>0</b> para publicar gratuitamente. Compradores pagam em Cristais airi ✦.
+              Deixe em <b>0</b> para publicar gratuitamente. Compradores pagam em Lumens ✦.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {[0, 50, 100, 200, 400].map((v) => (

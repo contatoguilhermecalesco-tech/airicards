@@ -213,7 +213,7 @@ const MORE_ITEMS = [
   {
     to: "/shop",
     label: "Loja",
-    description: "Cristais airi ✦, decks, packs e mais",
+    description: "Lumens ✦, decks, packs e mais",
     icon: ShoppingBag,
     color: "#c084fc",
     matcher: (p: string) => p.startsWith("/shop"),
