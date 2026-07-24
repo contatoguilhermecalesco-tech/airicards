@@ -225,6 +225,14 @@ function RankPill() {
 
 const MORE_ITEMS = [
   {
+    to: "/perfil",
+    label: "Meu perfil",
+    description: "Cosméticos equipados e vitrine",
+    icon: UserRound,
+    color: "#a78bfa",
+    matcher: (p: string) => p.startsWith("/perfil"),
+  },
+  {
     to: "/shop",
     label: "Loja",
     description: "Arlys ✦, decks, packs e mais",
