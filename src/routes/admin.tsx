@@ -13,15 +13,19 @@ import {
   Sparkles,
   Tag as TagIcon,
   Trash2,
+  Pencil,
+  X,
   Wand2,
   Wrench,
 } from "lucide-react";
 import {
   createChangelogEntry,
+  updateChangelogEntry,
   deleteChangelogEntry,
   initChangelog,
   useChangelog,
   type ChangelogCategory,
+  type ChangelogEntry,
 } from "@/lib/changelog-store";
 import { generateChangelogEntry } from "@/lib/changelog-ai.functions";
 import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
@@ -1070,6 +1074,34 @@ function ChangelogSection() {
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const isEditing = editingId !== null;
+
+  function resetForm() {
+    setTitle("");
+    setBody("");
+    setNotes("");
+    setIdea("");
+    setIconKey("");
+    setEditingId(null);
+    setErr(null);
+  }
+
+  function startEditing(entry: ChangelogEntry) {
+    setEditingId(entry.id);
+    setTitle(entry.title);
+    setBody(entry.body);
+    setNotes(entry.notes ?? "");
+    setCategory(entry.category);
+    setIconKey((entry.icon as NotificationIconKey | null) ?? "");
+    setIdea("");
+    setErr(null);
+    setOk(null);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
 
   const activeMeta =
     CHANGELOG_CATEGORIES.find((c) => c.key === category) ?? CHANGELOG_CATEGORIES[0];
@@ -1096,19 +1128,27 @@ function ChangelogSection() {
     setErr(null);
     setOk(null);
     try {
-      await createChangelogEntry({
-        title,
-        body,
-        notes: notes.trim() || null,
-        category,
-        icon: iconKey || null,
-      });
-      setTitle("");
-      setBody("");
-      setNotes("");
-      setIdea("");
-      setIconKey("");
-      setOk("Novidade publicada.");
+      if (editingId) {
+        await updateChangelogEntry(editingId, {
+          title,
+          body,
+          notes: notes.trim() || null,
+          category,
+          icon: iconKey || null,
+        });
+        resetForm();
+        setOk("Patch atualizado.");
+      } else {
+        await createChangelogEntry({
+          title,
+          body,
+          notes: notes.trim() || null,
+          category,
+          icon: iconKey || null,
+        });
+        resetForm();
+        setOk("Novidade publicada.");
+      }
       setTimeout(() => setOk(null), 3000);
     } catch (e) {
       setErr((e as Error).message);
@@ -1128,12 +1168,25 @@ function ChangelogSection() {
     <section className="space-y-4">
       {/* Editorial header — same language as /novidades */}
       <div className="flex items-center gap-3">
-        <span className="h-4 w-1 rounded-sm bg-primary" />
+        <span
+          className="h-4 w-1 rounded-sm"
+          style={{ backgroundColor: isEditing ? activeMeta.color : undefined }}
+        />
         <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
-          Publicar patch notes
+          {isEditing ? "Editando patch" : "Publicar patch notes"}
         </h2>
         <div className="h-px flex-1 bg-white/[0.06]" />
+        {isEditing && (
+          <button
+            onClick={resetForm}
+            className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.2em] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground"
+          >
+            <X className="h-3 w-3" strokeWidth={2.5} />
+            Cancelar
+          </button>
+        )}
       </div>
+
 
       {/* LIVE PREVIEW — mirrors the /novidades hero */}
       <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#0a0a0f]">
@@ -1461,10 +1514,12 @@ function ChangelogSection() {
           >
             {sendBusy ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
+            ) : isEditing ? (
+              <Pencil className="h-3.5 w-3.5" strokeWidth={2.5} />
             ) : (
               <Send className="h-3.5 w-3.5" strokeWidth={2.5} />
             )}
-            Publicar patch
+            {isEditing ? "Salvar edição" : "Publicar patch"}
           </button>
         </div>
       </div>
@@ -1544,13 +1599,30 @@ function ChangelogSection() {
                       {n.body}
                     </p>
                   </div>
-                  <button
-                    onClick={() => void deleteChangelogEntry(n.id)}
-                    className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-red-400"
-                    aria-label="Excluir"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
-                  </button>
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      onClick={() => startEditing(n)}
+                      className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-primary"
+                      aria-label="Editar"
+                      style={
+                        editingId === n.id
+                          ? { color: meta.color, backgroundColor: `${meta.color}1a` }
+                          : undefined
+                      }
+                    >
+                      <Pencil className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (editingId === n.id) resetForm();
+                        void deleteChangelogEntry(n.id);
+                      }}
+                      className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-red-400"
+                      aria-label="Excluir"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    </button>
+                  </div>
                 </li>
               );
             })}
