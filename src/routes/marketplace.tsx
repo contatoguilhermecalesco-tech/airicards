@@ -44,12 +44,18 @@ export const Route = createFileRoute("/marketplace")({
 
 function MarketplacePage() {
   const profile = useCurrentProfile();
+  const wallet = useWallet();
   const [decks, setDecks] = useState<PublishedDeckRow[] | null>(null);
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | "mine">("all");
   const [importing, setImporting] = useState<string | null>(null);
   const [imported, setImported] = useState<Record<string, string>>({});
   const [liked, setLiked] = useState<Record<string, number>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile) void loadWallet(profile.id);
+  }, [profile?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -76,15 +82,20 @@ function MarketplacePage() {
   }, [decks, q, filter, profile]);
 
   async function handleImport(row: PublishedDeckRow) {
-    if (importing) return;
+    if (importing || !profile) return;
     setImporting(row.id);
-    try {
-      const newDeckId = await importPublishedDeck(row);
-      setImported((s) => ({ ...s, [row.id]: newDeckId }));
-    } catch {
-      /* ignore */
-    } finally {
-      setImporting(null);
+    setError(null);
+    const r = await buyPublishedDeck(profile.id, row);
+    setImporting(null);
+    if (r.ok && r.deckId) {
+      setImported((s) => ({ ...s, [row.id]: r.deckId! }));
+    } else if (!r.ok) {
+      setError(
+        r.reason === "insufficient"
+          ? `Você precisa de ${row.price} ✦ para este deck.`
+          : "Não foi possível adquirir o deck.",
+      );
+      setTimeout(() => setError(null), 2500);
     }
   }
 
