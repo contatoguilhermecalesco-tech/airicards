@@ -457,6 +457,11 @@ export function useActivityFeed(otherId: ProfileId | undefined, limit = 8): Acti
   );
 }
 
+/** Feed unificado — eventos dos dois perfis, mais recentes primeiro. */
+export function useUnifiedFeed(limit = 30): ActivityEvent[] {
+  return useSocial((s) => s.events.slice(0, limit));
+}
+
 export function useReactionsForEvent(eventId: string): ActivityReaction[] {
   return useSocial((s) => s.reactions.filter((r) => r.eventId === eventId));
 }

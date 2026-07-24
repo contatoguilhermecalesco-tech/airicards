@@ -22,6 +22,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
 import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
@@ -106,6 +107,11 @@ const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SocialStatsRoute = SocialStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
+  getParentRoute: () => SocialRoute,
 } as any)
 const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   id: '/library/$deckId',
@@ -218,8 +224,9 @@ export interface FileRoutesByFullPath {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
@@ -252,8 +259,9 @@ export interface FileRoutesByTo {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/social/stats': typeof SocialStatsRoute
   '/library': typeof LibraryIndexRoute
   '/study': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
@@ -283,8 +291,9 @@ export interface FileRoutesById {
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/library/$deckId': typeof LibraryDeckIdRoute
+  '/social/stats': typeof SocialStatsRoute
   '/library/': typeof LibraryIndexRoute
   '/study/': typeof StudyIndexRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
@@ -321,6 +330,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
+    | '/social/stats'
     | '/library/'
     | '/study/'
     | '/deck/$owner/$slug'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
+    | '/social/stats'
     | '/library'
     | '/study'
     | '/deck/$owner/$slug'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/library/$deckId'
+    | '/social/stats'
     | '/library/'
     | '/study/'
     | '/deck/$owner/$slug'
@@ -418,7 +430,7 @@ export interface RootRouteChildren {
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SocialRoute: typeof SocialRoute
+  SocialRoute: typeof SocialRouteWithChildren
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
@@ -526,6 +538,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/library/'
       preLoaderRoute: typeof LibraryIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/social/stats': {
+      id: '/social/stats'
+      path: '/stats'
+      fullPath: '/social/stats'
+      preLoaderRoute: typeof SocialStatsRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/library/$deckId': {
       id: '/library/$deckId'
@@ -663,6 +682,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface SocialRouteChildren {
+  SocialStatsRoute: typeof SocialStatsRoute
+}
+
+const SocialRouteChildren: SocialRouteChildren = {
+  SocialStatsRoute: SocialStatsRoute,
+}
+
+const SocialRouteWithChildren =
+  SocialRoute._addFileChildren(SocialRouteChildren)
+
 interface StudyListeningHistoryRouteChildren {
   StudyListeningHistoryIdRoute: typeof StudyListeningHistoryIdRoute
   StudyListeningHistoryIndexRoute: typeof StudyListeningHistoryIndexRoute
@@ -728,7 +758,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SocialRoute: SocialRoute,
+  SocialRoute: SocialRouteWithChildren,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
