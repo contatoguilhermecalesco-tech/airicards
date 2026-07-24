@@ -74,6 +74,7 @@ export function GiftReceivedOverlay() {
   // Auto-dispensar depois de ~5.5s.
   useEffect(() => {
     if (!current) return;
+    playGiftChime();
     const t = window.setTimeout(() => setPhase("out"), 5000);
     const t2 = window.setTimeout(() => setCurrent(null), 5500);
     return () => {
