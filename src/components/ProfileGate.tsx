@@ -483,13 +483,15 @@ function ProfileLoading({ profile }: { profile: Profile }) {
     >
       <div className="flex w-full max-w-sm flex-col items-center">
         <Logo size="md" />
-        <span
-          aria-hidden
-          className="mt-10 grid h-16 w-16 place-items-center rounded-full text-xl font-semibold text-white"
-          style={{ backgroundImage: profile.gradient, ...HEADING_FONT }}
-        >
-          {profile.name.charAt(0).toUpperCase()}
-        </span>
+        <div className="mt-10">
+          <ProfileAvatar
+            profileId={profile.id}
+            initial={profile.name.charAt(0).toUpperCase()}
+            gradient={profile.gradient}
+            size={64}
+            fontScale={0.32}
+          />
+        </div>
         <div className="mt-6 h-[2px] w-32 overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full w-1/3 rounded-full bg-white/70"
