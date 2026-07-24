@@ -1599,13 +1599,30 @@ function ChangelogSection() {
                       {n.body}
                     </p>
                   </div>
-                  <button
-                    onClick={() => void deleteChangelogEntry(n.id)}
-                    className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-red-400"
-                    aria-label="Excluir"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
-                  </button>
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      onClick={() => startEditing(n)}
+                      className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-primary"
+                      aria-label="Editar"
+                      style={
+                        editingId === n.id
+                          ? { color: meta.color, backgroundColor: `${meta.color}1a` }
+                          : undefined
+                      }
+                    >
+                      <Pencil className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (editingId === n.id) resetForm();
+                        void deleteChangelogEntry(n.id);
+                      }}
+                      className="rounded-full p-1.5 text-foreground/40 transition hover:bg-white/[0.06] hover:text-red-400"
+                      aria-label="Excluir"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    </button>
+                  </div>
                 </li>
               );
             })}
