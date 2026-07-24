@@ -354,7 +354,8 @@ export function createCard(
 export function deleteCard(id: string) {
   state = { ...state, cards: state.cards.filter((c) => c.id !== id) };
   emit();
-  scheduleSave();
+  // Persistência imediata — evita eco/pull que "traz" a carta de volta.
+  void flushSave();
 }
 
 export function updateCard(
