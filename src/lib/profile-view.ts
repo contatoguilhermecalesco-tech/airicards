@@ -68,7 +68,7 @@ export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSn
   return {
     profileId,
     wallet,
-    rank: d.rank_state ?? null,
+    rank: d.rank ?? null,
     streak: d.home_sessions?.streak ?? null,
     cardsTotal: cards.length,
     mastered,
