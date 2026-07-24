@@ -139,8 +139,18 @@ function emitHome() {
 // --- Cloud sync -------------------------------------------------------
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+// Timestamp da nossa última escrita bem-sucedida. Realtime devolve nossos
+// próprios writes; se puxarmos o remoto durante esse eco enquanto ainda há
+// mutações locais em curso, o item deletado "volta" na UI. Ignoramos pulls
+// dentro de uma janela curta após o save local.
+let lastLocalSaveAt = 0;
+const REMOTE_ECHO_WINDOW_MS = 2000;
 
-async function pullFromCloud(profileId: string) {
+async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
+  if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
+    // É provavelmente o eco do nosso próprio save — ignora.
+    return;
+  }
   const { data, error } = await supabase
     .from("profile_data")
     .select("data, home_sessions")
@@ -162,39 +172,7 @@ async function pullFromCloud(profileId: string) {
   }
 }
 
-function scheduleSave() {
-  if (!activeProfile || !isBrowser()) return;
-  const profileId = activeProfile;
-  saveCache(profileId, state, home);
-  if (saveTimer) clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    const { error } = await supabase
-      .from("profile_data")
-      .upsert(
-        {
-          profile_id: profileId,
-          data: state as never,
-          home_sessions: home as never,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "profile_id" },
-      );
-    if (error) console.error("[airi] save failed", error);
-  }, 400);
-}
-
-/**
- * Força a persistência imediata do estado atual em profile_data, sem esperar
- * o debounce. Útil em operações críticas (ex.: compra de deck) onde precisamos
- * garantir que a mudança ficou salva antes de navegar ou notificar o usuário.
- */
-export async function flushSave(): Promise<void> {
-  if (!activeProfile || !isBrowser()) return;
-  const profileId = activeProfile;
-  if (saveTimer) {
-    clearTimeout(saveTimer);
-    saveTimer = null;
-  }
+async function persistNow(profileId: string) {
   saveCache(profileId, state, home);
   const { error } = await supabase
     .from("profile_data")
@@ -207,7 +185,39 @@ export async function flushSave(): Promise<void> {
       },
       { onConflict: "profile_id" },
     );
-  if (error) console.error("[airi] flush save failed", error);
+  if (error) {
+    console.error("[airi] save failed", error);
+    return;
+  }
+  lastLocalSaveAt = Date.now();
+}
+
+function scheduleSave() {
+  if (!activeProfile || !isBrowser()) return;
+  const profileId = activeProfile;
+  saveCache(profileId, state, home);
+  if (saveTimer) clearTimeout(saveTimer);
+  // Debounce curto — mutações UI (delete/edit) sentem-se instantâneas mas
+  // ainda agrupamos escritas em rajada (ex.: revisão sequencial).
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    void persistNow(profileId);
+  }, 150);
+}
+
+/**
+ * Força a persistência imediata do estado atual em profile_data, sem esperar
+ * o debounce. Útil em operações críticas (delete, compra de deck, import)
+ * onde precisamos garantir que a mudança ficou salva antes de qualquer pull.
+ */
+export async function flushSave(): Promise<void> {
+  if (!activeProfile || !isBrowser()) return;
+  const profileId = activeProfile;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  await persistNow(profileId);
 }
 
 export function setActiveProfileId(profileId: string | null) {
