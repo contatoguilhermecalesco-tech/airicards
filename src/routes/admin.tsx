@@ -1,3 +1,4 @@
+import { ArlysIcon } from "@/components/StatChip";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
@@ -1789,7 +1790,7 @@ import {
   type AdminDuelRow,
 } from "@/lib/admin-actions";
 import { loadWallet, currentProfileForWallet } from "@/lib/wallet-store";
-import { Gem, Minus, X as XIcon, Trophy } from "lucide-react";
+import { Minus, X as XIcon, Trophy } from "lucide-react";
 
 const QUICK_GRANTS = [50, 100, 250, 500, 1000];
 
@@ -1848,7 +1849,7 @@ function ArlysAdminSection() {
     <section className="ios-card rounded-3xl p-4 sm:p-5">
       <div className="mb-3 flex items-center gap-2">
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-300">
-          <Gem className="h-4 w-4" strokeWidth={2.25} />
+          <ArlysIcon className="h-4 w-4" strokeWidth={2.25} />
         </span>
         <div>
           <h2 className="text-sm font-semibold">Arlys ✦</h2>

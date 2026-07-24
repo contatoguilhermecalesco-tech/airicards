@@ -1,3 +1,4 @@
+import { ArlysIcon } from "@/components/StatChip";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -6,7 +7,7 @@ import {
   Check,
   Compass,
   Download,
-  Gem,
+
   Heart,
   Search,
   ShoppingBag,
@@ -132,7 +133,7 @@ function MarketplacePage() {
         </div>
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-400/30 bg-violet-500/10 px-3 py-1.5 text-xs font-semibold text-violet-200">
-            <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
+            <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
             {wallet.crystals} ✦
           </div>
           <Link
@@ -238,7 +239,7 @@ function MarketplacePage() {
                     </button>
                     {row.price > 0 && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-200">
-                        <Gem className="h-3 w-3" strokeWidth={2.5} />
+                        <ArlysIcon className="h-3 w-3" strokeWidth={2.5} />
                         {row.price}
                       </span>
                     )}
@@ -268,7 +269,7 @@ function MarketplacePage() {
                         <>
                           {row.price > 0 ? (
                             <>
-                              <Gem className="h-3.5 w-3.5" strokeWidth={2.75} />
+                              <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.75} />
                               Comprar · {row.price} ✦
                             </>
                           ) : (

@@ -1,3 +1,4 @@
+import { ArlysIcon } from "@/components/StatChip";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -8,7 +9,7 @@ import {
   Crown,
   Eye,
   Flame,
-  Gem,
+
   Gift,
   Heart,
   HelpCircle,
@@ -220,7 +221,7 @@ function ShopPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur">
-            <Gem className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
+            <ArlysIcon className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
             <div className="leading-tight">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Saldo
@@ -358,7 +359,7 @@ function HelpDialog({ onClose }: { onClose: () => void }) {
             <X className="h-4 w-4" />
           </button>
           <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-200">
-            <Gem className="h-3.5 w-3.5" strokeWidth={2.5} />
+            <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
             Arlys ✦
           </p>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">Como funciona a Loja</h2>
@@ -552,7 +553,7 @@ function DeckCard({
       </p>
       <div className="mt-4 flex items-center justify-between">
         <span className="inline-flex items-center gap-1 text-base font-semibold text-violet-200">
-          <Gem className="h-4 w-4" strokeWidth={2.25} />
+          <ArlysIcon className="h-4 w-4" strokeWidth={2.25} />
           {deck.price}{" "}
           <span className="text-[11px] font-medium text-muted-foreground">Arlys ✦</span>
         </span>
@@ -627,7 +628,7 @@ function ItemCard({
       )}
       <div className="mt-4 flex items-center justify-between">
         <span className="inline-flex items-center gap-1 text-base font-semibold">
-          <Gem className="h-4 w-4" strokeWidth={2.25} />
+          <ArlysIcon className="h-4 w-4" strokeWidth={2.25} />
           {item.price}{" "}
           <span className="text-[11px] font-medium text-muted-foreground">Arlys ✦</span>
         </span>
@@ -930,7 +931,7 @@ function CosmeticCard({
 
       <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/5 pt-3">
         <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
-          <Gem className="h-3.5 w-3.5 text-violet-300" strokeWidth={2.5} />
+          <ArlysIcon className="h-3.5 w-3.5 text-violet-300" strokeWidth={2.5} />
           {item.price}
           <span className="text-[10px] font-medium text-white/40">Arlys ✦</span>
         </span>
@@ -1122,7 +1123,7 @@ function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => voi
           style={{ borderColor: "#1a1b1e", background: "#2b2d31" }}
         >
           <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
-            <Gem className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
+            <ArlysIcon className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
             {item.price}
             <span className="text-[11px] font-medium text-white/50">Arlys ✦</span>
           </span>
