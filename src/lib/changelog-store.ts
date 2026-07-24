@@ -9,6 +9,7 @@ export type ChangelogEntry = {
   id: string;
   title: string;
   body: string;
+  notes: string | null;
   category: ChangelogCategory;
   icon: string | null;
   created_at: string;
