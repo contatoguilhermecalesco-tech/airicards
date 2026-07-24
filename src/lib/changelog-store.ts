@@ -141,6 +141,33 @@ export async function createChangelogEntry(input: {
   return data as ChangelogEntry;
 }
 
+export async function updateChangelogEntry(
+  id: string,
+  input: {
+    title: string;
+    body: string;
+    notes?: string | null;
+    category: ChangelogCategory;
+    icon?: string | null;
+  },
+) {
+  const { data, error } = await supabase
+    .from("changelog_entries")
+    .update({
+      title: input.title.trim(),
+      body: input.body.trim(),
+      notes: input.notes?.trim() || null,
+      category: input.category,
+      icon: input.icon ?? null,
+    })
+    .eq("id", id)
+    .select("*")
+    .single();
+  if (error) throw error;
+  await fetchAll();
+  return data as ChangelogEntry;
+}
+
 export async function deleteChangelogEntry(id: string) {
   const { error } = await supabase.from("changelog_entries").delete().eq("id", id);
   if (error) throw error;
