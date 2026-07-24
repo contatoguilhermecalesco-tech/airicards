@@ -121,6 +121,7 @@ export function markAllChangelogSeen() {
 export async function createChangelogEntry(input: {
   title: string;
   body: string;
+  notes?: string | null;
   category: ChangelogCategory;
   icon?: string | null;
 }) {
@@ -129,6 +130,7 @@ export async function createChangelogEntry(input: {
     .insert({
       title: input.title.trim(),
       body: input.body.trim(),
+      notes: input.notes?.trim() || null,
       category: input.category,
       icon: input.icon ?? null,
     })
