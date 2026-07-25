@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { Gift, Sparkles, X } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Gift, Sparkles } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useCurrentProfile } from "@/lib/profile";
 import { getPrefs, isQuietNow } from "@/lib/notification-prefs";
