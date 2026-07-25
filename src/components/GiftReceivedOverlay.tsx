@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Gift, Sparkles } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
@@ -110,18 +110,17 @@ export function GiftReceivedOverlay() {
   const current: CardGift | null = pending[0] ?? null;
   const onSocial = pathname?.startsWith("/social") ?? false;
 
-  // Toca o chime apenas uma vez por presente novo.
-  const chimedRef = useRef<string | null>(null);
+  // Toca o chime em loop enquanto houver presente pendente e o usuário
+  // não estiver na aba Social. Para assim que o toast some (aceito/aberto).
   useEffect(() => {
-    if (!current) {
-      chimedRef.current = null;
-      return;
-    }
-    if (chimedRef.current !== current.id) {
-      chimedRef.current = current.id;
+    if (!current || onSocial) return;
+    playGiftChime();
+    // Repete a cada ~3.2s (duração do chime + respiro) até ser dispensado.
+    const id = window.setInterval(() => {
       playGiftChime();
-    }
-  }, [current?.id]);
+    }, 3200);
+    return () => window.clearInterval(id);
+  }, [current?.id, onSocial]);
 
   if (!current || onSocial) return null;
 
