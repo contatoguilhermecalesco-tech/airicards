@@ -253,6 +253,10 @@ function scheduleCloudSave() {
 
 async function fetchAllRemoteRanks() {
   if (!isBrowser()) return;
+  // Só faz sentido consultar profile_data quando existe sessão autenticada;
+  // sem sessão a RLS bloqueia com 401 e polui o console.
+  const { data: sess } = await supabase.auth.getSession();
+  if (!sess.session) return;
   const ids = PROFILES.map((p) => p.id);
   const { data, error } = await supabase
     .from("profile_data")
@@ -269,6 +273,7 @@ async function fetchAllRemoteRanks() {
   }
   emitRemote();
 }
+
 
 export function setActiveRankProfile(profileId: string | null) {
   if (activeProfile === profileId) return;
