@@ -127,9 +127,7 @@ export function GiftReceivedOverlay() {
 
   const sender = profileMeta(current.fromProfile);
 
-  // Clip-path hextech (cantos cortados em diagonal — assinatura visual LoL)
-  const hexClip =
-    "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)";
+
 
   return (
     <div
