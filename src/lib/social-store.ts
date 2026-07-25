@@ -210,8 +210,33 @@ function mapReaction(row: any): ActivityReaction {
 
 let started = false;
 let channel: ReturnType<typeof supabase.channel> | null = null;
+let authListenerBound = false;
+
+async function waitForSession(timeoutMs = 8000): Promise<boolean> {
+  const { data } = await supabase.auth.getSession();
+  if (data.session) return true;
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      sub.data.subscription.unsubscribe();
+      resolve(false);
+    }, timeoutMs);
+    const sub = supabase.auth.onAuthStateChange((_evt, session) => {
+      if (session) {
+        clearTimeout(timer);
+        sub.data.subscription.unsubscribe();
+        resolve(true);
+      }
+    });
+  });
+}
 
 async function fetchAll() {
+  // Sem sessão, o PostgREST responde 401 para tabelas restritas a `authenticated`
+  // (duels/wallets/card_gifts/activity_events/activity_reactions/duel_results).
+  // Aguarda o signInAnonymously do bootstrap antes do primeiro fetch.
+  const hasSession = await waitForSession();
+  if (!hasSession) return;
+
   const anySb = supabase as any;
   const [duels, results, gifts, events, reactions] = await Promise.all([
     anySb.from("duels").select("*").order("created_at", { ascending: false }).limit(30),
@@ -237,6 +262,16 @@ export function startSocialSync() {
   fetchAll()
     .then(() => runDuelMaintenance())
     .catch(() => {});
+
+  // Reexecuta o fetch quando a sessão troca (login/PIN, refresh, troca de perfil).
+  if (!authListenerBound) {
+    authListenerBound = true;
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        fetchAll().catch(() => {});
+      }
+    });
+  }
 
   channel = supabase
     .channel("social-sync")
