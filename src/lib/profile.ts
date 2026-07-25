@@ -245,4 +245,11 @@ export async function signOutProfile(): Promise<void> {
   isAdminFlag = false;
   writeCache(null);
   emit();
+  // Ao trocar de perfil, sempre volte para a Home com um reload limpo —
+  // isso descarta qualquer estado de módulo (social-store, gifts, decks…)
+  // carregado sob a sessão anterior e garante um refetch completo do
+  // Supabase para o novo perfil autenticado.
+  if (isBrowser()) {
+    window.location.replace("/");
+  }
 }
