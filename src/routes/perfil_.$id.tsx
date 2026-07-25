@@ -123,9 +123,14 @@ function PerfilViewer() {
   const initial = profile.name.charAt(0).toUpperCase();
   const handleUser = profile.name.toLowerCase().replace(/\s+/g, "");
   const handleSuffix = ".airi.com.br";
-  const rank = snapshot?.rank;
+  // `rank` pode chegar como `{}` quando o perfil existe em profile_data mas
+  // ainda não iniciou o ranqueado — trate como "sem rank" para não quebrar
+  // a leitura de TIER_COLORS[tier].ring.
+  const rawRank = snapshot?.rank;
+  const rank = rawRank && rawRank.tier && (rawRank.tier in TIER_COLORS) ? rawRank : null;
   const streak = snapshot?.streak;
   const bio = snapshot?.wallet.bio?.trim();
+
 
   return (
     <main className="mx-auto max-w-2xl px-4 pt-6 pb-24 sm:px-6">
