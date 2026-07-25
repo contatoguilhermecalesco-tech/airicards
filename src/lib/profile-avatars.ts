@@ -17,12 +17,19 @@ function emit() {
 async function fetchOnce(profileId: string) {
   if (inflight.has(profileId)) return inflight.get(profileId)!;
   const p = (async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("wallets")
       .select("inventory")
       .eq("profile_id", profileId)
       .maybeSingle();
-    const inv = (data?.inventory ?? {}) as { avatarUrl?: string };
+    // RLS bloqueia leitura sem sessão → não cacheia null para permitir retry
+    // após o login (senão a foto do outro perfil ficaria travada como "A").
+    if (error || !data) {
+      delete cache[profileId];
+      emit();
+      return;
+    }
+    const inv = (data.inventory ?? {}) as { avatarUrl?: string };
     cache[profileId] = typeof inv.avatarUrl === "string" && inv.avatarUrl ? inv.avatarUrl : null;
     emit();
   })().finally(() => inflight.delete(profileId));
@@ -54,6 +61,18 @@ if (typeof window !== "undefined") {
     const w = getWallet();
     if (w.profileId && w.loaded) {
       setAvatarCache(w.profileId, w.avatarUrl || null);
+    }
+  });
+
+  // Ao autenticar (ou trocar de sessão), re-busca todos os avatares que
+  // ficaram nulos por falta de permissão antes do login.
+  supabase.auth.onAuthStateChange((event) => {
+    if (event !== "SIGNED_IN" && event !== "TOKEN_REFRESHED" && event !== "INITIAL_SESSION") return;
+    for (const id of Object.keys(cache)) {
+      if (!cache[id]) {
+        delete cache[id];
+        void fetchOnce(id);
+      }
     }
   });
 }
