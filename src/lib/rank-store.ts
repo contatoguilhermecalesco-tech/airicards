@@ -303,8 +303,14 @@ if (isBrowser()) {
   };
   apply();
   subscribeProfile(apply);
-  // Popular leaderboard e ouvir mudanças de qualquer perfil.
+  // Popular leaderboard e ouvir mudanças de qualquer perfil — só depois
+  // que houver sessão, para não bater no PostgREST como anon (401).
   void fetchAllRemoteRanks();
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+      void fetchAllRemoteRanks();
+    }
+  });
   supabase
     .channel("rank:all")
     .on(
@@ -314,6 +320,7 @@ if (isBrowser()) {
     )
     .subscribe();
 }
+
 
 function persist() {
   if (activeProfile) {
