@@ -253,6 +253,10 @@ function scheduleCloudSave() {
 
 async function fetchAllRemoteRanks() {
   if (!isBrowser()) return;
+  // Só faz sentido consultar profile_data quando existe sessão autenticada;
+  // sem sessão a RLS bloqueia com 401 e polui o console.
+  const { data: sess } = await supabase.auth.getSession();
+  if (!sess.session) return;
   const ids = PROFILES.map((p) => p.id);
   const { data, error } = await supabase
     .from("profile_data")
@@ -269,6 +273,7 @@ async function fetchAllRemoteRanks() {
   }
   emitRemote();
 }
+
 
 export function setActiveRankProfile(profileId: string | null) {
   if (activeProfile === profileId) return;
@@ -298,8 +303,14 @@ if (isBrowser()) {
   };
   apply();
   subscribeProfile(apply);
-  // Popular leaderboard e ouvir mudanças de qualquer perfil.
+  // Popular leaderboard e ouvir mudanças de qualquer perfil — só depois
+  // que houver sessão, para não bater no PostgREST como anon (401).
   void fetchAllRemoteRanks();
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+      void fetchAllRemoteRanks();
+    }
+  });
   supabase
     .channel("rank:all")
     .on(
@@ -309,6 +320,7 @@ if (isBrowser()) {
     )
     .subscribe();
 }
+
 
 function persist() {
   if (activeProfile) {
