@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Gift, Sparkles } from "lucide-react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
