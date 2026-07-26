@@ -287,6 +287,7 @@ async function persistNow(profileId: string) {
 function scheduleSave() {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
+  lastLocalMutationAt = Date.now();
   saveCache(profileId, state, home);
   if (!hydrated) {
     // Marca que temos alterações locais pendentes; serão enviadas assim
@@ -311,6 +312,7 @@ function scheduleSave() {
 export async function flushSave(): Promise<void> {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
+  lastLocalMutationAt = Date.now();
   if (saveTimer) {
     clearTimeout(saveTimer);
     saveTimer = null;
