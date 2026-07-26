@@ -141,10 +141,16 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 // Timestamp da nossa última escrita bem-sucedida. Realtime devolve nossos
 // próprios writes; se puxarmos o remoto durante esse eco enquanto ainda há
-// mutações locais em curso, o item deletado "volta" na UI. Ignoramos pulls
-// dentro de uma janela curta após o save local.
+// mutações locais em curso, o item deletado "volta" na UI. Janela curta
+// para absorver o eco imediato sem bloquear updates de outro device.
 let lastLocalSaveAt = 0;
-const REMOTE_ECHO_WINDOW_MS = 2000;
+const REMOTE_ECHO_WINDOW_MS = 500;
+// Timestamp da última mutação local. Se um pull chega poucos segundos
+// depois de uma criação/edição, preservamos itens locais que ainda não
+// estão no remoto (proteção contra last-write-wins entre devices).
+let lastLocalMutationAt = 0;
+const LOCAL_MUTATION_WINDOW_MS = 5000;
+let persistInFlight: Promise<void> | null = null;
 // Hidratado = já concluímos o primeiro pull do servidor para o perfil ativo.
 // Antes disso NÃO escrevemos no cloud — caso contrário o cache local (que
 // pode estar defasado em relação a outro dispositivo) sobrescreve dados
@@ -159,6 +165,15 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
     // É provavelmente o eco do nosso próprio save — ignora.
     return;
+  }
+  // Se ainda há um save agendado, garante que ele vá pro servidor antes
+  // de sobrescrevermos o estado local com a leitura remota.
+  if (saveTimer) {
+    await flushSave();
+  }
+  // Aguarda qualquer escrita em andamento terminar.
+  if (persistInFlight) {
+    try { await persistInFlight; } catch { /* ignore */ }
   }
   const { data, error } = await supabase
     .from("profile_data")
@@ -181,11 +196,17 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     if (activeProfile !== profileId) return; // profile switched meanwhile
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    // Se o usuário mutou localmente antes deste primeiro pull, o cache local
-    // pode ter dados mais novos que o servidor. Nesse caso, mesclamos:
-    // servidor como base + itens locais que não estão no servidor. Isso
-    // protege trabalho feito enquanto a rede estava lenta.
-    if (!hydrated && pendingSaveBeforeHydration) {
+
+    // Merge inteligente:
+    // - Base = remoto (fonte da verdade entre devices).
+    // - Preserva itens locais criados/editados nos últimos LOCAL_MUTATION_WINDOW_MS
+    //   que ainda não apareceram no remoto — protege trabalho recente
+    //   contra pulls que chegam antes do nosso próprio save propagar.
+    const withinLocalWindow =
+      Date.now() - lastLocalMutationAt < LOCAL_MUTATION_WINDOW_MS;
+    const shouldMerge = (!hydrated && pendingSaveBeforeHydration) || withinLocalWindow;
+
+    if (shouldMerge) {
       const remoteDeckIds = new Set(remote.decks.map((d) => d.id));
       const remoteCardIds = new Set(remote.cards.map((c) => c.id));
       const extraDecks = state.decks.filter((d) => !remoteDeckIds.has(d.id));
@@ -194,6 +215,11 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
         decks: [...extraDecks, ...remote.decks],
         cards: [...extraCards, ...remote.cards],
       };
+      // Se preservamos itens locais, precisamos re-enviar pro servidor para
+      // que o outro device também os veja.
+      if (extraDecks.length > 0 || extraCards.length > 0) {
+        pendingSaveBeforeHydration = true;
+      }
     } else {
       state = remote;
     }
@@ -215,38 +241,53 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
       pendingSaveBeforeHydration = false;
       void persistNow(profileId);
     }
+  } else if (pendingSaveBeforeHydration) {
+    // Merge preservou itens locais — precisa reenviar.
+    pendingSaveBeforeHydration = false;
+    void persistNow(profileId);
   }
 }
 
 async function persistNow(profileId: string) {
-  saveCache(profileId, state, home);
-  if (!hydrated) {
-    // Ainda não sincronizamos com o servidor — não podemos sobrescrever o
-    // que outro device escreveu. Guarda a intenção e sai.
-    pendingSaveBeforeHydration = true;
-    return;
-  }
-  const { error } = await supabase
-    .from("profile_data")
-    .upsert(
-      {
-        profile_id: profileId,
-        data: state as never,
-        home_sessions: home as never,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "profile_id" },
-    );
-  if (error) {
-    console.error("[airi] save failed", error);
-    return;
-  }
-  lastLocalSaveAt = Date.now();
+  // Serializa escritas: se já houver uma em andamento, encadeia.
+  const run = async () => {
+    saveCache(profileId, state, home);
+    if (!hydrated) {
+      pendingSaveBeforeHydration = true;
+      return;
+    }
+    const snapshotState = state;
+    const snapshotHome = home;
+    const { error } = await supabase
+      .from("profile_data")
+      .upsert(
+        {
+          profile_id: profileId,
+          data: snapshotState as never,
+          home_sessions: snapshotHome as never,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "profile_id" },
+      );
+    if (error) {
+      console.error("[airi] save failed", error);
+      return;
+    }
+    lastLocalSaveAt = Date.now();
+  };
+  const prev = persistInFlight ?? Promise.resolve();
+  persistInFlight = prev.then(run, run).finally(() => {
+    // Só limpa se ninguém encadeou depois de nós.
+    if (persistInFlight && persistInFlight === current) persistInFlight = null;
+  });
+  const current = persistInFlight;
+  await current;
 }
 
 function scheduleSave() {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
+  lastLocalMutationAt = Date.now();
   saveCache(profileId, state, home);
   if (!hydrated) {
     // Marca que temos alterações locais pendentes; serão enviadas assim
@@ -271,6 +312,7 @@ function scheduleSave() {
 export async function flushSave(): Promise<void> {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
+  lastLocalMutationAt = Date.now();
   if (saveTimer) {
     clearTimeout(saveTimer);
     saveTimer = null;
@@ -345,6 +387,18 @@ if (isBrowser()) {
   void import("@/lib/profile").then(({ subscribeProfile }) => {
     subscribeProfile(applyCurrent);
   });
+  // Reconciliação: quando a aba volta ao foco ou a conexão retorna,
+  // buscamos o estado mais recente do servidor. Isso resolve o clássico
+  // "criei no PC mas não vejo no celular" quando o realtime não entregou
+  // o evento (aba dormindo, rede instável, etc.).
+  const reconcile = () => {
+    if (!activeProfile) return;
+    if (document.visibilityState !== "visible") return;
+    void pullFromCloud(activeProfile, { force: true });
+  };
+  window.addEventListener("focus", reconcile);
+  document.addEventListener("visibilitychange", reconcile);
+  window.addEventListener("online", reconcile);
 }
 
 // --- React hooks ------------------------------------------------------

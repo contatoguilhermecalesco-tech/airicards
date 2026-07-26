@@ -270,3 +270,109 @@ export const adminFetchAllProfileSessionsFn = createServerFn({ method: "GET" })
     if (error) throw error;
     return (data ?? []) as ProfileSessionRow[];
   });
+
+// ---------- Backup / Import (decks + cartas) --------------------------------
+
+const backupExportSchema = z.object({ profileId: z.string().min(1).max(64) });
+
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonValue[] | { [k: string]: JsonValue };
+type BackupState = { decks: JsonValue[]; cards: JsonValue[] };
+
+export type ProfileBackup = {
+  version: 1;
+  exportedAt: string;
+  profileId: string;
+  data: BackupState;
+};
+
+export const adminExportProfileDataFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => backupExportSchema.parse(input))
+  .handler(async ({ data, context }): Promise<ProfileBackup> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: row, error } = await supabaseAdmin
+      .from("profile_data")
+      .select("data")
+      .eq("profile_id", data.profileId)
+      .maybeSingle();
+    if (error) throw error;
+    const raw = row?.data as unknown;
+    const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+    const decks = Array.isArray(rec.decks) ? (rec.decks as JsonValue[]) : [];
+    const cards = Array.isArray(rec.cards) ? (rec.cards as JsonValue[]) : [];
+    return {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      profileId: data.profileId,
+      data: { decks, cards },
+    };
+  });
+
+const backupImportSchema = z.object({
+  profileId: z.string().min(1).max(64),
+  // Aceita tanto o formato de export (com wrapper) quanto o payload puro.
+  payload: z.unknown(),
+  // Estratégia: "merge" mescla decks/cartas por id, "replace" sobrescreve.
+  strategy: z.enum(["merge", "replace"]),
+});
+
+type FlashState = {
+  decks: Array<{ id: string; [k: string]: unknown }>;
+  cards: Array<{ id: string; [k: string]: unknown }>;
+};
+
+function coercePayload(payload: unknown): FlashState {
+  const pRec = payload as Record<string, unknown> | null;
+  const inner =
+    pRec && typeof pRec === "object" && "data" in pRec
+      ? (pRec.data as unknown)
+      : payload;
+  const rec = (inner ?? {}) as Record<string, unknown>;
+  const decks = Array.isArray(rec.decks) ? (rec.decks as FlashState["decks"]) : [];
+  const cards = Array.isArray(rec.cards) ? (rec.cards as FlashState["cards"]) : [];
+  return { decks, cards };
+}
+
+export const adminImportProfileDataFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => backupImportSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ decks: number; cards: number }> => {
+    await assertAdmin(context.supabase);
+    const incoming = coercePayload(data.payload);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    let nextState: FlashState = incoming;
+    if (data.strategy === "merge") {
+      const { data: existing } = await supabaseAdmin
+        .from("profile_data")
+        .select("data")
+        .eq("profile_id", data.profileId)
+        .maybeSingle();
+      const current = coercePayload(existing?.data ?? null);
+      const deckMap = new Map(current.decks.map((d) => [d.id, d]));
+      for (const d of incoming.decks) deckMap.set(d.id, d);
+      const cardMap = new Map(current.cards.map((c) => [c.id, c]));
+      for (const c of incoming.cards) cardMap.set(c.id, c);
+      nextState = {
+        decks: Array.from(deckMap.values()),
+        cards: Array.from(cardMap.values()),
+      };
+    }
+
+    const { error } = await supabaseAdmin.from("profile_data").upsert(
+      {
+        profile_id: data.profileId,
+        data: nextState as never,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "profile_id" },
+    );
+    if (error) throw error;
+    return { decks: nextState.decks.length, cards: nextState.cards.length };
+  });
