@@ -146,10 +146,10 @@ let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 let lastLocalSaveAt = 0;
 const REMOTE_ECHO_WINDOW_MS = 2000;
 
-async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
+async function pullFromCloud(profileId: string, opts?: { force?: boolean }): Promise<boolean> {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
     // É provavelmente o eco do nosso próprio save — ignora.
-    return;
+    return false;
   }
   const { data, error } = await supabase
     .from("profile_data")
@@ -158,12 +158,12 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     .maybeSingle();
   if (error) {
     console.error("[airi] pull failed", error);
-    return;
+    return false;
   }
   if (data) {
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    if (activeProfile !== profileId) return; // profile switched meanwhile
+    if (activeProfile !== profileId) return false; // profile switched meanwhile
     state = remote;
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
@@ -175,7 +175,9 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     saveCache(profileId, state, home);
     emit();
     emitHome();
+    return true;
   }
+  return false;
 }
 
 async function persistNow(profileId: string) {
@@ -252,11 +254,10 @@ export function setActiveProfileId(profileId: string | null) {
       : { ...cached.home, day: todayKey(), count: 0, reviewed: 0 };
   emit();
   emitHome();
-  // Punições diárias com base no estado carregado.
-  runDailyPunishments();
-
   // Refresh from Cloud, then subscribe to Realtime updates from other devices.
-  void pullFromCloud(profileId).then(() => runDailyPunishments());
+  void pullFromCloud(profileId).then((loaded) => {
+    if (loaded) runDailyPunishments();
+  });
   realtimeChannel = supabase
     .channel(`profile_data:${profileId}`)
     .on(
@@ -294,7 +295,9 @@ if (isBrowser()) {
     )
       return;
     if (!activeProfile) return;
-    void pullFromCloud(activeProfile, { force: true });
+    void pullFromCloud(activeProfile, { force: true }).then((loaded) => {
+      if (loaded) runDailyPunishments();
+    });
   });
 }
 
