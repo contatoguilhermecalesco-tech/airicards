@@ -392,7 +392,8 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
         </div>
         <div className="safe-bottom" />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
