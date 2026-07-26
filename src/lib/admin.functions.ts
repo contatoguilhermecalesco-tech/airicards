@@ -275,11 +275,15 @@ export const adminFetchAllProfileSessionsFn = createServerFn({ method: "GET" })
 
 const backupExportSchema = z.object({ profileId: z.string().min(1).max(64) });
 
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonValue[] | { [k: string]: JsonValue };
+type BackupState = { decks: JsonValue[]; cards: JsonValue[] };
+
 export type ProfileBackup = {
   version: 1;
   exportedAt: string;
   profileId: string;
-  data: { decks: unknown[]; cards: unknown[] };
+  data: BackupState;
 };
 
 export const adminExportProfileDataFn = createServerFn({ method: "POST" })
@@ -296,11 +300,15 @@ export const adminExportProfileDataFn = createServerFn({ method: "POST" })
       .eq("profile_id", data.profileId)
       .maybeSingle();
     if (error) throw error;
+    const raw = row?.data as unknown;
+    const rec = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+    const decks = Array.isArray(rec.decks) ? (rec.decks as JsonValue[]) : [];
+    const cards = Array.isArray(rec.cards) ? (rec.cards as JsonValue[]) : [];
     return {
       version: 1,
       exportedAt: new Date().toISOString(),
       profileId: data.profileId,
-      data: row?.data ?? { decks: [], cards: [] },
+      data: { decks, cards },
     };
   });
 
