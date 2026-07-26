@@ -387,6 +387,18 @@ if (isBrowser()) {
   void import("@/lib/profile").then(({ subscribeProfile }) => {
     subscribeProfile(applyCurrent);
   });
+  // Reconciliação: quando a aba volta ao foco ou a conexão retorna,
+  // buscamos o estado mais recente do servidor. Isso resolve o clássico
+  // "criei no PC mas não vejo no celular" quando o realtime não entregou
+  // o evento (aba dormindo, rede instável, etc.).
+  const reconcile = () => {
+    if (!activeProfile) return;
+    if (document.visibilityState !== "visible") return;
+    void pullFromCloud(activeProfile, { force: true });
+  };
+  window.addEventListener("focus", reconcile);
+  document.addEventListener("visibilitychange", reconcile);
+  window.addEventListener("online", reconcile);
 }
 
 // --- React hooks ------------------------------------------------------
