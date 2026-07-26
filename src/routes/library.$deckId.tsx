@@ -287,6 +287,7 @@ function DeckDetail() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium">{c.front}</p>
+                    <SyncDot id={c.id} />
                     {c.mode === "expression" && (
                       <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
                         expressão
