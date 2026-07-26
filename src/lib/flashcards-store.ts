@@ -282,6 +282,15 @@ export async function flushSave(): Promise<void> {
 export function setActiveProfileId(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
+  // Reinicia o estado de hidratação — writes ficam bloqueadas até o
+  // primeiro pull do servidor terminar (evita que o cache local defasado
+  // sobrescreva dados criados em outro device).
+  hydrated = false;
+  pendingSaveBeforeHydration = false;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
 
   if (realtimeChannel) {
     supabase.removeChannel(realtimeChannel);
@@ -291,6 +300,7 @@ export function setActiveProfileId(profileId: string | null) {
   if (!profileId) {
     state = { decks: [], cards: [] };
     home = { day: todayKey(), count: 0 };
+    hydrated = true; // sem perfil, nada a sincronizar
     emit();
     emitHome();
     return;
@@ -309,7 +319,9 @@ export function setActiveProfileId(profileId: string | null) {
   runDailyPunishments();
 
   // Refresh from Cloud, then subscribe to Realtime updates from other devices.
-  void pullFromCloud(profileId).then(() => runDailyPunishments());
+  // Force=true garante que o primeiro pull NÃO seja ignorado por eco.
+  void pullFromCloud(profileId, { force: true }).then(() => runDailyPunishments());
+
   realtimeChannel = supabase
     .channel(`profile_data:${profileId}`)
     .on(
