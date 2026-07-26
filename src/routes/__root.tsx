@@ -302,7 +302,8 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
   if (!open) return null;
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
       role="dialog"
