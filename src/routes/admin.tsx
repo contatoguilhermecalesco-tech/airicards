@@ -27,6 +27,9 @@ import {
   Wand2,
   Wrench,
   ChevronRight,
+  Database,
+  Download,
+  Upload,
 } from "lucide-react";
 import {
   createChangelogEntry,
