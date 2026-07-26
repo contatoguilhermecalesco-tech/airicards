@@ -194,6 +194,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "notifications", label: "Notificações", hint: "Enviar avisos e alertas", Icon: BellIcon, color: "#34d399" },
   { key: "changelog", label: "Patch notes", hint: "Publicar / editar novidades", Icon: ScrollText, color: "#c084fc", wide: true },
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
+  { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
 ];
 
 function AdminPage() {
