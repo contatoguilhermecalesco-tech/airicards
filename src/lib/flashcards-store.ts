@@ -141,10 +141,16 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 // Timestamp da nossa última escrita bem-sucedida. Realtime devolve nossos
 // próprios writes; se puxarmos o remoto durante esse eco enquanto ainda há
-// mutações locais em curso, o item deletado "volta" na UI. Ignoramos pulls
-// dentro de uma janela curta após o save local.
+// mutações locais em curso, o item deletado "volta" na UI. Janela curta
+// para absorver o eco imediato sem bloquear updates de outro device.
 let lastLocalSaveAt = 0;
-const REMOTE_ECHO_WINDOW_MS = 2000;
+const REMOTE_ECHO_WINDOW_MS = 500;
+// Timestamp da última mutação local. Se um pull chega poucos segundos
+// depois de uma criação/edição, preservamos itens locais que ainda não
+// estão no remoto (proteção contra last-write-wins entre devices).
+let lastLocalMutationAt = 0;
+const LOCAL_MUTATION_WINDOW_MS = 5000;
+let persistInFlight: Promise<void> | null = null;
 // Hidratado = já concluímos o primeiro pull do servidor para o perfil ativo.
 // Antes disso NÃO escrevemos no cloud — caso contrário o cache local (que
 // pode estar defasado em relação a outro dispositivo) sobrescreve dados
