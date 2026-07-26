@@ -163,7 +163,7 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }): Pro
   if (data) {
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    if (activeProfile !== profileId) return; // profile switched meanwhile
+    if (activeProfile !== profileId) return false; // profile switched meanwhile
     state = remote;
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
