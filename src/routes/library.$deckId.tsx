@@ -17,6 +17,7 @@ import { buildShareUrl } from "@/lib/share";
 import { useCurrentProfile } from "@/lib/profile";
 import { publishDeck, unpublishDeck, findPublishedDeck } from "@/lib/marketplace";
 import { SendGiftDialog } from "@/components/SendGiftDialog";
+import { SyncDot } from "@/components/SyncIndicator";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
