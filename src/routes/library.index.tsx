@@ -8,6 +8,7 @@ import {
   updateDeck,
   type Deck,
 } from "@/lib/flashcards-store";
+import { SyncDot } from "@/components/SyncIndicator";
 import {
   DECK_COLORS,
   DEFAULT_DECK_COLOR,
