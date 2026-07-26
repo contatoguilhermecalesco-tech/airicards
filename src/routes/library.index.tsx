@@ -221,8 +221,9 @@ function DeckCard({
             <Layers className="h-6 w-6 drop-shadow" strokeWidth={2.25} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-[17px] font-bold leading-tight text-foreground">
-              {deck.name}
+            <h3 className="flex items-center gap-2 truncate text-[17px] font-bold leading-tight text-foreground">
+              <span className="truncate">{deck.name}</span>
+              <SyncDot id={deck.id} />
             </h3>
             <p className="mt-1 truncate text-[13px] text-muted-foreground">
               {total} carta{total === 1 ? "" : "s"}
