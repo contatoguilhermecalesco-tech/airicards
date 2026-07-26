@@ -290,8 +290,10 @@ async function persistNow(profileId: string) {
     saveCache(profileId, state, home);
     if (!hydrated) {
       pendingSaveBeforeHydration = true;
+      setSyncStatus("pending");
       return;
     }
+    setSyncStatus("saving");
     const snapshotState = state;
     const snapshotHome = home;
     const { error } = await supabase
@@ -307,9 +309,12 @@ async function persistNow(profileId: string) {
       );
     if (error) {
       console.error("[airi] save failed", error);
+      setSyncStatus(isBrowser() && navigator.onLine === false ? "offline" : "error");
       return;
     }
     lastLocalSaveAt = Date.now();
+    clearPendingItems();
+    setSyncStatus(computeIdleStatus());
   };
   const prev = persistInFlight ?? Promise.resolve();
   persistInFlight = prev.then(run, run).finally(() => {
@@ -326,14 +331,12 @@ function scheduleSave() {
   lastLocalMutationAt = Date.now();
   saveCache(profileId, state, home);
   if (!hydrated) {
-    // Marca que temos alterações locais pendentes; serão enviadas assim
-    // que o primeiro pull terminar.
     pendingSaveBeforeHydration = true;
+    setSyncStatus("pending");
     return;
   }
+  setSyncStatus("saving");
   if (saveTimer) clearTimeout(saveTimer);
-  // Debounce curto — mutações UI (delete/edit) sentem-se instantâneas mas
-  // ainda agrupamos escritas em rajada (ex.: revisão sequencial).
   saveTimer = setTimeout(() => {
     saveTimer = null;
     void persistNow(profileId);
@@ -353,7 +356,34 @@ export async function flushSave(): Promise<void> {
     clearTimeout(saveTimer);
     saveTimer = null;
   }
+  setSyncStatus("saving");
   await persistNow(profileId);
+}
+
+// --- Sync hooks & helpers exportados ---------------------------------
+export function useSyncStatus(): SyncStatus {
+  return useSyncExternalStore(
+    (l) => {
+      syncListeners.add(l);
+      return () => syncListeners.delete(l);
+    },
+    () => syncStatus,
+    () => "synced",
+  );
+}
+export function useItemPending(id: string | undefined | null): boolean {
+  return useSyncExternalStore(
+    (l) => {
+      pendingItemListeners.add(l);
+      return () => pendingItemListeners.delete(l);
+    },
+    () => (id ? pendingItems.has(id) : false),
+    () => false,
+  );
+}
+/** Marca ids (deck/carta) como pendentes de confirmação no banco. */
+export function markPending(...ids: (string | undefined | null)[]) {
+  for (const id of ids) if (id) markItemPending(id);
 }
 
 
