@@ -1,7 +1,26 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Check, ChevronDown, Gift, Globe, Pencil, Play, Plus, Share2, Sparkles, Swords, Trash2, Upload, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowUpDown,
+  Check,
+  ChevronDown,
+  Gift,
+  Globe,
+  LayoutGrid,
+  List as ListIcon,
+  Pencil,
+  Play,
+  Plus,
+  Search,
+  Share2,
+  Sparkles,
+  Swords,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import {
   useStore,
   createCard,
@@ -18,6 +37,14 @@ import { useCurrentProfile } from "@/lib/profile";
 import { publishDeck, unpublishDeck, findPublishedDeck } from "@/lib/marketplace";
 import { SendGiftDialog } from "@/components/SendGiftDialog";
 import { SyncDot } from "@/components/SyncIndicator";
+import { deckGradient, getDeckColor } from "@/lib/deck-colors";
+import {
+  useCardPrefs,
+  setCardPrefs,
+  type CardFilter,
+  type CardSort,
+  type CardViewMode,
+} from "@/lib/library-prefs";
 import { Field, ConfirmDialog } from "./library.index";
 
 export const Route = createFileRoute("/library/$deckId")({
