@@ -160,6 +160,42 @@ let hydrated = false;
 // disparamos um save único com o estado já mesclado com o servidor.
 let pendingSaveBeforeHydration = false;
 
+// --- Sync status tracker ---------------------------------------------
+// Estados possíveis do sincronismo com o banco (Lovable Cloud).
+// - 'synced'  : tudo salvo remotamente.
+// - 'saving'  : escrita em andamento.
+// - 'pending' : alterações locais aguardando envio (hidratação/offline).
+// - 'error'   : última tentativa falhou.
+// - 'offline' : navegador sem rede.
+export type SyncStatus = "synced" | "saving" | "pending" | "error" | "offline";
+let syncStatus: SyncStatus = "synced";
+const syncListeners = new Set<() => void>();
+// IDs de decks/cartas com mutações locais ainda não confirmadas no banco.
+const pendingItems = new Set<string>();
+const pendingItemListeners = new Set<() => void>();
+function setSyncStatus(next: SyncStatus) {
+  if (syncStatus === next) return;
+  syncStatus = next;
+  syncListeners.forEach((l) => l());
+}
+function emitPendingItems() {
+  pendingItemListeners.forEach((l) => l());
+}
+function markItemPending(id: string) {
+  if (!id) return;
+  pendingItems.add(id);
+  emitPendingItems();
+}
+function clearPendingItems() {
+  if (pendingItems.size === 0) return;
+  pendingItems.clear();
+  emitPendingItems();
+}
+function computeIdleStatus(): SyncStatus {
+  if (isBrowser() && navigator.onLine === false) return "offline";
+  return "synced";
+}
+
 
 async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
@@ -254,8 +290,10 @@ async function persistNow(profileId: string) {
     saveCache(profileId, state, home);
     if (!hydrated) {
       pendingSaveBeforeHydration = true;
+      setSyncStatus("pending");
       return;
     }
+    setSyncStatus("saving");
     const snapshotState = state;
     const snapshotHome = home;
     const { error } = await supabase
@@ -271,9 +309,12 @@ async function persistNow(profileId: string) {
       );
     if (error) {
       console.error("[airi] save failed", error);
+      setSyncStatus(isBrowser() && navigator.onLine === false ? "offline" : "error");
       return;
     }
     lastLocalSaveAt = Date.now();
+    clearPendingItems();
+    setSyncStatus(computeIdleStatus());
   };
   const prev = persistInFlight ?? Promise.resolve();
   persistInFlight = prev.then(run, run).finally(() => {
@@ -290,14 +331,12 @@ function scheduleSave() {
   lastLocalMutationAt = Date.now();
   saveCache(profileId, state, home);
   if (!hydrated) {
-    // Marca que temos alterações locais pendentes; serão enviadas assim
-    // que o primeiro pull terminar.
     pendingSaveBeforeHydration = true;
+    setSyncStatus("pending");
     return;
   }
+  setSyncStatus("saving");
   if (saveTimer) clearTimeout(saveTimer);
-  // Debounce curto — mutações UI (delete/edit) sentem-se instantâneas mas
-  // ainda agrupamos escritas em rajada (ex.: revisão sequencial).
   saveTimer = setTimeout(() => {
     saveTimer = null;
     void persistNow(profileId);
@@ -317,7 +356,34 @@ export async function flushSave(): Promise<void> {
     clearTimeout(saveTimer);
     saveTimer = null;
   }
+  setSyncStatus("saving");
   await persistNow(profileId);
+}
+
+// --- Sync hooks & helpers exportados ---------------------------------
+export function useSyncStatus(): SyncStatus {
+  return useSyncExternalStore(
+    (l) => {
+      syncListeners.add(l);
+      return () => syncListeners.delete(l);
+    },
+    () => syncStatus,
+    () => "synced",
+  );
+}
+export function useItemPending(id: string | undefined | null): boolean {
+  return useSyncExternalStore(
+    (l) => {
+      pendingItemListeners.add(l);
+      return () => pendingItemListeners.delete(l);
+    },
+    () => (id ? pendingItems.has(id) : false),
+    () => false,
+  );
+}
+/** Marca ids (deck/carta) como pendentes de confirmação no banco. */
+export function markPending(...ids: (string | undefined | null)[]) {
+  for (const id of ids) if (id) markItemPending(id);
 }
 
 
@@ -398,7 +464,19 @@ if (isBrowser()) {
   };
   window.addEventListener("focus", reconcile);
   document.addEventListener("visibilitychange", reconcile);
-  window.addEventListener("online", reconcile);
+  window.addEventListener("online", () => {
+    // Voltamos à rede: se havia coisas pendentes, o próximo save resolve;
+    // caso contrário, refletimos "synced" imediatamente.
+    if (syncStatus === "offline" || syncStatus === "error") {
+      setSyncStatus(pendingItems.size > 0 ? "pending" : "synced");
+    }
+    reconcile();
+  });
+  window.addEventListener("offline", () => {
+    setSyncStatus("offline");
+  });
+  // Estado inicial coerente com a rede.
+  if (navigator.onLine === false) setSyncStatus("offline");
 }
 
 // --- React hooks ------------------------------------------------------
@@ -430,16 +508,22 @@ export function createDeck(name: string, description?: string, color?: string): 
   };
   state = { ...state, decks: [deck, ...state.decks] };
   emit();
+  markItemPending(deck.id);
   void flushSave();
   return deck;
 }
 
 export function deleteDeck(id: string) {
+  const affectedCards = state.cards.filter((c) => c.deckId === id).map((c) => c.id);
   state = {
     decks: state.decks.filter((d) => d.id !== id),
     cards: state.cards.filter((c) => c.deckId !== id),
   };
   emit();
+  // Deleção: remove marcadores locais desses ids — nada a "confirmar" mais.
+  pendingItems.delete(id);
+  for (const cid of affectedCards) pendingItems.delete(cid);
+  emitPendingItems();
   // Persistência imediata — evita eco/pull que "traz" o deck de volta.
   void flushSave();
 }
@@ -450,6 +534,7 @@ export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "descr
     decks: state.decks.map((d) => (d.id === id ? { ...d, ...patch } : d)),
   };
   emit();
+  markItemPending(id);
   scheduleSave();
 }
 
@@ -475,6 +560,7 @@ export function createCard(
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
+  markItemPending(card.id);
   // Persistência imediata — evita que um pull/echo remoto sobrescreva a carta recém-criada.
   void flushSave();
   return card;
@@ -483,6 +569,8 @@ export function createCard(
 export function deleteCard(id: string) {
   state = { ...state, cards: state.cards.filter((c) => c.id !== id) };
   emit();
+  pendingItems.delete(id);
+  emitPendingItems();
   // Persistência imediata — evita eco/pull que "traz" a carta de volta.
   void flushSave();
 }
@@ -513,6 +601,7 @@ export function updateCard(
     }),
   };
   emit();
+  markItemPending(id);
   void flushSave();
 }
 
