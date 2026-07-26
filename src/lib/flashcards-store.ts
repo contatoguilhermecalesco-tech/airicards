@@ -280,6 +280,22 @@ if (isBrowser()) {
   void import("@/lib/profile").then(({ subscribeProfile }) => {
     subscribeProfile(applyCurrent);
   });
+  // Sessão autenticada pode ficar pronta DEPOIS do primeiro pullFromCloud.
+  // Sem re-pull, RLS retorna vazio na primeira hidratação e o usuário vê
+  // seus decks/cartas "sumidos" até um reload manual. Refazemos o pull
+  // sempre que uma sessão válida aparece ou é renovada.
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (!session) return;
+    if (
+      event !== "SIGNED_IN" &&
+      event !== "TOKEN_REFRESHED" &&
+      event !== "USER_UPDATED" &&
+      event !== "INITIAL_SESSION"
+    )
+      return;
+    if (!activeProfile) return;
+    void pullFromCloud(activeProfile, { force: true });
+  });
 }
 
 // --- React hooks ------------------------------------------------------
