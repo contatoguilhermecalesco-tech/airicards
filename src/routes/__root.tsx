@@ -394,19 +394,42 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   );
 }
 
+/**
+ * Hook: monitora direção e posição do scroll para navbar contextual.
+ * - `atTop`: usuário está no topo (< 8px) → topbar totalmente transparente.
+ * - `hidden`: rolando para baixo depois de 80px → esconde a barra.
+ */
+function useScrollNav() {
+  const [atTop, setAtTop] = useState(true);
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setAtTop(y < 8);
+        if (y > 80 && y > lastY + 4) setHidden(true);
+        else if (y < lastY - 4 || y < 80) setHidden(false);
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return { atTop, hidden };
+}
+
 function TopBar() {
   const { pathname, isMoreActive } = useMoreState();
   const isReview = pathname.startsWith("/review");
   const [moreOpen, setMoreOpen] = useState(false);
   const unreadNews = useChangelogUnread();
+  const { atTop, hidden } = useScrollNav();
   if (isReview) return null;
-
-  const linkClass = (active: boolean) =>
-    `tap-target relative inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-medium transition lg:px-3.5 lg:text-sm ${
-      active
-        ? "bg-accent text-foreground"
-        : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-    }`;
 
   const navItems = [
     { to: "/", label: "Início", icon: Home, active: pathname === "/" },
@@ -415,55 +438,81 @@ function TopBar() {
     { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
   ] as const;
 
+  const linkClass = (active: boolean) =>
+    `tap-target relative inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors lg:px-3.5 lg:text-sm ${
+      active
+        ? "text-foreground"
+        : "text-muted-foreground hover:text-foreground"
+    }`;
+
   return (
-    <header className="sticky top-0 z-40 w-full">
-      <div className="glass-panel border-b">
-        <nav className="mx-auto grid w-full max-w-6xl grid-cols-[auto_1fr_auto] items-center gap-3 px-[clamp(0.75rem,3vw,1.5rem)] py-2.5 lg:gap-6">
-          {/* Esquerda: logo */}
-          <Link to="/" className="tap-target flex items-center gap-2.5" aria-label="airi — início">
-            <img
-              src={airiLogo.url}
-              alt=""
-              className="h-10 w-10 rounded-2xl object-contain sm:h-11 sm:w-11"
-            />
-            <span className="hidden text-[17px] font-semibold lowercase tracking-tight sm:inline">
-              airi
-            </span>
-          </Link>
+    <header
+      className={`sticky top-0 z-40 w-full transition-[transform,opacity] duration-300 ease-out ${
+        hidden ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
+      }`}
+    >
+      {/* Container flutuante — cápsula centrada com margem lateral no desktop */}
+      <div
+        className={`mx-auto w-full max-w-6xl px-[clamp(0.5rem,3vw,1.25rem)] transition-all duration-300 ease-out ${
+          atTop ? "pt-2 sm:pt-3" : "pt-1.5 sm:pt-2"
+        }`}
+      >
+        <div
+          className={`relative overflow-hidden rounded-2xl border transition-all duration-300 ease-out sm:rounded-full ${
+            atTop
+              ? "border-white/5 bg-white/[0.02] backdrop-blur-md shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset]"
+              : "border-white/10 bg-[hsl(var(--background))]/70 backdrop-blur-2xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.7),0_1px_0_0_rgba(255,255,255,0.05)_inset]"
+          }`}
+        >
+          {/* Brilho interno sutil no topo da cápsula */}
+          <span
+            aria-hidden
+            className={`pointer-events-none absolute inset-x-8 top-0 h-px transition-opacity duration-300 ${
+              atTop ? "opacity-0" : "opacity-100"
+            }`}
+            style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.35), transparent)" }}
+          />
 
-          {/* Centro: navegação principal (≥sm) */}
-          <div className="hidden items-center justify-center gap-0.5 sm:flex lg:gap-1">
-            {navItems.map(({ to, label, icon: Icon, active }) => (
-              <Link key={to} to={to} className={linkClass(active)}>
-                <Icon className="h-4 w-4" strokeWidth={2.25} />
-                <span>{label}</span>
-              </Link>
-            ))}
-            <button
-              type="button"
-              onClick={() => setMoreOpen(true)}
-              className={`${linkClass(isMoreActive)} relative`}
-              aria-haspopup="dialog"
-              aria-expanded={moreOpen}
-            >
-              <MoreHorizontal className="h-4 w-4" strokeWidth={2.25} />
-              <span>Mais</span>
-              {unreadNews > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
-                  {unreadNews}
-                </span>
-              )}
-            </button>
-          </div>
+          <nav className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-2 py-1.5 sm:px-3 sm:py-2 lg:gap-6">
+            {/* Esquerda: logo */}
+            <Link to="/" className="tap-target flex items-center gap-2 pl-1" aria-label="airi — início">
+              <img
+                src={airiLogo.url}
+                alt=""
+                className="h-9 w-9 rounded-xl object-contain sm:h-10 sm:w-10 sm:rounded-2xl"
+              />
+              <span className="hidden text-[16px] font-semibold lowercase tracking-tight sm:inline">
+                airi
+              </span>
+            </Link>
 
-          {/* Direita: sync + rank + notificações + perfil */}
-          <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
-            <SyncIndicator minimal />
-            <RankPill />
-            <NotificationsBell />
-            <ProfileMenu />
-          </div>
-        </nav>
+            {/* Centro: navegação com pill deslizante */}
+            <div className="hidden justify-center sm:flex">
+              <SlidingNav
+                items={[
+                  ...navItems.map((i) => ({ key: i.to, to: i.to, label: i.label, icon: i.icon, active: i.active })),
+                  {
+                    key: "more",
+                    label: "Mais",
+                    icon: MoreHorizontal,
+                    active: isMoreActive,
+                    badge: unreadNews,
+                    onClick: () => setMoreOpen(true),
+                  },
+                ]}
+                linkClass={linkClass}
+              />
+            </div>
+
+            {/* Direita: sync + rank + notificações + perfil */}
+            <div className="flex shrink-0 items-center gap-1 justify-self-end pr-1 sm:gap-1.5">
+              <SyncIndicator minimal />
+              <RankPill />
+              <NotificationsBell />
+              <ProfileMenu />
+            </div>
+          </nav>
+        </div>
       </div>
       <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
     </header>
@@ -471,69 +520,230 @@ function TopBar() {
 }
 
 /**
+ * Navegação central do desktop com pill deslizante seguindo o item ativo.
+ * Usa medição de layout para animar left/width via transform smooth.
+ */
+type NavItem = {
+  key: string;
+  to?: string;
+  label: string;
+  icon: typeof Home;
+  active: boolean;
+  badge?: number;
+  onClick?: () => void;
+};
+
+function SlidingNav({
+  items,
+  linkClass,
+}: {
+  items: NavItem[];
+  linkClass: (active: boolean) => string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const activeEl = container.querySelector<HTMLElement>("[data-active='true']");
+    if (!activeEl) {
+      setPill((p) => ({ ...p, visible: false }));
+      return;
+    }
+    const cRect = container.getBoundingClientRect();
+    const aRect = activeEl.getBoundingClientRect();
+    setPill({ left: aRect.left - cRect.left, width: aRect.width, visible: true });
+  }, [items.map((i) => `${i.key}:${i.active}`).join("|")]);
+
+  return (
+    <div ref={containerRef} className="relative flex items-center gap-0.5 lg:gap-1">
+      {/* Pill deslizante */}
+      <span
+        aria-hidden
+        className={`absolute top-1/2 -z-0 h-[calc(100%-6px)] -translate-y-1/2 rounded-full bg-white/[0.06] ring-1 ring-white/10 transition-all duration-[350ms] ${
+          pill.visible ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          left: pill.left,
+          width: pill.width,
+          transitionTimingFunction: "cubic-bezier(0.32, 0.72, 0, 1)",
+        }}
+      />
+      {items.map((item) => {
+        const Icon = item.icon;
+        const content = (
+          <>
+            <Icon className="h-4 w-4" strokeWidth={2.25} />
+            <span>{item.label}</span>
+            {item.badge && item.badge > 0 ? (
+              <span className="ml-0.5 inline-flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                {item.badge}
+              </span>
+            ) : null}
+          </>
+        );
+        if (item.to) {
+          return (
+            <Link
+              key={item.key}
+              to={item.to}
+              data-active={item.active}
+              className={`${linkClass(item.active)} z-10`}
+            >
+              {content}
+            </Link>
+          );
+        }
+        return (
+          <button
+            key={item.key}
+            type="button"
+            onClick={item.onClick}
+            data-active={item.active}
+            className={`${linkClass(item.active)} z-10`}
+          >
+            {content}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * Barra inferior fixa (mobile). Escondida em ≥sm.
+ * - Cápsula flutuante com margem lateral, mais respirável no notch.
+ * - Indicador ativo é uma pílula deslizante atrás do item selecionado.
  */
 function BottomBar() {
   const { pathname, isMoreActive } = useMoreState();
   const isReview = pathname.startsWith("/review");
   const [moreOpen, setMoreOpen] = useState(false);
   const unreadNews = useChangelogUnread();
-  if (isReview) return null;
+  const containerRef = useRef<HTMLUListElement>(null);
+  const [pill, setPill] = useState<{ left: number; width: number; visible: boolean }>({
+    left: 0,
+    width: 0,
+    visible: false,
+  });
 
-  const items = [
-    { to: "/", label: "Início", icon: Home, active: pathname === "/" },
-    { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
-    { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
-    { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
-  ] as const;
+  const items: Array<{
+    key: string;
+    to?: string;
+    label: string;
+    icon: typeof Home;
+    active: boolean;
+    isMore?: boolean;
+    badge?: number;
+  }> = [
+    { key: "/", to: "/", label: "Início", icon: Home, active: pathname === "/" },
+    { key: "/library", to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
+    { key: "/study", to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { key: "/social", to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
+    { key: "more", label: "Mais", icon: MoreHorizontal, active: isMoreActive, isMore: true, badge: unreadNews },
+  ];
+
+  useEffect(() => {
+    if (isReview) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const activeEl = container.querySelector<HTMLElement>("[data-active='true']");
+    if (!activeEl) {
+      setPill((p) => ({ ...p, visible: false }));
+      return;
+    }
+    const cRect = container.getBoundingClientRect();
+    const aRect = activeEl.getBoundingClientRect();
+    setPill({ left: aRect.left - cRect.left, width: aRect.width, visible: true });
+  }, [pathname, isMoreActive, isReview]);
+
+  if (isReview) return null;
 
   return (
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 sm:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:hidden"
       >
-        <div className="glass-panel border-t safe-bottom">
-          <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1 px-2 pt-1.5">
-            {items.map(({ to, label, icon: Icon, active }) => (
-              <li key={to}>
-                <Link
-                  to={to}
-                  className={`tap-target flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
-                    active ? "text-foreground" : "text-muted-foreground"
-                  }`}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <Icon
-                    className={`h-[22px] w-[22px] transition ${active ? "text-primary" : ""}`}
-                    strokeWidth={2.25}
-                  />
-                  <span className="truncate">{label}</span>
-                </Link>
-              </li>
-            ))}
-            <li>
-              <button
-                type="button"
-                onClick={() => setMoreOpen(true)}
-                className={`tap-target relative flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-1.5 text-[11px] font-medium transition ${
-                  isMoreActive ? "text-foreground" : "text-muted-foreground"
-                }`}
-                aria-haspopup="dialog"
-                aria-expanded={moreOpen}
-              >
-                <MoreHorizontal
-                  className={`h-[22px] w-[22px] transition ${isMoreActive ? "text-primary" : ""}`}
-                  strokeWidth={2.25}
-                />
-                <span className="truncate">Mais</span>
-                {unreadNews > 0 && (
-                  <span className="absolute right-1 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
-                    {unreadNews}
+        <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-[hsl(var(--background))]/85 backdrop-blur-2xl shadow-[0_-10px_40px_-10px_rgba(0,0,0,0.6),0_1px_0_0_rgba(255,255,255,0.06)_inset]">
+          {/* Brilho superior sutil (violeta) */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-10 top-0 h-px"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent)" }}
+          />
+          <ul
+            ref={containerRef}
+            className="relative grid grid-cols-5 gap-0.5 px-1.5 py-1.5"
+          >
+            {/* Pill deslizante */}
+            <span
+              aria-hidden
+              className={`pointer-events-none absolute top-1/2 h-[52px] -translate-y-1/2 rounded-2xl bg-white/[0.06] ring-1 ring-white/10 transition-all duration-[380ms] ${
+                pill.visible ? "opacity-100" : "opacity-0"
+              }`}
+              style={{
+                left: pill.left,
+                width: pill.width,
+                transitionTimingFunction: "cubic-bezier(0.32, 0.72, 0, 1)",
+              }}
+            />
+            {items.map((item) => {
+              const Icon = item.icon;
+              const active = item.active;
+              const baseCls = `tap-target relative z-10 flex w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-1 py-2 text-[10.5px] font-medium transition-colors active:scale-[0.94] duration-150 ${
+                active ? "text-foreground" : "text-muted-foreground"
+              }`;
+              const inner = (
+                <>
+                  <span className="relative">
+                    <Icon
+                      className={`h-[22px] w-[22px] transition-colors ${active ? "text-primary" : ""}`}
+                      strokeWidth={2.25}
+                    />
+                    {"badge" in item && item.badge && item.badge > 0 ? (
+                      <span className="absolute -right-1.5 -top-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                        {item.badge}
+                      </span>
+                    ) : null}
                   </span>
-                )}
-              </button>
-            </li>
+                  <span className="truncate">{item.label}</span>
+                </>
+              );
+              if ("isMore" in item && item.isMore) {
+                return (
+                  <li key="more">
+                    <button
+                      type="button"
+                      onClick={() => setMoreOpen(true)}
+                      data-active={active}
+                      className={baseCls}
+                      aria-haspopup="dialog"
+                      aria-expanded={moreOpen}
+                    >
+                      {inner}
+                    </button>
+                  </li>
+                );
+              }
+              return (
+                <li key={item.key}>
+                  <Link
+                    to={item.to!}
+                    data-active={active}
+                    className={baseCls}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {inner}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </nav>
