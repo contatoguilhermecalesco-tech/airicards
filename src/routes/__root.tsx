@@ -9,6 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
@@ -301,7 +302,8 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
   if (!open) return null;
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
       role="dialog"
@@ -390,7 +392,8 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
         </div>
         <div className="safe-bottom" />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
