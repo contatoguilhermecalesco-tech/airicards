@@ -52,17 +52,17 @@
 :root {
   --radius: 1rem;
 
-  /* Sophisticated iOS-style dark with soft purple */
-  --background: oklch(0.17 0.015 285);
+  /* Sophisticated iOS-style deep purple dark */
+  --background: oklch(0.13 0.035 295);
   --foreground: oklch(0.97 0.005 285);
 
-  --surface: oklch(0.21 0.018 285);
-  --surface-elevated: oklch(0.245 0.02 285);
+  --surface: oklch(0.18 0.038 295);
+  --surface-elevated: oklch(0.22 0.04 295);
 
-  --card: oklch(0.215 0.018 285);
+  --card: oklch(0.19 0.038 295);
   --card-foreground: oklch(0.97 0.005 285);
 
-  --popover: oklch(0.23 0.02 285);
+  --popover: oklch(0.21 0.04 295);
   --popover-foreground: oklch(0.97 0.005 285);
 
   /* Soft, muted purple — not neon */
