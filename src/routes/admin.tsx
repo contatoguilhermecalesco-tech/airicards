@@ -163,7 +163,8 @@ type PanelKey =
   | "pin"
   | "tags"
   | "notifications"
-  | "changelog";
+  | "changelog"
+  | "backup";
 
 type PanelDef = {
   key: PanelKey;
