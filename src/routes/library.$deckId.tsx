@@ -284,82 +284,16 @@ function DeckDetail() {
         </div>
       </div>
 
-      <div className="mt-8">
-        {cards.length === 0 ? (
-          <div className="ios-card grid place-items-center rounded-3xl px-6 py-16 text-center">
-            <div>
-              <h2 className="text-lg font-semibold">Nenhuma carta ainda</h2>
-              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Adicione palavras em inglês com sua tradução. Elas vão aparecer
-                na sua próxima sessão de revisão.
-              </p>
-              <button
-                onClick={() => setAddOpen(true)}
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
-              >
-                <Plus className="h-4 w-4" strokeWidth={2.5} />
-                Adicionar primeira carta
-              </button>
-            </div>
-          </div>
-        ) : (
-          <ul className="space-y-2">
-            {cards.map((c) => (
-              <li
-                key={c.id}
-                className={`ios-card group flex items-center justify-between gap-4 rounded-2xl px-5 py-4 ${
-                  isEnemy(c) ? "ring-1 ring-destructive/30" : ""
-                }`}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate font-medium">{c.front}</p>
-                    <SyncDot id={c.id} />
-                    {c.mode === "expression" && (
-                      <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                        expressão
-                      </span>
-                    )}
-                    {isEnemy(c) && (
-                      <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
-                        <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
-                        inimiga
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                    {c.back}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-1">
-                  <button
-                    onClick={() => setEditCard(c)}
-                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-accent hover:text-foreground sm:opacity-0 sm:group-hover:opacity-100"
-                    aria-label="Editar carta"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setGiftCard(c)}
-                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-primary/15 hover:text-primary sm:opacity-0 sm:group-hover:opacity-100"
-                    aria-label="Enviar carta"
-                    title="Enviar para o outro perfil"
-                  >
-                    <Gift className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(c.id)}
-                    className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100"
-                    aria-label="Excluir carta"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <CardsPanel
+        deckId={deckId}
+        deckColor={deck.color}
+        cards={cards}
+        onAdd={() => setAddOpen(true)}
+        onEdit={(c) => setEditCard(c)}
+        onGift={(c) => setGiftCard(c)}
+        onDelete={(id) => setConfirmDelete(id)}
+      />
+
 
       <div className="mt-10 text-center">
         <button
