@@ -732,9 +732,9 @@ function BottomBar() {
                 );
               }
               return (
-                <li key={item.to}>
+                <li key={item.key}>
                   <Link
-                    to={item.to}
+                    to={item.to!}
                     data-active={active}
                     className={baseCls}
                     aria-current={active ? "page" : undefined}
