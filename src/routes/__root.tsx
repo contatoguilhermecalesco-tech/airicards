@@ -632,13 +632,21 @@ function BottomBar() {
     visible: false,
   });
 
-  const items = [
-    { to: "/", label: "Início", icon: Home, active: pathname === "/" },
-    { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
-    { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
-    { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
+  const items: Array<{
+    key: string;
+    to?: string;
+    label: string;
+    icon: typeof Home;
+    active: boolean;
+    isMore?: boolean;
+    badge?: number;
+  }> = [
+    { key: "/", to: "/", label: "Início", icon: Home, active: pathname === "/" },
+    { key: "/library", to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
+    { key: "/study", to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { key: "/social", to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
     { key: "more", label: "Mais", icon: MoreHorizontal, active: isMoreActive, isMore: true, badge: unreadNews },
-  ] as const;
+  ];
 
   useEffect(() => {
     if (isReview) return;
