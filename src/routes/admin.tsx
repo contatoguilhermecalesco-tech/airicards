@@ -169,7 +169,9 @@ type PanelKey =
   | "tags"
   | "notifications"
   | "changelog"
-  | "backup";
+  | "backup"
+  | "streak";
+
 
 type PanelDef = {
   key: PanelKey;
