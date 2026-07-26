@@ -601,6 +601,7 @@ export function updateCard(
     }),
   };
   emit();
+  markItemPending(id);
   void flushSave();
 }
 
