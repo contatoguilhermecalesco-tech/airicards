@@ -145,6 +145,15 @@ let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 // dentro de uma janela curta após o save local.
 let lastLocalSaveAt = 0;
 const REMOTE_ECHO_WINDOW_MS = 2000;
+// Hidratado = já concluímos o primeiro pull do servidor para o perfil ativo.
+// Antes disso NÃO escrevemos no cloud — caso contrário o cache local (que
+// pode estar defasado em relação a outro dispositivo) sobrescreve dados
+// recém-criados em outro device, quebrando a sincronia PC ↔ celular.
+let hydrated = false;
+// Fila de mutações pedidas antes da hidratação — quando o pull termina,
+// disparamos um save único com o estado já mesclado com o servidor.
+let pendingSaveBeforeHydration = false;
+
 
 async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
