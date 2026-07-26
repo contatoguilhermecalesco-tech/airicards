@@ -279,7 +279,7 @@ export type ProfileBackup = {
   version: 1;
   exportedAt: string;
   profileId: string;
-  data: unknown;
+  data: { decks: unknown[]; cards: unknown[] };
 };
 
 export const adminExportProfileDataFn = createServerFn({ method: "POST" })
