@@ -464,7 +464,19 @@ if (isBrowser()) {
   };
   window.addEventListener("focus", reconcile);
   document.addEventListener("visibilitychange", reconcile);
-  window.addEventListener("online", reconcile);
+  window.addEventListener("online", () => {
+    // Voltamos à rede: se havia coisas pendentes, o próximo save resolve;
+    // caso contrário, refletimos "synced" imediatamente.
+    if (syncStatus === "offline" || syncStatus === "error") {
+      setSyncStatus(pendingItems.size > 0 ? "pending" : "synced");
+    }
+    reconcile();
+  });
+  window.addEventListener("offline", () => {
+    setSyncStatus("offline");
+  });
+  // Estado inicial coerente com a rede.
+  if (navigator.onLine === false) setSyncStatus("offline");
 }
 
 // --- React hooks ------------------------------------------------------
