@@ -458,7 +458,7 @@ function TopBar() {
 
           {/* Direita: sync + rank + notificações + perfil */}
           <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
-            <SyncIndicator />
+            <SyncIndicator minimal />
             <RankPill />
             <NotificationsBell />
             <ProfileMenu />
