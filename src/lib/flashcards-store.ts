@@ -167,13 +167,36 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     .maybeSingle();
   if (error) {
     console.error("[airi] pull failed", error);
+    // Mesmo em falha, liberamos as escritas para não travar o app offline.
+    if (!hydrated) {
+      hydrated = true;
+      if (pendingSaveBeforeHydration) {
+        pendingSaveBeforeHydration = false;
+        void persistNow(profileId);
+      }
+    }
     return;
   }
   if (data) {
+    if (activeProfile !== profileId) return; // profile switched meanwhile
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    if (activeProfile !== profileId) return; // profile switched meanwhile
-    state = remote;
+    // Se o usuário mutou localmente antes deste primeiro pull, o cache local
+    // pode ter dados mais novos que o servidor. Nesse caso, mesclamos:
+    // servidor como base + itens locais que não estão no servidor. Isso
+    // protege trabalho feito enquanto a rede estava lenta.
+    if (!hydrated && pendingSaveBeforeHydration) {
+      const remoteDeckIds = new Set(remote.decks.map((d) => d.id));
+      const remoteCardIds = new Set(remote.cards.map((c) => c.id));
+      const extraDecks = state.decks.filter((d) => !remoteDeckIds.has(d.id));
+      const extraCards = state.cards.filter((c) => !remoteCardIds.has(c.id));
+      state = {
+        decks: [...extraDecks, ...remote.decks],
+        cards: [...extraCards, ...remote.cards],
+      };
+    } else {
+      state = remote;
+    }
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
     // zeramos os contadores diários e mantemos o resto.
@@ -185,10 +208,24 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     emit();
     emitHome();
   }
+  // Libera escritas para o cloud a partir de agora.
+  if (!hydrated) {
+    hydrated = true;
+    if (pendingSaveBeforeHydration) {
+      pendingSaveBeforeHydration = false;
+      void persistNow(profileId);
+    }
+  }
 }
 
 async function persistNow(profileId: string) {
   saveCache(profileId, state, home);
+  if (!hydrated) {
+    // Ainda não sincronizamos com o servidor — não podemos sobrescrever o
+    // que outro device escreveu. Guarda a intenção e sai.
+    pendingSaveBeforeHydration = true;
+    return;
+  }
   const { error } = await supabase
     .from("profile_data")
     .upsert(
@@ -211,6 +248,12 @@ function scheduleSave() {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
   saveCache(profileId, state, home);
+  if (!hydrated) {
+    // Marca que temos alterações locais pendentes; serão enviadas assim
+    // que o primeiro pull terminar.
+    pendingSaveBeforeHydration = true;
+    return;
+  }
   if (saveTimer) clearTimeout(saveTimer);
   // Debounce curto — mutações UI (delete/edit) sentem-se instantâneas mas
   // ainda agrupamos escritas em rajada (ex.: revisão sequencial).
@@ -234,6 +277,7 @@ export async function flushSave(): Promise<void> {
   }
   await persistNow(profileId);
 }
+
 
 export function setActiveProfileId(profileId: string | null) {
   if (activeProfile === profileId) return;
