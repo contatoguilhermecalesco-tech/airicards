@@ -145,6 +145,15 @@ let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 // dentro de uma janela curta após o save local.
 let lastLocalSaveAt = 0;
 const REMOTE_ECHO_WINDOW_MS = 2000;
+// Hidratado = já concluímos o primeiro pull do servidor para o perfil ativo.
+// Antes disso NÃO escrevemos no cloud — caso contrário o cache local (que
+// pode estar defasado em relação a outro dispositivo) sobrescreve dados
+// recém-criados em outro device, quebrando a sincronia PC ↔ celular.
+let hydrated = false;
+// Fila de mutações pedidas antes da hidratação — quando o pull termina,
+// disparamos um save único com o estado já mesclado com o servidor.
+let pendingSaveBeforeHydration = false;
+
 
 async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
@@ -158,13 +167,36 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     .maybeSingle();
   if (error) {
     console.error("[airi] pull failed", error);
+    // Mesmo em falha, liberamos as escritas para não travar o app offline.
+    if (!hydrated) {
+      hydrated = true;
+      if (pendingSaveBeforeHydration) {
+        pendingSaveBeforeHydration = false;
+        void persistNow(profileId);
+      }
+    }
     return;
   }
   if (data) {
+    if (activeProfile !== profileId) return; // profile switched meanwhile
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    if (activeProfile !== profileId) return; // profile switched meanwhile
-    state = remote;
+    // Se o usuário mutou localmente antes deste primeiro pull, o cache local
+    // pode ter dados mais novos que o servidor. Nesse caso, mesclamos:
+    // servidor como base + itens locais que não estão no servidor. Isso
+    // protege trabalho feito enquanto a rede estava lenta.
+    if (!hydrated && pendingSaveBeforeHydration) {
+      const remoteDeckIds = new Set(remote.decks.map((d) => d.id));
+      const remoteCardIds = new Set(remote.cards.map((c) => c.id));
+      const extraDecks = state.decks.filter((d) => !remoteDeckIds.has(d.id));
+      const extraCards = state.cards.filter((c) => !remoteCardIds.has(c.id));
+      state = {
+        decks: [...extraDecks, ...remote.decks],
+        cards: [...extraCards, ...remote.cards],
+      };
+    } else {
+      state = remote;
+    }
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
     // zeramos os contadores diários e mantemos o resto.
@@ -176,10 +208,24 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
     emit();
     emitHome();
   }
+  // Libera escritas para o cloud a partir de agora.
+  if (!hydrated) {
+    hydrated = true;
+    if (pendingSaveBeforeHydration) {
+      pendingSaveBeforeHydration = false;
+      void persistNow(profileId);
+    }
+  }
 }
 
 async function persistNow(profileId: string) {
   saveCache(profileId, state, home);
+  if (!hydrated) {
+    // Ainda não sincronizamos com o servidor — não podemos sobrescrever o
+    // que outro device escreveu. Guarda a intenção e sai.
+    pendingSaveBeforeHydration = true;
+    return;
+  }
   const { error } = await supabase
     .from("profile_data")
     .upsert(
@@ -202,6 +248,12 @@ function scheduleSave() {
   if (!activeProfile || !isBrowser()) return;
   const profileId = activeProfile;
   saveCache(profileId, state, home);
+  if (!hydrated) {
+    // Marca que temos alterações locais pendentes; serão enviadas assim
+    // que o primeiro pull terminar.
+    pendingSaveBeforeHydration = true;
+    return;
+  }
   if (saveTimer) clearTimeout(saveTimer);
   // Debounce curto — mutações UI (delete/edit) sentem-se instantâneas mas
   // ainda agrupamos escritas em rajada (ex.: revisão sequencial).
@@ -226,9 +278,19 @@ export async function flushSave(): Promise<void> {
   await persistNow(profileId);
 }
 
+
 export function setActiveProfileId(profileId: string | null) {
   if (activeProfile === profileId) return;
   activeProfile = profileId;
+  // Reinicia o estado de hidratação — writes ficam bloqueadas até o
+  // primeiro pull do servidor terminar (evita que o cache local defasado
+  // sobrescreva dados criados em outro device).
+  hydrated = false;
+  pendingSaveBeforeHydration = false;
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
 
   if (realtimeChannel) {
     supabase.removeChannel(realtimeChannel);
@@ -238,6 +300,7 @@ export function setActiveProfileId(profileId: string | null) {
   if (!profileId) {
     state = { decks: [], cards: [] };
     home = { day: todayKey(), count: 0 };
+    hydrated = true; // sem perfil, nada a sincronizar
     emit();
     emitHome();
     return;
@@ -256,7 +319,9 @@ export function setActiveProfileId(profileId: string | null) {
   runDailyPunishments();
 
   // Refresh from Cloud, then subscribe to Realtime updates from other devices.
-  void pullFromCloud(profileId).then(() => runDailyPunishments());
+  // Force=true garante que o primeiro pull NÃO seja ignorado por eco.
+  void pullFromCloud(profileId, { force: true }).then(() => runDailyPunishments());
+
   realtimeChannel = supabase
     .channel(`profile_data:${profileId}`)
     .on(
