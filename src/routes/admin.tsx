@@ -367,6 +367,7 @@ function AdminPage() {
                 {openPanel === "notifications" && <NotificationsSection />}
                 {openPanel === "changelog" && <ChangelogSection />}
                 {openPanel === "backup" && <BackupSection />}
+                {openPanel === "streak" && <StreakAdminSection />}
               </div>
             </>
           )}
