@@ -358,6 +358,7 @@ function AdminPage() {
                 {openPanel === "tags" && <TagsSection />}
                 {openPanel === "notifications" && <NotificationsSection />}
                 {openPanel === "changelog" && <ChangelogSection />}
+                {openPanel === "backup" && <BackupSection />}
               </div>
             </>
           )}
