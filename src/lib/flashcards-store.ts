@@ -508,16 +508,22 @@ export function createDeck(name: string, description?: string, color?: string): 
   };
   state = { ...state, decks: [deck, ...state.decks] };
   emit();
+  markItemPending(deck.id);
   void flushSave();
   return deck;
 }
 
 export function deleteDeck(id: string) {
+  const affectedCards = state.cards.filter((c) => c.deckId === id).map((c) => c.id);
   state = {
     decks: state.decks.filter((d) => d.id !== id),
     cards: state.cards.filter((c) => c.deckId !== id),
   };
   emit();
+  // Deleção: remove marcadores locais desses ids — nada a "confirmar" mais.
+  pendingItems.delete(id);
+  for (const cid of affectedCards) pendingItems.delete(cid);
+  emitPendingItems();
   // Persistência imediata — evita eco/pull que "traz" o deck de volta.
   void flushSave();
 }
@@ -528,6 +534,7 @@ export function updateDeck(id: string, patch: Partial<Pick<Deck, "name" | "descr
     decks: state.decks.map((d) => (d.id === id ? { ...d, ...patch } : d)),
   };
   emit();
+  markItemPending(id);
   scheduleSave();
 }
 
@@ -553,6 +560,7 @@ export function createCard(
   };
   state = { ...state, cards: [card, ...state.cards] };
   emit();
+  markItemPending(card.id);
   // Persistência imediata — evita que um pull/echo remoto sobrescreva a carta recém-criada.
   void flushSave();
   return card;
@@ -561,6 +569,8 @@ export function createCard(
 export function deleteCard(id: string) {
   state = { ...state, cards: state.cards.filter((c) => c.id !== id) };
   emit();
+  pendingItems.delete(id);
+  emitPendingItems();
   // Persistência imediata — evita eco/pull que "traz" a carta de volta.
   void flushSave();
 }
