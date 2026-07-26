@@ -146,10 +146,10 @@ let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 let lastLocalSaveAt = 0;
 const REMOTE_ECHO_WINDOW_MS = 2000;
 
-async function pullFromCloud(profileId: string, opts?: { force?: boolean }): Promise<boolean> {
+async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
     // É provavelmente o eco do nosso próprio save — ignora.
-    return false;
+    return;
   }
   const { data, error } = await supabase
     .from("profile_data")
@@ -158,12 +158,12 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }): Pro
     .maybeSingle();
   if (error) {
     console.error("[airi] pull failed", error);
-    return false;
+    return;
   }
   if (data) {
     const remote = (data.data ?? { decks: [], cards: [] }) as State;
     const remoteHome = (data.home_sessions ?? { day: todayKey(), count: 0 }) as HomeSessions;
-    if (activeProfile !== profileId) return false; // profile switched meanwhile
+    if (activeProfile !== profileId) return; // profile switched meanwhile
     state = remote;
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
@@ -175,9 +175,7 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }): Pro
     saveCache(profileId, state, home);
     emit();
     emitHome();
-    return true;
   }
-  return false;
 }
 
 async function persistNow(profileId: string) {
@@ -254,10 +252,11 @@ export function setActiveProfileId(profileId: string | null) {
       : { ...cached.home, day: todayKey(), count: 0, reviewed: 0 };
   emit();
   emitHome();
+  // Punições diárias com base no estado carregado.
+  runDailyPunishments();
+
   // Refresh from Cloud, then subscribe to Realtime updates from other devices.
-  void pullFromCloud(profileId).then((loaded) => {
-    if (loaded) runDailyPunishments();
-  });
+  void pullFromCloud(profileId).then(() => runDailyPunishments());
   realtimeChannel = supabase
     .channel(`profile_data:${profileId}`)
     .on(
@@ -280,24 +279,6 @@ if (isBrowser()) {
   applyCurrent();
   void import("@/lib/profile").then(({ subscribeProfile }) => {
     subscribeProfile(applyCurrent);
-  });
-  // Sessão autenticada pode ficar pronta DEPOIS do primeiro pullFromCloud.
-  // Sem re-pull, RLS retorna vazio na primeira hidratação e o usuário vê
-  // seus decks/cartas "sumidos" até um reload manual. Refazemos o pull
-  // sempre que uma sessão válida aparece ou é renovada.
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (!session) return;
-    if (
-      event !== "SIGNED_IN" &&
-      event !== "TOKEN_REFRESHED" &&
-      event !== "USER_UPDATED" &&
-      event !== "INITIAL_SESSION"
-    )
-      return;
-    if (!activeProfile) return;
-    void pullFromCloud(activeProfile, { force: true }).then((loaded) => {
-      if (loaded) runDailyPunishments();
-    });
   });
 }
 
