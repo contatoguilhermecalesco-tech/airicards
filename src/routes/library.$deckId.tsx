@@ -625,3 +625,498 @@ function CardSheet({
     </div>
   );
 }
+
+// ============================================================
+// Cards panel (search + view + filter + sort) — Spotify-style
+// ============================================================
+function CardsPanel({
+  deckId,
+  deckColor,
+  cards,
+  onAdd,
+  onEdit,
+  onGift,
+  onDelete,
+}: {
+  deckId: string;
+  deckColor?: string;
+  cards: Card[];
+  onAdd: () => void;
+  onEdit: (c: Card) => void;
+  onGift: (c: Card) => void;
+  onDelete: (id: string) => void;
+}) {
+  const prefs = useCardPrefs(deckId);
+  const [query, setQuery] = useState("");
+  const now = Date.now();
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = [...cards];
+    if (q) {
+      list = list.filter(
+        (c) =>
+          c.front.toLowerCase().includes(q) ||
+          c.back.toLowerCase().includes(q) ||
+          (c.source ?? "").toLowerCase().includes(q),
+      );
+    }
+    switch (prefs.filter) {
+      case "word":
+        list = list.filter((c) => (c.mode ?? "word") === "word");
+        break;
+      case "sentence":
+        list = list.filter((c) => c.mode === "sentence");
+        break;
+      case "expression":
+        list = list.filter((c) => c.mode === "expression");
+        break;
+      case "new":
+        list = list.filter((c) => (c.reps ?? 0) === 0);
+        break;
+      case "learning":
+        list = list.filter((c) => (c.reps ?? 0) > 0 && (c.successes ?? 0) < 3);
+        break;
+      case "mastered":
+        list = list.filter((c) => (c.successes ?? 0) >= 3);
+        break;
+      case "enemies":
+        list = list.filter(isEnemy);
+        break;
+    }
+    switch (prefs.sort) {
+      case "recent":
+        list.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+        break;
+      case "alpha":
+        list.sort((a, b) => a.front.localeCompare(b.front, "pt"));
+        break;
+      case "due":
+        list.sort((a, b) => a.dueAt - b.dueAt);
+        break;
+      case "hardest":
+        list.sort((a, b) => (b.lapses ?? 0) - (a.lapses ?? 0));
+        break;
+    }
+    return list;
+  }, [cards, prefs.filter, prefs.sort, query]);
+
+  if (cards.length === 0) {
+    return (
+      <div className="mt-8 ios-card grid place-items-center rounded-3xl px-6 py-16 text-center">
+        <div>
+          <h2 className="text-lg font-semibold">Nenhuma carta ainda</h2>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            Adicione palavras em inglês com sua tradução. Elas vão aparecer
+            na sua próxima sessão de revisão.
+          </p>
+          <button
+            onClick={onAdd}
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2.5} />
+            Adicionar primeira carta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-8 space-y-3">
+      {/* Toolbar */}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:items-center">
+        <div className="relative min-w-0">
+          <div className="flex items-center gap-2.5 rounded-[16px] border border-white/10 bg-white/[0.04] px-3.5 py-2.5 backdrop-blur-2xl transition focus-within:border-primary/40 focus-within:bg-white/[0.06]">
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar cartas…"
+              className="w-full min-w-0 bg-transparent text-[14px] text-foreground placeholder:text-muted-foreground/70 outline-none"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/10 text-muted-foreground hover:bg-white/20 hover:text-foreground"
+                aria-label="Limpar busca"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <CardViewToggle mode={prefs.view} onChange={(v) => setCardPrefs(deckId, { view: v })} />
+          <CardSortMenu sort={prefs.sort} onChange={(s) => setCardPrefs(deckId, { sort: s })} />
+        </div>
+      </div>
+
+      <CardFilterChips
+        current={prefs.filter}
+        onChange={(f) => setCardPrefs(deckId, { filter: f })}
+        cards={cards}
+        now={now}
+      />
+
+      {filtered.length === 0 ? (
+        <p className="rounded-[18px] border border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-muted-foreground backdrop-blur-xl">
+          Nenhuma carta com esses filtros.
+        </p>
+      ) : prefs.view === "grid" ? (
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {filtered.map((c) => (
+            <CardGridItem
+              key={c.id}
+              card={c}
+              deckColor={deckColor}
+              onEdit={() => onEdit(c)}
+              onGift={() => onGift(c)}
+              onDelete={() => onDelete(c.id)}
+            />
+          ))}
+        </ul>
+      ) : (
+        <ul className="divide-y divide-white/5 overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.02] backdrop-blur-xl">
+          {filtered.map((c) => (
+            <CardListItem
+              key={c.id}
+              card={c}
+              onEdit={() => onEdit(c)}
+              onGift={() => onGift(c)}
+              onDelete={() => onDelete(c.id)}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function CardViewToggle({
+  mode,
+  onChange,
+}: {
+  mode: CardViewMode;
+  onChange: (m: CardViewMode) => void;
+}) {
+  const items: { id: CardViewMode; icon: typeof LayoutGrid; label: string }[] = [
+    { id: "list", icon: ListIcon, label: "Lista" },
+    { id: "grid", icon: LayoutGrid, label: "Grade" },
+  ];
+  return (
+    <div className="flex items-center gap-0.5 rounded-[14px] border border-white/10 bg-white/[0.03] p-1 backdrop-blur-md">
+      {items.map((it) => {
+        const active = mode === it.id;
+        const Icon = it.icon;
+        return (
+          <button
+            key={it.id}
+            onClick={() => onChange(it.id)}
+            aria-label={it.label}
+            title={it.label}
+            className={`grid h-8 w-8 place-items-center rounded-[10px] transition ${
+              active
+                ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+            }`}
+          >
+            <Icon className="h-4 w-4" strokeWidth={2.25} />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function CardSortMenu({
+  sort,
+  onChange,
+}: {
+  sort: CardSort;
+  onChange: (s: CardSort) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const options: { id: CardSort; label: string }[] = [
+    { id: "recent", label: "Recentes" },
+    { id: "due", label: "Vencimento" },
+    { id: "hardest", label: "Mais erradas" },
+    { id: "alpha", label: "A → Z" },
+  ];
+  const label = options.find((o) => o.id === sort)?.label ?? "Ordenar";
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex h-10 items-center gap-1.5 rounded-[14px] border border-white/10 bg-white/[0.03] px-3 text-[13px] font-medium text-foreground/85 backdrop-blur-md hover:bg-white/[0.06]"
+      >
+        <ArrowUpDown className="h-3.5 w-3.5" strokeWidth={2.5} />
+        <span className="hidden sm:inline">{label}</span>
+      </button>
+      {open && (
+        <>
+          <button
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          <div className="absolute right-0 top-[calc(100%+6px)] z-50 w-44 overflow-hidden rounded-[16px] border border-white/10 bg-[color-mix(in_oklab,var(--surface)_88%,black)]/95 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
+            {options.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => {
+                  onChange(opt.id);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center justify-between px-3.5 py-2.5 text-left text-[13px] transition ${
+                  sort === opt.id
+                    ? "bg-primary/15 text-primary"
+                    : "text-foreground/85 hover:bg-white/[0.06]"
+                }`}
+              >
+                {opt.label}
+                {sort === opt.id && <Check className="h-3.5 w-3.5" strokeWidth={2.75} />}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function CardFilterChips({
+  current,
+  onChange,
+  cards,
+  now,
+}: {
+  current: CardFilter;
+  onChange: (f: CardFilter) => void;
+  cards: Card[];
+  now: number;
+}) {
+  void now;
+  const counts = useMemo(() => {
+    return {
+      all: cards.length,
+      word: cards.filter((c) => (c.mode ?? "word") === "word").length,
+      sentence: cards.filter((c) => c.mode === "sentence").length,
+      expression: cards.filter((c) => c.mode === "expression").length,
+      new: cards.filter((c) => (c.reps ?? 0) === 0).length,
+      learning: cards.filter((c) => (c.reps ?? 0) > 0 && (c.successes ?? 0) < 3).length,
+      mastered: cards.filter((c) => (c.successes ?? 0) >= 3).length,
+      enemies: cards.filter(isEnemy).length,
+    };
+  }, [cards]);
+
+  const chips: { id: CardFilter; label: string; count: number; tone?: string }[] = [
+    { id: "all", label: "Todas", count: counts.all },
+    { id: "new", label: "Novas", count: counts.new, tone: "rgb(129 140 248)" },
+    { id: "learning", label: "Aprendendo", count: counts.learning, tone: "rgb(251 191 36)" },
+    { id: "mastered", label: "Dominadas", count: counts.mastered, tone: "rgb(52 211 153)" },
+    { id: "enemies", label: "Inimigas", count: counts.enemies, tone: "rgb(248 113 113)" },
+    { id: "word", label: "Palavras", count: counts.word },
+    { id: "sentence", label: "Frases", count: counts.sentence },
+    { id: "expression", label: "Expressões", count: counts.expression },
+  ];
+
+  return (
+    <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {chips.map((c) => {
+        const active = current === c.id;
+        if (c.count === 0 && c.id !== "all") return null;
+        return (
+          <button
+            key={c.id}
+            onClick={() => onChange(c.id)}
+            className={`shrink-0 snap-start rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition ${
+              active
+                ? "border-primary/40 bg-primary/15 text-foreground"
+                : "border-white/10 bg-white/[0.03] text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+            }`}
+            style={active && c.tone ? { color: c.tone, borderColor: `${c.tone}55` } : undefined}
+          >
+            {c.label}
+            <span className="ml-1.5 text-[11px] opacity-70">{c.count}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function CardListItem({
+  card: c,
+  onEdit,
+  onGift,
+  onDelete,
+}: {
+  card: Card;
+  onEdit: () => void;
+  onGift: () => void;
+  onDelete: () => void;
+}) {
+  const enemy = isEnemy(c);
+  const isNew = (c.reps ?? 0) === 0;
+  const mastered = (c.successes ?? 0) >= 3;
+  return (
+    <li
+      className={`group relative flex items-center gap-3 px-4 py-3 transition hover:bg-white/[0.03] ${
+        enemy ? "bg-destructive/[0.04]" : ""
+      }`}
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-[14.5px] font-semibold text-foreground">
+            {c.front}
+          </p>
+          <SyncDot id={c.id} />
+          {c.mode === "expression" && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-primary">
+              expr
+            </span>
+          )}
+          {c.mode === "sentence" && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-white/10 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+              frase
+            </span>
+          )}
+          {isNew && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-indigo-400/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-indigo-300">
+              nova
+            </span>
+          )}
+          {mastered && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-emerald-400/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-emerald-300">
+              dominada
+            </span>
+          )}
+          {enemy && (
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-destructive">
+              <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
+              inimiga
+            </span>
+          )}
+        </div>
+        <p className="mt-0.5 truncate text-[12.5px] text-muted-foreground">{c.back}</p>
+      </div>
+      <div className="flex shrink-0 items-center gap-0.5 opacity-60 transition group-hover:opacity-100">
+        <button
+          onClick={onEdit}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+          aria-label="Editar carta"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onGift}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-primary/15 hover:text-primary"
+          aria-label="Enviar carta"
+          title="Enviar para o outro perfil"
+        >
+          <Gift className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+          aria-label="Excluir carta"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </li>
+  );
+}
+
+function CardGridItem({
+  card: c,
+  deckColor,
+  onEdit,
+  onGift,
+  onDelete,
+}: {
+  card: Card;
+  deckColor?: string;
+  onEdit: () => void;
+  onGift: () => void;
+  onDelete: () => void;
+}) {
+  const gradient = deckGradient(deckColor);
+  const color = getDeckColor(deckColor);
+  const enemy = isEnemy(c);
+  return (
+    <li
+      className={`group relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl transition ${
+        enemy ? "border-destructive/30 bg-destructive/[0.04]" : ""
+      }`}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-0.5"
+        style={{ background: gradient }}
+      />
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] font-bold text-foreground">{c.front}</p>
+          <p className="mt-1 line-clamp-2 text-[13px] text-muted-foreground">{c.back}</p>
+        </div>
+        <SyncDot id={c.id} />
+      </div>
+      <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        {c.mode === "expression" && (
+          <span
+            className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+            style={{ color: color.from, background: `${color.tint}22` }}
+          >
+            expressão
+          </span>
+        )}
+        {c.mode === "sentence" && (
+          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            frase
+          </span>
+        )}
+        {(c.reps ?? 0) === 0 && (
+          <span className="rounded-full bg-indigo-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-indigo-300">
+            nova
+          </span>
+        )}
+        {(c.successes ?? 0) >= 3 && (
+          <span className="rounded-full bg-emerald-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+            dominada
+          </span>
+        )}
+        {enemy && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
+            <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
+            inimiga
+          </span>
+        )}
+      </div>
+      <div className="mt-3 flex justify-end gap-0.5 opacity-60 transition group-hover:opacity-100">
+        <button
+          onClick={onEdit}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-white/10 hover:text-foreground"
+          aria-label="Editar carta"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onGift}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-primary/15 hover:text-primary"
+          aria-label="Enviar carta"
+        >
+          <Gift className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onDelete}
+          className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
+          aria-label="Excluir carta"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </li>
+  );
+}
