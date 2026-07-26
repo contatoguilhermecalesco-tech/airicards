@@ -160,6 +160,42 @@ let hydrated = false;
 // disparamos um save único com o estado já mesclado com o servidor.
 let pendingSaveBeforeHydration = false;
 
+// --- Sync status tracker ---------------------------------------------
+// Estados possíveis do sincronismo com o banco (Lovable Cloud).
+// - 'synced'  : tudo salvo remotamente.
+// - 'saving'  : escrita em andamento.
+// - 'pending' : alterações locais aguardando envio (hidratação/offline).
+// - 'error'   : última tentativa falhou.
+// - 'offline' : navegador sem rede.
+export type SyncStatus = "synced" | "saving" | "pending" | "error" | "offline";
+let syncStatus: SyncStatus = "synced";
+const syncListeners = new Set<() => void>();
+// IDs de decks/cartas com mutações locais ainda não confirmadas no banco.
+const pendingItems = new Set<string>();
+const pendingItemListeners = new Set<() => void>();
+function setSyncStatus(next: SyncStatus) {
+  if (syncStatus === next) return;
+  syncStatus = next;
+  syncListeners.forEach((l) => l());
+}
+function emitPendingItems() {
+  pendingItemListeners.forEach((l) => l());
+}
+function markItemPending(id: string) {
+  if (!id) return;
+  pendingItems.add(id);
+  emitPendingItems();
+}
+function clearPendingItems() {
+  if (pendingItems.size === 0) return;
+  pendingItems.clear();
+  emitPendingItems();
+}
+function computeIdleStatus(): SyncStatus {
+  if (isBrowser() && navigator.onLine === false) return "offline";
+  return "synced";
+}
+
 
 async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
   if (!opts?.force && Date.now() - lastLocalSaveAt < REMOTE_ECHO_WINDOW_MS) {
