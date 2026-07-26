@@ -54,6 +54,9 @@ import {
   adminResetExamsFn,
   adminExportProfileDataFn,
   adminImportProfileDataFn,
+  adminFetchStreaksFn,
+  adminSetStreakFn,
+  type StreakRow,
 } from "@/lib/admin.functions";
 import { useAppSettings, setSetting } from "@/lib/app-settings";
 import { useRank, resetRank, tierLabel, TIER_COLORS, readRankForProfile, subscribeAllRanks, type RankState } from "@/lib/rank-store";
