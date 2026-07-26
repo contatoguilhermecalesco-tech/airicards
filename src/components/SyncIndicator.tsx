@@ -7,6 +7,7 @@ type Meta = {
   Icon: typeof Check;
   tone: string; // classes
   dot: string; // fundo do ponto
+  iconColor: string;
 };
 
 const META: Record<SyncStatus, Meta> = {
@@ -16,6 +17,7 @@ const META: Record<SyncStatus, Meta> = {
     Icon: Check,
     tone: "text-emerald-300/90 border-emerald-400/20 bg-emerald-400/[0.06]",
     dot: "bg-emerald-400",
+    iconColor: "text-emerald-400/70",
   },
   saving: {
     label: "Salvando…",
@@ -23,6 +25,7 @@ const META: Record<SyncStatus, Meta> = {
     Icon: Loader2,
     tone: "text-primary/90 border-primary/25 bg-primary/[0.08]",
     dot: "bg-primary",
+    iconColor: "text-primary/80",
   },
   pending: {
     label: "Pendente",
@@ -30,6 +33,7 @@ const META: Record<SyncStatus, Meta> = {
     Icon: Upload,
     tone: "text-amber-300/90 border-amber-400/25 bg-amber-400/[0.06]",
     dot: "bg-amber-400",
+    iconColor: "text-amber-400/80",
   },
   error: {
     label: "Falha ao sincronizar",
@@ -37,6 +41,7 @@ const META: Record<SyncStatus, Meta> = {
     Icon: AlertTriangle,
     tone: "text-destructive border-destructive/30 bg-destructive/10",
     dot: "bg-destructive",
+    iconColor: "text-destructive",
   },
   offline: {
     label: "Offline",
@@ -44,17 +49,56 @@ const META: Record<SyncStatus, Meta> = {
     Icon: CloudOff,
     tone: "text-slate-300/90 border-white/10 bg-white/[0.05]",
     dot: "bg-slate-400",
+    iconColor: "text-slate-400",
   },
 };
 
 /**
  * Selo global de sincronismo — encaixa no navbar.
  * Em telas pequenas mostra só o ícone; ≥sm mostra o rótulo curto.
+ * Para versão minimalista no topo do app, use `minimal`.
  */
-export function SyncIndicator({ compact = false }: { compact?: boolean }) {
+export function SyncIndicator({
+  compact = false,
+  minimal = false,
+}: {
+  compact?: boolean;
+  minimal?: boolean;
+}) {
   const status = useSyncStatus();
-  const { label, short, Icon, tone } = META[status];
+  const { label, short, Icon, tone, iconColor } = META[status];
   const spinning = status === "saving";
+
+  if (minimal) {
+    // Ícone sólido quando há atenção; ponto verde quase invisível quando synced.
+    const needsAttention = status === "error" || status === "offline" || status === "saving" || status === "pending";
+    if (!needsAttention) {
+      return (
+        <span
+          className="inline-flex h-5 w-5 items-center justify-center rounded-full"
+          title={label}
+          aria-label={label}
+          role="status"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/40" />
+        </span>
+      );
+    }
+    return (
+      <span
+        className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${tone} border`}
+        title={label}
+        aria-label={label}
+        role="status"
+      >
+        <Icon
+          className={`h-3 w-3 ${iconColor} ${spinning ? "animate-spin" : ""}`}
+          strokeWidth={2.5}
+        />
+      </span>
+    );
+  }
+
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-[11px] font-semibold uppercase tracking-wider backdrop-blur-md transition ${tone}`}
@@ -90,7 +134,7 @@ export function SyncDot({
   const pulse = status === "saving" || status === "pending";
   return (
     <span
-      className={`relative inline-flex h-2 w-2 shrink-0 ${className}`}
+      className={`relative inline-flex h-1.5 w-1.5 shrink-0 ${className}`}
       title={
         status === "error"
           ? "Falha ao salvar — tentando novamente"
@@ -102,10 +146,10 @@ export function SyncDot({
     >
       {pulse && (
         <span
-          className={`absolute inset-0 animate-ping rounded-full opacity-60 ${meta.dot}`}
+          className={`absolute inset-0 animate-ping rounded-full opacity-50 ${meta.dot}`}
         />
       )}
-      <span className={`relative inline-block h-2 w-2 rounded-full ${meta.dot}`} />
+      <span className={`relative inline-block h-1.5 w-1.5 rounded-full ${meta.dot}`} />
     </span>
   );
 }
