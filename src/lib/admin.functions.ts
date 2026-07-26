@@ -376,3 +376,130 @@ export const adminImportProfileDataFn = createServerFn({ method: "POST" })
     if (error) throw error;
     return { decks: nextState.decks.length, cards: nextState.cards.length };
   });
+
+// ---------- Streak (edição manual de sequência diária) ----------------------
+
+export type StreakRow = {
+  profile_id: string;
+  current: number;
+  longest: number;
+  lastDay: string;
+  startedOn: string | null;
+};
+
+export const adminFetchStreaksFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<StreakRow[]> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data, error } = await supabaseAdmin
+      .from("profile_data")
+      .select("profile_id, home_sessions");
+    if (error) throw error;
+    const rows = (data ?? []) as Array<{
+      profile_id: string;
+      home_sessions: {
+        streak?: {
+          current?: number;
+          longest?: number;
+          lastDay?: string;
+          startedOn?: string;
+        };
+      } | null;
+    }>;
+    return rows.map((r) => {
+      const s = r.home_sessions?.streak ?? {};
+      return {
+        profile_id: r.profile_id,
+        current: Math.max(0, Math.floor(s.current ?? 0)),
+        longest: Math.max(0, Math.floor(s.longest ?? 0)),
+        lastDay: s.lastDay ?? "",
+        startedOn: s.startedOn ?? null,
+      };
+    });
+  });
+
+const setStreakSchema = z.object({
+  profileId: z.string().min(1).max(64),
+  current: z.number().int().gte(0).lte(100_000),
+  longest: z.number().int().gte(0).lte(100_000).optional(),
+  lastDay: z.string().min(4).max(16).optional(),
+});
+
+function todayDateKey(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+
+export const adminSetStreakFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => setStreakSchema.parse(input))
+  .handler(async ({ data, context }): Promise<StreakRow> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: row } = await supabaseAdmin
+      .from("profile_data")
+      .select("home_sessions")
+      .eq("profile_id", data.profileId)
+      .maybeSingle();
+    const home = (row?.home_sessions ?? {}) as Record<string, unknown>;
+    const prevStreak = (home.streak ?? {}) as Record<string, unknown>;
+    const current = Math.max(0, Math.floor(data.current));
+    const longest = Math.max(
+      current,
+      Math.floor(data.longest ?? (prevStreak.longest as number) ?? 0),
+    );
+    const lastDay =
+      data.lastDay && data.lastDay.length > 0
+        ? data.lastDay
+        : current > 0
+          ? todayDateKey()
+          : "";
+    const startedOn =
+      current > 0
+        ? ((prevStreak.startedOn as string) ?? todayDateKey())
+        : null;
+    const nextStreak = {
+      current,
+      longest,
+      lastDay,
+      startedOn: startedOn ?? undefined,
+      history: (prevStreak.history as Record<string, string>) ?? {},
+      milestonesReached:
+        (prevStreak.milestonesReached as number[]) ?? [],
+    };
+    const nextHome = {
+      ...home,
+      day: (home.day as string) ?? todayDateKey(),
+      count: (home.count as number) ?? 0,
+      reviewed: (home.reviewed as number) ?? 0,
+      streak: nextStreak,
+      // Limpa marcador de punição para o streak não ser rebaixado logo em seguida.
+      punishments: {
+        ...((home.punishments as Record<string, unknown>) ?? {}),
+        streakBrokenAppliedFor: lastDay || undefined,
+      },
+    };
+    const { error } = await supabaseAdmin
+      .from("profile_data")
+      .upsert(
+        {
+          profile_id: data.profileId,
+          home_sessions: nextHome as never,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "profile_id" },
+      );
+    if (error) throw error;
+    return {
+      profile_id: data.profileId,
+      current,
+      longest,
+      lastDay,
+      startedOn: startedOn,
+    };
+  });
