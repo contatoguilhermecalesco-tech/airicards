@@ -52,16 +52,20 @@ const ACCENT_CHOICES = ["lavender", "violet", "pink", "sky", "emerald", "amber"]
 
 export function BundleBuilderSection() {
   const [items, setItems] = useState<ShopItem[]>([]);
+  const [slots, setSlots] = useState<FeaturedSlotRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<ShopItem | null>(null);
+  const [vitrineFor, setVitrineFor] = useState<{ bundle: ShopItem; slot: FeaturedSlotRow } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
   async function reload() {
     setLoading(true);
     try {
-      setItems(await listAllShopItems());
+      const [it, sl] = await Promise.all([listAllShopItems(), listFeaturedSlots()]);
+      setItems(it);
+      setSlots(sl);
     } finally {
       setLoading(false);
     }
@@ -75,6 +79,15 @@ export function BundleBuilderSection() {
     () => items.filter((i) => i.kind !== "bundle"),
     [items],
   );
+
+  // Featured slot for a bundle (item_kind='shop_item', item_id=bundle.id)
+  const slotForBundle = useMemo(() => {
+    const map = new Map<string, FeaturedSlotRow>();
+    for (const s of slots) {
+      if (s.item_kind === "shop_item") map.set(s.item_id, s);
+    }
+    return map;
+  }, [slots]);
 
   async function toggleActive(b: ShopItem) {
     setBusy(b.id);
@@ -99,8 +112,43 @@ export function BundleBuilderSection() {
       return;
     setBusy(b.id);
     try {
+      // If featured, remove the slot too
+      const s = slotForBundle.get(b.id);
+      if (s) await deleteFeaturedSlot(s).catch(() => undefined);
       await deleteShopItem(b.id);
-      setItems((prev) => prev.filter((x) => x.id !== b.id));
+      await reload();
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function feature(b: ShopItem) {
+    setBusy(b.id);
+    setErr(null);
+    try {
+      // Only one featured slot allowed — remove all existing first
+      for (const s of slots) {
+        await deleteFeaturedSlot(s).catch(() => undefined);
+      }
+      await createFeaturedSlot({ item_kind: "shop_item", item_id: b.id, position: 0 });
+      await reload();
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function unfeature(b: ShopItem) {
+    const s = slotForBundle.get(b.id);
+    if (!s) return;
+    setBusy(b.id);
+    setErr(null);
+    try {
+      await deleteFeaturedSlot(s);
+      await reload();
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -112,9 +160,9 @@ export function BundleBuilderSection() {
     <section className="ios-card rounded-3xl p-4 sm:p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Bundles</h3>
+          <h3 className="text-sm font-semibold text-foreground">Bundles &amp; Vitrine</h3>
           <p className="mt-0.5 text-[11.5px] text-foreground/50">
-            Pacotes especiais estilo Riot — vários itens agrupados por um preço.
+            Pacotes estilo Riot — ative na loja, destaque na vitrine e configure splash art.
           </p>
         </div>
         <button
@@ -124,6 +172,19 @@ export function BundleBuilderSection() {
           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
           Novo bundle
         </button>
+      </div>
+
+      {/* Image specs hint */}
+      <div className="mb-3 flex gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-[11.5px] text-foreground/70">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={2.5} />
+        <div className="leading-relaxed">
+          <strong className="text-foreground">Vitrine:</strong>{" "}
+          <span>apenas 1 bundle em destaque. Splash </span>
+          <span className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10.5px]">2400 × 1200</span>
+          <span> · Art </span>
+          <span className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10.5px]">1024 × 1024</span>
+          <span>. Personagem à direita, zona segura de texto à esquerda.</span>
+        </div>
       </div>
 
       {err && (
@@ -145,25 +206,49 @@ export function BundleBuilderSection() {
         <ul className="space-y-2">
           {bundles.map((b) => {
             const ids = bundleItemIds(b);
-            const rarity = RARITY_META[rarityFor(b.price)];
+            const featuredSlot = slotForBundle.get(b.id);
+            const isFeatured = Boolean(featuredSlot);
+            const rarity = RARITY_META[featuredSlot?.rarity_override ?? rarityFor(b.price)];
             return (
               <li
                 key={b.id}
-                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-2.5"
+                className={`rounded-2xl border p-2.5 transition ${
+                  isFeatured
+                    ? "border-amber-400/40 bg-amber-500/[0.05]"
+                    : "border-white/10 bg-white/[0.03]"
+                }`}
               >
-                <span
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
-                  style={{ background: rarity.gradient }}
-                >
-                  <Crown className="h-5 w-5" strokeWidth={2.25} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-semibold">{b.name}</p>
-                  <p className="mt-0.5 truncate text-[11px] text-foreground/50">
-                    {ids.length} itens · {b.price} ✦ · {b.active ? "Ativo" : "Inativo"}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10"
+                    style={{ background: rarity.gradient }}
+                  >
+                    {featuredSlot?.splash_url ? (
+                      <img src={featuredSlot.splash_url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="grid h-full w-full place-items-center text-white/70">
+                        <ImageIcon className="h-4 w-4" strokeWidth={2} />
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate text-[13px] font-semibold">{b.name}</p>
+                      {isFeatured && (
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-amber-200">
+                          <Star className="h-2.5 w-2.5" strokeWidth={2.75} />
+                          Vitrine
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 truncate text-[11px] text-foreground/50">
+                      {ids.length} itens · {b.price} ✦ · {b.active ? "Ativo na loja" : "Inativo"}
+                      {featuredSlot?.tagline ? ` · "${featuredSlot.tagline}"` : ""}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
+
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   <button
                     onClick={() => void toggleActive(b)}
                     disabled={busy === b.id}
@@ -173,18 +258,45 @@ export function BundleBuilderSection() {
                         : "bg-white/[0.05] text-foreground/60 hover:bg-white/10"
                     }`}
                   >
-                    {b.active ? "Ativo" : "Inativo"}
+                    {b.active ? "Ativo na loja" : "Inativo"}
                   </button>
+                  {isFeatured ? (
+                    <>
+                      <button
+                        onClick={() => setVitrineFor({ bundle: b, slot: featuredSlot! })}
+                        className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 px-2.5 py-1 text-[10.5px] font-semibold text-amber-200 transition hover:bg-amber-500/30"
+                      >
+                        <Star className="h-3 w-3" strokeWidth={2.75} />
+                        Editar vitrine
+                      </button>
+                      <button
+                        onClick={() => void unfeature(b)}
+                        disabled={busy === b.id}
+                        className="rounded-full bg-white/[0.05] px-2.5 py-1 text-[10.5px] font-semibold text-foreground/60 transition hover:bg-white/10"
+                      >
+                        Tirar do destaque
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => void feature(b)}
+                      disabled={busy === b.id}
+                      className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-[10.5px] font-semibold text-amber-200 transition hover:bg-amber-500/25"
+                    >
+                      <Star className="h-3 w-3" strokeWidth={2.75} />
+                      {slots.length > 0 ? "Substituir destaque" : "Destacar na vitrine"}
+                    </button>
+                  )}
                   <button
                     onClick={() => setEditing(b)}
                     className="rounded-full bg-primary/20 px-2.5 py-1 text-[10.5px] font-semibold text-primary transition hover:bg-primary/30"
                   >
-                    Editar
+                    Editar bundle
                   </button>
                   <button
                     onClick={() => void remove(b)}
                     disabled={busy === b.id}
-                    className="grid h-7 w-7 place-items-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-200 transition hover:bg-red-500/20"
+                    className="ml-auto grid h-7 w-7 place-items-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-200 transition hover:bg-red-500/20"
                   >
                     <Trash2 className="h-3.5 w-3.5" strokeWidth={2.5} />
                   </button>
@@ -213,6 +325,18 @@ export function BundleBuilderSection() {
           onClose={() => setEditing(null)}
           onSaved={async () => {
             setEditing(null);
+            await reload();
+          }}
+        />
+      )}
+
+      {vitrineFor && (
+        <BundleVitrineEditor
+          slot={vitrineFor.slot}
+          bundleName={vitrineFor.bundle.name}
+          onClose={() => setVitrineFor(null)}
+          onSaved={async () => {
+            setVitrineFor(null);
             await reload();
           }}
         />
