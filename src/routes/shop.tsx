@@ -43,8 +43,11 @@ import {
   visualFor,
   DiscordAvatar,
   PowerupCover,
+  DeckCover,
+  PackCover,
   powerupBadge,
   powerupPalette,
+  collectionPalette,
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
