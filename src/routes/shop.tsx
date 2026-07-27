@@ -42,6 +42,9 @@ import {
   slotLabel,
   visualFor,
   DiscordAvatar,
+  PowerupCover,
+  powerupBadge,
+  powerupPalette,
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
@@ -214,7 +217,8 @@ function ShopPage() {
     const needle = q.trim().toLowerCase();
     let list = unified.filter((u) => {
       if (category !== "all" && u.kind !== category) return false;
-      if (rarityFilter !== "all" && u.rarity !== rarityFilter) return false;
+      // Power-ups não usam raridade — filtro só afeta os outros tipos.
+      if (rarityFilter !== "all" && u.kind !== "powerup" && u.rarity !== rarityFilter) return false;
       if (affordableOnly && u.price > wallet.crystals) return false;
       if (!needle) return true;
       return (
@@ -528,7 +532,9 @@ function ShopPage() {
 
       {/* Rarity chips + affordable */}
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
+        {category !== "powerup" && (
+          <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
+        )}
         <button
           type="button"
           onClick={() => setAffordableOnly((v) => !v)}
@@ -709,49 +715,81 @@ function UnifiedCard({
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
   const isVitrine = view === "vitrine";
+  const isPowerup = item.kind === "powerup";
+  const puPal = isPowerup ? powerupPalette(item.accent) : null;
+  const puBadge = isPowerup
+    ? powerupBadge(((item.raw as ShopItem).payload ?? {}) as Record<string, unknown>)
+    : undefined;
 
   return (
     <li
-      className={`relative isolate overflow-hidden rounded-3xl border ${rarity.border} bg-[oklch(0.15_0.02_285)] transition-all hover:-translate-y-0.5`}
-      style={{ boxShadow: `0 20px 45px -30px ${rarity.glow}` }}
+      className={`relative isolate overflow-hidden rounded-3xl border ${
+        isPowerup ? "border-white/10" : rarity.border
+      } bg-[oklch(0.15_0.02_285)] transition-all hover:-translate-y-0.5`}
+      style={{
+        boxShadow: isPowerup
+          ? `0 20px 45px -30px ${puPal!.halo}`
+          : `0 20px 45px -30px ${rarity.glow}`,
+      }}
     >
-      {/* rarity banner */}
-      <div
-        aria-hidden
-        className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
-        style={{ background: rarity.gradient }}
-      >
-        <span
-          aria-hidden
-          className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
-          }}
-        />
-        <div className="absolute inset-0 flex items-start justify-between p-3">
-          <RarityChip rarity={item.rarity} />
+      {isPowerup ? (
+        <div className="relative">
+          <PowerupCover
+            accent={item.accent}
+            icon={item.icon}
+            height={isVitrine ? "h-32" : "h-28"}
+            badge={puBadge}
+          />
           {owned && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+            <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
               Adquirido
             </span>
           )}
           {stack > 0 && !owned && (
-            <span className="inline-flex items-center rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+            <span className="absolute right-3 bottom-3 inline-flex items-center rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               Estoque: {stack}
             </span>
           )}
         </div>
-        <div className="absolute bottom-3 left-3">
+      ) : (
+        <div
+          aria-hidden
+          className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
+          style={{ background: rarity.gradient }}
+        >
           <span
-            className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
-            style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
-          >
-            <Icon className="h-5 w-5" strokeWidth={2.25} />
-          </span>
+            aria-hidden
+            className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+            }}
+          />
+          <div className="absolute inset-0 flex items-start justify-between p-3">
+            <RarityChip rarity={item.rarity} />
+            {owned && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                <Check className="h-3 w-3" strokeWidth={2.75} />
+                Adquirido
+              </span>
+            )}
+            {stack > 0 && !owned && (
+              <span className="inline-flex items-center rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                Estoque: {stack}
+              </span>
+            )}
+          </div>
+          <div className="absolute bottom-3 left-3">
+            <span
+              className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
+              style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
+            >
+              <Icon className="h-5 w-5" strokeWidth={2.25} />
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
@@ -850,20 +888,28 @@ function ListRow({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const isPowerup = item.kind === "powerup";
+  const puPal = isPowerup ? powerupPalette(item.accent) : null;
+  const thumbBg = isPowerup
+    ? `radial-gradient(circle at 30% 20%, ${puPal!.ring}, transparent 65%), linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7))`
+    : rarity.gradient;
+  const thumbGlow = isPowerup ? puPal!.halo : rarity.glow;
   return (
     <li
-      className={`flex items-center gap-3 rounded-2xl border ${rarity.border} bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
+      className={`flex items-center gap-3 rounded-2xl border ${
+        isPowerup ? "border-white/10" : rarity.border
+      } bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
     >
       <span
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
-        style={{ background: rarity.gradient, boxShadow: `0 6px 20px -8px ${rarity.glow}` }}
+        style={{ background: thumbBg, boxShadow: `0 6px 20px -8px ${thumbGlow}` }}
       >
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="truncate text-sm font-semibold">{item.name}</p>
-          <RarityChip rarity={item.rarity} />
+          {!isPowerup && <RarityChip rarity={item.rarity} />}
         </div>
         <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
           {kindLabelBR(item.kind)}
