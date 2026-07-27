@@ -155,6 +155,7 @@ function AdminPage() {
     void load();
     void initNotifications();
     void initChangelog();
+    void initBundleConcepts();
   }, []);
 
   function nameFor(profileId: string) {
