@@ -1,9 +1,10 @@
 import type { CompanionProfile } from "@/lib/companion-assets";
 
 /**
- * Renders a companion character with multi-frame pose animation when available.
- * Igris cycles through: idle stance → reverent bow → sword-draw with violet slash burst.
- * Single-frame companions (Raposa Guardiã) fall back to the classic idle float.
+ * Renders a companion character. When `frames` are provided, plays a real
+ * frame-by-frame sequence (kneeling → rising → standing → sword-draw → back to rest)
+ * with near-step transitions, plus an optional violet slash burst on the final pose.
+ * Single-frame companions fall back to the classic idle float.
  */
 export function CompanionRender({ companion }: { companion: CompanionProfile }) {
   const frames = companion.frames && companion.frames.length > 1 ? companion.frames : null;
@@ -19,7 +20,16 @@ export function CompanionRender({ companion }: { companion: CompanionProfile }) 
     );
   }
 
-  const frameClass = ["companion-frame-a", "companion-frame-b", "companion-frame-c"];
+  // Map each frame index to a dedicated keyframe utility so the sequence keeps
+  // hard timing (real animation, not a crossfade). Supports up to 5 frames.
+  const frameClass = [
+    "companion-seq-0",
+    "companion-seq-1",
+    "companion-seq-2",
+    "companion-seq-3",
+    "companion-seq-4",
+  ];
+
   return (
     <div className="relative h-full w-full">
       {frames.map((src, i) => (
@@ -28,7 +38,7 @@ export function CompanionRender({ companion }: { companion: CompanionProfile }) 
           src={src}
           alt={i === 0 ? companion.name : ""}
           aria-hidden={i !== 0}
-          className={`${frameClass[i] ?? "companion-frame-a"} companion-idle absolute inset-0 h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(168,85,247,0.55)]`}
+          className={`${frameClass[i] ?? "companion-seq-0"} absolute inset-0 h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(168,85,247,0.55)]`}
           loading="lazy"
         />
       ))}
@@ -38,7 +48,7 @@ export function CompanionRender({ companion }: { companion: CompanionProfile }) 
           className="companion-slash-flash pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at 55% 40%, rgba(216,180,254,0.85), rgba(168,85,247,0.35) 30%, transparent 65%)",
+              "radial-gradient(circle at 55% 40%, rgba(216,180,254,0.9), rgba(168,85,247,0.4) 30%, transparent 65%)",
             mixBlendMode: "screen",
           }}
         />
