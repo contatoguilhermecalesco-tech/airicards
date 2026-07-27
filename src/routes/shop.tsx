@@ -785,9 +785,6 @@ function UnifiedCard({
             cardCount={(item.raw as PublishedDeckRow).card_count}
             owner={item.owner}
           />
-          <div className="absolute right-3 top-3 flex items-center gap-1.5">
-            <RarityChip rarity={item.rarity} />
-          </div>
           {owned && (
             <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
@@ -802,15 +799,60 @@ function UnifiedCard({
             height={isVitrine ? "h-32" : "h-28"}
             deckCount={item.bundleItems?.length}
           />
-          <div className="absolute right-3 top-3">
-            <RarityChip rarity={item.rarity} />
-          </div>
           {owned && (
             <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
               Adquirido
             </span>
           )}
+        </div>
+      ) : item.kind === "bundle" ? (
+        <div
+          className={`relative w-full overflow-hidden ${isVitrine ? "h-40" : "h-32"}`}
+          style={{
+            background: splashUrl || artUrl
+              ? "#0b0616"
+              : rarity.gradient,
+          }}
+        >
+          {(splashUrl || artUrl) && (
+            <img
+              src={(splashUrl || artUrl) as string}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          {/* dark scrim for legibility */}
+          <span
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)",
+            }}
+          />
+          <span
+            aria-hidden
+            className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+            }}
+          />
+          <div className="absolute inset-0 flex items-start justify-between p-3">
+            <RarityChip rarity={item.rarity} />
+            {owned && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                <Check className="h-3 w-3" strokeWidth={2.75} />
+                Adquirido
+              </span>
+            )}
+          </div>
+          <span className="absolute bottom-3 left-3 rounded-full border border-white/25 bg-black/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur">
+            Bundle
+            {item.bundleItems?.length ? ` · ${item.bundleItems.length} itens` : ""}
+          </span>
         </div>
       ) : (
         <div
