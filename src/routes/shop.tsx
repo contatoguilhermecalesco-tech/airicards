@@ -784,7 +784,7 @@ function UnifiedCard({
             )}
             <button
               onClick={onBuy}
-              disabled={busy || owned || (!isMineDeck && !canAfford)}
+              disabled={busy || owned || (!isMineDeck && item.kind !== "bundle" && !canAfford)}
               className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
               {busy ? (
@@ -799,6 +799,8 @@ function UnifiedCard({
                 </>
               ) : isMineDeck ? (
                 "Importar"
+              ) : item.kind === "bundle" ? (
+                "Ver conteúdo"
               ) : canAfford ? (
                 "Comprar"
               ) : (
