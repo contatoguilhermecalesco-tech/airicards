@@ -180,9 +180,20 @@ export function ShopHero({
               className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
               style={{ background: rarity.gradient }}
             />
-            {item.kind === "cosmetic" && "payload" in item.raw ? (
+            {item.artUrl ? (
+              <div
+                className="relative flex h-[220px] items-center justify-center overflow-hidden rounded-2xl"
+                style={{ filter: `drop-shadow(0 20px 40px ${rarity.glow})` }}
+              >
+                <img
+                  src={item.artUrl}
+                  alt=""
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            ) : item.kind === "cosmetic" && "payload" in item.raw ? (
               <MiniProfileCard item={item.raw as ShopItem} />
-            ) : (
+            ) : item.splashUrl ? null : (
               <div
                 className="relative flex h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-black/25 p-5 text-center backdrop-blur"
                 style={{ boxShadow: `0 20px 60px -20px ${rarity.glow}` }}
