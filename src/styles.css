@@ -541,33 +541,65 @@
   animation: companion-sparkle var(--dur, 2.4s) ease-in-out var(--delay, 0s) infinite;
 }
 
-/* ---- Multi-frame companion cycle (Igris: idle → bow → sword-draw) ---- */
-@keyframes companion-frame-a {
-  0%, 28% { opacity: 1; }
-  35%, 88% { opacity: 0; }
-  95%, 100% { opacity: 1; }
+/* ---- Multi-frame companion sequence (Igris rises and draws the sword) ----
+   8s cycle over 5 frames. Each frame holds nearly opaque during its slice
+   with only ~1% fade edges so the motion reads as animation, not a crossfade.
+   Timeline:
+     0-24%   idle kneel (rest)
+     24-28%  rise 1 (gripping hilt)
+     28-32%  rise 2 (lifting blade)
+     32-38%  standing (blade grounded)
+     38-62%  sword-draw hero pose (slash flash)
+     62-66%  standing (return)
+     66-70%  rise 2
+     70-74%  rise 1
+     74-100% idle kneel (rest)
+*/
+@keyframes companion-seq-0 {
+  0%, 23% { opacity: 1; }
+  25%, 73% { opacity: 0; }
+  75%, 100% { opacity: 1; }
 }
-@keyframes companion-frame-b {
-  0%, 32% { opacity: 0; }
-  38%, 55% { opacity: 1; }
-  62%, 100% { opacity: 0; }
+@keyframes companion-seq-1 {
+  0%, 23% { opacity: 0; }
+  25%, 27% { opacity: 1; }
+  29%, 69% { opacity: 0; }
+  71%, 73% { opacity: 1; }
+  75%, 100% { opacity: 0; }
 }
-@keyframes companion-frame-c {
-  0%, 58% { opacity: 0; }
-  66%, 85% { opacity: 1; }
-  92%, 100% { opacity: 0; }
+@keyframes companion-seq-2 {
+  0%, 27% { opacity: 0; }
+  29%, 31% { opacity: 1; }
+  33%, 65% { opacity: 0; }
+  67%, 69% { opacity: 1; }
+  71%, 100% { opacity: 0; }
+}
+@keyframes companion-seq-3 {
+  0%, 31% { opacity: 0; }
+  33%, 37% { opacity: 1; }
+  39%, 61% { opacity: 0; }
+  63%, 65% { opacity: 1; }
+  67%, 100% { opacity: 0; }
+}
+@keyframes companion-seq-4 {
+  0%, 37% { opacity: 0; }
+  39%, 61% { opacity: 1; }
+  63%, 100% { opacity: 0; }
 }
 @keyframes companion-slash-flash {
-  0%, 60% { opacity: 0; transform: scale(0.6) rotate(-8deg); }
-  66% { opacity: 0.95; transform: scale(1.15) rotate(4deg); }
-  74% { opacity: 0.55; transform: scale(1.35) rotate(10deg); }
-  85%, 100% { opacity: 0; transform: scale(1.5) rotate(14deg); }
+  0%, 37% { opacity: 0; transform: scale(0.55) rotate(-10deg); }
+  40% { opacity: 0.95; transform: scale(1.15) rotate(4deg); }
+  46% { opacity: 0.55; transform: scale(1.35) rotate(10deg); }
+  55%, 100% { opacity: 0; transform: scale(1.5) rotate(14deg); }
 }
-@utility companion-frame-a { animation: companion-frame-a 9s ease-in-out infinite; }
-@utility companion-frame-b { animation: companion-frame-b 9s ease-in-out infinite; }
-@utility companion-frame-c { animation: companion-frame-c 9s ease-in-out infinite; }
+@utility companion-seq-0 { animation: companion-seq-0 8s linear infinite; }
+@utility companion-seq-1 { animation: companion-seq-1 8s linear infinite; }
+@utility companion-seq-2 { animation: companion-seq-2 8s linear infinite; }
+@utility companion-seq-3 { animation: companion-seq-3 8s linear infinite; }
+@utility companion-seq-4 { animation: companion-seq-4 8s linear infinite; }
 @utility companion-slash-flash {
-  animation: companion-slash-flash 9s ease-in-out infinite;
+  animation: companion-slash-flash 8s ease-in-out infinite;
   filter: blur(6px);
 }
+
 

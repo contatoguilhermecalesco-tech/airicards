@@ -3,8 +3,11 @@
 // a `frames` array animate through multiple poses (idle → bow → sword-draw).
 import kitsuneUrl from "@/assets/shop/florescer/companion.png";
 import igrisIdleUrl from "@/assets/shop/monarca/companion.png";
-import igrisBowUrl from "@/assets/shop/monarca/companion-bow.png";
+import igrisRise1Url from "@/assets/shop/monarca/companion-rise1.png";
+import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
+import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
+
 
 export type CompanionProfile = {
   key: string;
@@ -30,9 +33,10 @@ const COMPANIONS: Record<string, CompanionProfile> = {
     src: igrisIdleUrl,
     glow: "#a855f7",
     tagline: "Primeiro cavaleiro do exército das sombras.",
-    frames: [igrisIdleUrl, igrisBowUrl, igrisDrawUrl],
+    frames: [igrisIdleUrl, igrisRise1Url, igrisRise2Url, igrisStandUrl, igrisDrawUrl],
     flash: true,
   },
+
 };
 
 export function companionFromEquipped(
