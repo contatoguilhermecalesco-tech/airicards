@@ -48,6 +48,8 @@ import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
+import { CompanionRender } from "@/components/CompanionRender";
+
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
 
@@ -672,13 +674,9 @@ function PerfilPage() {
                 />
               ))}
               <div className="companion-hop absolute inset-0">
-                <img
-                  src={companion.src}
-                  alt={companion.name}
-                  className="companion-idle relative h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(192,132,252,0.55)]"
-                  loading="lazy"
-                />
+                <CompanionRender companion={companion} />
               </div>
+
             </div>
           )}
         </div>

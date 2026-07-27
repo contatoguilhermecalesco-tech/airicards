@@ -1,7 +1,10 @@
 // Companion (pet) cosmetics — small character rendered next to the profile avatar.
-// Each key maps to a transparent PNG asset and a soft glow color.
+// Each key maps to a transparent PNG asset and a soft glow color. Companions with
+// a `frames` array animate through multiple poses (idle → bow → sword-draw).
 import kitsuneUrl from "@/assets/shop/florescer/companion.png";
-import igrisUrl from "@/assets/shop/monarca/companion.png";
+import igrisIdleUrl from "@/assets/shop/monarca/companion.png";
+import igrisBowUrl from "@/assets/shop/monarca/companion-bow.png";
+import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
 
 export type CompanionProfile = {
   key: string;
@@ -9,6 +12,8 @@ export type CompanionProfile = {
   src: string;
   glow: string; // rgba/hex used for the soft aura behind the companion
   tagline: string;
+  frames?: string[]; // optional multi-pose sequence — src should equal frames[0]
+  flash?: boolean;   // enables the violet slash-flash burst on the final frame
 };
 
 const COMPANIONS: Record<string, CompanionProfile> = {
@@ -22,9 +27,11 @@ const COMPANIONS: Record<string, CompanionProfile> = {
   igris_cavaleiro: {
     key: "igris_cavaleiro",
     name: "Igris, o Cavaleiro-Sombra",
-    src: igrisUrl,
+    src: igrisIdleUrl,
     glow: "#a855f7",
     tagline: "Primeiro cavaleiro do exército das sombras.",
+    frames: [igrisIdleUrl, igrisBowUrl, igrisDrawUrl],
+    flash: true,
   },
 };
 
