@@ -45,6 +45,10 @@ import {
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
+import {
+  listActiveFeaturedSlots,
+  type FeaturedSlotRow,
+} from "@/lib/featured-slots";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -117,6 +121,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
 
   // Toolbar state
   const [category, setCategory] = useState<Category>("all");
@@ -133,6 +138,7 @@ function ShopPage() {
   useEffect(() => {
     listShopItems().then(setItems);
     listPublishedDecks().then(setDecks);
+    listActiveFeaturedSlots().then(setFeaturedSlots).catch(() => setFeaturedSlots([]));
   }, []);
 
   useEffect(() => {
@@ -225,7 +231,36 @@ function ShopPage() {
   /* ---------------------- Featured for hero ---------------------- */
 
   const featured: FeaturedItem[] = useMemo(() => {
-    // Pick top 5 items by rarity weight + price, prefer bundle/mythic
+    // Prefer admin-curated slots when present.
+    if (featuredSlots.length > 0) {
+      const byId = new Map(unified.map((u) => [u.id, u]));
+      const curated: FeaturedItem[] = [];
+      for (const slot of featuredSlots) {
+        const u = byId.get(slot.item_id);
+        if (!u) continue;
+        curated.push({
+          id: u.id,
+          kind: u.kind === "decks" ? "deck" : u.kind,
+          name: u.name,
+          description: slot.description_override || u.description,
+          price: u.price,
+          rarity: slot.rarity_override ?? u.rarity,
+          icon: u.icon,
+          tagline:
+            slot.tagline ||
+            (u.kind === "decks"
+              ? `Por ${u.owner ?? "airi"}`
+              : u.kind === "bundle"
+                ? `Contém ${u.bundleItems?.length ?? "vários"} itens`
+                : undefined),
+          raw: u.raw,
+          splashUrl: slot.splash_url,
+          artUrl: slot.art_url,
+        });
+      }
+      if (curated.length > 0) return curated;
+    }
+    // Fallback: auto-pick top 5 by rarity weight + price
     const pool = unified
       .slice()
       .sort((a, b) => {
@@ -251,7 +286,7 @@ function ShopPage() {
             : undefined,
       raw: u.raw,
     }));
-  }, [unified]);
+  }, [unified, featuredSlots]);
 
   /* ---------------------- Owned set (cosmetics + decks bought) ---------------------- */
 

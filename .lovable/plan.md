@@ -1,64 +1,99 @@
-Vou resolver os três pontos técnicos, na ordem que o app pede (o mais rápido/isolado primeiro, o refactor grande por último).
+# Painel Admin — Vitrine da Loja
 
-## 1. Remover o card "Em breve" de `/study`
+Sistema para o admin curar manualmente o que aparece no carrossel principal da loja (`ShopHero`), estilo Riot Games — com splash arts customizadas, ordem controlada, tagline e agendamento.
 
-Hoje todos os cinco dias da semana já têm rota (`to`). O trecho de `Lock` + `"Em breve"` em `src/routes/study.index.tsx` nunca renderiza — é código morto que só polui a leitura.
+## Tamanhos oficiais de imagem
 
-- Simplificar o componente: remover `available`, `Lock`, `!available && "Em breve"`.
-- Deixar apenas o caminho com `Link to={d.to}`.
-- Sem mudança visual para o usuário (o dia bloqueado nunca aparecia).
+Documentados dentro do próprio painel (dica visual ao lado dos uploads):
 
-## 2. Sincronizar missões das inimigas na nuvem
+- **Splash art (fundo)**: `2400 × 1200 px` (2:1), JPG ou PNG, até ~800KB
+  - Zona segura de texto: 40% esquerdo (título + preço + botão vivem ali)
+  - Ponto focal do personagem/item: metade direita
+- **Art do item (opcional, canto direito)**: `1024 × 1024 px`, PNG com fundo transparente
+- **Ambos são opcionais** — se não subir, o Hero usa o gradient de raridade + ícone (comportamento atual)
 
-**Problema:** `src/lib/enemy-system.ts` guarda `airi.enemy-missions.<profile>` só no `localStorage`, então progresso de missão diária/semanal não bate entre PC e celular.
+## O que o admin controla por slot
 
-**Combo** eu deixo local: ele é uma métrica de sessão da Arena (zera ao sair, não faz sentido sincronizar contador em tempo real entre abas). Vou apenas persistir o `best` do dia dentro da mesma estrutura de missões, para ficar cross-device.
+- Item vinculado (busca entre `shop_items` ativos + `published_decks` premium)
+- Splash art (upload)
+- Art do item (upload, opcional)
+- Overline/tagline curta ("NOVO", "EDIÇÃO LIMITADA", "VOLTOU")
+- Descrição customizada (opcional — sobrescreve a do item)
+- Override de raridade visual (opcional)
+- Ordem (drag-to-reorder)
+- Ativo/inativo (toggle)
+- Agendamento opcional: `starts_at` / `ends_at`
 
-**Solução (sem migration nova):** guardar missões dentro do `profile_data.data` JSONB, num sub-objeto `enemyMissions`. Isso reusa o pipeline de sync já existente (`flashcards-store` faz merge por `updated_at` e tem `lastLocalMutationAt`).
+## Banco de dados
 
-Passos:
-- Estender `flashcards-store` para expor um espaço leve `getMeta("enemyMissions") / setMeta(...)` gravando dentro de `data.meta.enemyMissions`, marcando `lastLocalMutationAt` para não ser sobrescrito pela nuvem.
-- Em `enemy-system.ts`:
-  - `loadState()` lê primeiro do store (nuvem→memória) e cai no `localStorage` como fallback/migração única.
-  - `persistMissions()` grava no store (que dispara sync) e também no `localStorage` (offline).
-  - `onEnemyDefeated` / `onComboReached` / `claimMission` continuam iguais — só a persistência muda.
-  - Ao trocar de perfil (evento existente), `refreshMissionsForCurrentProfile()` recarrega do store.
-- Reconciliação de datas: se dailyKey/weeklyKey da nuvem for mais recente que o local, adota a nuvem; se local tem mais progresso na mesma chave, faz `max(progress)` por missão de mesmo `id` (evita perder progresso ao abrir o outro device com estado antigo em cache).
-
-## 3. Refatorar `src/routes/admin.tsx` (2653 linhas)
-
-Hoje o arquivo é um monólito com ~12 painéis. Vou extrair cada painel para `src/components/admin/*.tsx`, mantendo comportamento 100% igual. A rota `admin.tsx` fica só com o Gate + navegação entre painéis (~250 linhas).
-
-Nova estrutura:
+Nova tabela `shop_featured_slots`:
 
 ```text
-src/components/admin/
-  types.ts                  // PanelDef, constantes compartilhadas
-  SessionsPanel.tsx
-  RankAdminSection.tsx
-  ProfilesRankOverview.tsx
-  TagsSection.tsx
-  NotificationsSection.tsx
-  ExamAdminSection.tsx
-  ChangelogSection.tsx
-  ArlysAdminSection.tsx
-  DuelsAdminSection.tsx
-  PinAdminSection.tsx
-  BackupSection.tsx
-  StreakAdminSection.tsx
-src/routes/admin.tsx        // Gate + AdminPage (registry + roteador de painéis)
+id              uuid PK
+item_kind       text  ('shop_item' | 'deck')
+item_id         text  (id em shop_items OU id do published_deck)
+splash_url      text?
+art_url         text?
+tagline         text?
+description_override text?
+rarity_override text?
+position        int   (ordem)
+active          bool
+starts_at       timestamptz?
+ends_at         timestamptz?
+created_at/updated_at
 ```
 
-Regras do refactor:
-- Nenhuma mudança de comportamento, texto, estilo ou fluxo.
-- Constantes locais (`ADMIN_PROFILE_ID`, `TAG_COLORS`, `QUICK_GRANTS`, `NOTIFICATION_ROUTES`, `CHANGELOG_CATEGORIES`) vão para `types.ts` ou ficam no arquivo do painel que as usa.
-- Helpers puros usados por só um painel viajam junto com ele.
-- Imports do Supabase, stores e libs continuam iguais dentro de cada arquivo movido.
-- Rota exporta o mesmo `Route` e usa `ADMIN_PANELS` montado a partir dos componentes extraídos.
+RLS:
+- SELECT: `authenticated` (todos leem — a loja renderiza)
+- ALL (write): `is_admin()`
 
-### Ordem de execução
-1. Study "Em breve" (1 arquivo).
-2. Sync das missões (2 arquivos: `flashcards-store.ts`, `enemy-system.ts`).
-3. Refactor admin (criação dos 12 arquivos + reescrita enxuta de `admin.tsx`).
+Bucket de storage `shop-featured` (público, apenas admin escreve).
 
-Sem mudanças de schema, sem novas rotas, sem alterar UI.
+## Estrutura de arquivos
+
+```text
+src/routes/admin.tsx                          (adiciona aba "Vitrine")
+src/components/admin/FeaturedSlotsPanel.tsx   (lista + drag-reorder + toggle)
+src/components/admin/FeaturedSlotEditor.tsx   (modal edição + uploads)
+src/lib/featured-slots.ts                     (CRUD + upload helpers)
+src/components/shop/ShopHero.tsx              (aceita splash_url/art_url)
+src/routes/shop.tsx                           (lê slots reais em vez de derivar por preço)
+```
+
+## Fluxo do admin
+
+1. Aba "Vitrine da Loja" no `/admin`
+2. Lista de slots ordenada, cada um com preview em miniatura
+3. Botão "+ Adicionar slot" → modal:
+   - Seletor de item (dropdown com busca)
+   - Upload splash (drag & drop com preview real do Hero embaixo)
+   - Upload art quadrado (opcional)
+   - Campos tagline + descrição
+   - Toggle ativo + datas opcionais
+4. Reordenar por drag ou setas ↑↓
+5. Deletar com confirmação
+
+## Fluxo do usuário (loja)
+
+- Se existem slots ativos e válidos (dentro da janela `starts_at`/`ends_at`), o `ShopHero` mostra APENAS eles, na ordem definida
+- Se não há slots ativos, cai no fallback atual (auto-featured pelo preço)
+- Splash renderiza como `background-image` cobrindo o card; overlay escuro no lado esquerdo garante legibilidade do texto
+
+## Detalhes técnicos
+
+- Upload usa `supabase.storage.from('shop-featured').upload()` com nome `${slotId}-splash.jpg`; URL pública salva no slot
+- Deletar slot também deleta os assets do storage
+- `shop.tsx` faz um `.from('shop_featured_slots').select('*').eq('active', true)` no mount e resolve o `item` correspondente do `shop_items`/`published_decks` já carregados em memória
+- `ShopHero` ganha props opcionais `splashUrl`/`artUrl`; quando presentes, substituem o backdrop gradient e o preview quadrado
+- Agendamento é filtrado client-side no `shop.tsx` (não precisa de cron)
+
+## Fora do escopo desta etapa
+
+- Bundles/skins agrupados (tabela `shop_items.kind='bundle'` com múltiplos itens) — fica pra próxima iteração assim que você tiver as artes
+- Analytics de cliques na vitrine
+- A/B test entre slots
+
+---
+
+Confirma e eu implemento tudo (migration + storage bucket + painel + integração com o Hero).

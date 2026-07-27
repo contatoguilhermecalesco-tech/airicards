@@ -23,6 +23,8 @@ export type FeaturedItem = {
   icon?: string;
   tagline?: string; // small overline
   raw: ShopItem | PublishedDeckRow;
+  splashUrl?: string | null; // admin-curated background art (2400x1200)
+  artUrl?: string | null; // admin-curated item art (1024x1024)
 };
 
 export function ShopHero({
@@ -66,20 +68,42 @@ export function ShopHero({
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
     >
-      {/* Backdrop gradient — rarity-driven */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-90"
-        style={{ background: rarity.gradient }}
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 opacity-60"
-        style={{
-          background:
-            "radial-gradient(circle at 85% 15%, rgba(255,255,255,0.18), transparent 45%), radial-gradient(circle at 15% 85%, rgba(0,0,0,0.45), transparent 50%)",
-        }}
-      />
+      {/* Backdrop — admin splash art if present, else rarity gradient */}
+      {item.splashUrl ? (
+        <>
+          <img
+            aria-hidden
+            src={item.splashUrl}
+            alt=""
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+          />
+          {/* Left-side darkening for text legibility */}
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 70%, transparent 100%)",
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 opacity-90"
+            style={{ background: rarity.gradient }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 opacity-60"
+            style={{
+              background:
+                "radial-gradient(circle at 85% 15%, rgba(255,255,255,0.18), transparent 45%), radial-gradient(circle at 15% 85%, rgba(0,0,0,0.45), transparent 50%)",
+            }}
+          />
+        </>
+      )}
       {/* Grain-ish shimmer */}
       <span
         aria-hidden
@@ -156,9 +180,20 @@ export function ShopHero({
               className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
               style={{ background: rarity.gradient }}
             />
-            {item.kind === "cosmetic" && "payload" in item.raw ? (
+            {item.artUrl ? (
+              <div
+                className="relative flex h-[220px] items-center justify-center overflow-hidden rounded-2xl"
+                style={{ filter: `drop-shadow(0 20px 40px ${rarity.glow})` }}
+              >
+                <img
+                  src={item.artUrl}
+                  alt=""
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            ) : item.kind === "cosmetic" && "payload" in item.raw ? (
               <MiniProfileCard item={item.raw as ShopItem} />
-            ) : (
+            ) : item.splashUrl ? null : (
               <div
                 className="relative flex h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-black/25 p-5 text-center backdrop-blur"
                 style={{ boxShadow: `0 20px 60px -20px ${rarity.glow}` }}
