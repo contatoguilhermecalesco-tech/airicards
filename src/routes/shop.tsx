@@ -302,7 +302,7 @@ function ShopPage() {
       }
       if (curated.length > 0) return curated.slice(0, 5);
     }
-    // Fallback: auto-pick the single top item by rarity weight + price
+    // Fallback: auto-pick top items by rarity weight + price
     const pool = unified
       .slice()
       .sort((a, b) => {
@@ -311,7 +311,7 @@ function ShopPage() {
         if (wb !== wa) return wb - wa;
         return b.price - a.price;
       })
-      .slice(0, 1);
+      .slice(0, 5);
     return pool.map<FeaturedItem>((u) => ({
       id: u.id,
       kind: u.kind === "decks" ? "deck" : u.kind,
