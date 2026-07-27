@@ -722,6 +722,8 @@ function UnifiedCard({
   busy,
   onBuy,
   onPreview,
+  splashUrl,
+  artUrl,
 }: {
   item: UnifiedItem;
   view: ViewMode;
@@ -732,6 +734,8 @@ function UnifiedCard({
   busy: boolean;
   onBuy: () => void;
   onPreview?: () => void;
+  splashUrl?: string | null;
+  artUrl?: string | null;
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
