@@ -500,9 +500,10 @@ function Home() {
       {/* Prova mensal */}
       {appSettings.exam_visible && (
         <section
-          className="animate-fade-in mt-6"
+          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-4 lg:mt-0"
           style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
         >
+
           <Link
             to="/exam"
             className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30`}
