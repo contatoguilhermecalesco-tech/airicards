@@ -92,7 +92,7 @@ function parseRiotBody(raw: string): Block[] {
 }
 
 function InlineRich({ text }: { text: string }) {
-  const tagRe = /\[(NOVO|REMOVIDO|BUG|NOVIDADE|AJUSTE)\]/gi;
+  const tagRe = /\[(NOVO|REMOVIDO|BUG|NOVIDADE|AJUSTE|CONCEPT|ARTE|MOVIMENTO|SOM|PALETA)\]/gi;
   const parts: Array<{ kind: "text" | "tag"; value: string }> = [];
   let lastIndex = 0;
   let m: RegExpExecArray | null;
@@ -153,6 +153,11 @@ function InlineRich({ text }: { text: string }) {
           REMOVIDO: "bg-rose-500/15 text-rose-300 border-rose-400/30",
           BUG: "bg-amber-500/15 text-amber-300 border-amber-400/30",
           AJUSTE: "bg-sky-500/15 text-sky-300 border-sky-400/30",
+          CONCEPT: "bg-fuchsia-500/15 text-fuchsia-200 border-fuchsia-400/30",
+          ARTE: "bg-violet-500/15 text-violet-200 border-violet-400/30",
+          PALETA: "bg-pink-500/15 text-pink-200 border-pink-400/30",
+          MOVIMENTO: "bg-cyan-500/15 text-cyan-200 border-cyan-400/30",
+          SOM: "bg-indigo-500/15 text-indigo-200 border-indigo-400/30",
         };
         return (
           <span
