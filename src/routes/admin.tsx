@@ -61,6 +61,8 @@ import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
+import { BundleConceptsSection } from "@/components/admin/BundleConceptsSection";
+import { initBundleConcepts } from "@/lib/bundle-concepts-store";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
