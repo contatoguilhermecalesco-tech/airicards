@@ -207,43 +207,6 @@ export function ShopHero({
           </div>
         </div>
 
-        {/* Right column: visual preview */}
-        <div className={`relative self-center ${item.splashUrl ? "hidden sm:block" : ""}`}>
-          <div className="relative mx-auto max-w-[240px] sm:max-w-[260px]">
-            {item.artUrl ? (
-              <div
-                className="relative flex h-[170px] items-center justify-center overflow-hidden rounded-2xl sm:h-[220px]"
-                style={{ filter: `drop-shadow(0 20px 40px ${rarity.glow})` }}
-              >
-                <img
-                  src={item.artUrl}
-                  alt=""
-                  className="max-h-full max-w-full object-contain"
-                />
-              </div>
-            ) : item.kind === "cosmetic" && "payload" in item.raw ? (
-              <MiniProfileCard item={item.raw as ShopItem} />
-            ) : item.splashUrl ? null : (
-              <div
-                className="relative flex h-[160px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-black/25 p-5 text-center backdrop-blur sm:h-[180px]"
-                style={{ boxShadow: `0 20px 60px -20px ${rarity.glow}` }}
-              >
-                <span
-                  className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-xl sm:h-16 sm:w-16"
-                  style={{ background: rarity.gradient }}
-                >
-                  <Icon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={2.25} />
-                </span>
-                <p className="text-sm font-semibold text-white">
-                  {kindLabel(item.kind)}
-                </p>
-                <p className="text-[11px] text-white/70 line-clamp-2">
-                  {item.description}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Controls */}
