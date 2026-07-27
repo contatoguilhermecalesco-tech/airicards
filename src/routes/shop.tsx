@@ -165,6 +165,16 @@ function ShopPage() {
     }
   }, []);
 
+  // Deep-link: /shop?b=<bundleId> — auto-open the bundle modal once items load.
+  const search = Route.useSearch();
+  useEffect(() => {
+    if (!search.b || !items) return;
+    const target = items.find((it) => it.id === search.b && it.kind === "bundle");
+    if (target) setBundleOpen(target);
+    // Clear the query param so refresh/close doesn't re-open.
+    router.navigate({ to: "/shop", search: {}, replace: true });
+  }, [search.b, items, router]);
+
   /* ---------------------- Unified list ---------------------- */
 
   const unified: UnifiedItem[] = useMemo(() => {
