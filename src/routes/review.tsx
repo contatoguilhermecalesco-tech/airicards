@@ -912,3 +912,193 @@ function FinishedState({
     </div>
   );
 }
+
+/* ---------------------- Type answer + Verdict ----------------------- */
+
+function TypeAnswerPanel({
+  inputRef,
+  value,
+  onChange,
+  onSubmit,
+  onGiveUp,
+  isEnemy,
+  shake,
+}: {
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  onGiveUp: () => void;
+  isEnemy: boolean;
+  shake: boolean;
+}) {
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-1 duration-200">
+      <label className="mb-2 flex items-center justify-between px-1">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+          <Sparkles className="h-3 w-3" strokeWidth={2.5} />
+          Digite a tradução em português
+        </span>
+        <button
+          type="button"
+          onClick={onGiveUp}
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70 transition hover:text-foreground"
+        >
+          <HelpCircle className="h-3 w-3" strokeWidth={2.5} />
+          Não sei
+        </button>
+      </label>
+
+      <div
+        className={`relative overflow-hidden rounded-2xl border transition ${
+          shake ? "answer-shake" : ""
+        } ${
+          isEnemy
+            ? "border-destructive/35 bg-destructive/[0.06]"
+            : "border-white/[0.10] bg-white/[0.04]"
+        }`}
+        style={{
+          boxShadow: isEnemy
+            ? "0 12px 40px -20px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.05)"
+            : "0 12px 40px -20px hsl(var(--primary) / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+          backdropFilter: "blur(20px) saturate(140%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r ${
+            isEnemy
+              ? "from-transparent via-destructive/50 to-transparent"
+              : "from-transparent via-primary/50 to-transparent"
+          }`}
+        />
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
+          autoFocus
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          inputMode="text"
+          placeholder="Sua tradução…"
+          className="w-full bg-transparent px-5 py-4 text-[17px] font-medium text-foreground placeholder:text-muted-foreground/40 focus:outline-none sm:text-[18px]"
+        />
+      </div>
+
+      <button
+        onClick={onSubmit}
+        disabled={!value.trim()}
+        className={`mt-3 w-full rounded-full py-4 text-[15px] font-semibold transition active:scale-[0.99] disabled:opacity-40 disabled:active:scale-100 ${
+          isEnemy
+            ? "bg-destructive text-destructive-foreground"
+            : "bg-foreground text-background"
+        }`}
+        style={{
+          boxShadow: isEnemy
+            ? "0 10px 30px -10px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.2)"
+            : "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.3)",
+        }}
+      >
+        <span className="inline-flex items-center justify-center gap-2">
+          {isEnemy ? (
+            <>
+              <Flame className="h-4 w-4" strokeWidth={2.75} />
+              Atacar
+            </>
+          ) : (
+            <>
+              Verificar
+              <CornerDownLeft className="h-4 w-4" strokeWidth={2.5} />
+            </>
+          )}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function VerdictBanner({
+  kind,
+  userAnswer,
+  expected,
+  similarity,
+}: {
+  kind: "correct" | "wrong";
+  userAnswer: string;
+  expected: string;
+  similarity: number;
+}) {
+  const isRight = kind === "correct";
+  const pct = Math.round(similarity * 100);
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl border px-4 py-4 ${
+        isRight
+          ? "border-success/30 bg-success/[0.08]"
+          : "border-destructive/35 bg-destructive/[0.08]"
+      }`}
+      style={{
+        boxShadow: isRight
+          ? "0 12px 40px -20px hsl(var(--success) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06)"
+          : "0 12px 40px -20px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+        backdropFilter: "blur(20px) saturate(140%)",
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em] ${
+            isRight ? "text-success" : "text-destructive"
+          }`}
+        >
+          {isRight ? (
+            <>
+              <Check className="h-3.5 w-3.5" strokeWidth={2.75} />
+              Correto
+            </>
+          ) : (
+            <>
+              <X className="h-3.5 w-3.5" strokeWidth={2.75} />
+              Errado
+            </>
+          )}
+        </div>
+        <div className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+          {pct}% de proximidade
+        </div>
+      </div>
+
+      {userAnswer.trim() && (
+        <div className="mt-3 space-y-1.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
+            Sua resposta
+          </p>
+          <p
+            className={`text-[15px] font-medium leading-snug ${
+              isRight ? "text-foreground" : "text-destructive line-through decoration-destructive/50"
+            }`}
+          >
+            {userAnswer}
+          </p>
+        </div>
+      )}
+
+      <div className="mt-3 space-y-1.5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
+          Tradução esperada
+        </p>
+        <p className="text-[16px] font-semibold leading-snug text-foreground">
+          {expected}
+        </p>
+      </div>
+    </div>
+  );
+}
+
