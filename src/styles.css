@@ -555,48 +555,44 @@
      70-74%  rise 1
      74-100% idle kneel (rest)
 */
+/* Suave: cada frame segura firme e faz crossfade largo com o vizinho,
+   evitando "piscadas" e dando sensação de movimento contínuo. */
 @keyframes companion-seq-0 {
-  0%, 23% { opacity: 1; }
-  25%, 73% { opacity: 0; }
-  75%, 100% { opacity: 1; }
+  0%, 15% { opacity: 1; }
+  22%, 78% { opacity: 0; }
+  85%, 100% { opacity: 1; }
 }
 @keyframes companion-seq-1 {
-  0%, 23% { opacity: 0; }
-  25%, 27% { opacity: 1; }
-  29%, 69% { opacity: 0; }
-  71%, 73% { opacity: 1; }
-  75%, 100% { opacity: 0; }
+  0%, 15% { opacity: 0; }
+  22%, 27% { opacity: 1; }
+  32%, 68% { opacity: 0; }
+  73%, 78% { opacity: 1; }
+  85%, 100% { opacity: 0; }
 }
 @keyframes companion-seq-2 {
   0%, 27% { opacity: 0; }
-  29%, 31% { opacity: 1; }
-  33%, 65% { opacity: 0; }
-  67%, 69% { opacity: 1; }
-  71%, 100% { opacity: 0; }
+  32%, 36% { opacity: 1; }
+  40%, 60% { opacity: 0; }
+  64%, 68% { opacity: 1; }
+  73%, 100% { opacity: 0; }
 }
 @keyframes companion-seq-3 {
-  0%, 31% { opacity: 0; }
-  33%, 37% { opacity: 1; }
-  39%, 61% { opacity: 0; }
-  63%, 65% { opacity: 1; }
-  67%, 100% { opacity: 0; }
+  0%, 36% { opacity: 0; }
+  40%, 44% { opacity: 1; }
+  48%, 56% { opacity: 0; }
+  60%, 64% { opacity: 1; }
+  68%, 100% { opacity: 0; }
 }
 @keyframes companion-seq-4 {
-  0%, 37% { opacity: 0; }
-  39%, 61% { opacity: 1; }
-  63%, 100% { opacity: 0; }
+  0%, 44% { opacity: 0; }
+  48%, 56% { opacity: 1; }
+  60%, 100% { opacity: 0; }
 }
-@keyframes companion-slash-flash {
-  0%, 37% { opacity: 0; transform: scale(0.55) rotate(-10deg); }
-  40% { opacity: 0.95; transform: scale(1.15) rotate(4deg); }
-  46% { opacity: 0.55; transform: scale(1.35) rotate(10deg); }
-  55%, 100% { opacity: 0; transform: scale(1.5) rotate(14deg); }
-}
-@utility companion-seq-0 { animation: companion-seq-0 8s linear infinite; }
-@utility companion-seq-1 { animation: companion-seq-1 8s linear infinite; }
-@utility companion-seq-2 { animation: companion-seq-2 8s linear infinite; }
-@utility companion-seq-3 { animation: companion-seq-3 8s linear infinite; }
-@utility companion-seq-4 { animation: companion-seq-4 8s linear infinite; }
+@utility companion-seq-0 { animation: companion-seq-0 9s ease-in-out infinite; }
+@utility companion-seq-1 { animation: companion-seq-1 9s ease-in-out infinite; }
+@utility companion-seq-2 { animation: companion-seq-2 9s ease-in-out infinite; }
+@utility companion-seq-3 { animation: companion-seq-3 9s ease-in-out infinite; }
+@utility companion-seq-4 { animation: companion-seq-4 9s ease-in-out infinite; }
 @utility companion-slash-flash {
   animation: companion-slash-flash 8s ease-in-out infinite;
   filter: blur(6px);
