@@ -71,6 +71,16 @@ function Review() {
   const [defeatFx, setDefeatFx] = useState<string | null>(null);
   const dmgIdRef = useRef(0);
 
+  // Digitação obrigatória da tradução
+  const [typed, setTyped] = useState("");
+  const [verdict, setVerdict] = useState<
+    | { correct: boolean; similarity: number; expected: string }
+    | null
+  >(null);
+  const [shake, setShake] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+
   const allCards = useStore((s) => s.cards);
 
   useEffect(() => {
@@ -121,6 +131,50 @@ function Review() {
     setTimeout(() => setDmgFx((xs) => xs.filter((x) => x.id !== id)), 1200);
   }
 
+  function resetAnswerState() {
+    setTyped("");
+    setVerdict(null);
+    setShake(false);
+  }
+
+  // Foca o input ao trocar de carta
+  useEffect(() => {
+    resetAnswerState();
+    setShowBack(false);
+    setAskDifficulty(false);
+    const t = setTimeout(() => inputRef.current?.focus(), 120);
+    return () => clearTimeout(t);
+  }, [currentId]);
+
+  function submitTypedAnswer() {
+    if (!current || verdict) return;
+    const trimmed = typed.trim();
+    if (!trimmed) {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
+    }
+    const res = matchAnswer(trimmed, current.back);
+    setVerdict({
+      correct: res.correct,
+      similarity: res.similarity,
+      expected: res.bestExpected,
+    });
+    setShowBack(true);
+    if (res.correct) {
+      setAskDifficulty(true);
+    } else {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  }
+
+  function giveUp() {
+    if (!current || verdict) return;
+    setVerdict({ correct: false, similarity: 0, expected: current.back });
+    setShowBack(true);
+  }
+
   function handleWrong() {
     if (!current) return;
     const wasEnemy = isEnemy(current);
@@ -138,12 +192,6 @@ function Review() {
       });
     }
     setIndex((i) => i + 1);
-    setShowBack(false);
-    setAskDifficulty(false);
-  }
-
-  function handleRight() {
-    setAskDifficulty(true);
   }
 
   function handleDifficulty(g: "hard" | "good" | "easy") {
@@ -164,15 +212,12 @@ function Review() {
       setTimeout(() => setDefeatFx(null), 1400);
       setTimeout(() => {
         setIndex((i) => i + 1);
-        setShowBack(false);
-        setAskDifficulty(false);
       }, 900);
       return;
     }
     setIndex((i) => i + 1);
-    setShowBack(false);
-    setAskDifficulty(false);
   }
+
 
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
@@ -194,53 +239,30 @@ function Review() {
     }
   }, [focusMode]);
 
-  // -------- Atalhos de teclado (desktop) --------
+  // -------- Atalhos de teclado --------
   useEffect(() => {
-    function isTypingTarget(t: EventTarget | null): boolean {
-      if (!(t instanceof HTMLElement)) return false;
-      const tag = t.tagName;
-      return tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable;
-    }
     function onKey(e: KeyboardEvent) {
-      if (isTypingTarget(e.target)) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (finished || !current) return;
-
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.toLowerCase();
 
-      // Virar carta
-      if (!showBack && (k === " " || k === "spacebar" || k === "enter")) {
+      // Após acerto: escolher dificuldade
+      if (verdict?.correct && askDifficulty) {
+        if (k === "1" || k === "d") return handleDifficulty("hard");
+        if (k === "2" || k === "m") return handleDifficulty("good");
+        if (k === "3" || k === "f") return handleDifficulty("easy");
+      }
+
+      // Após erro: Enter para próxima
+      if (verdict && !verdict.correct && e.key === "Enter") {
         e.preventDefault();
-        setShowBack(true);
-        return;
-      }
-
-      // Aguardando escolha de dificuldade (após "Acertei")
-      if (showBack && askDifficulty) {
-        if (k === "f") return handleDifficulty("easy");
-        if (k === "m") return handleDifficulty("good");
-        if (k === "d") return handleDifficulty("hard");
-        if (k === "1") return handleDifficulty("hard");
-        if (k === "2") return handleDifficulty("good");
-        if (k === "3") return handleDifficulty("easy");
-        return;
-      }
-
-      // Errei / Acertei
-      if (showBack && !askDifficulty) {
-        if (k === "1" || k === "e") {
-          e.preventDefault();
-          return handleWrong();
-        }
-        if (k === "2" || k === "a") {
-          e.preventDefault();
-          return handleRight();
-        }
+        return handleWrong();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showBack, askDifficulty, finished, current]);
+  }, [verdict, askDifficulty, finished, current]);
+
 
 
 
