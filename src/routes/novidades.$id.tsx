@@ -88,10 +88,18 @@ function NovidadeDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const { entries } = useChangelog();
+  const { items: concepts } = useBundleConcepts();
 
   useEffect(() => {
     void initChangelog();
+    void initBundleConcepts();
   }, []);
+
+  if (id.startsWith("concept:")) {
+    const conceptId = id.slice("concept:".length);
+    const concept = concepts.find((c) => c.id === conceptId) ?? null;
+    return <ConceptDetail concept={concept} onBack={() => navigate({ to: "/novidades" })} />;
+  }
 
   const index = entries.findIndex((e) => e.id === id);
   const entry = index >= 0 ? entries[index] : null;
