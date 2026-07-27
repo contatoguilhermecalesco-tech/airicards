@@ -94,6 +94,9 @@ export function BundleDetailModal({
                   "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.85) 100%)",
               }}
             />
+            {bundle.id === "bundle.florescer_celestial" && (
+              <SakuraPetals density="epic" seed={11} withHalo />
+            )}
             <button
               onClick={onClose}
               className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-black/40 text-white/90 backdrop-blur transition hover:bg-black/60"
