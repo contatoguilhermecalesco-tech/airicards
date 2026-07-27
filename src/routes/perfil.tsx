@@ -582,13 +582,13 @@ function PerfilPage() {
               boxShadow: `0 12px 30px -8px ${decorationPalette.ring}55`,
             }}
           >
-            {/* Aura art (decoration) — glow BEHIND avatar (rendered first, sits under) */}
+            {/* Aura art (decoration) — glow around avatar (screen blend keeps face visible) */}
             {decorationArt && (
               <img
                 src={decorationArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute -inset-6 -z-10 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain"
+                className="pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain mix-blend-screen opacity-90"
                 style={{ animation: "spin 24s linear infinite" }}
               />
             )}
