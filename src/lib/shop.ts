@@ -111,6 +111,27 @@ export async function buyShopItem(profileId: string, item: ShopItem): Promise<Bu
       const effect = String(item.payload.effect ?? item.id);
       const uses = Number(item.payload.uses ?? 1) || 1;
       await grantPowerup(effect, uses);
+    } else if (item.kind === "bundle") {
+      // Grant every contained item at once — bundle price is charged once above.
+      const contained = await getBundleContents(item);
+      for (const child of contained) {
+        try {
+          if (child.kind === "cosmetic") {
+            const key = String(child.payload.key ?? child.id);
+            const slot = String(child.payload.slot ?? "cosmetic");
+            const full = `${slot}:${key}`;
+            // Skip cosmetics already owned so nothing breaks
+            const w = getWallet();
+            if (!w.cosmetics.includes(full)) await grantCosmetic(full);
+          } else if (child.kind === "powerup") {
+            const effect = String(child.payload.effect ?? child.id);
+            const uses = Number(child.payload.uses ?? 1) || 1;
+            await grantPowerup(effect, uses);
+          }
+        } catch {
+          // best-effort per child
+        }
+      }
     }
     await logPurchase({
       buyer_profile_id: profileId,
@@ -127,11 +148,89 @@ export async function buyShopItem(profileId: string, item: ShopItem): Promise<Bu
           ? "Pack liberado — em breve na sua biblioteca."
           : item.kind === "cosmetic"
             ? "Item cosmético desbloqueado."
-            : "Power-up adicionado ao inventário.",
+            : item.kind === "bundle"
+              ? "Bundle desbloqueado — todos os itens já estão no seu inventário."
+              : "Power-up adicionado ao inventário.",
     };
   } catch {
     return { ok: false, reason: "error" };
   }
+}
+
+/* --------------------------- Bundle helpers --------------------------- */
+
+export function bundleItemIds(item: ShopItem): string[] {
+  const arr = (item.payload as { items?: unknown })?.items;
+  return Array.isArray(arr) ? (arr as unknown[]).map((x) => String(x)).filter(Boolean) : [];
+}
+
+export async function getBundleContents(item: ShopItem): Promise<ShopItem[]> {
+  const ids = bundleItemIds(item);
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase
+    .from("shop_items")
+    .select("*")
+    .in("id", ids);
+  if (error || !data) return [];
+  const map = new Map<string, ShopItem>();
+  (data as unknown as ShopItem[]).forEach((r) => map.set(r.id, r));
+  // Preserve the admin-defined order
+  return ids.map((id) => map.get(id)).filter((x): x is ShopItem => Boolean(x));
+}
+
+export async function createShopBundle(input: {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  items: string[];
+  icon?: string;
+  accent?: string;
+  sort_order?: number;
+}): Promise<ShopItem> {
+  const row = {
+    id: input.id,
+    kind: "bundle",
+    name: input.name,
+    description: input.description,
+    price: Math.max(0, Math.round(input.price)),
+    payload: { items: input.items },
+    icon: input.icon ?? "crown",
+    accent: input.accent ?? "lavender",
+    active: true,
+    sort_order: input.sort_order ?? 0,
+  };
+  const { data, error } = await supabase
+    .from("shop_items")
+    .insert(row as never)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as unknown as ShopItem;
+}
+
+export async function updateShopBundle(
+  id: string,
+  patch: {
+    name?: string;
+    description?: string;
+    price?: number;
+    items?: string[];
+    icon?: string;
+    accent?: string;
+    active?: boolean;
+  },
+): Promise<void> {
+  const row: Record<string, unknown> = {};
+  if (patch.name !== undefined) row.name = patch.name;
+  if (patch.description !== undefined) row.description = patch.description;
+  if (patch.price !== undefined) row.price = Math.max(0, Math.round(patch.price));
+  if (patch.icon !== undefined) row.icon = patch.icon;
+  if (patch.accent !== undefined) row.accent = patch.accent;
+  if (patch.active !== undefined) row.active = patch.active;
+  if (patch.items !== undefined) row.payload = { items: patch.items };
+  const { error } = await supabase.from("shop_items").update(row as never).eq("id", id);
+  if (error) throw error;
 }
 
 export async function buyPublishedDeck(
