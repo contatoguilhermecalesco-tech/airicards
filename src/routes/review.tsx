@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles } from "lucide-react";
+import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles, Zap } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -13,6 +13,18 @@ import {
   registerHomeSession,
 } from "@/lib/flashcards-store";
 import { matchAnswer } from "@/lib/answer-match";
+import {
+  enemyTier,
+  TIER_META,
+  useCombo,
+  resetCombo,
+  bumpCombo,
+  breakCombo,
+  comboMultiplier,
+  onEnemyDefeated,
+  onComboReached,
+  getComboCount,
+} from "@/lib/enemy-system";
 
 
 type ReviewMode = "due" | "enemies";
@@ -70,6 +82,8 @@ function Review() {
   >([]);
   const [defeatFx, setDefeatFx] = useState<string | null>(null);
   const dmgIdRef = useRef(0);
+  const combo = useCombo();
+  const comboMult = comboMultiplier(combo.count);
 
   // Digitação obrigatória da tradução
   const [typed, setTyped] = useState("");
@@ -85,6 +99,7 @@ function Review() {
 
   useEffect(() => {
     if (!deckId && !isEnemyRun) registerHomeSession();
+    if (isEnemyRun) resetCombo();
     const source = isEnemyRun
       ? getEnemyCards(deckId).filter((c) => !isDefeated(c))
       : getDueCards(deckId, Date.now());
@@ -163,9 +178,14 @@ function Review() {
     setShowBack(true);
     if (res.correct) {
       setAskDifficulty(true);
+      if (isEnemyRun && isEnemy(current)) {
+        bumpCombo();
+        onComboReached(getComboCount());
+      }
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      if (isEnemyRun) breakCombo();
     }
   }
 
@@ -185,6 +205,7 @@ function Review() {
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
     if (wasEnemy) spawnDmg("+1 HP", "heal");
+    if (isEnemyRun) breakCombo();
     if (willBecomeEnemy) {
       flashNotice({
         kind: "enemy-born",
@@ -197,6 +218,7 @@ function Review() {
   function handleDifficulty(g: "hard" | "good" | "easy") {
     if (!current) return;
     const wasEnemy = isEnemy(current);
+    const tierBefore = wasEnemy ? enemyTier(current) : "wounded";
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
@@ -204,9 +226,10 @@ function Review() {
     setReviewed((n) => n + 1);
     if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
     if (willDefeat) {
+      onEnemyDefeated(tierBefore);
       flashNotice({
         kind: "enemy-defeated",
-        text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
+        text: `${TIER_META[tierBefore].label} derrotada! +1 vitória.`,
       });
       setDefeatFx(current.front);
       setTimeout(() => setDefeatFx(null), 1400);
@@ -396,6 +419,46 @@ function Review() {
             />
           </div>
         )}
+
+        {/* Combo pill + tier badge (Arena) */}
+        {isEnemyRun && current && (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {currentIsEnemy && (() => {
+              const t = enemyTier(current);
+              const meta = TIER_META[t];
+              return (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                  style={{
+                    borderColor: meta.glow,
+                    color: meta.color,
+                    background: "rgba(255,255,255,0.03)",
+                    boxShadow: `0 0 20px -8px ${meta.glow}`,
+                  }}
+                >
+                  <span aria-hidden>{meta.icon}</span>
+                  {meta.label}
+                </span>
+              );
+            })()}
+            {combo.count >= 2 && (
+              <span
+                key={combo.count}
+                className="combo-pop inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/[0.10] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary"
+                style={{ boxShadow: "0 0 24px -8px hsl(var(--primary) / 0.7)" }}
+              >
+                <Zap className="h-3 w-3" strokeWidth={3} />
+                Combo x{combo.count}
+                {comboMult > 1 && (
+                  <span className="ml-0.5 rounded bg-primary/25 px-1 py-0.5 text-[9px] tabular-nums">
+                    ×{comboMult}
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+        )}
+
 
         {queue.length === 0 && !current ? (
           <EmptyState enemyRun={isEnemyRun} />

@@ -1,68 +1,123 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Swords, Skull, Flame, Trophy, ArrowRight, Search, X } from "lucide-react";
+import {
+  Swords,
+  Skull,
+  Flame,
+  Trophy,
+  
+  Search,
+  X,
+  Sparkles,
+  Gift,
+  Check,
+} from "lucide-react";
 import {
   useStore,
   isEnemy,
   isDefeated,
+  type Card,
 } from "@/lib/flashcards-store";
+import {
+  enemyTier,
+  tierRank,
+  TIER_META,
+  useMissions,
+  claimMission,
+  type EnemyTier,
+} from "@/lib/enemy-system";
 
 export const Route = createFileRoute("/enemies")({
   head: () => ({
     meta: [
-      { title: "Cartas Inimigas — Airi" },
+      { title: "Arena — Cartas inimigas | Airi" },
       {
         name: "description",
         content:
-          "Enfrente as cartas que mais te desafiam. Um espaço dedicado às suas cartas inimigas.",
+          "Enfrente as cartas que mais te desafiam. Filtre por nível de perigo, cumpra missões diárias e derrote chefões.",
       },
-      { property: "og:title", content: "Arena de Cartas Inimigas — Airi" },
+      { property: "og:title", content: "Arena — Cartas inimigas | Airi" },
       {
         property: "og:description",
-        content: "Suas cartas mais difíceis, reunidas em um só lugar.",
+        content:
+          "Cace inimigas, encare chefões e ganhe Arlys nas missões da Arena.",
       },
     ],
   }),
   component: EnemiesPage,
 });
 
-function enemyLevelLabel(lapses: number, successes: number) {
-  const net = lapses - successes;
-  if (net >= 5) return { label: "Chefão", tone: "boss" as const };
-  if (net >= 3) return { label: "Elite", tone: "elite" as const };
-  return { label: "Inimiga", tone: "regular" as const };
-}
+const FILTER_TIERS: (EnemyTier | "all" | "active" | "defeated")[] = [
+  "active",
+  "nemesis",
+  "boss",
+  "elite",
+  "wounded",
+  "defeated",
+];
+const FILTER_LABEL: Record<(typeof FILTER_TIERS)[number], string> = {
+  active: "Ativas",
+  nemesis: "Nêmesis",
+  boss: "Chefão",
+  elite: "Elite",
+  wounded: "Ferida",
+  defeated: "Derrotadas",
+  all: "Todas",
+};
 
 function EnemiesPage() {
   const cards = useStore((s) => s.cards);
   const decks = useStore((s) => s.decks);
+  const missions = useMissions();
   const [query, setQuery] = useState("");
+  const [filter, setFilter] =
+    useState<(typeof FILTER_TIERS)[number]>("active");
 
-  const enemies = useMemo(
-    () =>
-      cards
-        .filter(isEnemy)
-        .sort((a, b) => {
-          const ad = (a.lapses ?? 0) - (a.successes ?? 0);
-          const bd = (b.lapses ?? 0) - (b.successes ?? 0);
-          return bd - ad;
-        }),
-    [cards],
+  const enemies = useMemo(() => cards.filter(isEnemy), [cards]);
+
+  const withTier = useMemo(
+    () => enemies.map((c) => ({ card: c, tier: enemyTier(c) })),
+    [enemies],
   );
 
+  const tierCounts = useMemo(() => {
+    const c: Record<EnemyTier, number> = {
+      wounded: 0,
+      elite: 0,
+      boss: 0,
+      nemesis: 0,
+      defeated: 0,
+    };
+    withTier.forEach(({ tier }) => (c[tier] += 1));
+    return c;
+  }, [withTier]);
+
   const filtered = useMemo(() => {
+    let list = withTier;
+    if (filter === "active") list = list.filter((x) => x.tier !== "defeated");
+    else if (filter === "defeated") list = list.filter((x) => x.tier === "defeated");
+    else if (filter !== "all") list = list.filter((x) => x.tier === filter);
+
     const q = query.trim().toLowerCase();
-    if (!q) return enemies;
-    return enemies.filter(
-      (c) =>
-        c.front.toLowerCase().includes(q) ||
-        c.back.toLowerCase().includes(q) ||
-        (c.targetWord ?? "").toLowerCase().includes(q),
-    );
-  }, [enemies, query]);
+    if (q) {
+      list = list.filter(
+        ({ card: c }) =>
+          c.front.toLowerCase().includes(q) ||
+          c.back.toLowerCase().includes(q) ||
+          (c.targetWord ?? "").toLowerCase().includes(q),
+      );
+    }
+    return list.sort((a, b) => {
+      const rd = tierRank(b.tier) - tierRank(a.tier);
+      if (rd !== 0) return rd;
+      const ad = (a.card.lapses ?? 0) - (a.card.successes ?? 0);
+      const bd = (b.card.lapses ?? 0) - (b.card.successes ?? 0);
+      return bd - ad;
+    });
+  }, [withTier, filter, query]);
 
   const active = enemies.filter((c) => !isDefeated(c)).length;
-  const defeated = enemies.filter(isDefeated).length;
+  const defeatedCount = tierCounts.defeated;
   const totalLapses = enemies.reduce((n, c) => n + (c.lapses ?? 0), 0);
 
   const deckName = (id: string) =>
@@ -76,7 +131,7 @@ function EnemiesPage() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[380px] opacity-70"
         style={{
           background:
-            "radial-gradient(55% 60% at 20% 0%, hsl(var(--destructive) / 0.18), transparent 70%), radial-gradient(45% 55% at 85% 5%, hsl(var(--destructive) / 0.10), transparent 70%)",
+            "radial-gradient(55% 60% at 20% 0%, hsl(var(--destructive) / 0.20), transparent 70%), radial-gradient(45% 55% at 85% 5%, hsl(280 90% 60% / 0.12), transparent 70%)",
         }}
       />
 
@@ -93,7 +148,7 @@ function EnemiesPage() {
           <p className="mt-2 text-[15px] text-muted-foreground">
             {enemies.length === 0
               ? "Nenhuma inimiga por aqui. Continue estudando — elas aparecem quando você erra uma carta 3 vezes."
-              : `${active} ativa${active === 1 ? "" : "s"} · ${defeated} derrotada${defeated === 1 ? "" : "s"} · ${totalLapses} tropeço${totalLapses === 1 ? "" : "s"} no total`}
+              : `${active} ativa${active === 1 ? "" : "s"} · ${defeatedCount} derrotada${defeatedCount === 1 ? "" : "s"} · ${totalLapses} tropeço${totalLapses === 1 ? "" : "s"} no total`}
           </p>
         </div>
         {active > 0 && (
@@ -109,78 +164,144 @@ function EnemiesPage() {
         )}
       </header>
 
+      {/* Missions */}
+      {enemies.length > 0 && (
+        <section className="mt-6 overflow-hidden rounded-[24px] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl sm:p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" strokeWidth={2.5} />
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary">
+                Missões da Arena
+              </p>
+            </div>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              Recompensa · Arlys ✦
+            </span>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {[...missions.daily, ...missions.weekly].map((m) => {
+              const isWeekly = missions.weekly.some((w) => w.id === m.id);
+              const done = m.progress >= m.target;
+              const pct = Math.min(100, (m.progress / m.target) * 100);
+              return (
+                <div
+                  key={m.id}
+                  className={`relative overflow-hidden rounded-2xl border p-3 transition ${
+                    m.claimed
+                      ? "border-success/25 bg-success/[0.06] opacity-70"
+                      : done
+                      ? "border-primary/40 bg-primary/[0.08]"
+                      : "border-white/[0.08] bg-white/[0.03]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest ${
+                            isWeekly
+                              ? "bg-primary/20 text-primary"
+                              : "bg-white/10 text-muted-foreground"
+                          }`}
+                        >
+                          {isWeekly ? "Semanal" : "Diária"}
+                        </span>
+                        <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+                          {m.progress}/{m.target}
+                        </span>
+                      </div>
+                      <p className="mt-1 truncate text-[14px] font-semibold text-foreground">
+                        {m.label}
+                      </p>
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {m.hint}
+                      </p>
+                    </div>
+                    <button
+                      disabled={!done || m.claimed}
+                      onClick={() => void claimMission(m.id)}
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider transition ${
+                        m.claimed
+                          ? "bg-success/20 text-success"
+                          : done
+                          ? "bg-primary text-primary-foreground shadow-[0_6px_20px_-8px_hsl(var(--primary)/0.6)] hover:opacity-95"
+                          : "bg-white/[0.06] text-muted-foreground"
+                      }`}
+                    >
+                      {m.claimed ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Check className="h-3 w-3" /> Pego
+                        </span>
+                      ) : done ? (
+                        <span className="inline-flex items-center gap-1">
+                          <Gift className="h-3 w-3" /> +{m.rewardArlys}✦
+                        </span>
+                      ) : (
+                        <span>+{m.rewardArlys}✦</span>
+                      )}
+                    </button>
+                  </div>
+                  <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.05]">
+                    <div
+                      className={`h-full rounded-full ${
+                        m.claimed
+                          ? "bg-success/60"
+                          : done
+                          ? "bg-primary"
+                          : "bg-destructive/70"
+                      }`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Stats strip */}
       {enemies.length > 0 && (
-        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
-          <StatTile
-            icon={<Swords className="h-4 w-4" strokeWidth={2.5} />}
-            label="Ativas"
-            value={active}
-            tone="destructive"
-          />
-          <StatTile
-            icon={<Trophy className="h-4 w-4" strokeWidth={2.5} />}
-            label="Derrotadas"
-            value={defeated}
-            tone="success"
-          />
-          <StatTile
-            icon={<Skull className="h-4 w-4" strokeWidth={2.5} />}
-            label="Tropeços"
-            value={totalLapses}
-            tone="muted"
-          />
+        <div className="mt-6 grid grid-cols-4 gap-2 sm:gap-3">
+          <TierTile tier="nemesis" value={tierCounts.nemesis} />
+          <TierTile tier="boss" value={tierCounts.boss} />
+          <TierTile tier="elite" value={tierCounts.elite} />
+          <TierTile tier="wounded" value={tierCounts.wounded} />
         </div>
       )}
 
-
-      {/* Podium — top 3 hardest active enemies */}
-      {(() => {
-        const top = enemies.filter((c) => !isDefeated(c)).slice(0, 3);
-        if (top.length === 0) return null;
-        const podiumOrder = [top[1], top[0], top[2]].filter(Boolean);
-        const heights = { 0: "h-16", 1: "h-24", 2: "h-12" } as const;
-        const medals = ["🥈", "🥇", "🥉"];
-        return (
-          <section className="relative mt-8 overflow-hidden rounded-[24px] border border-destructive/20 bg-gradient-to-b from-destructive/[0.08] via-transparent to-transparent p-5 backdrop-blur-md">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-destructive" strokeWidth={2.5} />
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-destructive">
-                Ranking dos chefes
-              </p>
-            </div>
-            <div className="mt-4 grid grid-cols-3 items-end gap-3">
-              {podiumOrder.map((c, i) => {
-                const lapses = c.lapses ?? 0;
-                const successes = c.successes ?? 0;
-                const net = lapses - successes;
-                return (
-                  <div key={c.id} className="flex flex-col items-center">
-                    <span className="text-[22px]">{medals[i]}</span>
-                    <p className="mt-1 line-clamp-2 max-w-full text-center text-[12px] font-semibold leading-tight text-foreground">
-                      {c.front}
-                    </p>
-                    <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive/90 tabular-nums">
-                      {net} pt · {lapses} err
-                    </p>
-                    <div
-                      className={`mt-2 w-full rounded-t-lg bg-gradient-to-t from-destructive/40 to-destructive/70 ${heights[i as 0 | 1 | 2]}`}
-                      style={{
-                        boxShadow:
-                          "inset 0 1px 0 hsl(var(--destructive) / 0.6), 0 10px 30px -10px hsl(var(--destructive) / 0.5)",
-                      }}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        );
-      })()}
+      {/* Filters */}
+      {enemies.length > 0 && (
+        <div className="mt-6 -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {FILTER_TIERS.map((f) => {
+            const isActive = filter === f;
+            const count =
+              f === "active"
+                ? active
+                : f === "all"
+                ? enemies.length
+                : tierCounts[f as EnemyTier] ?? 0;
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`snap-start whitespace-nowrap rounded-full border px-3 py-1.5 text-[12px] font-semibold transition ${
+                  isActive
+                    ? "border-destructive/60 bg-destructive/20 text-destructive"
+                    : "border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {FILTER_LABEL[f]}
+                <span className="ml-1.5 tabular-nums opacity-70">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Search */}
       {enemies.length > 0 && (
-        <div className="relative mt-6">
+        <div className="relative mt-4">
           <div className="relative flex items-center gap-2.5 rounded-[18px] border border-white/10 bg-white/[0.04] px-4 py-3 backdrop-blur-2xl transition focus-within:border-destructive/40">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
@@ -208,125 +329,13 @@ function EnemiesPage() {
           <EmptyEnemies />
         ) : filtered.length === 0 ? (
           <p className="rounded-[22px] border border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-muted-foreground backdrop-blur-xl">
-            Nenhuma inimiga para “{query}”.
+            Nenhuma inimiga para esse filtro.
           </p>
         ) : (
           <ul className="grid gap-3">
-            {filtered.map((c) => {
-              const lapses = c.lapses ?? 0;
-              const successes = c.successes ?? 0;
-              const defeated = isDefeated(c);
-              const meta = enemyLevelLabel(lapses, successes);
-              const hpMax = Math.max(lapses, 1);
-              const hpNow = Math.max(0, lapses - successes);
-              const hpPct = Math.max(6, Math.min(100, (hpNow / hpMax) * 100));
-              return (
-                <li
-                  key={c.id}
-                  className={`group relative overflow-hidden rounded-[22px] border p-4 backdrop-blur-md transition ${
-                    defeated
-                      ? "border-success/25 bg-success/[0.05]"
-                      : "border-destructive/25 bg-gradient-to-br from-destructive/[0.08] via-transparent to-transparent"
-                  }`}
-                  style={{
-                    boxShadow: defeated
-                      ? "inset 0 1px 0 hsl(var(--success)/0.10)"
-                      : "inset 0 1px 0 hsl(var(--destructive)/0.15), 0 20px 40px -30px hsl(var(--destructive)/0.4)",
-                  }}
-                >
-                  {/* corner glow */}
-                  {!defeated && (
-                    <div
-                      aria-hidden
-                      className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-40 blur-2xl"
-                      style={{
-                        background:
-                          "radial-gradient(closest-side, hsl(var(--destructive)/0.4), transparent 70%)",
-                      }}
-                    />
-                  )}
-
-                  <div className="relative flex items-start gap-3">
-                    <div
-                      className={`grid h-11 w-11 shrink-0 place-items-center rounded-[14px] ${
-                        defeated
-                          ? "bg-success/15 text-success"
-                          : "bg-destructive/15 text-destructive"
-                      }`}
-                      style={{
-                        boxShadow: defeated
-                          ? "inset 0 0 0 1px hsl(var(--success)/0.25)"
-                          : "inset 0 0 0 1px hsl(var(--destructive)/0.3)",
-                      }}
-                    >
-                      {defeated ? (
-                        <Trophy className="h-5 w-5" strokeWidth={2.5} />
-                      ) : (
-                        <Swords className="h-5 w-5" strokeWidth={2.5} />
-                      )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] ${
-                            defeated
-                              ? "bg-success/15 text-success"
-                              : meta.tone === "boss"
-                              ? "bg-destructive text-destructive-foreground"
-                              : meta.tone === "elite"
-                              ? "bg-destructive/25 text-destructive"
-                              : "bg-destructive/15 text-destructive"
-                          }`}
-                        >
-                          {defeated ? "Derrotada" : meta.label}
-                        </span>
-                        <span className="truncate text-[11px] text-muted-foreground">
-                          {deckName(c.deckId)}
-                        </span>
-                      </div>
-                      <p className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-foreground">
-                        {c.front}
-                      </p>
-                      <p className="mt-0.5 line-clamp-1 text-[13px] text-muted-foreground">
-                        {c.back}
-                      </p>
-
-                      {/* HP bar */}
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider">
-                          <span
-                            className={
-                              defeated ? "text-success" : "text-destructive/90"
-                            }
-                          >
-                            {defeated ? "Domínio" : "Resistência"}
-                          </span>
-                          <span className="tabular-nums text-muted-foreground">
-                            {successes}/{lapses}
-                          </span>
-                        </div>
-                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
-                          <div
-                            className={`hp-fill h-full rounded-full ${
-                              defeated
-                                ? "bg-gradient-to-r from-success/70 to-success"
-                                : "bg-gradient-to-r from-destructive/80 to-destructive"
-                            }`}
-                            style={{
-                              width: defeated ? "100%" : `${hpPct}%`,
-                              boxShadow: defeated
-                                ? "0 0 10px hsl(var(--success)/0.5)"
-                                : "0 0 10px hsl(var(--destructive)/0.5)",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
+            {filtered.map(({ card: c, tier }) => (
+              <EnemyRow key={c.id} card={c} tier={tier} deckName={deckName(c.deckId)} />
+            ))}
           </ul>
         )}
       </div>
@@ -334,31 +343,133 @@ function EnemiesPage() {
   );
 }
 
-function StatTile({
-  icon,
-  label,
-  value,
-  tone,
+function EnemyRow({
+  card: c,
+  tier,
+  deckName,
 }: {
-  icon: React.ReactNode;
-  label: string;
-  value: number;
-  tone: "destructive" | "success" | "muted";
+  card: Card;
+  tier: EnemyTier;
+  deckName: string;
 }) {
-  const toneCls =
-    tone === "destructive"
-      ? "border-destructive/25 bg-destructive/[0.08] text-destructive"
-      : tone === "success"
-      ? "border-success/25 bg-success/[0.08] text-success"
-      : "border-white/10 bg-white/[0.04] text-muted-foreground";
+  const lapses = c.lapses ?? 0;
+  const successes = c.successes ?? 0;
+  const defeated = tier === "defeated";
+  const meta = TIER_META[tier];
+  const hpMax = Math.max(lapses, 1);
+  const hpNow = Math.max(0, lapses - successes);
+  const hpPct = Math.max(6, Math.min(100, (hpNow / hpMax) * 100));
+
+  return (
+    <li
+      className={`group relative overflow-hidden rounded-[22px] border p-4 backdrop-blur-md transition ${
+        defeated
+          ? "border-success/25 bg-success/[0.05]"
+          : "border-white/[0.08] bg-white/[0.03]"
+      }`}
+      style={{
+        boxShadow: defeated
+          ? "inset 0 1px 0 hsl(var(--success)/0.10)"
+          : `inset 0 1px 0 ${meta.glow}, 0 20px 40px -30px ${meta.glow}`,
+      }}
+    >
+      {/* corner glow */}
+      {!defeated && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-50 blur-2xl"
+          style={{
+            background: `radial-gradient(closest-side, ${meta.glow}, transparent 70%)`,
+          }}
+        />
+      )}
+
+      <div className="relative flex items-start gap-3">
+        <div
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] text-lg"
+          style={{
+            background: defeated
+              ? "hsl(var(--success) / 0.12)"
+              : "rgba(255,255,255,0.04)",
+            boxShadow: `inset 0 0 0 1px ${meta.glow}`,
+          }}
+        >
+          {defeated ? (
+            <Trophy className="h-5 w-5 text-success" strokeWidth={2.5} />
+          ) : (
+            <span aria-hidden>{meta.icon}</span>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em]"
+              style={{
+                background: defeated
+                  ? "hsl(var(--success) / 0.15)"
+                  : `${meta.color.replace(")", " / 0.18)")}`,
+                color: defeated ? "hsl(var(--success))" : meta.color,
+              }}
+            >
+              {meta.label}
+            </span>
+            <span className="truncate text-[11px] text-muted-foreground">
+              {deckName}
+            </span>
+          </div>
+          <p className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-foreground">
+            {c.front}
+          </p>
+          <p className="mt-0.5 line-clamp-1 text-[13px] text-muted-foreground">
+            {c.back}
+          </p>
+
+          {/* HP bar */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider">
+              <span
+                style={{ color: defeated ? "hsl(var(--success))" : meta.color }}
+              >
+                {defeated ? "Domínio" : "Resistência"}
+              </span>
+              <span className="tabular-nums text-muted-foreground">
+                {successes}/{lapses}
+              </span>
+            </div>
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <div
+                className="hp-fill h-full rounded-full"
+                style={{
+                  width: defeated ? "100%" : `${hpPct}%`,
+                  background: defeated
+                    ? "linear-gradient(90deg, hsl(var(--success)/0.7), hsl(var(--success)))"
+                    : `linear-gradient(90deg, ${meta.color.replace(")", " / 0.6)")}, ${meta.color})`,
+                  boxShadow: `0 0 10px ${meta.glow}`,
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function TierTile({ tier, value }: { tier: EnemyTier; value: number }) {
+  const meta = TIER_META[tier];
   return (
     <div
-      className={`rounded-2xl border px-3 py-3 backdrop-blur-md ${toneCls}`}
-      style={{ boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.05)" }}
+      className="rounded-2xl border px-3 py-3 backdrop-blur-md"
+      style={{
+        borderColor: meta.glow,
+        background: "rgba(255,255,255,0.03)",
+        boxShadow: `inset 0 1px 0 rgb(255 255 255 / 0.05), inset 0 0 30px -20px ${meta.glow}`,
+      }}
     >
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
-        {icon}
-        {label}
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.18em]" style={{ color: meta.color }}>
+        <span aria-hidden className="text-[11px]">{meta.icon}</span>
+        {meta.label}
       </div>
       <div className="mt-1 text-[22px] font-bold tabular-nums text-foreground">
         {value}
@@ -383,7 +494,7 @@ function EmptyEnemies() {
         className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:opacity-95"
       >
         Ir para a biblioteca
-        <ArrowRight className="h-4 w-4" />
+        <Swords className="h-4 w-4" />
       </Link>
     </div>
   );
