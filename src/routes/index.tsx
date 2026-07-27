@@ -391,9 +391,10 @@ function Home() {
       {/* Chefões pendentes — alerta gamificado */}
       {enemies.length > 0 && (
         <section
-          className="animate-fade-in mt-6"
+          className="animate-fade-in mt-6 lg:col-span-7 lg:col-start-1 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
         >
+
           <Link
             to="/enemies"
             className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30`}
