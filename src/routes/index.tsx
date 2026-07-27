@@ -296,10 +296,18 @@ function Home() {
 
             {/* Copy — centered on mobile, left on ≥sm */}
             <div className="order-2 min-w-0 flex-1 space-y-1 text-center sm:order-1 sm:text-left">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
-                Sessão de hoje
-              </p>
-              <p className="mt-1.5 text-[24px] font-medium leading-tight tracking-tight text-foreground sm:text-[26px]">
+              <div className="flex items-center justify-center gap-2 sm:justify-start">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
+                  Sessão de hoje
+                </span>
+                {due > 0 && (
+                  <span className="relative inline-flex h-1.5 w-1.5">
+                    <span aria-hidden className="absolute inset-0 rounded-full bg-primary/70 motion-safe:animate-ping" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                  </span>
+                )}
+              </div>
+              <p className="mt-1.5 text-[24px] font-medium leading-tight tracking-tight text-foreground sm:text-[28px]">
                 {due === 0
                   ? "Tudo em dia por agora"
                   : `${due} carta${due === 1 ? "" : "s"} te esperam`}
@@ -311,8 +319,32 @@ function Home() {
                     ? `${reviewedToday} revisada${reviewedToday === 1 ? "" : "s"} hoje`
                     : "Sua sessão diária te espera."}
               </p>
+              {/* Insight row — dá contexto humano ao número */}
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1 sm:justify-start">
+                {masteryPct > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="h-1 w-1 rounded-full bg-emerald-300/80" />
+                    <span className="tabular-nums text-foreground/85">{masteryPct}%</span>
+                    <span>dominado</span>
+                  </span>
+                )}
+                {dueDeckCount > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="h-1 w-1 rounded-full bg-primary/80" />
+                    <span className="tabular-nums text-foreground/85">{dueDeckCount}</span>
+                    <span>deck{dueDeckCount === 1 ? "" : "s"} com pendências</span>
+                  </span>
+                )}
+                {reviewedToday > 0 && streak.current > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <Flame className="h-3 w-3 text-orange-300" strokeWidth={2.5} />
+                    <span className="tabular-nums text-foreground/85">dia {streak.current}</span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
+
 
 
           {/* CTA */}
