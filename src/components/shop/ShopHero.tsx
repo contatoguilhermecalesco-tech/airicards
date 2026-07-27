@@ -62,13 +62,18 @@ export function ShopHero({
   const owned = ownedIds.has(item.id);
   const canAfford = wallet >= item.price;
 
+  const advance = () => setIdx((i) => (i + 1) % featured.length);
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
     <section
-      className="relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0"
+      className={`relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0 ${featured.length > 1 ? "cursor-pointer" : ""}`}
+      onClick={() => featured.length > 1 && advance()}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
     >
+
       {/* Backdrop — admin splash art if present, else rarity gradient */}
       {item.splashUrl ? (
         <>
