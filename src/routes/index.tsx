@@ -441,9 +441,10 @@ function Home() {
 
       {/* Stats — glass chips */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
+
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
         <StatChip label="Revisadas" value={reviewedToday} accent />
