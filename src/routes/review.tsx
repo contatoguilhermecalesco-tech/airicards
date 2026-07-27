@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Sparkles, Skull, Flame, Focus, Minimize2, Keyboard } from "lucide-react";
+import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -12,6 +12,7 @@ import {
   ENEMY_THRESHOLD,
   registerHomeSession,
 } from "@/lib/flashcards-store";
+import { matchAnswer } from "@/lib/answer-match";
 
 
 type ReviewMode = "due" | "enemies";
@@ -70,6 +71,16 @@ function Review() {
   const [defeatFx, setDefeatFx] = useState<string | null>(null);
   const dmgIdRef = useRef(0);
 
+  // Digitação obrigatória da tradução
+  const [typed, setTyped] = useState("");
+  const [verdict, setVerdict] = useState<
+    | { correct: boolean; similarity: number; expected: string }
+    | null
+  >(null);
+  const [shake, setShake] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+
   const allCards = useStore((s) => s.cards);
 
   useEffect(() => {
@@ -120,6 +131,50 @@ function Review() {
     setTimeout(() => setDmgFx((xs) => xs.filter((x) => x.id !== id)), 1200);
   }
 
+  function resetAnswerState() {
+    setTyped("");
+    setVerdict(null);
+    setShake(false);
+  }
+
+  // Foca o input ao trocar de carta
+  useEffect(() => {
+    resetAnswerState();
+    setShowBack(false);
+    setAskDifficulty(false);
+    const t = setTimeout(() => inputRef.current?.focus(), 120);
+    return () => clearTimeout(t);
+  }, [currentId]);
+
+  function submitTypedAnswer() {
+    if (!current || verdict) return;
+    const trimmed = typed.trim();
+    if (!trimmed) {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
+    }
+    const res = matchAnswer(trimmed, current.back);
+    setVerdict({
+      correct: res.correct,
+      similarity: res.similarity,
+      expected: res.bestExpected,
+    });
+    setShowBack(true);
+    if (res.correct) {
+      setAskDifficulty(true);
+    } else {
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
+  }
+
+  function giveUp() {
+    if (!current || verdict) return;
+    setVerdict({ correct: false, similarity: 0, expected: current.back });
+    setShowBack(true);
+  }
+
   function handleWrong() {
     if (!current) return;
     const wasEnemy = isEnemy(current);
@@ -137,12 +192,6 @@ function Review() {
       });
     }
     setIndex((i) => i + 1);
-    setShowBack(false);
-    setAskDifficulty(false);
-  }
-
-  function handleRight() {
-    setAskDifficulty(true);
   }
 
   function handleDifficulty(g: "hard" | "good" | "easy") {
@@ -163,15 +212,12 @@ function Review() {
       setTimeout(() => setDefeatFx(null), 1400);
       setTimeout(() => {
         setIndex((i) => i + 1);
-        setShowBack(false);
-        setAskDifficulty(false);
       }, 900);
       return;
     }
     setIndex((i) => i + 1);
-    setShowBack(false);
-    setAskDifficulty(false);
   }
+
 
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
@@ -193,53 +239,30 @@ function Review() {
     }
   }, [focusMode]);
 
-  // -------- Atalhos de teclado (desktop) --------
+  // -------- Atalhos de teclado --------
   useEffect(() => {
-    function isTypingTarget(t: EventTarget | null): boolean {
-      if (!(t instanceof HTMLElement)) return false;
-      const tag = t.tagName;
-      return tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable;
-    }
     function onKey(e: KeyboardEvent) {
-      if (isTypingTarget(e.target)) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (finished || !current) return;
-
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key.toLowerCase();
 
-      // Virar carta
-      if (!showBack && (k === " " || k === "spacebar" || k === "enter")) {
+      // Após acerto: escolher dificuldade
+      if (verdict?.correct && askDifficulty) {
+        if (k === "1" || k === "d") return handleDifficulty("hard");
+        if (k === "2" || k === "m") return handleDifficulty("good");
+        if (k === "3" || k === "f") return handleDifficulty("easy");
+      }
+
+      // Após erro: Enter para próxima
+      if (verdict && !verdict.correct && e.key === "Enter") {
         e.preventDefault();
-        setShowBack(true);
-        return;
-      }
-
-      // Aguardando escolha de dificuldade (após "Acertei")
-      if (showBack && askDifficulty) {
-        if (k === "f") return handleDifficulty("easy");
-        if (k === "m") return handleDifficulty("good");
-        if (k === "d") return handleDifficulty("hard");
-        if (k === "1") return handleDifficulty("hard");
-        if (k === "2") return handleDifficulty("good");
-        if (k === "3") return handleDifficulty("easy");
-        return;
-      }
-
-      // Errei / Acertei
-      if (showBack && !askDifficulty) {
-        if (k === "1" || k === "e") {
-          e.preventDefault();
-          return handleWrong();
-        }
-        if (k === "2" || k === "a") {
-          e.preventDefault();
-          return handleRight();
-        }
+        return handleWrong();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [showBack, askDifficulty, finished, current]);
+  }, [verdict, askDifficulty, finished, current]);
+
 
 
 
@@ -483,94 +506,71 @@ function Review() {
             )}
 
 
-            {/* Actions */}
+            {/* Actions — digitação obrigatória */}
             <div className="mt-8">
-              {!showBack ? (
-                <button
-                  onClick={() => setShowBack(true)}
-                  className={`group relative w-full overflow-hidden rounded-full py-4 text-[15px] font-semibold transition active:scale-[0.99] ${
-                    currentIsEnemy
-                      ? "bg-destructive text-destructive-foreground"
-                      : "bg-foreground text-background"
-                  }`}
-                  style={{
-                    boxShadow: currentIsEnemy
-                      ? "0 10px 30px -10px hsl(var(--destructive) / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.25)"
-                      : "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.35)",
-                  }}
-                >
-                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
-                    {currentIsEnemy ? (
-                      <>
-                        <Flame className="h-4 w-4" strokeWidth={2.75} />
-                        Encarar o inimigo
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-                        Mostrar resposta
-                      </>
-                    )}
-                  </span>
-                </button>
-              ) : askDifficulty ? (
-                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-1 duration-200">
-                  <p className="text-center text-[12px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                    {currentIsEnemy ? "Golpe certeiro?" : "Quão fácil foi?"}
+              {!verdict ? (
+                <TypeAnswerPanel
+                  inputRef={inputRef}
+                  value={typed}
+                  onChange={setTyped}
+                  onSubmit={submitTypedAnswer}
+                  onGiveUp={giveUp}
+                  isEnemy={currentIsEnemy}
+                  shake={shake}
+                />
+              ) : verdict.correct ? (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                  <VerdictBanner
+                    kind="correct"
+                    userAnswer={typed}
+                    expected={verdict.expected}
+                    similarity={verdict.similarity}
+                  />
+                  <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+                    {currentIsEnemy ? "Golpe certeiro? Classifique." : "Quão fácil foi?"}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    <GradeButton
-                      label="Difícil"
-                      tone="warning"
-                      onClick={() => handleDifficulty("hard")}
-                    />
-                    <GradeButton
-                      label="Médio"
-                      tone="primary"
-                      onClick={() => handleDifficulty("good")}
-                    />
-                    <GradeButton
-                      label="Fácil"
-                      tone="success"
-                      onClick={() => handleDifficulty("easy")}
-                    />
+                    <GradeButton label="Difícil" tone="warning" onClick={() => handleDifficulty("hard")} />
+                    <GradeButton label="Médio" tone="primary" onClick={() => handleDifficulty("good")} />
+                    <GradeButton label="Fácil" tone="success" onClick={() => handleDifficulty("easy")} />
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 animate-in fade-in duration-200">
-                  <GradeButton
-                    label={currentIsEnemy ? "Levei dano" : "Errei"}
-                    tone="destructive"
-                    icon={
-                      currentIsEnemy ? (
-                        <Skull className="h-4 w-4" strokeWidth={2.75} />
-                      ) : (
-                        <X className="h-4 w-4" strokeWidth={2.75} />
-                      )
-                    }
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                  <VerdictBanner
+                    kind="wrong"
+                    userAnswer={typed}
+                    expected={verdict.expected}
+                    similarity={verdict.similarity}
+                  />
+                  <button
                     onClick={handleWrong}
-                  />
-                  <GradeButton
-                    label={currentIsEnemy ? "Acertei" : "Acertei"}
-                    tone="success"
-                    icon={<Check className="h-4 w-4" strokeWidth={2.75} />}
-                    onClick={handleRight}
-                  />
+                    className="group relative w-full overflow-hidden rounded-full bg-foreground py-4 text-[15px] font-semibold text-background transition active:scale-[0.99]"
+                    style={{
+                      boxShadow: "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.35)",
+                    }}
+                  >
+                    <span className="inline-flex items-center justify-center gap-2">
+                      Próxima carta
+                      <CornerDownLeft className="h-4 w-4" strokeWidth={2.5} />
+                    </span>
+                  </button>
                 </div>
               )}
 
-              {/* Dica de atalhos — só desktop, escondida no modo foco */}
+              {/* Dica de atalhos */}
               {!focusMode && (
                 <p className="mt-4 hidden items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60 sm:inline-flex">
                   <Keyboard className="h-3 w-3" strokeWidth={2.5} />
-                  {!showBack
-                    ? "Espaço para virar"
-                    : askDifficulty
-                    ? "F Fácil · M Médio · D Difícil"
-                    : "1 Errei · 2 Acertei"}
+                  {!verdict
+                    ? "Enter para verificar"
+                    : verdict.correct
+                    ? "1 Difícil · 2 Médio · 3 Fácil"
+                    : "Enter para próxima"}
                 </p>
               )}
             </div>
+
           </div>
         )}
       </div>
@@ -912,3 +912,193 @@ function FinishedState({
     </div>
   );
 }
+
+/* ---------------------- Type answer + Verdict ----------------------- */
+
+function TypeAnswerPanel({
+  inputRef,
+  value,
+  onChange,
+  onSubmit,
+  onGiveUp,
+  isEnemy,
+  shake,
+}: {
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: () => void;
+  onGiveUp: () => void;
+  isEnemy: boolean;
+  shake: boolean;
+}) {
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-1 duration-200">
+      <label className="mb-2 flex items-center justify-between px-1">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+          <Sparkles className="h-3 w-3" strokeWidth={2.5} />
+          Digite a tradução em português
+        </span>
+        <button
+          type="button"
+          onClick={onGiveUp}
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70 transition hover:text-foreground"
+        >
+          <HelpCircle className="h-3 w-3" strokeWidth={2.5} />
+          Não sei
+        </button>
+      </label>
+
+      <div
+        className={`relative overflow-hidden rounded-2xl border transition ${
+          shake ? "answer-shake" : ""
+        } ${
+          isEnemy
+            ? "border-destructive/35 bg-destructive/[0.06]"
+            : "border-white/[0.10] bg-white/[0.04]"
+        }`}
+        style={{
+          boxShadow: isEnemy
+            ? "0 12px 40px -20px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.05)"
+            : "0 12px 40px -20px hsl(var(--primary) / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+          backdropFilter: "blur(20px) saturate(140%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className={`pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r ${
+            isEnemy
+              ? "from-transparent via-destructive/50 to-transparent"
+              : "from-transparent via-primary/50 to-transparent"
+          }`}
+        />
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
+          autoFocus
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          inputMode="text"
+          placeholder="Sua tradução…"
+          className="w-full bg-transparent px-5 py-4 text-[17px] font-medium text-foreground placeholder:text-muted-foreground/40 focus:outline-none sm:text-[18px]"
+        />
+      </div>
+
+      <button
+        onClick={onSubmit}
+        disabled={!value.trim()}
+        className={`mt-3 w-full rounded-full py-4 text-[15px] font-semibold transition active:scale-[0.99] disabled:opacity-40 disabled:active:scale-100 ${
+          isEnemy
+            ? "bg-destructive text-destructive-foreground"
+            : "bg-foreground text-background"
+        }`}
+        style={{
+          boxShadow: isEnemy
+            ? "0 10px 30px -10px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.2)"
+            : "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.3)",
+        }}
+      >
+        <span className="inline-flex items-center justify-center gap-2">
+          {isEnemy ? (
+            <>
+              <Flame className="h-4 w-4" strokeWidth={2.75} />
+              Atacar
+            </>
+          ) : (
+            <>
+              Verificar
+              <CornerDownLeft className="h-4 w-4" strokeWidth={2.5} />
+            </>
+          )}
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function VerdictBanner({
+  kind,
+  userAnswer,
+  expected,
+  similarity,
+}: {
+  kind: "correct" | "wrong";
+  userAnswer: string;
+  expected: string;
+  similarity: number;
+}) {
+  const isRight = kind === "correct";
+  const pct = Math.round(similarity * 100);
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl border px-4 py-4 ${
+        isRight
+          ? "border-success/30 bg-success/[0.08]"
+          : "border-destructive/35 bg-destructive/[0.08]"
+      }`}
+      style={{
+        boxShadow: isRight
+          ? "0 12px 40px -20px hsl(var(--success) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06)"
+          : "0 12px 40px -20px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+        backdropFilter: "blur(20px) saturate(140%)",
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em] ${
+            isRight ? "text-success" : "text-destructive"
+          }`}
+        >
+          {isRight ? (
+            <>
+              <Check className="h-3.5 w-3.5" strokeWidth={2.75} />
+              Correto
+            </>
+          ) : (
+            <>
+              <X className="h-3.5 w-3.5" strokeWidth={2.75} />
+              Errado
+            </>
+          )}
+        </div>
+        <div className="rounded-full bg-white/[0.05] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+          {pct}% de proximidade
+        </div>
+      </div>
+
+      {userAnswer.trim() && (
+        <div className="mt-3 space-y-1.5">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
+            Sua resposta
+          </p>
+          <p
+            className={`text-[15px] font-medium leading-snug ${
+              isRight ? "text-foreground" : "text-destructive line-through decoration-destructive/50"
+            }`}
+          >
+            {userAnswer}
+          </p>
+        </div>
+      )}
+
+      <div className="mt-3 space-y-1.5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">
+          Tradução esperada
+        </p>
+        <p className="text-[16px] font-semibold leading-snug text-foreground">
+          {expected}
+        </p>
+      </div>
+    </div>
+  );
+}
+
