@@ -44,8 +44,29 @@ export function BundleConceptsSection() {
   const [splashUrl, setSplashUrl] = useState("");
   const [shopBundleId, setShopBundleId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function handleFileSelected(file: File | null | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErr("Selecione um arquivo de imagem.");
+      return;
+    }
+    setUploading(true);
+    setErr(null);
+    try {
+      const url = await uploadConceptImage(file);
+      setSplashUrl(url);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao enviar imagem.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   const isEditing = editingId !== null;
 
