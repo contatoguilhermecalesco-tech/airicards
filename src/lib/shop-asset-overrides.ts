@@ -25,7 +25,7 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.aura.florescer_celestial": { art: florescerAura },
   "cosmetic.frame.coroa_guardia": { art: florescerFrame },
   "cosmetic.effect.bosque_celestial": { art: florescerBackground },
-  "cosmetic.overlay.chuva_sakura": { art: florescerBackground },
+  "cosmetic.overlay.chuva_sakura": { art: florescerSakura },
   "cosmetic.veil.veu_celestial": { art: florescerCardframe },
   "cosmetic.companion.kitsune_florescer": { art: florescerCompanion },
 };
