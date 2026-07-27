@@ -224,9 +224,10 @@ function Review() {
     setReviewed((n) => n + 1);
     if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
     if (willDefeat) {
+      onEnemyDefeated(tierBefore);
       flashNotice({
         kind: "enemy-defeated",
-        text: "Inimigo derrotado! +1 vitória contra as cartas difíceis.",
+        text: `${TIER_META[tierBefore].label} derrotada! +1 vitória.`,
       });
       setDefeatFx(current.front);
       setTimeout(() => setDefeatFx(null), 1400);
