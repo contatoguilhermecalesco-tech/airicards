@@ -210,10 +210,6 @@ export function ShopHero({
         {/* Right column: visual preview */}
         <div className={`relative self-center ${item.splashUrl ? "hidden sm:block" : ""}`}>
           <div className="relative mx-auto max-w-[240px] sm:max-w-[260px]">
-            <div
-              className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
-              style={{ background: rarity.gradient }}
-            />
             {item.artUrl ? (
               <div
                 className="relative flex h-[170px] items-center justify-center overflow-hidden rounded-2xl sm:h-[220px]"
