@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, Package, Pencil, Send, Sparkles, Trash2, Upload, Wand2, X } from "lucide-react";
+import { ImagePlus, Images, Loader2, Package, Pencil, Send, Sparkles, Trash2, Upload, Wand2, X, ArrowUp, ArrowDown } from "lucide-react";
 import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import {
   createBundleConcept,
@@ -7,6 +7,7 @@ import {
   deleteBundleConcept,
   useBundleConcepts,
   type BundleConcept,
+  type ConceptGalleryItem,
 } from "@/lib/bundle-concepts-store";
 import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
 import { generateBundleConcept } from "@/lib/bundle-concepts-ai.functions";
