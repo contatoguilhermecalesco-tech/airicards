@@ -567,7 +567,7 @@ function Home() {
               Ver todos
             </Link>
           </div>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
             {decks.slice(0, 4).map((d, i) => {
               const total = cards.filter((c) => c.deckId === d.id).length;
               const dueInDeck = cards.filter(
