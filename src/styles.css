@@ -476,3 +476,29 @@
   75% { transform: translateX(-2px); }
 }
 @utility answer-shake { animation: answer-shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+/* ---- Sakura petals (Florescer Celestial bundle) ---- */
+@keyframes sakura-fall {
+  0%   { transform: translate3d(0, -12%, 0) rotate(0deg); opacity: 0; }
+  8%   { opacity: var(--petal-opacity, 0.9); }
+  50%  { transform: translate3d(calc(var(--petal-drift, 40px) * 0.6), 55%, 0) rotate(180deg); }
+  92%  { opacity: var(--petal-opacity, 0.9); }
+  100% { transform: translate3d(var(--petal-drift, 40px), 115%, 0) rotate(360deg); opacity: 0; }
+}
+@keyframes sakura-sway {
+  0%, 100% { transform: translateX(-6px) rotate(-8deg); }
+  50%      { transform: translateX(6px)  rotate(8deg); }
+}
+@keyframes sakura-halo {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.7;  transform: scale(1.08); }
+}
+@utility sakura-petal {
+  animation: sakura-fall var(--petal-duration, 9s) linear var(--petal-delay, 0s) infinite;
+}
+@utility sakura-petal-inner {
+  animation: sakura-sway calc(var(--petal-duration, 9s) * 0.35) ease-in-out infinite;
+}
+@utility sakura-halo {
+  animation: sakura-halo 4.5s ease-in-out infinite;
+}

@@ -48,6 +48,7 @@ import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
+import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
 
 
@@ -367,6 +368,8 @@ function PerfilPage() {
   const effectArt = getEquippedArt(wallet.equipped.effect);
   const veilArt = getEquippedArt(wallet.equipped.veil);
   const veil = equippedItem.veil;
+  // Sakura petals from the Florescer Celestial bundle — trigger on the effect slot.
+  const showSakura = wallet.equipped.effect === "effect:bosque_celestial";
 
   // Hero palette: prioritize effect → veil → decoration → badge → default.
   // Nameplate is NOT included — it only decorates the avatar (frame), not the banner.
@@ -526,6 +529,7 @@ function PerfilPage() {
               />
             </>
           )}
+          {showSakura && <SakuraPetals density="normal" seed={19} withHalo />}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
