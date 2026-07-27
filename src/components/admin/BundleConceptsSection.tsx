@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, Package, Pencil, Send, Trash2, Upload, X } from "lucide-react";
+import { ImagePlus, Loader2, Package, Pencil, Send, Sparkles, Trash2, Upload, Wand2, X } from "lucide-react";
 import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import {
   createBundleConcept,
@@ -9,6 +9,7 @@ import {
   type BundleConcept,
 } from "@/lib/bundle-concepts-store";
 import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
+import { generateBundleConcept } from "@/lib/bundle-concepts-ai.functions";
 
 const PALETTE_PRESETS = [
   { name: "Ametista", value: "#a855f7" },
@@ -48,6 +49,48 @@ export function BundleConceptsSection() {
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // AI assistant state
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiBusy, setAiBusy] = useState<null | "full" | "refine" | "tagline" | "concept">(null);
+
+  async function runAi(mode: "full" | "refine" | "tagline" | "concept") {
+    const prompt = aiPrompt.trim();
+    if (!prompt && mode === "full") {
+      setErr("Descreva a ideia do bundle antes de gerar.");
+      return;
+    }
+    setAiBusy(mode);
+    setErr(null);
+    try {
+      const draft = await generateBundleConcept({
+        data: {
+          prompt: prompt || "Refinar o rascunho atual mantendo a essência.",
+          currentTitle: title || undefined,
+          currentTagline: tagline || undefined,
+          currentConcept: concept || undefined,
+          mode,
+        },
+      });
+      if (mode === "tagline") {
+        if (draft.tagline) setTagline(draft.tagline);
+      } else if (mode === "concept") {
+        if (draft.concept) setConcept(draft.concept);
+      } else {
+        if (draft.title) setTitle(draft.title);
+        if (draft.tagline) setTagline(draft.tagline);
+        if (draft.concept) setConcept(draft.concept);
+      }
+      setOk("Rascunho gerado pela IA.");
+      setTimeout(() => setOk(null), 2500);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setAiBusy(null);
+    }
+  }
+
 
   async function handleFileSelected(file: File | null | undefined) {
     if (!file) return;
@@ -156,6 +199,86 @@ export function BundleConceptsSection() {
           </button>
         )}
       </div>
+
+      {/* AI assistant */}
+      <div className="overflow-hidden rounded-2xl border border-fuchsia-400/20 bg-gradient-to-br from-fuchsia-500/[0.08] via-violet-500/[0.05] to-transparent">
+        <button
+          type="button"
+          onClick={() => setAiOpen((v) => !v)}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left"
+        >
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-fuchsia-400 to-violet-500 text-white shadow-[0_0_20px_rgba(217,70,239,0.35)]">
+            <Sparkles className="h-4 w-4" strokeWidth={2.5} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[12.5px] font-semibold text-foreground">Assistente de escrita</span>
+            <span className="block text-[11px] text-foreground/55">
+              Descreva a ideia e a IA gera título, tagline e o diário completo.
+            </span>
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-200/70">
+            {aiOpen ? "Fechar" : "Abrir"}
+          </span>
+        </button>
+
+        {aiOpen && (
+          <div className="space-y-3 border-t border-white/[0.06] px-4 pb-4 pt-3">
+            <textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              rows={3}
+              placeholder="ex: bundle inspirado nas skins Spirit Blossom, atmosfera de florescer celestial, sakura, espíritos, uma raposa de nove caudas como companion, cores rosa e lavanda"
+              className="w-full rounded-xl border border-white/[0.08] bg-black/30 px-3 py-2 text-[13px] text-foreground placeholder:text-foreground/35 focus:border-fuchsia-400/50 focus:outline-none"
+            />
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => runAi("full")}
+                disabled={aiBusy !== null}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-600 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white shadow-[0_4px_18px_rgba(168,85,247,0.35)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {aiBusy === "full" ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={2.5} />
+                ) : (
+                  <Wand2 className="h-3.5 w-3.5" strokeWidth={2.5} />
+                )}
+                Gerar tudo
+              </button>
+              <button
+                type="button"
+                onClick={() => runAi("refine")}
+                disabled={aiBusy !== null || (!title && !concept)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-foreground/80 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {aiBusy === "refine" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                Refinar rascunho
+              </button>
+              <button
+                type="button"
+                onClick={() => runAi("tagline")}
+                disabled={aiBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-foreground/80 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {aiBusy === "tagline" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                Só a tagline
+              </button>
+              <button
+                type="button"
+                onClick={() => runAi("concept")}
+                disabled={aiBusy !== null}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-foreground/80 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {aiBusy === "concept" ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                Só o concept
+              </button>
+              <span className="ml-auto text-[10px] text-foreground/40">
+                A IA lê o que você já escreveu ao refinar.
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
 
       {/* Live preview card */}
       <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#0a0a0f]">
