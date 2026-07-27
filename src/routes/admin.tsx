@@ -242,7 +242,7 @@ function AdminPage() {
       </section>
 
       <Dialog open={openPanel !== null} onOpenChange={(o) => !o && setOpenPanel(null)}>
-        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl max-h-[92vh] overflow-hidden flex flex-col", activePanel?.wide && "sm:max-w-3xl")}>
+        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl max-h-[95vh] overflow-hidden flex flex-col", activePanel?.wide && "sm:max-w-5xl lg:max-w-6xl")}>
           {activePanel && (
             <>
               <DialogHeader className="border-b border-white/[0.06] px-5 pb-3 pt-5">
