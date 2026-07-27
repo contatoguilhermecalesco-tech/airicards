@@ -570,18 +570,26 @@ function ModalShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm">
-      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/10 bg-[oklch(0.14_0.02_285)] p-5 shadow-2xl">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold">{title}</h3>
-          <button
-            onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.1]"
-          >
-            <X className="h-4 w-4" strokeWidth={2.5} />
-          </button>
+    <div
+      className="fixed inset-0 z-[120] overflow-y-auto bg-black/70 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div className="flex min-h-full items-start justify-center p-3 sm:items-center sm:p-6">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-[oklch(0.14_0.02_285)] p-4 shadow-2xl sm:p-5"
+        >
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-base font-semibold">{title}</h3>
+            <button
+              onClick={onClose}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.1]"
+            >
+              <X className="h-4 w-4" strokeWidth={2.5} />
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );

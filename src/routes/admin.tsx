@@ -58,6 +58,7 @@ import { ChangelogSection } from "@/components/admin/ChangelogSection";
 import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 import { FeaturedSlotsSection } from "@/components/admin/FeaturedSlotsSection";
+import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
@@ -96,7 +97,8 @@ type PanelKey =
   | "changelog"
   | "backup"
   | "streak"
-  | "vitrine";
+  | "vitrine"
+  | "shop-items";
 
 type PanelDef = {
   key: PanelKey;
@@ -120,6 +122,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "changelog", label: "Patch notes", hint: "Publicar / editar novidades", Icon: ScrollText, color: "#c084fc", wide: true },
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
+  { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
   { key: "vitrine", label: "Vitrine da Loja", hint: "Curar destaques + splash arts", Icon: ShoppingBag, color: "#f472b6", wide: true },
 ];
 
@@ -237,7 +240,7 @@ function AdminPage() {
       </section>
 
       <Dialog open={openPanel !== null} onOpenChange={(o) => !o && setOpenPanel(null)}>
-        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl", activePanel?.wide && "sm:max-w-3xl")}>
+        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl max-h-[92vh] overflow-hidden flex flex-col", activePanel?.wide && "sm:max-w-3xl")}>
           {activePanel && (
             <>
               <DialogHeader className="border-b border-white/[0.06] px-5 pb-3 pt-5">
@@ -263,7 +266,7 @@ function AdminPage() {
                 </div>
               </DialogHeader>
 
-              <div className="px-5 pb-5">
+              <div className="flex-1 overflow-y-auto px-5 pb-5">
                 {openPanel === "sessions" && (
                   <SessionsPanel
                     merged={merged}
@@ -287,6 +290,7 @@ function AdminPage() {
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "vitrine" && <FeaturedSlotsSection />}
+                {openPanel === "shop-items" && <ShopItemsSection />}
               </div>
             </>
           )}
