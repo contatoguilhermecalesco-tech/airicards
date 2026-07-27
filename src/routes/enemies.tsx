@@ -79,6 +79,7 @@ function EnemiesPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] =
     useState<(typeof FILTER_TIERS)[number]>("active");
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const enemies = useMemo(() => cards.filter(isEnemy), [cards]);
 
