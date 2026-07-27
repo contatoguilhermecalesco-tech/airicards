@@ -63,6 +63,9 @@ import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 const BUNDLE_ASSET_OVERRIDES = SHOP_ASSET_OVERRIDES;
 
 export const Route = createFileRoute("/shop")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    b: typeof search.b === "string" ? search.b : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Loja airi — Arlys ✦" },
@@ -161,6 +164,16 @@ function ShopPage() {
       localStorage.setItem("airi.shop.helpSeen", "1");
     }
   }, []);
+
+  // Deep-link: /shop?b=<bundleId> — auto-open the bundle modal once items load.
+  const search = Route.useSearch();
+  useEffect(() => {
+    if (!search.b || !items) return;
+    const target = items.find((it) => it.id === search.b && it.kind === "bundle");
+    if (target) setBundleOpen(target);
+    // Clear the query param so refresh/close doesn't re-open.
+    router.navigate({ to: "/shop", search: {}, replace: true });
+  }, [search.b, items, router]);
 
   /* ---------------------- Unified list ---------------------- */
 
