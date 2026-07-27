@@ -5,7 +5,7 @@ import {
   Skull,
   Flame,
   Trophy,
-  ArrowRight,
+  
   Search,
   X,
   Sparkles,
