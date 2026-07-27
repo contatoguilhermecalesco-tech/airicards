@@ -888,20 +888,28 @@ function ListRow({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const isPowerup = item.kind === "powerup";
+  const puPal = isPowerup ? powerupPalette(item.accent) : null;
+  const thumbBg = isPowerup
+    ? `radial-gradient(circle at 30% 20%, ${puPal!.ring}, transparent 65%), linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7))`
+    : rarity.gradient;
+  const thumbGlow = isPowerup ? puPal!.halo : rarity.glow;
   return (
     <li
-      className={`flex items-center gap-3 rounded-2xl border ${rarity.border} bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
+      className={`flex items-center gap-3 rounded-2xl border ${
+        isPowerup ? "border-white/10" : rarity.border
+      } bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
     >
       <span
         className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
-        style={{ background: rarity.gradient, boxShadow: `0 6px 20px -8px ${rarity.glow}` }}
+        style={{ background: thumbBg, boxShadow: `0 6px 20px -8px ${thumbGlow}` }}
       >
         <Icon className="h-5 w-5" strokeWidth={2.25} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="truncate text-sm font-semibold">{item.name}</p>
-          <RarityChip rarity={item.rarity} />
+          {!isPowerup && <RarityChip rarity={item.rarity} />}
         </div>
         <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
           {kindLabelBR(item.kind)}
