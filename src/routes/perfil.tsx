@@ -159,9 +159,14 @@ const SLOT_META: Record<
     icon: Star,
   },
   effect: {
-    label: "Efeito de perfil",
-    hint: "Brilhos e reflexos no banner.",
+    label: "Capa de perfil",
+    hint: "Imagem de fundo do banner do seu perfil.",
     icon: Zap,
+  },
+  overlay: {
+    label: "Efeito sobre a capa",
+    hint: "Efeito animado que aparece por cima da capa.",
+    icon: Sparkles,
   },
   companion: {
     label: "Companheiro",
@@ -175,7 +180,7 @@ const SLOT_META: Record<
   },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "veil", "companion"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "overlay", "veil", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
@@ -333,6 +338,7 @@ function PerfilPage() {
       decoration: [],
       badge: [],
       effect: [],
+      overlay: [],
       companion: [],
       veil: [],
     };
@@ -368,10 +374,10 @@ function PerfilPage() {
   const effectArt = getEquippedArt(wallet.equipped.effect);
   const veilArt = getEquippedArt(wallet.equipped.veil);
   const veil = equippedItem.veil;
-  // Sakura petals from the Florescer Celestial bundle — trigger on the effect slot.
-  const showSakura =
-    wallet.equipped.effect === "effect:bosque_celestial" ||
-    wallet.equipped.effect === "effect:chuva_sakura";
+  // Chuva de Sakura vive no slot "overlay" — cai por cima da capa (effect).
+  const showSakura = wallet.equipped.overlay === "overlay:chuva_sakura";
+  // A capa (effect) usa a imagem de fundo em cover, sem mix-blend.
+  const hasCoverArt = !!effectArt;
 
   // Hero palette: prioritize effect → veil → decoration → badge → default.
   // Nameplate is NOT included — it only decorates the avatar (frame), not the banner.
@@ -505,12 +511,12 @@ function PerfilPage() {
               />
             </>
           )}
-          {effectArt && (
+        {effectArt && (
             <img
               src={effectArt}
               alt=""
               aria-hidden
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
             />
           )}
           {veilArt && (

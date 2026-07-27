@@ -6,7 +6,7 @@ import type { ProfileId } from "@/lib/social-store";
 
 export type Cosmetic = string; // key identifier (e.g. "deck_frame:aurora")
 
-export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect" | "companion" | "veil";
+export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect" | "overlay" | "companion" | "veil";
 
 export type EquippedMap = Partial<Record<CosmeticSlot, string>>;
 
@@ -191,6 +191,8 @@ export async function grantCosmetic(key: string) {
 // canônicos; qualquer outro valor cai em "effect" para não perder o item.
 function slotFromKey(key: string): CosmeticSlot {
   const raw = key.split(":")[0]?.toLowerCase() ?? "";
+  if (raw === "overlay" || raw.includes("sakura") || raw.includes("petal") || raw.includes("petala"))
+    return "overlay";
   if (raw === "veil" || raw.includes("veu")) return "veil";
   if (raw === "companion" || raw.includes("kitsune") || raw.includes("pet"))
     return "companion";
