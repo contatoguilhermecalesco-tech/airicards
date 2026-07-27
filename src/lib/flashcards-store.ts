@@ -250,6 +250,9 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
       state = {
         decks: [...extraDecks, ...remote.decks],
         cards: [...extraCards, ...remote.cards],
+        // Meta local vence dentro da janela de mutação recente para não
+        // perder progresso de missões/combo feito nos últimos segundos.
+        meta: state.meta ?? remote.meta,
       };
       // Se preservamos itens locais, precisamos re-enviar pro servidor para
       // que o outro device também os veja.
