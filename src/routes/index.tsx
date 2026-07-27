@@ -151,6 +151,26 @@ function Home() {
   const pendingPct = Math.min(1, due / dailyTarget);
   const pctLabel = Math.round(reviewedPct * 100);
 
+  // ---- Insights (contexto para os stats) --------------------------------
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const cardsThisWeek = useMemo(
+    () => cards.filter((c) => c.createdAt >= weekAgo).length,
+    [cards, weekAgo],
+  );
+  const masteredCount = useMemo(
+    () => cards.filter((c) => (c.reps ?? 0) >= 3 && !isEnemy(c)).length,
+    [cards],
+  );
+  const masteryPct = cards.length === 0 ? 0 : Math.round((masteredCount / cards.length) * 100);
+  const dueDeckCount = useMemo(() => {
+    const set = new Set<string>();
+    cards.forEach((c) => {
+      if (c.dueAt <= now) set.add(c.deckId);
+    });
+    return set.size;
+  }, [cards, now]);
+
+
 
   return (
     <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14 lg:max-w-6xl lg:px-8 lg:pt-16 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6 lg:items-start">
