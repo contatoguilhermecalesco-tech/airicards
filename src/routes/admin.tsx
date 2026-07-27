@@ -102,7 +102,8 @@ type PanelKey =
   | "backup"
   | "streak"
   | "bundles"
-  | "shop-items";
+  | "shop-items"
+  | "concepts";
 
 type PanelDef = {
   key: PanelKey;
