@@ -112,7 +112,7 @@ export function BundleDetailModal({
               <X className="h-4 w-4" strokeWidth={2.5} />
             </button>
 
-            <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-8">
+            <div className="flex flex-col gap-4 p-5 pr-14 sm:flex-row sm:items-center sm:gap-6 sm:p-8 sm:pr-8">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <RarityChip rarity={rarityFor(bundle.price)} size="md" />
