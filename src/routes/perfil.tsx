@@ -511,12 +511,12 @@ function PerfilPage() {
               />
             </>
           )}
-          {effectArt && (
+        {effectArt && (
             <img
               src={effectArt}
               alt=""
               aria-hidden
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover"
             />
           )}
           {veilArt && (
