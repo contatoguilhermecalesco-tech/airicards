@@ -249,30 +249,31 @@ export function ShopHero({
         <>
           <button
             aria-label="Anterior"
-            onClick={() => setIdx((i) => (i - 1 + featured.length) % featured.length)}
+            onClick={(e) => { e.stopPropagation(); setIdx((i) => (i - 1 + featured.length) % featured.length); }}
             className="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </button>
           <button
             aria-label="Próximo"
-            onClick={() => setIdx((i) => (i + 1) % featured.length)}
+            onClick={(e) => { e.stopPropagation(); advance(); }}
             className="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
           </button>
-          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5">
+          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5" onClick={stop}>
             {featured.map((_, i) => (
               <button
                 key={i}
                 aria-label={`Ir para destaque ${i + 1}`}
-                onClick={() => setIdx(i)}
+                onClick={(e) => { e.stopPropagation(); setIdx(i); }}
                 className={`h-1.5 rounded-full transition-all ${
                   i === idx ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
                 }`}
               />
             ))}
           </div>
+
         </>
       )}
     </section>
