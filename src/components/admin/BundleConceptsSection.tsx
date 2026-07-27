@@ -486,6 +486,110 @@ export function BundleConceptsSection() {
         </label>
       </div>
 
+      {/* Gallery — múltiplas imagens do processo criativo */}
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <Images className="h-3.5 w-3.5 text-fuchsia-300" strokeWidth={2.5} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-foreground/60">
+            Galeria do processo · {gallery.length}
+          </p>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleGalleryFiles(e.target.files)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            disabled={galleryUploading}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/80 transition hover:bg-white/[0.08] hover:text-foreground disabled:opacity-50"
+          >
+            {galleryUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+            {galleryUploading ? "Enviando…" : "Adicionar imagens"}
+          </button>
+        </div>
+        <p className="mb-3 text-[10.5px] text-foreground/45">
+          Suba concept arts, keyframes e estudos. Ordena o processo criativo — como o dev diary da Riot. Cada imagem pode ter uma legenda e uma etiqueta curta (ex: <span className="text-foreground/70">Concept 01</span>, <span className="text-foreground/70">Keyframe D</span>).
+        </p>
+
+        {gallery.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.015] p-6 text-center text-[12px] text-foreground/45">
+            Nenhuma imagem ainda — comece pelo rascunho e vá até o keyframe final.
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {gallery.map((item, idx) => (
+              <li
+                key={`${item.url}-${idx}`}
+                className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
+              >
+                <div
+                  className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/40"
+                  style={{
+                    backgroundImage: `url(${item.url})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/40">
+                      #{String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <input
+                      value={item.tag ?? ""}
+                      onChange={(e) => updateGalleryItem(idx, { tag: e.target.value })}
+                      placeholder="Etiqueta (ex: Concept 01)"
+                      className="flex-1 rounded-md border border-white/[0.06] bg-black/25 px-2 py-1 text-[11.5px] font-semibold text-foreground/90 focus:border-fuchsia-400/50 focus:outline-none"
+                    />
+                  </div>
+                  <input
+                    value={item.caption ?? ""}
+                    onChange={(e) => updateGalleryItem(idx, { caption: e.target.value })}
+                    placeholder="Legenda — descreva o momento do processo"
+                    className="w-full rounded-md border border-white/[0.06] bg-black/25 px-2 py-1 text-[12px] text-foreground/80 focus:border-primary/50 focus:outline-none"
+                  />
+                </div>
+                <div className="flex shrink-0 flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryItem(idx, -1)}
+                    disabled={idx === 0}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label="Subir"
+                  >
+                    <ArrowUp className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryItem(idx, 1)}
+                    disabled={idx === gallery.length - 1}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label="Descer"
+                  >
+                    <ArrowDown className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryItem(idx)}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-rose-400/20 bg-rose-500/10 text-rose-300 transition hover:bg-rose-500/20"
+                    aria-label="Remover"
+                  >
+                    <X className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+
       {/* Concept preview */}
       {concept.trim() && (
         <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4">
