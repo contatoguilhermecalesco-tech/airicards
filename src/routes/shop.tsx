@@ -327,7 +327,7 @@ function ShopPage() {
     }
     // Fallback: auto-pick top items by rarity weight + price
     const pool = unified
-      .slice()
+      .filter((u) => !VITRINE_EXCLUDED_IDS.has(u.id))
       .sort((a, b) => {
         const wa = RARITY_META[a.rarity].weight + (a.kind === "bundle" ? 2 : 0);
         const wb = RARITY_META[b.rarity].weight + (b.kind === "bundle" ? 2 : 0);
