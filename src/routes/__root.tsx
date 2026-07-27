@@ -417,7 +417,7 @@ function TopBar() {
   ] as const;
 
   const pillLink = (active: boolean) =>
-    `tap-target relative rounded-full px-4 py-1.5 text-[13px] font-semibold tracking-tight transition-all duration-200 lg:px-5 lg:text-sm ${
+    `tap-target relative inline-flex min-w-[92px] items-center justify-center rounded-full px-4 py-1.5 text-center text-[13px] font-semibold tracking-tight transition-all duration-200 lg:min-w-[104px] lg:px-5 lg:text-sm ${
       active
         ? "bg-white/10 text-white shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset]"
         : "text-white/50 hover:text-white/90"
