@@ -6,7 +6,7 @@ import type { ProfileId } from "@/lib/social-store";
 
 export type Cosmetic = string; // key identifier (e.g. "deck_frame:aurora")
 
-export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect" | "companion";
+export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect" | "companion" | "veil";
 
 export type EquippedMap = Partial<Record<CosmeticSlot, string>>;
 
@@ -187,10 +187,13 @@ export async function grantCosmetic(key: string) {
   }
 }
 
-// Slot dentro da chave — formato "<slot>:<id>". Aceita apenas os 4 slots
+// Slot dentro da chave — formato "<slot>:<id>". Aceita apenas os slots
 // canônicos; qualquer outro valor cai em "effect" para não perder o item.
 function slotFromKey(key: string): CosmeticSlot {
   const raw = key.split(":")[0]?.toLowerCase() ?? "";
+  if (raw === "veil" || raw.includes("veu")) return "veil";
+  if (raw === "companion" || raw.includes("kitsune") || raw.includes("pet"))
+    return "companion";
   if (raw.includes("frame") || raw.includes("deck") || raw.includes("nameplate"))
     return "nameplate";
   if (raw.includes("aura") || raw.includes("decoration")) return "decoration";

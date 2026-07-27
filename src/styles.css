@@ -414,6 +414,13 @@
 @utility cosmetic-sparkle {
   animation: cosmetic-sparkle 2.2s ease-in-out infinite;
 }
+@keyframes cosmetic-veil-drift {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.55; }
+  50% { transform: translate3d(0,-6px,0) scale(1.02); opacity: 0.75; }
+}
+@utility cosmetic-veil-float {
+  animation: cosmetic-veil-drift 7s ease-in-out infinite;
+}
 
 /* ---- Epic aura animations ---- */
 @keyframes aura-spin-reverse {

@@ -167,9 +167,14 @@ const SLOT_META: Record<
     hint: "Um espírito que acompanha seu perfil.",
     icon: Heart,
   },
+  veil: {
+    label: "Véu de perfil",
+    hint: "Camada translúcida com brilhos por cima do banner.",
+    icon: Sparkles,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "companion"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "veil", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
@@ -328,6 +333,7 @@ function PerfilPage() {
       badge: [],
       effect: [],
       companion: [],
+      veil: [],
     };
     wallet.cosmetics.forEach((k) => {
       const it = byKey.get(k);
@@ -359,11 +365,13 @@ function PerfilPage() {
   const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
+  const veilArt = getEquippedArt(wallet.equipped.veil);
+  const veil = equippedItem.veil;
 
   // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
   const heroItem = nameplate ?? effect ?? decoration ?? badge;
   const heroPalette = heroItem ? paletteFor(heroItem.accent) : DISCORD_PALETTE.violet;
-  const showBanner = !!nameplate || !!effect;
+  const showBanner = !!nameplate || !!effect || !!veil;
   const showDecoration = !!decoration;
   const decorationPalette = decoration ? paletteFor(decoration.accent) : heroPalette;
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
@@ -498,6 +506,24 @@ function PerfilPage() {
               aria-hidden
               className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
             />
+          )}
+          {veilArt && (
+            <>
+              <img
+                src={veilArt}
+                alt=""
+                aria-hidden
+                className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen"
+              />
+              <span
+                aria-hidden
+                className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+                }}
+              />
+            </>
           )}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
@@ -955,9 +981,10 @@ function PerfilPage() {
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-foreground">Onde meu perfil aparece?</p>
             <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-              Esta é a sua vitrine airi. Todo cosmético que você compra na loja fica guardado aqui
-              e pode ser equipado nos 4 slots (nameplate, decoração, badge e efeito). O banner e a
-              aura acompanham você em previews sociais, no perfil e ao compartilhar conquistas.
+              Esta é a sua vitrine airi. Todo cosmético que você compra na loja fica guardado aqui e
+              pode ser equipado nos 6 slots (nameplate, decoração, badge, efeito, véu e
+              companheiro). O banner e a aura acompanham você em previews sociais, no perfil e ao
+              compartilhar conquistas.
             </p>
           </div>
         </div>

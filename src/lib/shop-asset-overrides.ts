@@ -4,7 +4,7 @@
 import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
 import florescerAura from "@/assets/shop/florescer/aura.png";
 import florescerFrame from "@/assets/shop/florescer/frame.png";
-import florescerTitle from "@/assets/shop/florescer/title.png";
+
 import florescerBackground from "@/assets/shop/florescer/background.png";
 import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
@@ -23,9 +23,8 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   // Individual items in the Florescer Celestial bundle
   "cosmetic.aura.florescer_celestial": { art: florescerAura },
   "cosmetic.frame.coroa_guardia": { art: florescerFrame },
-  "cosmetic.badge.guardia_flores": { art: florescerTitle },
   "cosmetic.effect.bosque_celestial": { art: florescerBackground },
-  "cosmetic.effect.veu_celestial": { art: florescerCardframe },
+  "cosmetic.veil.veu_celestial": { art: florescerCardframe },
   "cosmetic.companion.kitsune_florescer": { art: florescerCompanion },
 };
 
@@ -41,9 +40,8 @@ export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefi
 export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "decoration:florescer_celestial": florescerAura,
   "nameplate:coroa_guardia": florescerFrame,
-  "badge:guardia_flores": florescerTitle,
   "effect:bosque_celestial": florescerBackground,
-  "effect:veu_celestial": florescerCardframe,
+  "veil:veu_celestial": florescerCardframe,
   "companion:kitsune_florescer": florescerCompanion,
 };
 
