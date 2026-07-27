@@ -34,7 +34,10 @@ async function fetchAll() {
     .order("created_at", { ascending: false })
     .limit(200);
   if (!error && data) {
-    items = data as unknown as BundleConcept[];
+    items = (data as any[]).map((r) => ({
+      ...r,
+      gallery: Array.isArray(r.gallery) ? r.gallery : [],
+    })) as unknown as BundleConcept[];
     emit();
   }
 }
