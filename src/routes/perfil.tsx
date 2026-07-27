@@ -981,9 +981,10 @@ function PerfilPage() {
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-foreground">Onde meu perfil aparece?</p>
             <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-              Esta é a sua vitrine airi. Todo cosmético que você compra na loja fica guardado aqui
-              e pode ser equipado nos 4 slots (nameplate, decoração, badge e efeito). O banner e a
-              aura acompanham você em previews sociais, no perfil e ao compartilhar conquistas.
+              Esta é a sua vitrine airi. Todo cosmético que você compra na loja fica guardado aqui e
+              pode ser equipado nos 6 slots (nameplate, decoração, badge, efeito, véu e
+              companheiro). O banner e a aura acompanham você em previews sociais, no perfil e ao
+              compartilhar conquistas.
             </p>
           </div>
         </div>
