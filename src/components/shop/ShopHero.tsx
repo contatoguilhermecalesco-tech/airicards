@@ -62,13 +62,18 @@ export function ShopHero({
   const owned = ownedIds.has(item.id);
   const canAfford = wallet >= item.price;
 
+  const advance = () => setIdx((i) => (i + 1) % featured.length);
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+
   return (
     <section
-      className="relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0"
+      className={`relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0 ${featured.length > 1 ? "cursor-pointer" : ""}`}
+      onClick={() => featured.length > 1 && advance()}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
     >
+
       {/* Backdrop — admin splash art if present, else rarity gradient */}
       {item.splashUrl ? (
         <>
@@ -164,10 +169,11 @@ export function ShopHero({
               </span>
             </div>
             <button
-              onClick={() => onBuy(item)}
+              onClick={(e) => { e.stopPropagation(); onBuy(item); }}
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
               className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
+
               {busyId === item.id ? (
                 <>
                   <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
@@ -243,30 +249,31 @@ export function ShopHero({
         <>
           <button
             aria-label="Anterior"
-            onClick={() => setIdx((i) => (i - 1 + featured.length) % featured.length)}
+            onClick={(e) => { e.stopPropagation(); setIdx((i) => (i - 1 + featured.length) % featured.length); }}
             className="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </button>
           <button
             aria-label="Próximo"
-            onClick={() => setIdx((i) => (i + 1) % featured.length)}
+            onClick={(e) => { e.stopPropagation(); advance(); }}
             className="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
           </button>
-          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5">
+          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5" onClick={stop}>
             {featured.map((_, i) => (
               <button
                 key={i}
                 aria-label={`Ir para destaque ${i + 1}`}
-                onClick={() => setIdx(i)}
+                onClick={(e) => { e.stopPropagation(); setIdx(i); }}
                 className={`h-1.5 rounded-full transition-all ${
                   i === idx ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
                 }`}
               />
             ))}
           </div>
+
         </>
       )}
     </section>
