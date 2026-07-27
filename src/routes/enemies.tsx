@@ -5,7 +5,7 @@ import {
   Skull,
   Flame,
   Trophy,
-  
+  HelpCircle,
   Search,
   X,
   Sparkles,
@@ -26,6 +26,13 @@ import {
   claimMission,
   type EnemyTier,
 } from "@/lib/enemy-system";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/enemies")({
   head: () => ({
@@ -72,6 +79,7 @@ function EnemiesPage() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] =
     useState<(typeof FILTER_TIERS)[number]>("active");
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const enemies = useMemo(() => cards.filter(isEnemy), [cards]);
 
@@ -151,17 +159,26 @@ function EnemiesPage() {
               : `${active} ativa${active === 1 ? "" : "s"} · ${defeatedCount} derrotada${defeatedCount === 1 ? "" : "s"} · ${totalLapses} tropeço${totalLapses === 1 ? "" : "s"} no total`}
           </p>
         </div>
-        {active > 0 && (
-          <Link
-            to="/review"
-            search={{ mode: "enemies" }}
-            className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-2xl border border-destructive/40 bg-destructive px-4 py-2.5 text-[14px] font-semibold text-destructive-foreground shadow-[0_10px_30px_-10px_hsl(var(--destructive)/0.7)] transition active:scale-95"
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={() => setHelpOpen(true)}
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"
+            aria-label="Como funcionam as cartas inimigas"
           >
-            <Flame className="h-4 w-4" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Enfrentar {active}</span>
-            <span className="sm:hidden">Enfrentar</span>
-          </Link>
-        )}
+            <HelpCircle className="h-5 w-5" strokeWidth={2} />
+          </button>
+          {active > 0 && (
+            <Link
+              to="/review"
+              search={{ mode: "enemies" }}
+              className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-2xl border border-destructive/40 bg-destructive px-4 py-2.5 text-[14px] font-semibold text-destructive-foreground shadow-[0_10px_30px_-10px_hsl(var(--destructive)/0.7)] transition active:scale-95"
+            >
+              <Flame className="h-4 w-4" strokeWidth={2.5} />
+              <span className="hidden sm:inline">Enfrentar {active}</span>
+              <span className="sm:hidden">Enfrentar</span>
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Missions */}
@@ -339,6 +356,8 @@ function EnemiesPage() {
           </ul>
         )}
       </div>
+
+      <EnemyHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </main>
   );
 }
@@ -497,5 +516,126 @@ function EmptyEnemies() {
         <Swords className="h-4 w-4" />
       </Link>
     </div>
+  );
+}
+
+const TIER_ORDER: EnemyTier[] = ["wounded", "elite", "boss", "nemesis"];
+
+function EnemyHelpDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="border-white/10 bg-[oklch(0.09_0.015_295)]">
+        <DialogHeader>
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-destructive/30 bg-destructive/10 text-destructive">
+            <Skull className="h-6 w-6" strokeWidth={2.5} />
+          </div>
+          <DialogTitle className="mt-4 text-center text-xl font-bold">
+            Como funcionam as cartas inimigas
+          </DialogTitle>
+          <DialogDescription className="text-center text-[14px] leading-relaxed">
+            As inimigas são cartas que você errou várias vezes. A Arena transforma
+            esses erros em um combate para você dominar o inglês de verdade.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="mt-2 space-y-4">
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
+              <Swords className="h-4 w-4 text-destructive" strokeWidth={2.5} />
+              Como nasce uma inimiga
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Quando você erra uma carta 3 vezes durante a revisão, ela vira uma
+              carta inimiga. Ela aparece aqui na Arena até ser derrotada.
+            </p>
+          </section>
+
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
+              <Flame className="h-4 w-4 text-warning" strokeWidth={2.5} />
+              Níveis de perigo
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Quanto mais você erra e menos acerta, mais perigosa ela fica. Subem de
+              nível conforme a diferença entre erros e acertos:
+            </p>
+            <div className="mt-3 grid gap-2">
+              {TIER_ORDER.map((tier) => {
+                const meta = TIER_META[tier];
+                return (
+                  <div
+                    key={tier}
+                    className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
+                  >
+                    <div
+                      className="grid h-9 w-9 place-items-center rounded-xl text-lg"
+                      style={{
+                        background: `${meta.color.replace(")", " / 0.12)")}`,
+                        boxShadow: `inset 0 0 0 1px ${meta.glow}`,
+                      }}
+                    >
+                      <span aria-hidden>{meta.icon}</span>
+                    </div>
+                    <div>
+                      <p
+                        className="text-[14px] font-semibold"
+                        style={{ color: meta.color }}
+                      >
+                        {meta.label}
+                      </p>
+                      <p className="text-[12px] text-muted-foreground">
+                        {tier === "wounded" && "Começo da ameaça"}
+                        {tier === "elite" && "Erros começam a pesar"}
+                        {tier === "boss" && "Chefe perigoso"}
+                        {tier === "nemesis" && "Seu maior desafio"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
+              <Trophy className="h-4 w-4 text-success" strokeWidth={2.5} />
+              Como derrotar
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Na revisão da Arena você digita a tradução correta. Cada acerto
+              reduz a resistência da carta. Quando seus acertos passarem seus
+              erros, ela é derrotada e vira um troféu.
+            </p>
+          </section>
+
+          <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
+              <Sparkles className="h-4 w-4 text-primary" strokeWidth={2.5} />
+              Combo e missões
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Acertar inimigas seguidas aumenta seu combo, que multiplica a
+              recompensa em Arlys ✦ e LP. Complete as missões diárias e semanais
+              para ganhar ainda mais.
+            </p>
+          </section>
+        </div>
+
+        <div className="mt-2">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="w-full rounded-2xl bg-primary py-3 text-[15px] font-semibold text-primary-foreground transition hover:opacity-95 active:scale-[0.99]"
+          >
+            Entendi
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
