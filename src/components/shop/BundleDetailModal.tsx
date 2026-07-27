@@ -512,7 +512,7 @@ function BundlePreview({
                   src={auraArt}
                   alt=""
                   aria-hidden
-                  className="pointer-events-none absolute left-1/2 top-1/2 h-[210%] w-[210%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_0_18px_rgba(192,132,252,0.55)]"
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[210%] w-[210%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain mix-blend-screen drop-shadow-[0_0_18px_rgba(192,132,252,0.55)]"
                   style={{ animation: "spin 24s linear infinite" }}
                 />
               </>
@@ -527,7 +527,7 @@ function BundlePreview({
                 src={frameArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[170%] w-[170%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
               />
             )}
             {/* Companion */}
