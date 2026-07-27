@@ -254,6 +254,34 @@ export function BundleDetailModal({
                   Voltar
                 </button>
                 <button
+                  onClick={onShare}
+                  title="Copiar link / compartilhar"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm font-semibold text-foreground/80 transition hover:bg-white/[0.08]"
+                >
+                  {shareState === "copied" ? (
+                    <>
+                      <Check className="h-4 w-4 text-emerald-300" strokeWidth={2.75} />
+                      <span className="hidden sm:inline">Link copiado</span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-4 w-4" strokeWidth={2.5} />
+                      <span className="hidden sm:inline">Compartilhar</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={onShareWhatsApp}
+                  title="Enviar pelo WhatsApp"
+                  aria-label="Enviar pelo WhatsApp"
+                  className="inline-flex shrink-0 items-center justify-center rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-2.5 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/25"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+                    <path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.5 0 .2 5.3.2 11.85c0 2.09.55 4.13 1.6 5.93L0 24l6.38-1.67a11.85 11.85 0 0 0 5.67 1.44h.01c6.55 0 11.85-5.3 11.85-11.85 0-3.17-1.23-6.15-3.39-8.44ZM12.06 21.6h-.01a9.74 9.74 0 0 1-4.96-1.36l-.36-.21-3.79.99 1.01-3.69-.23-.38a9.75 9.75 0 0 1-1.49-5.1c0-5.39 4.39-9.78 9.83-9.78 2.62 0 5.09 1.02 6.94 2.87a9.73 9.73 0 0 1 2.87 6.92c0 5.39-4.39 9.74-9.81 9.74Zm5.37-7.29c-.29-.15-1.74-.86-2.01-.96-.27-.1-.47-.15-.66.15-.2.29-.76.96-.94 1.16-.17.2-.34.22-.63.07-.29-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.29-.02-.44.13-.59.13-.13.29-.34.44-.51.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.51-.07-.15-.66-1.59-.9-2.18-.24-.57-.48-.5-.66-.51l-.56-.01c-.2 0-.51.07-.78.37-.27.29-1.02 1-1.02 2.44s1.04 2.83 1.19 3.03c.15.2 2.05 3.13 4.97 4.39.69.3 1.24.48 1.66.61.7.22 1.33.19 1.83.12.56-.08 1.74-.71 1.99-1.4.25-.68.25-1.27.17-1.4-.07-.13-.27-.2-.56-.34Z"/>
+                  </svg>
+                  <span className="ml-1 hidden sm:inline">WhatsApp</span>
+                </button>
+                <button
                   onClick={onBuy}
                   disabled={busy || allOwned || !canAfford || (contents?.length ?? 0) === 0}
                   className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-5"
