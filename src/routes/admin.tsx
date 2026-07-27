@@ -291,7 +291,6 @@ function AdminPage() {
                 {openPanel === "changelog" && <ChangelogSection />}
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}
-                {openPanel === "vitrine" && <FeaturedSlotsSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
                 {openPanel === "bundles" && <BundleBuilderSection />}
               </div>
