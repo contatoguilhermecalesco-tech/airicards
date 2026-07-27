@@ -125,6 +125,7 @@ export function BundleConceptsSection() {
     setPalette("#a855f7");
     setSplashUrl("");
     setShopBundleId("");
+    setGallery([]);
     setErr(null);
   }
 
@@ -136,11 +137,52 @@ export function BundleConceptsSection() {
     setPalette(entry.palette || "#a855f7");
     setSplashUrl(entry.splash_url ?? "");
     setShopBundleId(entry.shop_bundle_id ?? "");
+    setGallery(Array.isArray(entry.gallery) ? entry.gallery : []);
     setErr(null);
     setOk(null);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }
+
+  async function handleGalleryFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (list.length === 0) {
+      setErr("Selecione arquivos de imagem.");
+      return;
+    }
+    setGalleryUploading(true);
+    setErr(null);
+    try {
+      const uploaded: ConceptGalleryItem[] = [];
+      for (const f of list) {
+        const url = await uploadConceptImage(f);
+        uploaded.push({ url, caption: "", tag: "" });
+      }
+      setGallery((g) => [...g, ...uploaded]);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao enviar imagens.");
+    } finally {
+      setGalleryUploading(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  }
+
+  function updateGalleryItem(idx: number, patch: Partial<ConceptGalleryItem>) {
+    setGallery((g) => g.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function removeGalleryItem(idx: number) {
+    setGallery((g) => g.filter((_, i) => i !== idx));
+  }
+  function moveGalleryItem(idx: number, dir: -1 | 1) {
+    setGallery((g) => {
+      const next = [...g];
+      const j = idx + dir;
+      if (j < 0 || j >= next.length) return g;
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return next;
+    });
   }
 
   async function handleSend() {
@@ -156,6 +198,7 @@ export function BundleConceptsSection() {
         palette,
         splash_url: splashUrl.trim() || null,
         shop_bundle_id: shopBundleId.trim() || null,
+        gallery,
       };
       if (editingId) {
         await updateBundleConcept(editingId, payload);
@@ -172,6 +215,7 @@ export function BundleConceptsSection() {
       setBusy(false);
     }
   }
+
 
   async function handleDelete(id: string) {
     if (!confirm("Remover este concept?")) return;
