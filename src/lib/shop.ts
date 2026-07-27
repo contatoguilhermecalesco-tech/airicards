@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getWallet, spend, grantCosmetic, grantPowerup } from "@/lib/wallet-store";
 import { importPublishedDeck, type PublishedDeckRow } from "@/lib/marketplace";
 
-export type ShopKind = "pack" | "cosmetic" | "powerup";
+export type ShopKind = "pack" | "cosmetic" | "powerup" | "bundle";
 
 export type ShopItem = {
   id: string;
