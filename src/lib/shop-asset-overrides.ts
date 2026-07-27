@@ -2,11 +2,11 @@
 // Keyed by shop item id. Used by the shop grid, hero and bundle detail modal
 // so cosmetics show their true art instead of generic previews.
 import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
-import florescerAura from "@/assets/shop/florescer/aura.jpg";
-import florescerFrame from "@/assets/shop/florescer/frame.jpg";
-import florescerTitle from "@/assets/shop/florescer/title.jpg";
-import florescerBackground from "@/assets/shop/florescer/background.jpg";
-import florescerCardframe from "@/assets/shop/florescer/cardframe.jpg";
+import florescerAura from "@/assets/shop/florescer/aura.png";
+import florescerFrame from "@/assets/shop/florescer/frame.png";
+import florescerTitle from "@/assets/shop/florescer/title.png";
+import florescerBackground from "@/assets/shop/florescer/background.png";
+import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
 
 export type ShopAssetOverride = {
