@@ -373,6 +373,7 @@ function PerfilPage() {
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
   const veilArt = getEquippedArt(wallet.equipped.veil);
+  const overlayArt = getEquippedArt(wallet.equipped.overlay);
   const veil = equippedItem.veil;
   // Chuva de Sakura vive no slot "overlay" — cai por cima da capa (effect).
   const showSakura = wallet.equipped.overlay === "overlay:chuva_sakura";
