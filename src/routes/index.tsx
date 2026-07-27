@@ -153,7 +153,7 @@ function Home() {
 
 
   return (
-    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
+    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14 lg:max-w-6xl lg:px-8 lg:pt-16 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6 lg:items-start">
       {/* Ambient aurora — soft violet layers */}
       <div
         aria-hidden
@@ -174,7 +174,7 @@ function Home() {
       />
 
       {/* Header */}
-      <header className="animate-fade-in flex flex-col space-y-1.5">
+      <header className="animate-fade-in flex flex-col space-y-1.5 lg:col-span-12 lg:row-start-1">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {eyebrow}
@@ -197,9 +197,10 @@ function Home() {
 
       {/* Hero — Liquid Glass */}
       <section
-        className="animate-fade-in relative mt-7 sm:mt-8"
+        className="animate-fade-in relative mt-7 sm:mt-8 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
+
         {/* soft halo behind glass */}
         <div
           aria-hidden
@@ -349,9 +350,10 @@ function Home() {
 
       {/* Atalhos — pills discretas estilo iOS */}
       <section
-        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-7 lg:col-start-1 lg:row-start-3 lg:mt-0 lg:flex-wrap lg:overflow-visible"
         style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
       >
+
         <QuickPill
           to="/social"
           label="Duelo"
@@ -381,14 +383,18 @@ function Home() {
       </section>
 
       {/* Streak — sequência de dias */}
-      <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
+      <div className="contents lg:block lg:col-span-7 lg:col-start-1 lg:row-start-4 [&>section]:lg:mt-0">
+        <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
+      </div>
+
 
       {/* Chefões pendentes — alerta gamificado */}
       {enemies.length > 0 && (
         <section
-          className="animate-fade-in mt-6"
+          className="animate-fade-in mt-6 lg:col-span-7 lg:col-start-1 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
         >
+
           <Link
             to="/enemies"
             className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30`}
@@ -435,9 +441,10 @@ function Home() {
 
       {/* Stats — glass chips */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5"
+        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
+
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
         <StatChip label="Revisadas" value={reviewedToday} accent />
@@ -449,9 +456,10 @@ function Home() {
       {/* Método RRSLG */}
       {cycle && (
         <section
-          className="animate-fade-in mt-6"
+          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-3 lg:mt-0"
           style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
         >
+
           <Link
             to="/study"
             className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055]`}
@@ -492,9 +500,10 @@ function Home() {
       {/* Prova mensal */}
       {appSettings.exam_visible && (
         <section
-          className="animate-fade-in mt-6"
+          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-4 lg:mt-0"
           style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
         >
+
           <Link
             to="/exam"
             className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30`}
@@ -543,9 +552,10 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10"
+          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
+
           <div className="mb-4 flex items-baseline justify-between px-1">
             <h2 className="text-[17px] font-semibold tracking-tight text-foreground">
               Seus decks
@@ -557,7 +567,7 @@ function Home() {
               Ver todos
             </Link>
           </div>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2.5 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
             {decks.slice(0, 4).map((d, i) => {
               const total = cards.filter((c) => c.deckId === d.id).length;
               const dueInDeck = cards.filter(
