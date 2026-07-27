@@ -420,6 +420,46 @@ function Review() {
           </div>
         )}
 
+        {/* Combo pill + tier badge (Arena) */}
+        {isEnemyRun && current && (
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {currentIsEnemy && (() => {
+              const t = enemyTier(current);
+              const meta = TIER_META[t];
+              return (
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                  style={{
+                    borderColor: meta.glow,
+                    color: meta.color,
+                    background: "rgba(255,255,255,0.03)",
+                    boxShadow: `0 0 20px -8px ${meta.glow}`,
+                  }}
+                >
+                  <span aria-hidden>{meta.icon}</span>
+                  {meta.label}
+                </span>
+              );
+            })()}
+            {combo.count >= 2 && (
+              <span
+                key={combo.count}
+                className="combo-pop inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/[0.10] px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary"
+                style={{ boxShadow: "0 0 24px -8px hsl(var(--primary) / 0.7)" }}
+              >
+                <Zap className="h-3 w-3" strokeWidth={3} />
+                Combo x{combo.count}
+                {comboMult > 1 && (
+                  <span className="ml-0.5 rounded bg-primary/25 px-1 py-0.5 text-[9px] tabular-nums">
+                    ×{comboMult}
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
+        )}
+
+
         {queue.length === 0 && !current ? (
           <EmptyState enemyRun={isEnemyRun} />
         ) : finished || !current ? (
