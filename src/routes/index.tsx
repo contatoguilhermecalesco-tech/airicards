@@ -588,7 +588,7 @@ function Home() {
       {/* Prova mensal */}
       {appSettings.exam_visible && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-4 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-6 lg:col-start-7 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
         >
 
