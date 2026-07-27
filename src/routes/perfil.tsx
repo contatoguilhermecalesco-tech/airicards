@@ -368,10 +368,11 @@ function PerfilPage() {
   const veilArt = getEquippedArt(wallet.equipped.veil);
   const veil = equippedItem.veil;
 
-  // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
-  const heroItem = nameplate ?? effect ?? decoration ?? badge;
+  // Hero palette: prioritize effect → veil → decoration → badge → default.
+  // Nameplate is NOT included — it only decorates the avatar (frame), not the banner.
+  const heroItem = effect ?? veil ?? decoration ?? badge;
   const heroPalette = heroItem ? paletteFor(heroItem.accent) : DISCORD_PALETTE.violet;
-  const showBanner = !!nameplate || !!effect || !!veil;
+  const showBanner = !!effect || !!veil;
   const showDecoration = !!decoration;
   const decorationPalette = decoration ? paletteFor(decoration.accent) : heroPalette;
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
