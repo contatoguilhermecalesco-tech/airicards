@@ -628,8 +628,8 @@ function ShopPage() {
           busy={busy === bundleOpen.id}
           onClose={() => setBundleOpen(null)}
           onBuy={() => void confirmBuyBundle(bundleOpen)}
-          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url}
-          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url}
+          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.splash}
+          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.art}
         />
       )}
     </main>
