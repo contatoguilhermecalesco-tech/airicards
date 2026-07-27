@@ -295,6 +295,7 @@ function AdminPage() {
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "vitrine" && <FeaturedSlotsSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
+                {openPanel === "bundles" && <BundleBuilderSection />}
               </div>
             </>
           )}
