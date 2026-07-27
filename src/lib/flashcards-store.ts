@@ -1051,3 +1051,20 @@ export async function resetHomeSessionsForProfile(profileId: string): Promise<vo
   }
 }
 
+// --- Meta store (sincroniza dados leves por perfil no cloud) ---------
+// Ex.: missões de inimigas, combo, flags de onboarding. Guardado dentro
+// de state.meta e persistido junto com decks/cartas em profile_data.data.
+export function getMeta<T>(key: string): T | undefined {
+  return state.meta?.[key] as T | undefined;
+}
+export function setMeta<T>(key: string, value: T) {
+  const meta = { ...(state.meta ?? {}), [key]: value };
+  state = { ...state, meta };
+  emit();
+  scheduleSave();
+}
+export function useMeta<T>(key: string): T | undefined {
+  return useStore((s) => s.meta?.[key] as T | undefined);
+}
+
+
