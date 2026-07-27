@@ -203,6 +203,7 @@ function Review() {
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
     if (wasEnemy) spawnDmg("+1 HP", "heal");
+    if (isEnemyRun) breakCombo();
     if (willBecomeEnemy) {
       flashNotice({
         kind: "enemy-born",
@@ -215,6 +216,7 @@ function Review() {
   function handleDifficulty(g: "hard" | "good" | "easy") {
     if (!current) return;
     const wasEnemy = isEnemy(current);
+    const tierBefore = wasEnemy ? enemyTier(current) : "wounded";
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
