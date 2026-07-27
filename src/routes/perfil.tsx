@@ -159,9 +159,14 @@ const SLOT_META: Record<
     icon: Star,
   },
   effect: {
-    label: "Efeito de perfil",
-    hint: "Brilhos e reflexos no banner.",
+    label: "Capa de perfil",
+    hint: "Imagem de fundo do banner do seu perfil.",
     icon: Zap,
+  },
+  overlay: {
+    label: "Efeito sobre a capa",
+    hint: "Efeito animado que aparece por cima da capa.",
+    icon: Sparkles,
   },
   companion: {
     label: "Companheiro",
@@ -175,7 +180,7 @@ const SLOT_META: Record<
   },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "veil", "companion"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "overlay", "veil", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
