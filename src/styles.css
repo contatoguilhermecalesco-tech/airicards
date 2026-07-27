@@ -502,3 +502,41 @@
 @utility sakura-halo {
   animation: sakura-halo 4.5s ease-in-out infinite;
 }
+
+/* ---- Companion / Pet animations ---- */
+@keyframes companion-idle {
+  0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }
+  25%      { transform: translateY(-4px) rotate(1deg) scale(1.01); }
+  50%      { transform: translateY(-7px) rotate(2deg) scale(1.02); }
+  75%      { transform: translateY(-3px) rotate(-1deg) scale(1.01); }
+}
+@keyframes companion-hop {
+  0%, 82%, 100% { transform: translateY(0) scaleY(1) scaleX(1); }
+  86%           { transform: translateY(2px) scaleY(0.88) scaleX(1.08); }
+  90%           { transform: translateY(-14px) scaleY(1.08) scaleX(0.95); }
+  94%           { transform: translateY(-6px) scaleY(1.02) scaleX(1); }
+  98%           { transform: translateY(1px) scaleY(0.94) scaleX(1.04); }
+}
+@keyframes companion-glow {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.15); }
+}
+@keyframes companion-sparkle {
+  0%, 100% { opacity: 0; transform: translate(var(--sx,0), var(--sy,0)) scale(0.4); }
+  40%      { opacity: 1; transform: translate(var(--sx,0), var(--sy,0)) scale(1); }
+  70%      { opacity: 0.6; }
+}
+@utility companion-idle {
+  animation: companion-idle 3.6s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+@utility companion-hop {
+  animation: companion-hop 6s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@utility companion-glow {
+  animation: companion-glow 3s ease-in-out infinite;
+}
+@utility companion-sparkle {
+  animation: companion-sparkle var(--dur, 2.4s) ease-in-out var(--delay, 0s) infinite;
+}

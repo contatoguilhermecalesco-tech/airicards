@@ -637,15 +637,39 @@ function PerfilPage() {
               aria-hidden
             >
               <div
-                className="absolute inset-0 rounded-full blur-2xl opacity-70"
-                style={{ background: `radial-gradient(circle, ${companion.glow}66, transparent 70%)` }}
+                className="companion-glow absolute inset-0 rounded-full blur-2xl"
+                style={{ background: `radial-gradient(circle, ${companion.glow}80, transparent 70%)` }}
               />
-              <img
-                src={companion.src}
-                alt={companion.name}
-                className="cosmetic-avatar-float relative h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(192,132,252,0.45)]"
-                loading="lazy"
-              />
+              {/* Sparkle particles */}
+              {[
+                { sx: "-18px", sy: "-8px", dur: "2.4s", delay: "0s", size: 6 },
+                { sx: "16px", sy: "-14px", dur: "2.8s", delay: "0.6s", size: 5 },
+                { sx: "22px", sy: "18px", dur: "3.1s", delay: "1.2s", size: 4 },
+                { sx: "-20px", sy: "16px", dur: "2.6s", delay: "1.8s", size: 5 },
+              ].map((p, i) => (
+                <span
+                  key={i}
+                  className="companion-sparkle absolute left-1/2 top-1/2 rounded-full"
+                  style={{
+                    width: p.size,
+                    height: p.size,
+                    background: companion.glow,
+                    boxShadow: `0 0 8px ${companion.glow}`,
+                    ["--sx" as any]: p.sx,
+                    ["--sy" as any]: p.sy,
+                    ["--dur" as any]: p.dur,
+                    ["--delay" as any]: p.delay,
+                  }}
+                />
+              ))}
+              <div className="companion-hop absolute inset-0">
+                <img
+                  src={companion.src}
+                  alt={companion.name}
+                  className="companion-idle relative h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(192,132,252,0.55)]"
+                  loading="lazy"
+                />
+              </div>
             </div>
           )}
         </div>
