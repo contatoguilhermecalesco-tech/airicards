@@ -160,9 +160,14 @@ const SLOT_META: Record<
     hint: "Brilhos e reflexos no banner.",
     icon: Zap,
   },
+  companion: {
+    label: "Companheiro",
+    hint: "Um espírito que acompanha seu perfil.",
+    icon: Heart,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
@@ -320,6 +325,7 @@ function PerfilPage() {
       decoration: [],
       badge: [],
       effect: [],
+      companion: [],
     };
     wallet.cosmetics.forEach((k) => {
       const it = byKey.get(k);
