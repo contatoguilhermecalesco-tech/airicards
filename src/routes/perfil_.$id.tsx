@@ -283,10 +283,10 @@ function PerfilViewer() {
       <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
         <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Cosméticos equipados</p>
         <ul className="mt-3 space-y-2">
-          {(["nameplate", "decoration", "badge", "effect"] as CosmeticSlot[]).map((s) => {
+          {(["nameplate", "decoration", "badge", "effect", "overlay"] as CosmeticSlot[]).map((s) => {
             const it = equippedItems[s];
             const label =
-              s === "nameplate" ? "Nameplate" : s === "decoration" ? "Decoração" : s === "badge" ? "Badge" : "Efeito";
+              s === "nameplate" ? "Nameplate" : s === "decoration" ? "Decoração" : s === "badge" ? "Badge" : s === "effect" ? "Capa" : "Efeito";
             if (!it) {
               return (
                 <li key={s} className="flex items-center justify-between rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-3 py-2 text-[12px] text-white/50">
