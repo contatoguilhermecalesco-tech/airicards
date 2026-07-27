@@ -244,14 +244,13 @@ function BundleItemRow({ item, owned }: { item: ShopItem; owned: boolean }) {
     >
       {override?.art ? (
         <span
-          className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/15 shadow-lg"
-          style={{ boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
+          className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl"
         >
           <img
             src={override.art}
             alt=""
             aria-hidden
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
         </span>
       ) : (
