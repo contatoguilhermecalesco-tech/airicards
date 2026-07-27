@@ -159,17 +159,26 @@ function EnemiesPage() {
               : `${active} ativa${active === 1 ? "" : "s"} · ${defeatedCount} derrotada${defeatedCount === 1 ? "" : "s"} · ${totalLapses} tropeço${totalLapses === 1 ? "" : "s"} no total`}
           </p>
         </div>
-        {active > 0 && (
-          <Link
-            to="/review"
-            search={{ mode: "enemies" }}
-            className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-2xl border border-destructive/40 bg-destructive px-4 py-2.5 text-[14px] font-semibold text-destructive-foreground shadow-[0_10px_30px_-10px_hsl(var(--destructive)/0.7)] transition active:scale-95"
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            onClick={() => setHelpOpen(true)}
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground"
+            aria-label="Como funcionam as cartas inimigas"
           >
-            <Flame className="h-4 w-4" strokeWidth={2.5} />
-            <span className="hidden sm:inline">Enfrentar {active}</span>
-            <span className="sm:hidden">Enfrentar</span>
-          </Link>
-        )}
+            <HelpCircle className="h-5 w-5" strokeWidth={2} />
+          </button>
+          {active > 0 && (
+            <Link
+              to="/review"
+              search={{ mode: "enemies" }}
+              className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-2xl border border-destructive/40 bg-destructive px-4 py-2.5 text-[14px] font-semibold text-destructive-foreground shadow-[0_10px_30px_-10px_hsl(var(--destructive)/0.7)] transition active:scale-95"
+            >
+              <Flame className="h-4 w-4" strokeWidth={2.5} />
+              <span className="hidden sm:inline">Enfrentar {active}</span>
+              <span className="sm:hidden">Enfrentar</span>
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Missions */}
