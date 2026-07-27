@@ -115,6 +115,39 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_concepts: {
+        Row: {
+          concept: string
+          created_at: string
+          id: string
+          palette: string
+          shop_bundle_id: string | null
+          splash_url: string | null
+          tagline: string | null
+          title: string
+        }
+        Insert: {
+          concept: string
+          created_at?: string
+          id?: string
+          palette?: string
+          shop_bundle_id?: string | null
+          splash_url?: string | null
+          tagline?: string | null
+          title: string
+        }
+        Update: {
+          concept?: string
+          created_at?: string
+          id?: string
+          palette?: string
+          shop_bundle_id?: string | null
+          splash_url?: string | null
+          tagline?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
       card_gifts: {
         Row: {
           back: string
