@@ -494,6 +494,70 @@ function ConceptDetail({ concept, onBack }: { concept: BundleConcept | null; onB
           <RiotPatchBody text={concept.concept} accent={accent} />
         </article>
 
+        {Array.isArray(concept.gallery) && concept.gallery.length > 0 && (
+          <section className="mt-14 animate-fade-in">
+            <div className="mb-5 flex items-center gap-3">
+              <span
+                className="h-4 w-1 rounded-sm"
+                style={{ backgroundColor: accent }}
+                aria-hidden
+              />
+              <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+                Processo · Concept arts
+              </h2>
+              <div className="h-px flex-1 bg-white/[0.06]" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-foreground/40">
+                {concept.gallery.length} peças
+              </span>
+            </div>
+            <ol className="grid gap-6 sm:grid-cols-2">
+              {concept.gallery.map((item, idx) => (
+                <li
+                  key={`${item.url}-${idx}`}
+                  className="group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0a0a0f] transition hover:-translate-y-0.5 hover:border-white/20"
+                >
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 z-10"
+                    style={{
+                      background: `linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%)`,
+                    }}
+                  />
+                  <img
+                    src={item.url}
+                    alt={item.caption ?? item.tag ?? `Concept ${idx + 1}`}
+                    loading="lazy"
+                    className="block aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                  />
+                  <div className="relative z-20 -mt-24 px-5 pb-5 pt-24">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-flex items-center rounded-full border px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.22em]"
+                        style={{
+                          borderColor: `${accent}66`,
+                          color: accent,
+                          backgroundColor: `${accent}18`,
+                        }}
+                      >
+                        {(item.tag && item.tag.trim()) || `Concept ${String(idx + 1).padStart(2, "0")}`}
+                      </span>
+                      <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-white/35">
+                        #{String(idx + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    {item.caption && item.caption.trim() && (
+                      <p className="mt-2 text-[13px] leading-relaxed text-white/85 sm:text-[13.5px]">
+                        {item.caption}
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+
+
         <div className="mt-10 flex items-center justify-center">
           <Link
             to="/novidades"

@@ -119,6 +119,7 @@ export type Database = {
         Row: {
           concept: string
           created_at: string
+          gallery: Json
           id: string
           palette: string
           shop_bundle_id: string | null
@@ -129,6 +130,7 @@ export type Database = {
         Insert: {
           concept: string
           created_at?: string
+          gallery?: Json
           id?: string
           palette?: string
           shop_bundle_id?: string | null
@@ -139,6 +141,7 @@ export type Database = {
         Update: {
           concept?: string
           created_at?: string
+          gallery?: Json
           id?: string
           palette?: string
           shop_bundle_id?: string | null

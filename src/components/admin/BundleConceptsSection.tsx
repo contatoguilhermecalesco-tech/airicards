@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, Package, Pencil, Send, Sparkles, Trash2, Upload, Wand2, X } from "lucide-react";
+import { ImagePlus, Images, Loader2, Package, Pencil, Send, Sparkles, Trash2, Upload, Wand2, X, ArrowUp, ArrowDown } from "lucide-react";
 import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import {
   createBundleConcept,
@@ -7,6 +7,7 @@ import {
   deleteBundleConcept,
   useBundleConcepts,
   type BundleConcept,
+  type ConceptGalleryItem,
 } from "@/lib/bundle-concepts-store";
 import { RiotPatchBody, RIOT_NOTES_PLACEHOLDER } from "@/lib/patch-notes";
 import { generateBundleConcept } from "@/lib/bundle-concepts-ai.functions";
@@ -44,11 +45,14 @@ export function BundleConceptsSection() {
   const [palette, setPalette] = useState("#a855f7");
   const [splashUrl, setSplashUrl] = useState("");
   const [shopBundleId, setShopBundleId] = useState("");
+  const [gallery, setGallery] = useState<ConceptGalleryItem[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   // AI assistant state
   const [aiOpen, setAiOpen] = useState(false);
@@ -121,6 +125,7 @@ export function BundleConceptsSection() {
     setPalette("#a855f7");
     setSplashUrl("");
     setShopBundleId("");
+    setGallery([]);
     setErr(null);
   }
 
@@ -132,11 +137,52 @@ export function BundleConceptsSection() {
     setPalette(entry.palette || "#a855f7");
     setSplashUrl(entry.splash_url ?? "");
     setShopBundleId(entry.shop_bundle_id ?? "");
+    setGallery(Array.isArray(entry.gallery) ? entry.gallery : []);
     setErr(null);
     setOk(null);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }
+
+  async function handleGalleryFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (list.length === 0) {
+      setErr("Selecione arquivos de imagem.");
+      return;
+    }
+    setGalleryUploading(true);
+    setErr(null);
+    try {
+      const uploaded: ConceptGalleryItem[] = [];
+      for (const f of list) {
+        const url = await uploadConceptImage(f);
+        uploaded.push({ url, caption: "", tag: "" });
+      }
+      setGallery((g) => [...g, ...uploaded]);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao enviar imagens.");
+    } finally {
+      setGalleryUploading(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  }
+
+  function updateGalleryItem(idx: number, patch: Partial<ConceptGalleryItem>) {
+    setGallery((g) => g.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
+  function removeGalleryItem(idx: number) {
+    setGallery((g) => g.filter((_, i) => i !== idx));
+  }
+  function moveGalleryItem(idx: number, dir: -1 | 1) {
+    setGallery((g) => {
+      const next = [...g];
+      const j = idx + dir;
+      if (j < 0 || j >= next.length) return g;
+      [next[idx], next[j]] = [next[j], next[idx]];
+      return next;
+    });
   }
 
   async function handleSend() {
@@ -152,6 +198,7 @@ export function BundleConceptsSection() {
         palette,
         splash_url: splashUrl.trim() || null,
         shop_bundle_id: shopBundleId.trim() || null,
+        gallery,
       };
       if (editingId) {
         await updateBundleConcept(editingId, payload);
@@ -168,6 +215,7 @@ export function BundleConceptsSection() {
       setBusy(false);
     }
   }
+
 
   async function handleDelete(id: string) {
     if (!confirm("Remover este concept?")) return;
@@ -437,6 +485,110 @@ export function BundleConceptsSection() {
           </p>
         </label>
       </div>
+
+      {/* Gallery — múltiplas imagens do processo criativo */}
+      <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <Images className="h-3.5 w-3.5 text-fuchsia-300" strokeWidth={2.5} />
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-foreground/60">
+            Galeria do processo · {gallery.length}
+          </p>
+          <div className="h-px flex-1 bg-white/[0.06]" />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleGalleryFiles(e.target.files)}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => galleryInputRef.current?.click()}
+            disabled={galleryUploading}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/80 transition hover:bg-white/[0.08] hover:text-foreground disabled:opacity-50"
+          >
+            {galleryUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Upload className="h-3 w-3" />}
+            {galleryUploading ? "Enviando…" : "Adicionar imagens"}
+          </button>
+        </div>
+        <p className="mb-3 text-[10.5px] text-foreground/45">
+          Suba concept arts, keyframes e estudos. Ordena o processo criativo — como o dev diary da Riot. Cada imagem pode ter uma legenda e uma etiqueta curta (ex: <span className="text-foreground/70">Concept 01</span>, <span className="text-foreground/70">Keyframe D</span>).
+        </p>
+
+        {gallery.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.015] p-6 text-center text-[12px] text-foreground/45">
+            Nenhuma imagem ainda — comece pelo rascunho e vá até o keyframe final.
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {gallery.map((item, idx) => (
+              <li
+                key={`${item.url}-${idx}`}
+                className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5"
+              >
+                <div
+                  className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/40"
+                  style={{
+                    backgroundImage: `url(${item.url})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-foreground/40">
+                      #{String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <input
+                      value={item.tag ?? ""}
+                      onChange={(e) => updateGalleryItem(idx, { tag: e.target.value })}
+                      placeholder="Etiqueta (ex: Concept 01)"
+                      className="flex-1 rounded-md border border-white/[0.06] bg-black/25 px-2 py-1 text-[11.5px] font-semibold text-foreground/90 focus:border-fuchsia-400/50 focus:outline-none"
+                    />
+                  </div>
+                  <input
+                    value={item.caption ?? ""}
+                    onChange={(e) => updateGalleryItem(idx, { caption: e.target.value })}
+                    placeholder="Legenda — descreva o momento do processo"
+                    className="w-full rounded-md border border-white/[0.06] bg-black/25 px-2 py-1 text-[12px] text-foreground/80 focus:border-primary/50 focus:outline-none"
+                  />
+                </div>
+                <div className="flex shrink-0 flex-col gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryItem(idx, -1)}
+                    disabled={idx === 0}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label="Subir"
+                  >
+                    <ArrowUp className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveGalleryItem(idx, 1)}
+                    disabled={idx === gallery.length - 1}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-white/10 bg-white/[0.03] text-foreground/60 transition hover:bg-white/[0.08] hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
+                    aria-label="Descer"
+                  >
+                    <ArrowDown className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryItem(idx)}
+                    className="grid h-6 w-6 place-items-center rounded-md border border-rose-400/20 bg-rose-500/10 text-rose-300 transition hover:bg-rose-500/20"
+                    aria-label="Remover"
+                  >
+                    <X className="h-3 w-3" strokeWidth={2.5} />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
 
       {/* Concept preview */}
       {concept.trim() && (

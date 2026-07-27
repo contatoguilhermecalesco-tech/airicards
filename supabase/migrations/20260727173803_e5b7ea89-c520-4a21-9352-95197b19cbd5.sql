@@ -1,0 +1,1 @@
+ALTER TABLE public.bundle_concepts ADD COLUMN IF NOT EXISTS gallery jsonb NOT NULL DEFAULT '[]'::jsonb;
