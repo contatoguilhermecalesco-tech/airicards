@@ -651,7 +651,7 @@ function AuraAvatar({
             src={decorationArt}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute -inset-[10px] h-[calc(100%+20px)] w-[calc(100%+20px)] max-w-none animate-[spin_9s_linear_infinite] object-contain drop-shadow-[0_0_10px_rgba(192,132,252,0.65)]"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[160%] w-[160%] max-w-none -translate-x-1/2 -translate-y-1/2 animate-[spin_9s_linear_infinite] object-contain opacity-90 mix-blend-screen drop-shadow-[0_0_10px_rgba(192,132,252,0.55)]"
           />
         )}
         {nameplateArt && (
@@ -659,7 +659,7 @@ function AuraAvatar({
             src={nameplateArt}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute -inset-[6px] h-[calc(100%+12px)] w-[calc(100%+12px)] max-w-none object-contain drop-shadow-[0_2px_6px_rgba(192,132,252,0.55)]"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_2px_6px_rgba(192,132,252,0.55)]"
           />
         )}
         {badgeArt && (
