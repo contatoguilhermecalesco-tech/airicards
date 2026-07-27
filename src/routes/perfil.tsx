@@ -507,6 +507,24 @@ function PerfilPage() {
               className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
             />
           )}
+          {veilArt && (
+            <>
+              <img
+                src={veilArt}
+                alt=""
+                aria-hidden
+                className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen"
+              />
+              <span
+                aria-hidden
+                className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
+                style={{
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
+                }}
+              />
+            </>
+          )}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
