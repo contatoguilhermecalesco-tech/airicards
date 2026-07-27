@@ -582,6 +582,16 @@ function PerfilPage() {
               boxShadow: `0 12px 30px -8px ${decorationPalette.ring}55`,
             }}
           >
+            {/* Aura art (decoration) — glow BEHIND avatar (rendered first, sits under) */}
+            {decorationArt && (
+              <img
+                src={decorationArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-6 -z-10 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain"
+                style={{ animation: "spin 24s linear infinite" }}
+              />
+            )}
             <DiscordAvatar
               size={112}
               ring={decorationPalette.ring}
@@ -614,28 +624,18 @@ function PerfilPage() {
                 onClick={onRemoveAvatar}
                 disabled={uploadingAvatar}
                 aria-label="Remover foto"
-                className="absolute -right-1 -top-1 grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/70 text-white shadow-lg backdrop-blur transition hover:bg-red-500/80 disabled:opacity-40"
+                className="absolute -right-1 -top-1 z-20 grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/70 text-white shadow-lg backdrop-blur transition hover:bg-red-500/80 disabled:opacity-40"
               >
                 <Trash2 className="h-3 w-3" strokeWidth={2.5} />
               </button>
             )}
-            {/* Aura art (decoration) — glow behind avatar */}
-            {decorationArt && (
-              <img
-                src={decorationArt}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain animate-spin-slow"
-                style={{ animation: "spin 24s linear infinite" }}
-              />
-            )}
-            {/* Frame art (nameplate) — decorative branch/ring around avatar */}
+            {/* Frame art (nameplate) — decorative ring around avatar (on top, centered) */}
             {nameplateArt && (
               <img
                 src={nameplateArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] max-w-none object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
               />
             )}
           </div>
