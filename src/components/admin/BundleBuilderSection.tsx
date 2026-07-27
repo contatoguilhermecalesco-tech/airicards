@@ -1,15 +1,19 @@
 // Admin — construtor de bundles (pacotes estilo Riot/LoL).
 // Cria um item de kind='bundle' que agrupa cosméticos/power-ups/packs existentes.
+// Também controla a Vitrine da Loja (1 bundle em destaque por vez).
 import { useEffect, useMemo, useState } from "react";
 import {
   Check,
   Crown,
+  ImageIcon,
+  Info,
   Loader2,
   Minus,
   Package,
   Plus,
   Search,
   Sparkles,
+  Star,
   Trash2,
   X,
 } from "lucide-react";
@@ -24,6 +28,13 @@ import {
 } from "@/lib/shop";
 import { rarityFor, RARITY_META } from "@/components/shop/shop-visuals";
 import { ArlysIcon } from "@/components/StatChip";
+import {
+  createFeaturedSlot,
+  deleteFeaturedSlot,
+  listFeaturedSlots,
+  type FeaturedSlotRow,
+} from "@/lib/featured-slots";
+import { BundleVitrineEditor } from "./BundleVitrineEditor";
 
 const ICON_CHOICES = [
   "crown",
