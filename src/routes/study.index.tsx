@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BookOpen, Headphones, Mic, PenLine, Sparkles, Lock } from "lucide-react";
+import { BookOpen, Headphones, Mic, PenLine, Sparkles } from "lucide-react";
 import { useAppSettings } from "@/lib/app-settings";
 
 export const Route = createFileRoute("/study/")({
