@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Sparkles, Skull, Flame, Focus, Minimize2, Keyboard } from "lucide-react";
+import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -12,6 +12,7 @@ import {
   ENEMY_THRESHOLD,
   registerHomeSession,
 } from "@/lib/flashcards-store";
+import { matchAnswer } from "@/lib/answer-match";
 
 
 type ReviewMode = "due" | "enemies";
