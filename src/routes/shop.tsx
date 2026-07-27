@@ -220,8 +220,14 @@ function ShopPage() {
     const needle = q.trim().toLowerCase();
     let list = unified.filter((u) => {
       if (category !== "all" && u.kind !== category) return false;
-      // Power-ups não usam raridade — filtro só afeta os outros tipos.
-      if (rarityFilter !== "all" && u.kind !== "powerup" && u.rarity !== rarityFilter) return false;
+      // Raridade só se aplica a cosméticos e bundles.
+      if (
+        rarityFilter !== "all" &&
+        u.kind !== "cosmetic" &&
+        u.kind !== "bundle" &&
+        u.rarity !== rarityFilter
+      )
+        return false;
       if (affordableOnly && u.price > wallet.crystals) return false;
       if (!needle) return true;
       return (
