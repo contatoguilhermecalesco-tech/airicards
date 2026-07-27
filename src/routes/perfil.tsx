@@ -365,11 +365,13 @@ function PerfilPage() {
   const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
+  const veilArt = getEquippedArt(wallet.equipped.veil);
+  const veil = equippedItem.veil;
 
   // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
   const heroItem = nameplate ?? effect ?? decoration ?? badge;
   const heroPalette = heroItem ? paletteFor(heroItem.accent) : DISCORD_PALETTE.violet;
-  const showBanner = !!nameplate || !!effect;
+  const showBanner = !!nameplate || !!effect || !!veil;
   const showDecoration = !!decoration;
   const decorationPalette = decoration ? paletteFor(decoration.accent) : heroPalette;
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
