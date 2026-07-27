@@ -237,7 +237,7 @@ function AdminPage() {
       </section>
 
       <Dialog open={openPanel !== null} onOpenChange={(o) => !o && setOpenPanel(null)}>
-        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl", activePanel?.wide && "sm:max-w-3xl")}>
+        <DialogContent className={cn("gap-3 p-0 sm:max-w-2xl max-h-[92vh] overflow-hidden flex flex-col", activePanel?.wide && "sm:max-w-3xl")}>
           {activePanel && (
             <>
               <DialogHeader className="border-b border-white/[0.06] px-5 pb-3 pt-5">
@@ -263,7 +263,7 @@ function AdminPage() {
                 </div>
               </DialogHeader>
 
-              <div className="px-5 pb-5">
+              <div className="flex-1 overflow-y-auto px-5 pb-5">
                 {openPanel === "sessions" && (
                   <SessionsPanel
                     merged={merged}
