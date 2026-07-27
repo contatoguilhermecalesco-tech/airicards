@@ -327,7 +327,7 @@ function PinPad({
 
   const filled = value.length;
   const targetLen = Math.max(4, pin.length || 4);
-  const dots = Array.from({ length: 6 }, (_, i) => i);
+  const dots = Array.from({ length: targetLen }, (_, i) => i);
 
   return (
     <Shell>
