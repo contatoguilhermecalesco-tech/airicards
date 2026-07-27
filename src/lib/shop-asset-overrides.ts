@@ -4,7 +4,7 @@
 import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
 import florescerAura from "@/assets/shop/florescer/aura.png";
 import florescerFrame from "@/assets/shop/florescer/frame.png";
-import florescerTitle from "@/assets/shop/florescer/title.png";
+
 import florescerBackground from "@/assets/shop/florescer/background.png";
 import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
