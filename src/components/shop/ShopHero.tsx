@@ -231,14 +231,14 @@ export function ShopHero({
           <button
             aria-label="Anterior"
             onClick={() => setIdx((i) => (i - 1 + featured.length) % featured.length)}
-            className="absolute left-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:left-3"
+            className="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </button>
           <button
             aria-label="Próximo"
             onClick={() => setIdx((i) => (i + 1) % featured.length)}
-            className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:right-3"
+            className="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
           </button>
