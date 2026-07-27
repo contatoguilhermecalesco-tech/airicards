@@ -496,18 +496,43 @@ function Home() {
         </section>
       )}
 
-      {/* Stats — glass chips */}
+      {/* Stats — glass chips com contexto */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
+        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-8 lg:col-start-1 lg:row-start-4 lg:mt-0 lg:grid-cols-4 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
-
-
-        <StatChip label="Decks" value={decks.length} />
-        <StatChip label="Cartas" value={cards.length} />
-        <StatChip label="Revisadas" value={reviewedToday} accent />
-        <StatChip label="Recorde" value={streak.longest} />
+        <StatChip
+          label="Decks"
+          value={decks.length}
+          hint={dueDeckCount > 0 ? `${dueDeckCount} com pendências` : "todos em dia"}
+          icon={<Layers className="h-3 w-3" strokeWidth={2.5} />}
+        />
+        <StatChip
+          label="Cartas"
+          value={cards.length}
+          hint={cardsThisWeek > 0 ? `+${cardsThisWeek} esta semana` : "adicione a primeira"}
+          icon={<BookOpen className="h-3 w-3" strokeWidth={2.5} />}
+          trend={cardsThisWeek > 0}
+        />
+        <StatChip
+          label="Revisadas"
+          value={reviewedToday}
+          hint={reviewedToday > 0 ? `hoje · ${pctLabel}% da meta` : "comece agora"}
+          icon={<Check className="h-3 w-3" strokeWidth={2.5} />}
+          accent
+        />
+        <StatChip
+          label="Domínio"
+          value={masteryPct}
+          suffix="%"
+          hint={masteredCount > 0 ? `${masteredCount} carta${masteredCount === 1 ? "" : "s"}` : "revise para subir"}
+          icon={<Trophy className="h-3 w-3" strokeWidth={2.5} />}
+        />
       </section>
+
+      {/* Rank tile — bento direita */}
+      <RankTile rank={rank} />
+
 
 
 
