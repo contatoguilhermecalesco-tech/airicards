@@ -448,6 +448,57 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_featured_slots: {
+        Row: {
+          active: boolean
+          art_url: string | null
+          created_at: string
+          description_override: string | null
+          ends_at: string | null
+          id: string
+          item_id: string
+          item_kind: string
+          position: number
+          rarity_override: string | null
+          splash_url: string | null
+          starts_at: string | null
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          art_url?: string | null
+          created_at?: string
+          description_override?: string | null
+          ends_at?: string | null
+          id?: string
+          item_id: string
+          item_kind: string
+          position?: number
+          rarity_override?: string | null
+          splash_url?: string | null
+          starts_at?: string | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          art_url?: string | null
+          created_at?: string
+          description_override?: string | null
+          ends_at?: string | null
+          id?: string
+          item_id?: string
+          item_kind?: string
+          position?: number
+          rarity_override?: string | null
+          splash_url?: string | null
+          starts_at?: string | null
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shop_items: {
         Row: {
           accent: string
