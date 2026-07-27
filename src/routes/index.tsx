@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
