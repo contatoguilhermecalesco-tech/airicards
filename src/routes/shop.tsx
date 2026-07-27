@@ -223,8 +223,7 @@ function ShopPage() {
       // Raridade só se aplica a cosméticos e bundles.
       if (
         rarityFilter !== "all" &&
-        u.kind !== "cosmetic" &&
-        u.kind !== "bundle" &&
+        (u.kind === "cosmetic" || u.kind === "bundle") &&
         u.rarity !== rarityFilter
       )
         return false;
