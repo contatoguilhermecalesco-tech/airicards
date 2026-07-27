@@ -175,9 +175,15 @@ function Review() {
     setShowBack(true);
     if (res.correct) {
       setAskDifficulty(true);
+      if (isEnemyRun && isEnemy(current)) {
+        bumpCombo();
+        // reads latest combo via listener; onComboReached uses maxProgress
+        onComboReached((useComboSnapshot() ?? 0));
+      }
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      if (isEnemyRun) breakCombo();
     }
   }
 
