@@ -61,6 +61,8 @@ import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
+import { BundleConceptsSection } from "@/components/admin/BundleConceptsSection";
+import { initBundleConcepts } from "@/lib/bundle-concepts-store";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
@@ -100,7 +102,8 @@ type PanelKey =
   | "backup"
   | "streak"
   | "bundles"
-  | "shop-items";
+  | "shop-items"
+  | "concepts";
 
 type PanelDef = {
   key: PanelKey;
@@ -126,6 +129,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
   { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
+  { key: "concepts", label: "Bundle concepts", hint: "Diário criativo dos bundles", Icon: ScrollText, color: "#e879f9", wide: true },
 ];
 
 function AdminPage() {
@@ -151,6 +155,7 @@ function AdminPage() {
     void load();
     void initNotifications();
     void initChangelog();
+    void initBundleConcepts();
   }, []);
 
   function nameFor(profileId: string) {
@@ -293,6 +298,7 @@ function AdminPage() {
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
                 {openPanel === "bundles" && <BundleBuilderSection />}
+                {openPanel === "concepts" && <BundleConceptsSection />}
               </div>
             </>
           )}

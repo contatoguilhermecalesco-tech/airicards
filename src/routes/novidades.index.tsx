@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,6 +7,7 @@ import {
   Wrench,
   Wand2,
   ArrowUpRight,
+  Package,
 } from "lucide-react";
 import {
   initChangelog,
@@ -15,6 +16,11 @@ import {
   type ChangelogCategory,
   type ChangelogEntry,
 } from "@/lib/changelog-store";
+import {
+  initBundleConcepts,
+  useBundleConcepts,
+  type BundleConcept,
+} from "@/lib/bundle-concepts-store";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 
 export const Route = createFileRoute("/novidades/")({
@@ -95,11 +101,14 @@ function groupByMonth(entries: ChangelogEntry[]) {
 
 function NovidadesPage() {
   const { entries, lastSeen } = useChangelog();
+  const { items: concepts } = useBundleConcepts();
+  const [tab, setTab] = useState<"patches" | "concepts">("patches");
 
   useEffect(() => {
     void initChangelog().then(() => {
       window.setTimeout(() => markAllChangelogSeen(), 600);
     });
+    void initBundleConcepts();
   }, []);
 
   const [featured, ...rest] = entries;
@@ -131,14 +140,39 @@ function NovidadesPage() {
               airi
             </span>
             <span className="text-[10px] uppercase tracking-[0.24em] text-foreground/30">
-              / patch notes
+              / {tab === "patches" ? "patch notes" : "bundle concepts"}
             </span>
           </div>
+        </div>
+        {/* Tabs */}
+        <div className="mx-auto flex max-w-3xl items-center gap-1 px-5 pb-2 sm:px-8">
+          {[
+            { key: "patches" as const, label: "Patch notes", Icon: Sparkles },
+            { key: "concepts" as const, label: "Bundle concepts", Icon: Package },
+          ].map((t) => {
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] transition ${
+                  active
+                    ? "border-primary/50 bg-primary/15 text-primary"
+                    : "border-white/10 bg-white/[0.02] text-foreground/55 hover:bg-white/[0.05] hover:text-foreground/80"
+                }`}
+              >
+                <t.Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
-        {entries.length === 0 ? (
+        {tab === "concepts" ? (
+          <ConceptsTab concepts={concepts} />
+        ) : entries.length === 0 ? (
           <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
             <p className="text-sm text-foreground/70">
               Ainda sem novidades por aqui.
@@ -448,5 +482,168 @@ function NovidadesPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function ConceptsTab({ concepts }: { concepts: BundleConcept[] }) {
+  if (concepts.length === 0) {
+    return (
+      <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+        <p className="text-sm text-foreground/70">Nenhum bundle concept publicado ainda.</p>
+        <p className="mt-1 text-xs text-foreground/45">
+          Aqui vão aparecer os diários criativos por trás de cada bundle da loja.
+        </p>
+      </div>
+    );
+  }
+  const [first, ...rest] = concepts;
+  return (
+    <>
+      {/* HERO concept */}
+      <section className="relative mt-6 animate-fade-in">
+        <Link
+          to="/novidades/$id"
+          params={{ id: `concept:${first.id}` }}
+          className="group block"
+        >
+          <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0a0f] transition group-hover:border-white/20">
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(120% 90% at 85% 0%, ${first.palette}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
+              }}
+            />
+            {first.splash_url && (
+              <div
+                aria-hidden
+                className="absolute inset-0 opacity-75"
+                style={{
+                  backgroundImage: `url(${first.splash_url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  maskImage:
+                    "linear-gradient(180deg, rgba(0,0,0,0.95), rgba(0,0,0,0.35) 60%, transparent)",
+                }}
+              />
+            )}
+            <div className="relative px-6 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12">
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                style={{
+                  borderColor: `${first.palette}66`,
+                  color: first.palette,
+                  backgroundColor: `${first.palette}18`,
+                }}
+              >
+                <Package className="h-3 w-3" strokeWidth={2.5} />
+                Concept
+              </span>
+              <h1 className="mt-6 text-[34px] font-semibold leading-[1.02] tracking-tight text-foreground sm:text-[44px]">
+                {first.title}
+              </h1>
+              {first.tagline && (
+                <p className="mt-3 max-w-xl font-serif text-[15px] italic leading-relaxed text-foreground/75 sm:text-[16px]">
+                  {first.tagline}
+                </p>
+              )}
+              <div className="mt-6 flex items-center gap-3">
+                <div
+                  className="h-[3px] max-w-[80px] flex-1 rounded-full"
+                  style={{ backgroundColor: first.palette }}
+                />
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] transition group-hover:-translate-y-0.5"
+                  style={{
+                    borderColor: `${first.palette}66`,
+                    color: first.palette,
+                    backgroundColor: `${first.palette}1a`,
+                    boxShadow: `0 8px 24px -12px ${first.palette}88`,
+                  }}
+                >
+                  Ler concept completo
+                  <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+                </span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </section>
+
+      {rest.length > 0 && (
+        <section className="mt-10 animate-fade-in">
+          <div className="mb-4 flex items-center gap-3">
+            <span className="h-4 w-1 rounded-sm bg-primary" />
+            <h2 className="text-[11px] font-bold uppercase tracking-[0.28em] text-foreground/70">
+              Mais bundles
+            </h2>
+            <div className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {rest.map((c) => (
+              <li key={c.id}>
+                <Link
+                  to="/novidades/$id"
+                  params={{ id: `concept:${c.id}` }}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 transition hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.05]"
+                >
+                  {c.splash_url && (
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 opacity-40"
+                      style={{
+                        backgroundImage: `url(${c.splash_url})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        maskImage:
+                          "linear-gradient(180deg, rgba(0,0,0,0.75), transparent 65%)",
+                      }}
+                    />
+                  )}
+                  <div className="relative flex items-start justify-between">
+                    <span
+                      className="grid h-9 w-9 place-items-center rounded-xl border"
+                      style={{
+                        backgroundColor: `${c.palette}18`,
+                        borderColor: `${c.palette}3d`,
+                        color: c.palette,
+                      }}
+                    >
+                      <Package className="h-4 w-4" strokeWidth={2.25} />
+                    </span>
+                    <ArrowUpRight
+                      className="h-4 w-4 text-foreground/25 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground/60"
+                      strokeWidth={2.25}
+                    />
+                  </div>
+                  <p
+                    className="relative mt-3 text-[9.5px] font-bold uppercase tracking-[0.2em]"
+                    style={{ color: c.palette }}
+                  >
+                    Concept
+                  </p>
+                  <h3 className="relative mt-1 text-[15px] font-semibold leading-snug text-foreground">
+                    {c.title}
+                  </h3>
+                  {c.tagline && (
+                    <p className="relative mt-1.5 line-clamp-2 font-serif text-[12.5px] italic leading-relaxed text-foreground/60">
+                      {c.tagline}
+                    </p>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="mt-16 flex items-center justify-center gap-3 text-foreground/25">
+        <span className="h-px w-10 bg-white/10" />
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em]">
+          airi · bundle concepts
+        </span>
+        <span className="h-px w-10 bg-white/10" />
+      </div>
+    </>
   );
 }
