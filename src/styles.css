@@ -593,8 +593,14 @@
 @utility companion-seq-2 { animation: companion-seq-2 9s ease-in-out infinite; }
 @utility companion-seq-3 { animation: companion-seq-3 9s ease-in-out infinite; }
 @utility companion-seq-4 { animation: companion-seq-4 9s ease-in-out infinite; }
+@keyframes companion-slash-flash {
+  0%, 46% { opacity: 0; transform: scale(0.55) rotate(-10deg); }
+  50% { opacity: 0.95; transform: scale(1.15) rotate(4deg); }
+  54% { opacity: 0.55; transform: scale(1.35) rotate(10deg); }
+  60%, 100% { opacity: 0; transform: scale(1.5) rotate(14deg); }
+}
 @utility companion-slash-flash {
-  animation: companion-slash-flash 8s ease-in-out infinite;
+  animation: companion-slash-flash 9s ease-in-out infinite;
   filter: blur(6px);
 }
 
