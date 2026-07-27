@@ -99,7 +99,6 @@ type PanelKey =
   | "changelog"
   | "backup"
   | "streak"
-  | "vitrine"
   | "bundles"
   | "shop-items";
 
