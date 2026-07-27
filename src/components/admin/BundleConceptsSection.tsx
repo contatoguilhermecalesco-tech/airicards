@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Loader2, Package, Pencil, Send, Trash2, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ImagePlus, Loader2, Package, Pencil, Send, Trash2, Upload, X } from "lucide-react";
+import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import {
   createBundleConcept,
   updateBundleConcept,
