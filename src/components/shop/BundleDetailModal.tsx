@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Loader2, Sparkles, X } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
+import { SakuraPetals } from "@/components/SakuraPetals";
 import {
   ICONS,
   MiniProfileCard,
