@@ -610,6 +610,18 @@ function ShopPage() {
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
+      {bundleOpen && (
+        <BundleDetailModal
+          bundle={bundleOpen}
+          wallet={wallet.crystals}
+          ownedIds={ownedIds}
+          busy={busy === bundleOpen.id}
+          onClose={() => setBundleOpen(null)}
+          onBuy={() => void confirmBuyBundle(bundleOpen)}
+          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url}
+          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url}
+        />
+      )}
     </main>
   );
 }
