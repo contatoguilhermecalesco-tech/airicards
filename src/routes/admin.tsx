@@ -60,6 +60,7 @@ import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 import { FeaturedSlotsSection } from "@/components/admin/FeaturedSlotsSection";
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
+import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
