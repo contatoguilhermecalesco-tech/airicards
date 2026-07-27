@@ -1,59 +1,64 @@
-# Plano — UX + Social
+Vou resolver os três pontos técnicos, na ordem que o app pede (o mais rápido/isolado primeiro, o refactor grande por último).
 
-Vou entregar todos os 7 itens de uma vez, priorizando os que dão mais valor imediato. Os dois pesados (offline real e marketplace) recebem tratamento cuidadoso para não quebrar o app.
+## 1. Remover o card "Em breve" de `/study`
 
-## 1. Widget iOS / Instalável (PWA manifest)
-- Criar `public/manifest.webmanifest` com nome "airi", ícones (do logo atual), `theme_color` roxo, `display: standalone`.
-- Adicionar `<link rel="manifest">`, `apple-touch-icon` e `apple-mobile-web-app-*` no `__root.tsx`.
-- Resultado: no iPhone, "Adicionar à Tela de Início" cria ícone airi, abre em fullscreen sem barra do Safari. Não é widget nativo (iOS não permite via web), mas é o mais próximo possível.
+Hoje todos os cinco dias da semana já têm rota (`to`). O trecho de `Lock` + `"Em breve"` em `src/routes/study.index.tsx` nunca renderiza — é código morto que só polui a leitura.
 
-## 2. Modo Offline
-- Instalar `vite-plugin-pwa` com `generateSW` + `registerType: "autoUpdate"`.
-- Criar wrapper `src/lib/register-sw.ts` que **só registra em produção** (bloqueia iframe/preview/dev — conforme regras Lovable).
-- Estratégia: `NetworkFirst` para HTML, `CacheFirst` para assets hasheados. Cartas e progresso já ficam no Supabase — o app volta a abrir offline e cartas locais (LocalStorage) funcionam sem rede.
-- Aviso: offline só funciona no app publicado, nunca no preview.
+- Simplificar o componente: remover `available`, `Lock`, `!available && "Em breve"`.
+- Deixar apenas o caminho com `Link to={d.to}`.
+- Sem mudança visual para o usuário (o dia bloqueado nunca aparecia).
 
-## 3. Atalhos de teclado (review)
-- Em `src/routes/review.tsx`, adicionar `useEffect` com `keydown`:
-  - `Espaço` → virar carta
-  - `1` ou `E` → Errei
-  - `2` ou `A` → Acertei
-  - `F` (após acerto) → Fácil, `M` → Médio, `D` → Difícil
-  - `Esc` → sair
-- Adicionar dica visual pequena ("Espaço para virar · 1 Errei · 2 Acertei") só em `sm:` (desktop).
+## 2. Sincronizar missões das inimigas na nuvem
 
-## 4. Modo Foco
-- Toggle no topo da tela de revisão (ícone `Focus`/`Minimize2`).
-- Ativo: esconde header interno, contador de sessão, botão sair, atalhos de teclado; deixa só a carta + botões grandes. Vinheta escura no fundo.
-- Estado guardado em `localStorage` (`airi.focus-mode`) — quem gosta, mantém sempre.
+**Problema:** `src/lib/enemy-system.ts` guarda `airi.enemy-missions.<profile>` só no `localStorage`, então progresso de missão diária/semanal não bate entre PC e celular.
 
-## 5. Onboarding progressivo
-- Novo `src/components/OnboardingTour.tsx` — 4 slides curtos estilo iOS (Início / Biblioteca / Revisão / Rank).
-- Trigger: `localStorage.getItem("airi.onboarded") !== "v1"` na primeira visita do perfil.
-- Estilo: bottom sheet no mobile, modal centrado no desktop. Botão "Pular" + "Próximo/Começar".
+**Combo** eu deixo local: ele é uma métrica de sessão da Arena (zera ao sair, não faz sentido sincronizar contador em tempo real entre abas). Vou apenas persistir o `best` do dia dentro da mesma estrutura de missões, para ficar cross-device.
 
-## 6. Compartilhar conquistas (estilo Wrapped)
-- Botão "Compartilhar" no `/rank` e no header do streak em `/`.
-- Novo componente `src/components/ShareCard.tsx` que renderiza um card 1080×1920 (formato stories) via HTML Canvas puro (sem `html-to-image`):
-  - Gradiente roxo profundo, emblema do rank, LP, tier, streak, cartas dominadas, nome do perfil, marca "airi".
-- Ação: `canvas.toBlob` → `navigator.share` no mobile (com fallback para `download`).
+**Solução (sem migration nova):** guardar missões dentro do `profile_data.data` JSONB, num sub-objeto `enemyMissions`. Isso reusa o pipeline de sync já existente (`flashcards-store` faz merge por `updated_at` e tem `lastLocalMutationAt`).
 
-## 7. Marketplace de decks
-- **Migration**: nova tabela `public.published_decks` (owner_profile_id, slug, name, description, color_key, card_count, cards jsonb, likes int, created_at, updated_at). Índice único em `(owner_profile_id, slug)`. RLS: leitura pública, escrita só pelo dono do slug (baseado em `X-Profile-ID` header — simplificando: qualquer authenticated pode inserir/atualizar já que o app já usa profile_id texto).
-- **Publicar deck**: no `library.$deckId.tsx`, adicionar botão "Publicar no Marketplace" ao lado do "Compartilhar link". Copia cartas p/ tabela pública.
-- **Nova rota `/marketplace`**: grid dos decks públicos com filtro por autor, busca, contagem de cartas, botão "Curtir" (incrementa `likes`) e "Adicionar à minha biblioteca" (reusa lógica de importação atual).
-- Item no navbar bottom não muda (já cheio); acesso via `/library` — botão "Explorar marketplace".
+Passos:
+- Estender `flashcards-store` para expor um espaço leve `getMeta("enemyMissions") / setMeta(...)` gravando dentro de `data.meta.enemyMissions`, marcando `lastLocalMutationAt` para não ser sobrescrito pela nuvem.
+- Em `enemy-system.ts`:
+  - `loadState()` lê primeiro do store (nuvem→memória) e cai no `localStorage` como fallback/migração única.
+  - `persistMissions()` grava no store (que dispara sync) e também no `localStorage` (offline).
+  - `onEnemyDefeated` / `onComboReached` / `claimMission` continuam iguais — só a persistência muda.
+  - Ao trocar de perfil (evento existente), `refreshMissionsForCurrentProfile()` recarrega do store.
+- Reconciliação de datas: se dailyKey/weeklyKey da nuvem for mais recente que o local, adota a nuvem; se local tem mais progresso na mesma chave, faz `max(progress)` por missão de mesmo `id` (evita perder progresso ao abrir o outro device com estado antigo em cache).
 
-## Ordem de execução técnica
+## 3. Refatorar `src/routes/admin.tsx` (2653 linhas)
 
-1. Disparar migration do marketplace (aprovação assíncrona).
-2. Em paralelo, escrever: manifest, wrapper SW, config vite, review keyboard/focus, OnboardingTour, ShareCard, componente do marketplace.
-3. Ligar botões no `/rank`, `/library.$deckId`, `/library.index`.
-4. Verificação final: build/typecheck automático + screenshot rápido do review + rank.
+Hoje o arquivo é um monólito com ~12 painéis. Vou extrair cada painel para `src/components/admin/*.tsx`, mantendo comportamento 100% igual. A rota `admin.tsx` fica só com o Gate + navegação entre painéis (~250 linhas).
 
-## O que NÃO faço (por segurança)
-- Widget de tela de bloqueio nativo do iOS — impossível via PWA.
-- Marketplace com pagamentos/moderação — só listagem pública gratuita.
-- Estatísticas complexas no share card (v1 mostra rank + streak + cartas).
+Nova estrutura:
 
-Se você aprovar, sigo direto para implementação. Se quiser ajustar algo (ex: remover algum atalho, mudar formato do share pra quadrado, etc.), me diz agora.
+```text
+src/components/admin/
+  types.ts                  // PanelDef, constantes compartilhadas
+  SessionsPanel.tsx
+  RankAdminSection.tsx
+  ProfilesRankOverview.tsx
+  TagsSection.tsx
+  NotificationsSection.tsx
+  ExamAdminSection.tsx
+  ChangelogSection.tsx
+  ArlysAdminSection.tsx
+  DuelsAdminSection.tsx
+  PinAdminSection.tsx
+  BackupSection.tsx
+  StreakAdminSection.tsx
+src/routes/admin.tsx        // Gate + AdminPage (registry + roteador de painéis)
+```
+
+Regras do refactor:
+- Nenhuma mudança de comportamento, texto, estilo ou fluxo.
+- Constantes locais (`ADMIN_PROFILE_ID`, `TAG_COLORS`, `QUICK_GRANTS`, `NOTIFICATION_ROUTES`, `CHANGELOG_CATEGORIES`) vão para `types.ts` ou ficam no arquivo do painel que as usa.
+- Helpers puros usados por só um painel viajam junto com ele.
+- Imports do Supabase, stores e libs continuam iguais dentro de cada arquivo movido.
+- Rota exporta o mesmo `Route` e usa `ADMIN_PANELS` montado a partir dos componentes extraídos.
+
+### Ordem de execução
+1. Study "Em breve" (1 arquivo).
+2. Sync das missões (2 arquivos: `flashcards-store.ts`, `enemy-system.ts`).
+3. Refactor admin (criação dos 12 arquivos + reescrita enxuta de `admin.tsx`).
+
+Sem mudanças de schema, sem novas rotas, sem alterar UI.

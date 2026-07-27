@@ -35,7 +35,7 @@ export type Deck = {
   createdAt: number;
 };
 
-type State = { decks: Deck[]; cards: Card[] };
+type State = { decks: Deck[]; cards: Card[]; meta?: Record<string, unknown> };
 export type StreakDayStatus = "done";
 export type Streak = {
   current: number;
@@ -250,6 +250,9 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
       state = {
         decks: [...extraDecks, ...remote.decks],
         cards: [...extraCards, ...remote.cards],
+        // Meta local vence dentro da janela de mutação recente para não
+        // perder progresso de missões/combo feito nos últimos segundos.
+        meta: state.meta ?? remote.meta,
       };
       // Se preservamos itens locais, precisamos re-enviar pro servidor para
       // que o outro device também os veja.
@@ -1047,4 +1050,21 @@ export async function resetHomeSessionsForProfile(profileId: string): Promise<vo
     emitHome();
   }
 }
+
+// --- Meta store (sincroniza dados leves por perfil no cloud) ---------
+// Ex.: missões de inimigas, combo, flags de onboarding. Guardado dentro
+// de state.meta e persistido junto com decks/cartas em profile_data.data.
+export function getMeta<T>(key: string): T | undefined {
+  return state.meta?.[key] as T | undefined;
+}
+export function setMeta<T>(key: string, value: T) {
+  const meta = { ...(state.meta ?? {}), [key]: value };
+  state = { ...state, meta };
+  emit();
+  scheduleSave();
+}
+export function useMeta<T>(key: string): T | undefined {
+  return useStore((s) => s.meta?.[key] as T | undefined);
+}
+
 
