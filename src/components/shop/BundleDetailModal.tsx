@@ -258,18 +258,26 @@ export function BundleDetailModal({
   );
 }
 
-function BundleItemRow({ item, owned }: { item: ShopItem; owned: boolean }) {
+function BundleItemRow({
+  item,
+  owned,
+  active,
+  onToggle,
+}: {
+  item: ShopItem;
+  owned: boolean;
+  active: boolean;
+  onToggle: () => void;
+}) {
   const rarity = RARITY_META[rarityFor(item.price)];
   const Icon = ICONS[item.icon] ?? Sparkles;
   const override = getShopAssetOverride(item.id);
   return (
     <li
-      className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition hover:bg-white/[0.05]`}
+      className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition ${active ? "opacity-100" : "opacity-55"}`}
     >
       {override?.art ? (
-        <span
-          className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl"
-        >
+        <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl">
           <img
             src={override.art}
             alt=""
@@ -295,17 +303,36 @@ function BundleItemRow({ item, owned }: { item: ShopItem; owned: boolean }) {
         <p className="mt-0.5 truncate text-[13px] font-semibold text-foreground">
           {item.name}
         </p>
-        <p className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
-          <ArlysIcon className="h-3 w-3 text-violet-300" strokeWidth={2.5} />
-          {item.price} ✦
-        </p>
+        <div className="mt-0.5 flex items-center gap-2">
+          <span className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+            <ArlysIcon className="h-3 w-3 text-violet-300" strokeWidth={2.5} />
+            {item.price} ✦
+          </span>
+          {owned && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-200">
+              <Check className="h-2.5 w-2.5" strokeWidth={2.75} />
+              Já tem
+            </span>
+          )}
+        </div>
       </div>
-      {owned && (
-        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
-          <Check className="h-3 w-3" strokeWidth={2.75} />
-          Já tem
-        </span>
-      )}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={active}
+        aria-label={active ? "Ocultar do preview" : "Mostrar no preview"}
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+          active
+            ? "border-violet-300/50 bg-gradient-to-r from-violet-500 to-fuchsia-500"
+            : "border-white/15 bg-white/10"
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transition-transform ${
+            active ? "translate-x-6" : "translate-x-1"
+          }`}
+        />
+      </button>
     </li>
   );
 }
