@@ -755,6 +755,41 @@ function UnifiedCard({
             </span>
           )}
         </div>
+      ) : item.kind === "decks" ? (
+        <div className="relative">
+          <DeckCover
+            accent={((item.raw as PublishedDeckRow).color_key as string) || item.accent}
+            height={isVitrine ? "h-32" : "h-28"}
+            cardCount={(item.raw as PublishedDeckRow).card_count}
+            owner={item.owner}
+          />
+          <div className="absolute right-3 top-3 flex items-center gap-1.5">
+            <RarityChip rarity={item.rarity} />
+          </div>
+          {owned && (
+            <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+              <Check className="h-3 w-3" strokeWidth={2.75} />
+              Adquirido
+            </span>
+          )}
+        </div>
+      ) : item.kind === "pack" ? (
+        <div className="relative">
+          <PackCover
+            accent={item.accent}
+            height={isVitrine ? "h-32" : "h-28"}
+            deckCount={item.bundleItems?.length}
+          />
+          <div className="absolute right-3 top-3">
+            <RarityChip rarity={item.rarity} />
+          </div>
+          {owned && (
+            <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+              <Check className="h-3 w-3" strokeWidth={2.75} />
+              Adquirido
+            </span>
+          )}
+        </div>
       ) : (
         <div
           aria-hidden
