@@ -2,15 +2,8 @@
 // Rotates through featured items automatically and on manual nav.
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { SakuraPetals } from "@/components/SakuraPetals";
 import { ArlysIcon } from "@/components/StatChip";
-import {
-  ICONS,
-  MiniProfileCard,
-  RARITY_META,
-  RarityChip,
-  type Rarity,
-} from "@/components/shop/shop-visuals";
+import { RARITY_META, RarityChip, type Rarity } from "@/components/shop/shop-visuals";
 import type { ShopItem } from "@/lib/shop";
 import type { PublishedDeckRow } from "@/lib/marketplace";
 
@@ -58,7 +51,6 @@ export function ShopHero({
   if (featured.length === 0) return null;
   const item = featured[idx];
   const rarity = RARITY_META[item.rarity];
-  const Icon = ICONS[item.icon ?? "sparkles"] ?? Sparkles;
   const owned = ownedIds.has(item.id);
   const canAfford = wallet >= item.price;
 
