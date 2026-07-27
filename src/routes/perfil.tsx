@@ -48,6 +48,7 @@ import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
+import { getEquippedArt } from "@/lib/shop-asset-overrides";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -353,6 +354,12 @@ function PerfilPage() {
   const effect = equippedItem.effect;
   const companion = companionFromEquipped(wallet.equipped);
 
+  // Curated art for each equipped slot (bundle-specific PNGs override the generic icon).
+  const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const decorationArt = getEquippedArt(wallet.equipped.decoration);
+  const badgeArt = getEquippedArt(wallet.equipped.badge);
+  const effectArt = getEquippedArt(wallet.equipped.effect);
+
   // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
   const heroItem = nameplate ?? effect ?? decoration ?? badge;
   const heroPalette = heroItem ? paletteFor(heroItem.accent) : DISCORD_PALETTE.violet;
@@ -484,6 +491,14 @@ function PerfilPage() {
               />
             </>
           )}
+          {effectArt && (
+            <img
+              src={effectArt}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
+            />
+          )}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
@@ -556,6 +571,25 @@ function PerfilPage() {
                 <Trash2 className="h-3 w-3" strokeWidth={2.5} />
               </button>
             )}
+            {/* Aura art (decoration) — glow behind avatar */}
+            {decorationArt && (
+              <img
+                src={decorationArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain animate-spin-slow"
+                style={{ animation: "spin 24s linear infinite" }}
+              />
+            )}
+            {/* Frame art (nameplate) — decorative branch/ring around avatar */}
+            {nameplateArt && (
+              <img
+                src={nameplateArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] max-w-none object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+              />
+            )}
           </div>
 
           {companion && (
@@ -598,8 +632,17 @@ function PerfilPage() {
                         "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
                     }}
                   />
-                  <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
-                  <span className="relative">{badgePalette.tag.toUpperCase()}</span>
+                  {badgeArt ? (
+                    <img
+                      src={badgeArt}
+                      alt=""
+                      aria-hidden
+                      className="relative h-4 w-4 object-contain"
+                    />
+                  ) : (
+                    <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
+                  )}
+                  <span className="relative">{badge.name.toUpperCase()}</span>
                 </span>
               )}
             </div>
@@ -765,9 +808,15 @@ function PerfilPage() {
                     style={{ background: paletteFor(equippedShop.accent).gradient }}
                   >
                     <span
-                      className="grid h-9 w-9 place-items-center rounded-lg bg-black/25 text-white backdrop-blur"
+                      className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-black/25 text-white backdrop-blur"
                     >
                       {(() => {
+                        const art = getEquippedArt(wallet.equipped[slot]);
+                        if (art) {
+                          return (
+                            <img src={art} alt="" aria-hidden className="h-8 w-8 object-contain" />
+                          );
+                        }
                         const Icon = ICONS[equippedShop.icon] ?? Sparkles;
                         return <Icon className="h-4 w-4" strokeWidth={2.5} />;
                       })()}

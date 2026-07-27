@@ -32,3 +32,22 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
   return SHOP_ASSET_OVERRIDES[itemId];
 }
+
+/**
+ * Map from wallet cosmetic key (`slot:key` as stored in wallet.equipped/cosmetics)
+ * to the curated art asset. Used by the profile page to render real bundle art
+ * instead of a generic Lucide icon when an item is equipped.
+ */
+export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
+  "decoration:florescer_celestial": florescerAura,
+  "nameplate:coroa_guardia": florescerFrame,
+  "badge:guardia_flores": florescerTitle,
+  "effect:bosque_celestial": florescerBackground,
+  "effect:veu_celestial": florescerCardframe,
+  "companion:kitsune_florescer": florescerCompanion,
+};
+
+export function getEquippedArt(walletKey: string | undefined | null): string | undefined {
+  if (!walletKey) return undefined;
+  return EQUIPPED_ART_BY_KEY[walletKey];
+}
