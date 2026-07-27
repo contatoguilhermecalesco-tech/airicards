@@ -13,6 +13,12 @@ import {
   useChangelog,
   type ChangelogCategory,
 } from "@/lib/changelog-store";
+import {
+  initBundleConcepts,
+  useBundleConcepts,
+  type BundleConcept,
+} from "@/lib/bundle-concepts-store";
+import { Package } from "lucide-react";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 import { RiotPatchBody } from "@/lib/patch-notes";
 
