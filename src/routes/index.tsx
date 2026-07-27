@@ -552,9 +552,10 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10"
+          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
+
           <div className="mb-4 flex items-baseline justify-between px-1">
             <h2 className="text-[17px] font-semibold tracking-tight text-foreground">
               Seus decks
