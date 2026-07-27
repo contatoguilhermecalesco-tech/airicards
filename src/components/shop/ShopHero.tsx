@@ -118,10 +118,10 @@ export function ShopHero({
         <SakuraPetals density="epic" seed={42} withHalo />
       )}
 
-      <div className="grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
+      <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
         <div className="min-w-0 self-center">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/90 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur">
               <Sparkles className="h-3 w-3" strokeWidth={2.75} />
               Em destaque
             </span>
@@ -131,22 +131,22 @@ export function ShopHero({
             </span>
           </div>
 
-          <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl">
+          <h2 className="mt-3 text-[22px] font-bold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl">
             {item.name}
           </h2>
           {item.tagline && (
-            <p className="mt-1 text-[13px] font-medium uppercase tracking-[0.14em] text-white/70">
+            <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/70 sm:text-[13px]">
               {item.tagline}
             </p>
           )}
-          <p className="mt-2 max-w-lg text-sm text-white/85">
+          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 sm:text-sm">
             {item.description || "Item exclusivo da loja airi."}
           </p>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-black/30 px-4 py-2.5 backdrop-blur">
-              <ArlysIcon className="h-5 w-5 text-white" strokeWidth={2.5} />
-              <span className="text-2xl font-bold text-white leading-none tabular-nums">
+          <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
+            <div className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-black/30 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
+              <ArlysIcon className="h-4 w-4 text-white sm:h-5 sm:w-5" strokeWidth={2.5} />
+              <span className="text-xl font-bold leading-none tabular-nums text-white sm:text-2xl">
                 {item.price}
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
@@ -156,27 +156,30 @@ export function ShopHero({
             <button
               onClick={() => onBuy(item)}
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+              className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
               {busyId === item.id ? (
                 <>
-                  <Sparkles className="h-4 w-4 animate-pulse" strokeWidth={2.5} />
-                  Adquirindo…
+                  <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
+                  <span className="truncate">Adquirindo…</span>
                 </>
               ) : owned ? (
-                "Adquirido"
+                <span className="truncate">Adquirido</span>
               ) : item.kind === "bundle" ? (
                 <>
-                  <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-                  Ver conteúdo
+                  <Sparkles className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                  <span className="truncate">Ver conteúdo</span>
                 </>
               ) : canAfford ? (
                 <>
-                  <ArlysIcon className="h-4 w-4" strokeWidth={2.5} />
-                  Comprar por {item.price} ✦
+                  <ArlysIcon className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                  <span className="truncate">
+                    <span className="hidden sm:inline">Comprar por </span>
+                    {item.price} ✦
+                  </span>
                 </>
               ) : (
-                `Faltam ${item.price - wallet} ✦`
+                <span className="truncate">Faltam {item.price - wallet} ✦</span>
               )}
             </button>
           </div>
@@ -184,14 +187,14 @@ export function ShopHero({
 
         {/* Right column: visual preview */}
         <div className="relative self-center">
-          <div className="relative mx-auto max-w-[260px]">
+          <div className="relative mx-auto max-w-[240px] sm:max-w-[260px]">
             <div
               className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
               style={{ background: rarity.gradient }}
             />
             {item.artUrl ? (
               <div
-                className="relative flex h-[220px] items-center justify-center overflow-hidden rounded-2xl"
+                className="relative flex h-[170px] items-center justify-center overflow-hidden rounded-2xl sm:h-[220px]"
                 style={{ filter: `drop-shadow(0 20px 40px ${rarity.glow})` }}
               >
                 <img
@@ -204,14 +207,14 @@ export function ShopHero({
               <MiniProfileCard item={item.raw as ShopItem} />
             ) : item.splashUrl ? null : (
               <div
-                className="relative flex h-[180px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-black/25 p-5 text-center backdrop-blur"
+                className="relative flex h-[160px] flex-col items-center justify-center gap-3 rounded-2xl border border-white/20 bg-black/25 p-5 text-center backdrop-blur sm:h-[180px]"
                 style={{ boxShadow: `0 20px 60px -20px ${rarity.glow}` }}
               >
                 <span
-                  className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-xl"
+                  className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-xl sm:h-16 sm:w-16"
                   style={{ background: rarity.gradient }}
                 >
-                  <Icon className="h-8 w-8" strokeWidth={2.25} />
+                  <Icon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={2.25} />
                 </span>
                 <p className="text-sm font-semibold text-white">
                   {kindLabel(item.kind)}
