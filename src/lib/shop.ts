@@ -28,6 +28,32 @@ export async function listShopItems(): Promise<ShopItem[]> {
   return data as unknown as ShopItem[];
 }
 
+// Admin-only: returns every item, active or not.
+export async function listAllShopItems(): Promise<ShopItem[]> {
+  const { data, error } = await supabase
+    .from("shop_items")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  if (error || !data) return [];
+  return data as unknown as ShopItem[];
+}
+
+export async function updateShopItem(
+  id: string,
+  patch: Partial<Pick<ShopItem, "active" | "sort_order" | "price" | "name" | "description">>,
+): Promise<void> {
+  const { error } = await supabase
+    .from("shop_items")
+    .update(patch as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteShopItem(id: string): Promise<void> {
+  const { error } = await supabase.from("shop_items").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function listMyPurchases(profileId: string) {
   const { data } = await supabase
     .from("shop_purchases")
