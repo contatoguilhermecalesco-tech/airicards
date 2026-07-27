@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -151,9 +151,29 @@ function Home() {
   const pendingPct = Math.min(1, due / dailyTarget);
   const pctLabel = Math.round(reviewedPct * 100);
 
+  // ---- Insights (contexto para os stats) --------------------------------
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const cardsThisWeek = useMemo(
+    () => cards.filter((c) => c.createdAt >= weekAgo).length,
+    [cards, weekAgo],
+  );
+  const masteredCount = useMemo(
+    () => cards.filter((c) => (c.reps ?? 0) >= 3 && !isEnemy(c)).length,
+    [cards],
+  );
+  const masteryPct = cards.length === 0 ? 0 : Math.round((masteredCount / cards.length) * 100);
+  const dueDeckCount = useMemo(() => {
+    const set = new Set<string>();
+    cards.forEach((c) => {
+      if (c.dueAt <= now) set.add(c.deckId);
+    });
+    return set.size;
+  }, [cards, now]);
+
+
 
   return (
-    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14 lg:max-w-6xl lg:px-8 lg:pt-16 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6 lg:items-start">
+    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14 lg:max-w-[1180px] lg:px-8 lg:pt-16 lg:grid lg:grid-cols-12 lg:gap-x-5 lg:gap-y-5 lg:items-start lg:auto-rows-min">
       {/* Ambient aurora — soft violet layers */}
       <div
         aria-hidden
@@ -197,7 +217,7 @@ function Home() {
 
       {/* Hero — Liquid Glass */}
       <section
-        className="animate-fade-in relative mt-7 sm:mt-8 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0"
+        className="animate-fade-in relative mt-7 sm:mt-8 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:row-span-2 lg:mt-0"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
 
@@ -276,10 +296,18 @@ function Home() {
 
             {/* Copy — centered on mobile, left on ≥sm */}
             <div className="order-2 min-w-0 flex-1 space-y-1 text-center sm:order-1 sm:text-left">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
-                Sessão de hoje
-              </p>
-              <p className="mt-1.5 text-[24px] font-medium leading-tight tracking-tight text-foreground sm:text-[26px]">
+              <div className="flex items-center justify-center gap-2 sm:justify-start">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
+                  Sessão de hoje
+                </span>
+                {due > 0 && (
+                  <span className="relative inline-flex h-1.5 w-1.5">
+                    <span aria-hidden className="absolute inset-0 rounded-full bg-primary/70 motion-safe:animate-ping" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                  </span>
+                )}
+              </div>
+              <p className="mt-1.5 text-[24px] font-medium leading-tight tracking-tight text-foreground sm:text-[28px]">
                 {due === 0
                   ? "Tudo em dia por agora"
                   : `${due} carta${due === 1 ? "" : "s"} te esperam`}
@@ -291,8 +319,32 @@ function Home() {
                     ? `${reviewedToday} revisada${reviewedToday === 1 ? "" : "s"} hoje`
                     : "Sua sessão diária te espera."}
               </p>
+              {/* Insight row — dá contexto humano ao número */}
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 pt-1 sm:justify-start">
+                {masteryPct > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="h-1 w-1 rounded-full bg-emerald-300/80" />
+                    <span className="tabular-nums text-foreground/85">{masteryPct}%</span>
+                    <span>dominado</span>
+                  </span>
+                )}
+                {dueDeckCount > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <span className="h-1 w-1 rounded-full bg-primary/80" />
+                    <span className="tabular-nums text-foreground/85">{dueDeckCount}</span>
+                    <span>deck{dueDeckCount === 1 ? "" : "s"} com pendências</span>
+                  </span>
+                )}
+                {reviewedToday > 0 && streak.current > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <Flame className="h-3 w-3 text-orange-300" strokeWidth={2.5} />
+                    <span className="tabular-nums text-foreground/85">dia {streak.current}</span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
+
 
 
           {/* CTA */}
@@ -355,7 +407,7 @@ function Home() {
 
       {/* Atalhos — pills discretas estilo iOS */}
       <section
-        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-7 lg:col-start-1 lg:row-start-3 lg:mt-0 lg:flex-wrap lg:overflow-visible"
+        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-0 lg:flex-wrap lg:overflow-visible"
         style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
       >
 
@@ -388,7 +440,7 @@ function Home() {
       </section>
 
       {/* Streak — sequência de dias */}
-      <div className="contents lg:block lg:col-span-7 lg:col-start-1 lg:row-start-4 [&>section]:lg:mt-0">
+      <div className="contents lg:block lg:col-span-4 lg:col-start-9 lg:row-start-2 [&>section]:lg:mt-0">
         <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
       </div>
 
@@ -396,7 +448,7 @@ function Home() {
       {/* Chefões pendentes — alerta gamificado */}
       {enemies.length > 0 && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-7 lg:col-start-1 lg:row-start-5 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-4 lg:mt-0"
           style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
         >
 
@@ -444,25 +496,50 @@ function Home() {
         </section>
       )}
 
-      {/* Stats — glass chips */}
+      {/* Stats — glass chips com contexto */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
+        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-8 lg:col-start-1 lg:row-start-4 lg:mt-0 lg:grid-cols-4 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
-
-
-        <StatChip label="Decks" value={decks.length} />
-        <StatChip label="Cartas" value={cards.length} />
-        <StatChip label="Revisadas" value={reviewedToday} accent />
-        <StatChip label="Recorde" value={streak.longest} />
+        <StatChip
+          label="Decks"
+          value={decks.length}
+          hint={dueDeckCount > 0 ? `${dueDeckCount} com pendências` : "todos em dia"}
+          icon={<Layers className="h-3 w-3" strokeWidth={2.5} />}
+        />
+        <StatChip
+          label="Cartas"
+          value={cards.length}
+          hint={cardsThisWeek > 0 ? `+${cardsThisWeek} esta semana` : "adicione a primeira"}
+          icon={<BookOpen className="h-3 w-3" strokeWidth={2.5} />}
+          trend={cardsThisWeek > 0}
+        />
+        <StatChip
+          label="Revisadas"
+          value={reviewedToday}
+          hint={reviewedToday > 0 ? `hoje · ${pctLabel}% da meta` : "comece agora"}
+          icon={<Check className="h-3 w-3" strokeWidth={2.5} />}
+          accent
+        />
+        <StatChip
+          label="Domínio"
+          value={masteryPct}
+          suffix="%"
+          hint={masteredCount > 0 ? `${masteredCount} carta${masteredCount === 1 ? "" : "s"}` : "revise para subir"}
+          icon={<Trophy className="h-3 w-3" strokeWidth={2.5} />}
+        />
       </section>
+
+      {/* Rank tile — bento direita */}
+      <RankTile rank={rank} />
+
 
 
 
       {/* Método RRSLG */}
       {cycle && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-3 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-6 lg:col-start-1 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
         >
 
@@ -511,7 +588,7 @@ function Home() {
       {/* Prova mensal */}
       {appSettings.exam_visible && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-4 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-6 lg:col-start-7 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "165ms", animationFillMode: "backwards" }}
         >
 
@@ -563,7 +640,7 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-4"
+          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-7 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
 
@@ -641,23 +718,137 @@ function Home() {
   );
 }
 
-function StatChip({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
+function StatChip({
+  label,
+  value,
+  accent = false,
+  hint,
+  suffix,
+  icon,
+  trend = false,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+  hint?: string;
+  suffix?: string;
+  icon?: React.ReactNode;
+  trend?: boolean;
+}) {
   return (
     <div
-      className={`${GLASS_BASE} p-3 transition-colors hover:bg-white/[0.055] ${
+      className={`${GLASS_BASE} group p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.06] ${
         accent ? "border-primary/25 bg-primary/[0.06]" : ""
       }`}
     >
       <GlassHighlight />
-      <p className={`relative text-[10px] font-semibold uppercase tracking-[0.14em] ${accent ? "text-primary/90" : "text-muted-foreground"}`}>
-        {label}
-      </p>
-      <p className={`relative mt-1 text-[20px] font-semibold leading-none tabular-nums ${accent ? "text-primary-foreground" : "text-foreground"}`}>
+      {accent && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-primary/20 opacity-70 blur-2xl"
+        />
+      )}
+      <div className="relative flex items-center gap-1.5">
+        {icon && (
+          <span className={accent ? "text-primary" : "text-muted-foreground/70"}>{icon}</span>
+        )}
+        <p
+          className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${
+            accent ? "text-primary/90" : "text-muted-foreground"
+          }`}
+        >
+          {label}
+        </p>
+        {trend && (
+          <TrendingUp className="ml-auto h-3 w-3 text-emerald-300/80" strokeWidth={2.5} />
+        )}
+      </div>
+      <p
+        className={`relative mt-1.5 flex items-baseline gap-0.5 text-[22px] font-semibold leading-none tabular-nums ${
+          accent ? "text-primary-foreground" : "text-foreground"
+        }`}
+      >
         {value}
+        {suffix && (
+          <span className="text-[13px] font-medium text-muted-foreground">{suffix}</span>
+        )}
       </p>
+      {hint && (
+        <p className="relative mt-1.5 truncate text-[10.5px] font-medium text-muted-foreground/80">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
+
+function RankTile({ rank }: { rank: ReturnType<typeof useRank> }) {
+  const tierColor = TIER_COLORS[rank.tier];
+  const tierName = TIER_LABEL[rank.tier];
+  const divRoman = isElite(rank.tier) ? "" : DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4];
+  const lpPct = Math.min(100, Math.max(0, (rank.lp / 100) * 100));
+
+  return (
+    <section
+      className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
+      style={{ animationDelay: "135ms", animationFillMode: "backwards" }}
+    >
+      <Link
+        to="/rank"
+        className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5`}
+        style={{
+          borderColor: `${tierColor.glow}33`,
+        }}
+      >
+        <GlassHighlight />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full opacity-60 blur-2xl transition-opacity group-hover:opacity-80"
+          style={{ background: `radial-gradient(closest-side, ${tierColor.glow}55, transparent 70%)` }}
+        />
+        <div className="relative flex items-center gap-3">
+          <div
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border"
+            style={{
+              borderColor: `${tierColor.glow}55`,
+              background: `linear-gradient(180deg, ${tierColor.glow}22, ${tierColor.glow}08)`,
+              boxShadow: `0 0 24px -8px ${tierColor.glow}`,
+            }}
+          >
+            <Crown className="h-5 w-5" strokeWidth={2.25} style={{ color: tierColor.glow }} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Rank atual
+            </p>
+            <p className="mt-1 truncate text-[15px] font-semibold text-foreground">
+              {tierName} {divRoman}
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+              {rank.lp} LP · {isElite(rank.tier) ? "elite" : "próxima divisão"}
+            </p>
+          </div>
+          <ChevronRight
+            className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+            strokeWidth={2.25}
+          />
+        </div>
+        {/* LP bar */}
+        <div className="relative mt-3 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${lpPct}%`,
+              background: `linear-gradient(90deg, ${tierColor.glow}, ${tierColor.glow}cc)`,
+              boxShadow: `0 0 8px ${tierColor.glow}`,
+            }}
+          />
+        </div>
+      </Link>
+    </section>
+  );
+}
+
 
 function QuickPill({
   to,
