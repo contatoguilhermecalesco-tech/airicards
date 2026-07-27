@@ -50,6 +50,48 @@ export function BundleConceptsSection() {
   const [ok, setOk] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // AI assistant state
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiBusy, setAiBusy] = useState<null | "full" | "refine" | "tagline" | "concept">(null);
+
+  async function runAi(mode: "full" | "refine" | "tagline" | "concept") {
+    const prompt = aiPrompt.trim();
+    if (!prompt && mode === "full") {
+      setErr("Descreva a ideia do bundle antes de gerar.");
+      return;
+    }
+    setAiBusy(mode);
+    setErr(null);
+    try {
+      const draft = await generateBundleConcept({
+        data: {
+          prompt: prompt || "Refinar o rascunho atual mantendo a essência.",
+          currentTitle: title || undefined,
+          currentTagline: tagline || undefined,
+          currentConcept: concept || undefined,
+          mode,
+        },
+      });
+      if (mode === "tagline") {
+        if (draft.tagline) setTagline(draft.tagline);
+      } else if (mode === "concept") {
+        if (draft.concept) setConcept(draft.concept);
+      } else {
+        if (draft.title) setTitle(draft.title);
+        if (draft.tagline) setTagline(draft.tagline);
+        if (draft.concept) setConcept(draft.concept);
+      }
+      setOk("Rascunho gerado pela IA.");
+      setTimeout(() => setOk(null), 2500);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setAiBusy(null);
+    }
+  }
+
+
   async function handleFileSelected(file: File | null | undefined) {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
