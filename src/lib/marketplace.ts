@@ -104,29 +104,13 @@ export async function listPublishedDecks(): Promise<PublishedDeckRow[]> {
   const { data, error } = await supabase
     .from("published_decks")
     .select("*")
-    .order("likes", { ascending: false })
+    .order("imports", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(120);
   if (error || !data) return [];
   return data as unknown as PublishedDeckRow[];
 }
 
-/** Incrementa curtidas atomicamente via read+update (RLS permissiva). */
-export async function likePublishedDeck(id: string): Promise<number | null> {
-  const { data: current, error: readErr } = await supabase
-    .from("published_decks")
-    .select("likes")
-    .eq("id", id)
-    .maybeSingle();
-  if (readErr || !current) return null;
-  const next = (current.likes ?? 0) + 1;
-  const { error: updErr } = await supabase
-    .from("published_decks")
-    .update({ likes: next })
-    .eq("id", id);
-  if (updErr) return null;
-  return next;
-}
 
 /** Importa o deck público como cópia na biblioteca do usuário atual. */
 export async function importPublishedDeck(row: PublishedDeckRow): Promise<string> {
