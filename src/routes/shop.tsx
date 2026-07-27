@@ -220,8 +220,13 @@ function ShopPage() {
     const needle = q.trim().toLowerCase();
     let list = unified.filter((u) => {
       if (category !== "all" && u.kind !== category) return false;
-      // Power-ups não usam raridade — filtro só afeta os outros tipos.
-      if (rarityFilter !== "all" && u.kind !== "powerup" && u.rarity !== rarityFilter) return false;
+      // Raridade só se aplica a cosméticos e bundles.
+      if (
+        rarityFilter !== "all" &&
+        (u.kind === "cosmetic" || u.kind === "bundle") &&
+        u.rarity !== rarityFilter
+      )
+        return false;
       if (affordableOnly && u.price > wallet.crystals) return false;
       if (!needle) return true;
       return (
@@ -535,7 +540,7 @@ function ShopPage() {
 
       {/* Rarity chips + affordable */}
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        {category !== "powerup" && (
+        {(category === "all" || category === "cosmetic" || category === "bundle") && (
           <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
         )}
         <button
@@ -604,28 +609,41 @@ function ShopPage() {
                 : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             }
           >
-            {filtered.map((u) => (
-              <UnifiedCard
-                key={`${u.kind}-${u.id}`}
-                item={u}
-                view={view}
-                owned={ownedIds.has(u.id)}
-                stack={
-                  u.kind === "powerup"
-                    ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0)
-                    : 0
-                }
-                isMineDeck={
-                  u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id
-                }
-                canAfford={wallet.crystals >= u.price}
-                busy={busy === u.id}
-                onBuy={() => handleBuyUnified(u)}
-                onPreview={
-                  u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
-                }
-              />
-            ))}
+            {filtered.map((u) => {
+              const slot = featuredSlots.find((s) => s.item_id === u.id);
+              const splashUrl =
+                u.kind === "bundle"
+                  ? (slot?.splash_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.splash ?? null)
+                  : null;
+              const artUrl =
+                u.kind === "bundle"
+                  ? (slot?.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art ?? null)
+                  : null;
+              return (
+                <UnifiedCard
+                  key={`${u.kind}-${u.id}`}
+                  item={u}
+                  view={view}
+                  owned={ownedIds.has(u.id)}
+                  stack={
+                    u.kind === "powerup"
+                      ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0)
+                      : 0
+                  }
+                  isMineDeck={
+                    u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id
+                  }
+                  canAfford={wallet.crystals >= u.price}
+                  busy={busy === u.id}
+                  onBuy={() => handleBuyUnified(u)}
+                  onPreview={
+                    u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
+                  }
+                  splashUrl={splashUrl}
+                  artUrl={artUrl}
+                />
+              );
+            })}
           </ul>
         )}
       </section>
@@ -704,6 +722,8 @@ function UnifiedCard({
   busy,
   onBuy,
   onPreview,
+  splashUrl,
+  artUrl,
 }: {
   item: UnifiedItem;
   view: ViewMode;
@@ -714,6 +734,8 @@ function UnifiedCard({
   busy: boolean;
   onBuy: () => void;
   onPreview?: () => void;
+  splashUrl?: string | null;
+  artUrl?: string | null;
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
@@ -763,9 +785,6 @@ function UnifiedCard({
             cardCount={(item.raw as PublishedDeckRow).card_count}
             owner={item.owner}
           />
-          <div className="absolute right-3 top-3 flex items-center gap-1.5">
-            <RarityChip rarity={item.rarity} />
-          </div>
           {owned && (
             <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
@@ -780,15 +799,60 @@ function UnifiedCard({
             height={isVitrine ? "h-32" : "h-28"}
             deckCount={item.bundleItems?.length}
           />
-          <div className="absolute right-3 top-3">
-            <RarityChip rarity={item.rarity} />
-          </div>
           {owned && (
             <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
               Adquirido
             </span>
           )}
+        </div>
+      ) : item.kind === "bundle" ? (
+        <div
+          className={`relative w-full overflow-hidden ${isVitrine ? "h-40" : "h-32"}`}
+          style={{
+            background: splashUrl || artUrl
+              ? "#0b0616"
+              : rarity.gradient,
+          }}
+        >
+          {(splashUrl || artUrl) && (
+            <img
+              src={(splashUrl || artUrl) as string}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          {/* dark scrim for legibility */}
+          <span
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)",
+            }}
+          />
+          <span
+            aria-hidden
+            className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+            }}
+          />
+          <div className="absolute inset-0 flex items-start justify-between p-3">
+            <RarityChip rarity={item.rarity} />
+            {owned && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                <Check className="h-3 w-3" strokeWidth={2.75} />
+                Adquirido
+              </span>
+            )}
+          </div>
+          <span className="absolute bottom-3 left-3 rounded-full border border-white/25 bg-black/40 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur">
+            Bundle
+            {item.bundleItems?.length ? ` · ${item.bundleItems.length} itens` : ""}
+          </span>
         </div>
       ) : (
         <div
@@ -957,7 +1021,7 @@ function ListRow({
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <p className="truncate text-sm font-semibold">{item.name}</p>
-          {!isPowerup && <RarityChip rarity={item.rarity} />}
+          {!isPowerup && !isDeck && !isPack && <RarityChip rarity={item.rarity} />}
         </div>
         <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
           {kindLabelBR(item.kind)}
