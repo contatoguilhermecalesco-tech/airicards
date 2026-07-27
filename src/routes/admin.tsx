@@ -126,8 +126,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
-  { key: "bundles", label: "Bundles", hint: "Pacotes estilo Riot com vários itens", Icon: Package, color: "#a855f7", wide: true },
-  { key: "vitrine", label: "Vitrine da Loja", hint: "Curar destaques + splash arts", Icon: ShoppingBag, color: "#f472b6", wide: true },
+  { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
 ];
 
 function AdminPage() {
