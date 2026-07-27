@@ -58,6 +58,7 @@ import { ChangelogSection } from "@/components/admin/ChangelogSection";
 import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 import { FeaturedSlotsSection } from "@/components/admin/FeaturedSlotsSection";
+import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
@@ -96,7 +97,8 @@ type PanelKey =
   | "changelog"
   | "backup"
   | "streak"
-  | "vitrine";
+  | "vitrine"
+  | "shop-items";
 
 type PanelDef = {
   key: PanelKey;
@@ -120,6 +122,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "changelog", label: "Patch notes", hint: "Publicar / editar novidades", Icon: ScrollText, color: "#c084fc", wide: true },
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
+  { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
   { key: "vitrine", label: "Vitrine da Loja", hint: "Curar destaques + splash arts", Icon: ShoppingBag, color: "#f472b6", wide: true },
 ];
 
@@ -287,6 +290,7 @@ function AdminPage() {
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "vitrine" && <FeaturedSlotsSection />}
+                {openPanel === "shop-items" && <ShopItemsSection />}
               </div>
             </>
           )}
