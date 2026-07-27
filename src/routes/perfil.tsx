@@ -48,6 +48,7 @@ import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
+import { getEquippedArt } from "@/lib/shop-asset-overrides";
 
 
 export const Route = createFileRoute("/perfil")({
