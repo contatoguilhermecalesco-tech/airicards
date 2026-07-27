@@ -808,9 +808,15 @@ function PerfilPage() {
                     style={{ background: paletteFor(equippedShop.accent).gradient }}
                   >
                     <span
-                      className="grid h-9 w-9 place-items-center rounded-lg bg-black/25 text-white backdrop-blur"
+                      className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-black/25 text-white backdrop-blur"
                     >
                       {(() => {
+                        const art = getEquippedArt(wallet.equipped[slot]);
+                        if (art) {
+                          return (
+                            <img src={art} alt="" aria-hidden className="h-8 w-8 object-contain" />
+                          );
+                        }
                         const Icon = ICONS[equippedShop.icon] ?? Sparkles;
                         return <Icon className="h-4 w-4" strokeWidth={2.5} />;
                       })()}
