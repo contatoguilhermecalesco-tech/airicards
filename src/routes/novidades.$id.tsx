@@ -495,8 +495,8 @@ function ConceptDetail({ concept, onBack }: { concept: BundleConcept | null; onB
         </article>
 
         {Array.isArray(concept.gallery) && concept.gallery.length > 0 && (
-          <section className="mt-14 animate-fade-in">
-            <div className="mb-5 flex items-center gap-3">
+          <section className="mt-12 animate-fade-in sm:mt-14">
+            <div className="mb-4 flex items-center gap-3 sm:mb-5">
               <span
                 className="h-4 w-1 rounded-sm"
                 style={{ backgroundColor: accent }}
@@ -510,47 +510,49 @@ function ConceptDetail({ concept, onBack }: { concept: BundleConcept | null; onB
                 {concept.gallery.length} peças
               </span>
             </div>
-            <ol className="grid gap-6 sm:grid-cols-2">
+            <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               {concept.gallery.map((item, idx) => (
                 <li
                   key={`${item.url}-${idx}`}
-                  className="group relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#0a0a0f] transition hover:-translate-y-0.5 hover:border-white/20"
+                  className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0a0f] transition hover:-translate-y-0.5 hover:border-white/20 sm:rounded-3xl"
                 >
-                  <div
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 z-10"
-                    style={{
-                      background: `linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%)`,
-                    }}
-                  />
-                  <img
-                    src={item.url}
-                    alt={item.caption ?? item.tag ?? `Concept ${idx + 1}`}
-                    loading="lazy"
-                    className="block aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                  />
-                  <div className="relative z-20 -mt-24 px-5 pb-5 pt-24">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="inline-flex items-center rounded-full border px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.22em]"
-                        style={{
-                          borderColor: `${accent}66`,
-                          color: accent,
-                          backgroundColor: `${accent}18`,
-                        }}
-                      >
-                        {(item.tag && item.tag.trim()) || `Concept ${String(idx + 1).padStart(2, "0")}`}
-                      </span>
-                      <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-white/35">
-                        #{String(idx + 1).padStart(2, "0")}
-                      </span>
+                  <div className="relative w-full overflow-hidden">
+                    <img
+                      src={item.url}
+                      alt={item.caption ?? item.tag ?? `Concept ${idx + 1}`}
+                      loading={idx < 2 ? "eager" : "lazy"}
+                      className="block aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    />
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
+                      style={{
+                        background: `linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 100%)`,
+                      }}
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 px-4 pb-4 sm:px-5 sm:pb-5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className="inline-flex items-center rounded-full border px-2 py-[3px] text-[9.5px] font-bold uppercase tracking-[0.22em]"
+                          style={{
+                            borderColor: `${accent}66`,
+                            color: accent,
+                            backgroundColor: `${accent}22`,
+                          }}
+                        >
+                          {(item.tag && item.tag.trim()) || `Concept ${String(idx + 1).padStart(2, "0")}`}
+                        </span>
+                        <span className="text-[9.5px] font-bold uppercase tracking-[0.22em] text-white/40">
+                          #{String(idx + 1).padStart(2, "0")}
+                        </span>
+                      </div>
                     </div>
-                    {item.caption && item.caption.trim() && (
-                      <p className="mt-2 text-[13px] leading-relaxed text-white/85 sm:text-[13.5px]">
-                        {item.caption}
-                      </p>
-                    )}
                   </div>
+                  {item.caption && item.caption.trim() && (
+                    <p className="px-4 pb-4 pt-3 text-[13px] leading-relaxed text-white/85 sm:px-5 sm:pb-5 sm:text-[13.5px]">
+                      {item.caption}
+                    </p>
+                  )}
                 </li>
               ))}
             </ol>
