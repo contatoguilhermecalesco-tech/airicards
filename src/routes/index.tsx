@@ -153,7 +153,7 @@ function Home() {
 
 
   return (
-    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14">
+    <main className="relative mx-auto max-w-md px-5 pt-8 pb-24 sm:max-w-xl sm:pt-14 lg:max-w-6xl lg:px-8 lg:pt-16 lg:grid lg:grid-cols-12 lg:gap-x-6 lg:gap-y-6 lg:items-start">
       {/* Ambient aurora — soft violet layers */}
       <div
         aria-hidden
