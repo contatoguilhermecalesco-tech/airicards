@@ -45,11 +45,14 @@ export function BundleConceptsSection() {
   const [palette, setPalette] = useState("#a855f7");
   const [splashUrl, setSplashUrl] = useState("");
   const [shopBundleId, setShopBundleId] = useState("");
+  const [gallery, setGallery] = useState<ConceptGalleryItem[]>([]);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   // AI assistant state
   const [aiOpen, setAiOpen] = useState(false);
