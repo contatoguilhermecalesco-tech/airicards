@@ -129,6 +129,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
   { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
+  { key: "concepts", label: "Bundle concepts", hint: "Diário criativo dos bundles", Icon: ScrollText, color: "#e879f9", wide: true },
 ];
 
 function AdminPage() {
