@@ -491,6 +491,14 @@ function PerfilPage() {
               />
             </>
           )}
+          {effectArt && (
+            <img
+              src={effectArt}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70 mix-blend-screen"
+            />
+          )}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
