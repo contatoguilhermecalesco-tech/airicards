@@ -42,6 +42,9 @@ import {
   slotLabel,
   visualFor,
   DiscordAvatar,
+  PowerupCover,
+  powerupBadge,
+  powerupPalette,
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
