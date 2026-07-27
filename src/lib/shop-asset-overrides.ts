@@ -1,0 +1,34 @@
+// Curated visual assets for signature shop items and bundles.
+// Keyed by shop item id. Used by the shop grid, hero and bundle detail modal
+// so cosmetics show their true art instead of generic previews.
+import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
+import florescerAura from "@/assets/shop/florescer/aura.jpg";
+import florescerFrame from "@/assets/shop/florescer/frame.jpg";
+import florescerTitle from "@/assets/shop/florescer/title.jpg";
+import florescerBackground from "@/assets/shop/florescer/background.jpg";
+import florescerCardframe from "@/assets/shop/florescer/cardframe.jpg";
+import florescerCompanion from "@/assets/shop/florescer/companion.png";
+
+export type ShopAssetOverride = {
+  /** Wide hero splash (shop hero + bundle modal background). */
+  splash?: string;
+  /** Square thumbnail (bundle card art, list rows). */
+  art: string;
+};
+
+export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
+  // Master bundle
+  "bundle.florescer_celestial": { splash: florescerSplash, art: florescerAura },
+
+  // Individual items in the Florescer Celestial bundle
+  "cosmetic.aura.florescer_celestial": { art: florescerAura },
+  "cosmetic.frame.coroa_guardia": { art: florescerFrame },
+  "cosmetic.badge.guardia_flores": { art: florescerTitle },
+  "cosmetic.effect.bosque_celestial": { art: florescerBackground },
+  "cosmetic.effect.veu_celestial": { art: florescerCardframe },
+  "cosmetic.companion.kitsune_florescer": { art: florescerCompanion },
+};
+
+export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
+  return SHOP_ASSET_OVERRIDES[itemId];
+}
