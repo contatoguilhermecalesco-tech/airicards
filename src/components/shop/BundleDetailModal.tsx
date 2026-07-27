@@ -11,6 +11,7 @@ import {
   rarityFor,
 } from "@/components/shop/shop-visuals";
 import { getBundleContents, type ShopItem } from "@/lib/shop";
+import { getShopAssetOverride } from "@/lib/shop-asset-overrides";
 
 export function BundleDetailModal({
   bundle,
