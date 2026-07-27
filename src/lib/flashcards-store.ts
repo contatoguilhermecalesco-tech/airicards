@@ -35,7 +35,7 @@ export type Deck = {
   createdAt: number;
 };
 
-type State = { decks: Deck[]; cards: Card[] };
+type State = { decks: Deck[]; cards: Card[]; meta?: Record<string, unknown> };
 export type StreakDayStatus = "done";
 export type Streak = {
   current: number;
