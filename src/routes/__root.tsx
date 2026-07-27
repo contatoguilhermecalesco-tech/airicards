@@ -755,7 +755,7 @@ function RootComponent() {
           - min-h-dvh cobre 100% da altura visível no Safari mobile (sem "salto" da barra).
           - pb-24 no mobile reserva espaço para a BottomBar fixa; sm:pb-0 desativa em desktop.
         */}
-        <div className="min-h-dvh pb-24 sm:pb-0">
+        <div className="min-h-dvh">
           <TopBar />
           <Outlet />
           <BottomBar />
