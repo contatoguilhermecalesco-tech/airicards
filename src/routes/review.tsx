@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles } from "lucide-react";
+import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles, Zap } from "lucide-react";
 import {
   useStore,
   getDueCards,
@@ -13,6 +13,17 @@ import {
   registerHomeSession,
 } from "@/lib/flashcards-store";
 import { matchAnswer } from "@/lib/answer-match";
+import {
+  enemyTier,
+  TIER_META,
+  useCombo,
+  resetCombo,
+  bumpCombo,
+  breakCombo,
+  comboMultiplier,
+  onEnemyDefeated,
+  onComboReached,
+} from "@/lib/enemy-system";
 
 
 type ReviewMode = "due" | "enemies";
