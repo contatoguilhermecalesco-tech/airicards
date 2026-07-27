@@ -5,7 +5,7 @@ import {
   Skull,
   Flame,
   Trophy,
-  
+  HelpCircle,
   Search,
   X,
   Sparkles,
@@ -26,6 +26,13 @@ import {
   claimMission,
   type EnemyTier,
 } from "@/lib/enemy-system";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/enemies")({
   head: () => ({
