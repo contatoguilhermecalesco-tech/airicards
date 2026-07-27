@@ -539,6 +539,14 @@ function PerfilPage() {
             </>
           )}
           {showSakura && <SakuraPetals density="normal" seed={19} withHalo />}
+          {overlayArt && !showSakura && (
+            <img
+              src={overlayArt}
+              alt=""
+              aria-hidden
+              className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-80"
+            />
+          )}
           <span
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
