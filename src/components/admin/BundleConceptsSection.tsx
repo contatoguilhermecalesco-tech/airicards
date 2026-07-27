@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Loader2, Package, Pencil, Send, Trash2, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ImagePlus, Loader2, Package, Pencil, Send, Trash2, Upload, X } from "lucide-react";
+import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import {
   createBundleConcept,
   updateBundleConcept,
@@ -43,8 +44,29 @@ export function BundleConceptsSection() {
   const [splashUrl, setSplashUrl] = useState("");
   const [shopBundleId, setShopBundleId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  async function handleFileSelected(file: File | null | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErr("Selecione um arquivo de imagem.");
+      return;
+    }
+    setUploading(true);
+    setErr(null);
+    try {
+      const url = await uploadConceptImage(file);
+      setSplashUrl(url);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao enviar imagem.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   const isEditing = editingId !== null;
 
@@ -231,15 +253,43 @@ export function BundleConceptsSection() {
           />
         </label>
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">Splash art (URL)</span>
+          <div className="block">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">Splash art</span>
+            <div className="flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileSelected(e.target.files?.[0])}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-[13px] font-semibold text-foreground/90 transition hover:bg-white/[0.08] disabled:opacity-60"
+              >
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : splashUrl ? <ImagePlus className="h-4 w-4" /> : <Upload className="h-4 w-4" />}
+                {uploading ? "Enviando…" : splashUrl ? "Trocar imagem" : "Enviar imagem"}
+              </button>
+              {splashUrl && (
+                <button
+                  type="button"
+                  onClick={() => setSplashUrl("")}
+                  className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-2 text-foreground/60 hover:text-foreground"
+                  title="Remover imagem"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
             <input
               value={splashUrl}
               onChange={(e) => setSplashUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[14px] text-foreground focus:border-primary/60 focus:outline-none"
+              placeholder="ou cole uma URL https://..."
+              className="mt-2 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-[12px] text-foreground/80 focus:border-primary/60 focus:outline-none"
             />
-          </label>
+          </div>
           <label className="block">
             <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">ID do bundle na loja</span>
             <input
