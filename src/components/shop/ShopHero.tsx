@@ -196,7 +196,7 @@ export function ShopHero({
         </div>
 
         {/* Right column: visual preview */}
-        <div className="relative self-center">
+        <div className={`relative self-center ${item.splashUrl ? "hidden sm:block" : ""}`}>
           <div className="relative mx-auto max-w-[240px] sm:max-w-[260px]">
             <div
               className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
