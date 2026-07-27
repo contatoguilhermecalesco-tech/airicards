@@ -197,9 +197,10 @@ function Home() {
 
       {/* Hero — Liquid Glass */}
       <section
-        className="animate-fade-in relative mt-7 sm:mt-8"
+        className="animate-fade-in relative mt-7 sm:mt-8 lg:col-span-7 lg:col-start-1 lg:row-start-2 lg:mt-0"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
+
         {/* soft halo behind glass */}
         <div
           aria-hidden
