@@ -101,11 +101,14 @@ function groupByMonth(entries: ChangelogEntry[]) {
 
 function NovidadesPage() {
   const { entries, lastSeen } = useChangelog();
+  const { items: concepts } = useBundleConcepts();
+  const [tab, setTab] = useState<"patches" | "concepts">("patches");
 
   useEffect(() => {
     void initChangelog().then(() => {
       window.setTimeout(() => markAllChangelogSeen(), 600);
     });
+    void initBundleConcepts();
   }, []);
 
   const [featured, ...rest] = entries;
