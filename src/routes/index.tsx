@@ -640,7 +640,7 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-4"
+          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-7 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
 
