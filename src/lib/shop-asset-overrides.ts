@@ -8,6 +8,7 @@ import florescerFrame from "@/assets/shop/florescer/frame.png";
 import florescerBackground from "@/assets/shop/florescer/background.png";
 import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
+import florescerSakura from "@/assets/shop/florescer/sakura-overlay.png";
 
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
