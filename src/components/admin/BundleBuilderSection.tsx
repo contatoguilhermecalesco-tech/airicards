@@ -27,6 +27,7 @@ import {
   type ShopItem,
 } from "@/lib/shop";
 import { rarityFor, RARITY_META } from "@/components/shop/shop-visuals";
+import { getShopAssetOverride } from "@/lib/shop-asset-overrides";
 import { ArlysIcon } from "@/components/StatChip";
 import {
   createFeaturedSlot,
