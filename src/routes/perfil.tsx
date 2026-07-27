@@ -333,6 +333,7 @@ function PerfilPage() {
       badge: [],
       effect: [],
       companion: [],
+      veil: [],
     };
     wallet.cosmetics.forEach((k) => {
       const it = byKey.get(k);
