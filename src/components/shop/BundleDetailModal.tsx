@@ -194,21 +194,21 @@ export function BundleDetailModal({
 
           {/* Footer — pricing + buy */}
           <div className="border-t border-white/[0.06] bg-black/25 p-4 sm:p-5">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div className="min-w-0">
                 {separately > 0 && savings > 0 && (
                   <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300/90">
                     Economize {savings} ✦ ({savingsPct}%)
                   </p>
                 )}
-                <div className="mt-1 flex items-baseline gap-2">
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className="inline-flex items-center gap-1.5 text-2xl font-bold text-foreground">
                     <ArlysIcon className="h-5 w-5 text-violet-300" strokeWidth={2.5} />
-                    {bundle.price}
+                    <span className="tabular-nums">{bundle.price}</span>
                     <span className="text-sm font-medium text-muted-foreground">✦</span>
                   </span>
                   {separately > 0 && separately !== bundle.price && (
-                    <span className="text-[12px] font-medium text-muted-foreground line-through">
+                    <span className="text-[12px] font-medium text-muted-foreground line-through tabular-nums">
                       {separately} ✦
                     </span>
                   )}
@@ -218,34 +218,34 @@ export function BundleDetailModal({
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex w-full items-center gap-2 sm:w-auto">
                 <button
                   onClick={onClose}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-foreground/80 transition hover:bg-white/[0.08]"
+                  className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-foreground/80 transition hover:bg-white/[0.08]"
                 >
                   Voltar
                 </button>
                 <button
                   onClick={onBuy}
                   disabled={busy || allOwned || !canAfford || (contents?.length ?? 0) === 0}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-40 sm:flex-none sm:px-5"
                 >
                   {busy ? (
                     <>
                       <Sparkles className="h-4 w-4 animate-pulse" strokeWidth={2.5} />
-                      Processando…
+                      <span className="truncate">Processando…</span>
                     </>
                   ) : allOwned ? (
                     <>
                       <Check className="h-4 w-4" strokeWidth={2.75} />
-                      Tudo adquirido
+                      <span className="truncate">Tudo adquirido</span>
                     </>
                   ) : !canAfford ? (
-                    "Arlys insuficientes"
+                    <span className="truncate">Arlys insuficientes</span>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-                      Comprar bundle
+                      <Sparkles className="h-4 w-4 shrink-0" strokeWidth={2.5} />
+                      <span className="truncate">Comprar bundle</span>
                     </>
                   )}
                 </button>
