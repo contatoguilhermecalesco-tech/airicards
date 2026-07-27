@@ -506,94 +506,71 @@ function Review() {
             )}
 
 
-            {/* Actions */}
+            {/* Actions — digitação obrigatória */}
             <div className="mt-8">
-              {!showBack ? (
-                <button
-                  onClick={() => setShowBack(true)}
-                  className={`group relative w-full overflow-hidden rounded-full py-4 text-[15px] font-semibold transition active:scale-[0.99] ${
-                    currentIsEnemy
-                      ? "bg-destructive text-destructive-foreground"
-                      : "bg-foreground text-background"
-                  }`}
-                  style={{
-                    boxShadow: currentIsEnemy
-                      ? "0 10px 30px -10px hsl(var(--destructive) / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.25)"
-                      : "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.35)",
-                  }}
-                >
-                  <span className="relative z-10 inline-flex items-center justify-center gap-2">
-                    {currentIsEnemy ? (
-                      <>
-                        <Flame className="h-4 w-4" strokeWidth={2.75} />
-                        Encarar o inimigo
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-4 w-4" strokeWidth={2.5} />
-                        Mostrar resposta
-                      </>
-                    )}
-                  </span>
-                </button>
-              ) : askDifficulty ? (
-                <div className="space-y-3 animate-in fade-in slide-in-from-bottom-1 duration-200">
-                  <p className="text-center text-[12px] font-medium uppercase tracking-[0.18em] text-muted-foreground/80">
-                    {currentIsEnemy ? "Golpe certeiro?" : "Quão fácil foi?"}
+              {!verdict ? (
+                <TypeAnswerPanel
+                  inputRef={inputRef}
+                  value={typed}
+                  onChange={setTyped}
+                  onSubmit={submitTypedAnswer}
+                  onGiveUp={giveUp}
+                  isEnemy={currentIsEnemy}
+                  shake={shake}
+                />
+              ) : verdict.correct ? (
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                  <VerdictBanner
+                    kind="correct"
+                    userAnswer={typed}
+                    expected={verdict.expected}
+                    similarity={verdict.similarity}
+                  />
+                  <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/80">
+                    {currentIsEnemy ? "Golpe certeiro? Classifique." : "Quão fácil foi?"}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    <GradeButton
-                      label="Difícil"
-                      tone="warning"
-                      onClick={() => handleDifficulty("hard")}
-                    />
-                    <GradeButton
-                      label="Médio"
-                      tone="primary"
-                      onClick={() => handleDifficulty("good")}
-                    />
-                    <GradeButton
-                      label="Fácil"
-                      tone="success"
-                      onClick={() => handleDifficulty("easy")}
-                    />
+                    <GradeButton label="Difícil" tone="warning" onClick={() => handleDifficulty("hard")} />
+                    <GradeButton label="Médio" tone="primary" onClick={() => handleDifficulty("good")} />
+                    <GradeButton label="Fácil" tone="success" onClick={() => handleDifficulty("easy")} />
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-2 animate-in fade-in duration-200">
-                  <GradeButton
-                    label={currentIsEnemy ? "Levei dano" : "Errei"}
-                    tone="destructive"
-                    icon={
-                      currentIsEnemy ? (
-                        <Skull className="h-4 w-4" strokeWidth={2.75} />
-                      ) : (
-                        <X className="h-4 w-4" strokeWidth={2.75} />
-                      )
-                    }
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                  <VerdictBanner
+                    kind="wrong"
+                    userAnswer={typed}
+                    expected={verdict.expected}
+                    similarity={verdict.similarity}
+                  />
+                  <button
                     onClick={handleWrong}
-                  />
-                  <GradeButton
-                    label={currentIsEnemy ? "Acertei" : "Acertei"}
-                    tone="success"
-                    icon={<Check className="h-4 w-4" strokeWidth={2.75} />}
-                    onClick={handleRight}
-                  />
+                    className="group relative w-full overflow-hidden rounded-full bg-foreground py-4 text-[15px] font-semibold text-background transition active:scale-[0.99]"
+                    style={{
+                      boxShadow: "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.35)",
+                    }}
+                  >
+                    <span className="inline-flex items-center justify-center gap-2">
+                      Próxima carta
+                      <CornerDownLeft className="h-4 w-4" strokeWidth={2.5} />
+                    </span>
+                  </button>
                 </div>
               )}
 
-              {/* Dica de atalhos — só desktop, escondida no modo foco */}
+              {/* Dica de atalhos */}
               {!focusMode && (
                 <p className="mt-4 hidden items-center justify-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/60 sm:inline-flex">
                   <Keyboard className="h-3 w-3" strokeWidth={2.5} />
-                  {!showBack
-                    ? "Espaço para virar"
-                    : askDifficulty
-                    ? "F Fácil · M Médio · D Difícil"
-                    : "1 Errei · 2 Acertei"}
+                  {!verdict
+                    ? "Enter para verificar"
+                    : verdict.correct
+                    ? "1 Difícil · 2 Médio · 3 Fácil"
+                    : "Enter para próxima"}
                 </p>
               )}
             </div>
+
           </div>
         )}
       </div>
