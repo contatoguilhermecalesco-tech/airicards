@@ -436,3 +436,180 @@ export function RarityChip({
     </span>
   );
 }
+
+/* ---------------------- Power-up cover ---------------------- */
+
+// Per-accent palette for power-up covers. Each entry paints a layered
+// radial + linear background, a soft halo behind the icon and orbital
+// sparkle colors — so covers feel like collectibles, not flat swatches.
+const POWERUP_PALETTE: Record<
+  string,
+  { base: string; halo: string; ring: string; spark: string; tag: string }
+> = {
+  sky: {
+    base: "radial-gradient(120% 100% at 20% 15%, #38bdf8 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #1e3a8a 0%, transparent 60%), linear-gradient(160deg,#0c1a3b 0%,#0a1024 100%)",
+    halo: "rgba(56,189,248,0.55)",
+    ring: "#7dd3fc",
+    spark: "#e0f2fe",
+    tag: "Protetor",
+  },
+  amber: {
+    base: "radial-gradient(120% 100% at 25% 20%, #fbbf24 0%, transparent 55%), radial-gradient(140% 100% at 90% 100%, #7c2d12 0%, transparent 60%), linear-gradient(160deg,#3b1a0a 0%,#1a0b06 100%)",
+    halo: "rgba(251,191,36,0.55)",
+    ring: "#fcd34d",
+    spark: "#fef3c7",
+    tag: "Aurífero",
+  },
+  violet: {
+    base: "radial-gradient(120% 100% at 20% 15%, #a78bfa 0%, transparent 55%), radial-gradient(130% 100% at 95% 95%, #3b0764 0%, transparent 60%), linear-gradient(160deg,#1e1244 0%,#0d0821 100%)",
+    halo: "rgba(167,139,250,0.55)",
+    ring: "#c4b5fd",
+    spark: "#ede9fe",
+    tag: "Arcano",
+  },
+  lavender: {
+    base: "radial-gradient(120% 100% at 25% 15%, #818cf8 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #312e81 0%, transparent 60%), linear-gradient(160deg,#171a3a 0%,#0a0b1c 100%)",
+    halo: "rgba(165,180,252,0.55)",
+    ring: "#a5b4fc",
+    spark: "#e0e7ff",
+    tag: "Etéreo",
+  },
+  pink: {
+    base: "radial-gradient(120% 100% at 25% 15%, #f472b6 0%, transparent 55%), radial-gradient(120% 100% at 90% 95%, #831843 0%, transparent 60%), linear-gradient(160deg,#3a0f28 0%,#1a0713 100%)",
+    halo: "rgba(244,114,182,0.55)",
+    ring: "#f9a8d4",
+    spark: "#fce7f3",
+    tag: "Coração",
+  },
+  emerald: {
+    base: "radial-gradient(120% 100% at 20% 15%, #34d399 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #064e3b 0%, transparent 60%), linear-gradient(160deg,#0a2e26 0%,#04140f 100%)",
+    halo: "rgba(52,211,153,0.55)",
+    ring: "#6ee7b7",
+    spark: "#d1fae5",
+    tag: "Verdejante",
+  },
+};
+
+export function powerupPalette(accent: string) {
+  return POWERUP_PALETTE[accent] ?? POWERUP_PALETTE.violet;
+}
+
+export function PowerupCover({
+  accent,
+  icon,
+  height = "h-28",
+  badge,
+}: {
+  accent: string;
+  icon: string;
+  height?: string;
+  badge?: string;
+}) {
+  const p = powerupPalette(accent);
+  const Icon = ICONS[icon] ?? Sparkles;
+  return (
+    <div
+      aria-hidden
+      className={`relative w-full overflow-hidden ${height}`}
+      style={{ background: p.base }}
+    >
+      {/* subtle dot grid to add texture */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-30"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)",
+          backgroundSize: "14px 14px",
+          maskImage:
+            "radial-gradient(120% 100% at 50% 50%, black 40%, transparent 100%)",
+        }}
+      />
+
+      {/* halo behind the icon */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full cosmetic-glow-pulse"
+        style={{
+          width: 140,
+          height: 140,
+          background: `radial-gradient(circle, ${p.halo} 0%, transparent 65%)`,
+          filter: "blur(6px)",
+        }}
+      />
+
+      {/* orbital sparkles */}
+      {[0, 1, 2, 3].map((i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 h-1 w-1 rounded-full cosmetic-sparkle"
+          style={{
+            background: p.spark,
+            boxShadow: `0 0 8px ${p.spark}`,
+            transform: `rotate(${i * 90}deg) translate(48px) rotate(-${i * 90}deg)`,
+            animationDelay: `${i * 0.6}s`,
+          }}
+        />
+      ))}
+
+      {/* shine sweep */}
+      <span
+        aria-hidden
+        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+        }}
+      />
+
+      {/* central icon medallion */}
+      <span
+        className="absolute left-1/2 top-1/2 grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border text-white backdrop-blur"
+        style={{
+          width: 56,
+          height: 56,
+          background: "rgba(0,0,0,0.32)",
+          borderColor: p.ring,
+          boxShadow: `0 0 24px ${p.halo}`,
+        }}
+      >
+        <Icon className="h-7 w-7" strokeWidth={2.1} style={{ color: p.ring }} />
+      </span>
+
+      {/* accent tag top-left */}
+      <span
+        className="absolute left-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur"
+        style={{
+          borderColor: `${p.ring}66`,
+          background: "rgba(0,0,0,0.35)",
+        }}
+      >
+        Power-up · {p.tag}
+      </span>
+
+      {badge && (
+        <span
+          className="absolute right-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur"
+          style={{
+            borderColor: `${p.ring}55`,
+            background: "rgba(0,0,0,0.35)",
+          }}
+        >
+          {badge}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function powerupBadge(payload: Record<string, unknown>): string | undefined {
+  const uses = Number(payload?.uses);
+  const dur = Number(payload?.duration_h);
+  const max = Number(payload?.max);
+  if (Number.isFinite(dur) && dur > 0) return `${dur}h`;
+  if (Number.isFinite(max) && max > 1) return `Estoca ${max}`;
+  if (Number.isFinite(uses) && uses > 1) return `${uses} usos`;
+  return undefined;
+}
+
