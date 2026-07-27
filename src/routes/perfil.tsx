@@ -570,6 +570,24 @@ function PerfilPage() {
               >
                 <Trash2 className="h-3 w-3" strokeWidth={2.5} />
               </button>
+            {/* Aura art (decoration) — glow behind avatar */}
+            {decorationArt && (
+              <img
+                src={decorationArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain animate-spin-slow"
+                style={{ animation: "spin 24s linear infinite" }}
+              />
+            )}
+            {/* Frame art (nameplate) — decorative branch/ring around avatar */}
+            {nameplateArt && (
+              <img
+                src={nameplateArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] max-w-none object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+              />
             )}
           </div>
 
