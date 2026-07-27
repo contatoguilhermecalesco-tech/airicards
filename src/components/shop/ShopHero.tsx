@@ -148,9 +148,10 @@ export function ShopHero({
               {item.tagline}
             </p>
           )}
-          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 sm:text-sm">
+          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 line-clamp-3 sm:line-clamp-none sm:text-sm">
             {item.description || "Item exclusivo da loja airi."}
           </p>
+
 
           <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
             <div className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-black/30 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
