@@ -140,14 +140,48 @@ function NovidadesPage() {
               airi
             </span>
             <span className="text-[10px] uppercase tracking-[0.24em] text-foreground/30">
-              / patch notes
+              / {tab === "patches" ? "patch notes" : "bundle concepts"}
             </span>
           </div>
+        </div>
+        {/* Tabs */}
+        <div className="mx-auto flex max-w-3xl items-center gap-1 px-5 pb-2 sm:px-8">
+          {[
+            { key: "patches" as const, label: "Patch notes", Icon: Sparkles },
+            { key: "concepts" as const, label: "Bundle concepts", Icon: Package },
+          ].map((t) => {
+            const active = tab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setTab(t.key)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] transition ${
+                  active
+                    ? "border-primary/50 bg-primary/15 text-primary"
+                    : "border-white/10 bg-white/[0.02] text-foreground/55 hover:bg-white/[0.05] hover:text-foreground/80"
+                }`}
+              >
+                <t.Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
-        {entries.length === 0 ? (
+        {tab === "concepts" ? (
+          <ConceptsTab concepts={concepts} />
+        ) : entries.length === 0 ? (
+          <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <p className="text-sm text-foreground/70">
+              Ainda sem novidades por aqui.
+            </p>
+            <p className="mt-1 text-xs text-foreground/45">
+              Assim que algo novo chegar, aparece nesta lista.
+            </p>
+          </div>
+        ) : (
           <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
             <p className="text-sm text-foreground/70">
               Ainda sem novidades por aqui.
