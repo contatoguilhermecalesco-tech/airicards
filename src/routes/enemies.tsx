@@ -356,6 +356,8 @@ function EnemiesPage() {
           </ul>
         )}
       </div>
+
+      <EnemyHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </main>
   );
 }
