@@ -87,13 +87,8 @@ function StudyIndex() {
       <div className="grid gap-3">
         {DAYS.map((d) => {
           const active = d.id === today;
-          const available = Boolean(d.to);
           const content = (
-            <div
-              className={`glass-panel relative overflow-hidden rounded-3xl border p-5 transition ${
-                available ? "hover:border-white/20" : "opacity-70"
-              }`}
-            >
+            <div className="glass-panel relative overflow-hidden rounded-3xl border p-5 transition hover:border-white/20">
               <div
                 aria-hidden
                 className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${d.accent} opacity-60`}
@@ -116,13 +111,7 @@ function StudyIndex() {
                   <p className="mt-0.5 text-lg font-semibold">{d.area}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{d.desc}</p>
                 </div>
-                {!available && (
-                  <Lock className="h-4 w-4 text-muted-foreground" strokeWidth={2.25} />
-                )}
               </div>
-              {!available && (
-                <p className="relative mt-3 text-xs text-muted-foreground">Em breve</p>
-              )}
             </div>
           );
           return d.to ? (
