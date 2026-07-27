@@ -35,8 +35,36 @@ export function BundleDetailModal({
 }) {
   const [contents, setContents] = useState<ShopItem[] | null>(null);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
+  const [shareState, setShareState] = useState<"idle" | "copied">("idle");
   const rarity = RARITY_META[rarityFor(bundle.price)];
   const Icon = ICONS[bundle.icon] ?? Sparkles;
+
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}/b/${bundle.id}` : `/b/${bundle.id}`;
+  const shareText = `Olha esse bundle da airi: ${bundle.name} ✦\n${shareUrl}`;
+
+  const onShare = async () => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share({ title: `airi — ${bundle.name}`, text: shareText, url: shareUrl });
+        return;
+      }
+    } catch {
+      /* fall through to clipboard */
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareState("copied");
+      setTimeout(() => setShareState("idle"), 1800);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const onShareWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   useEffect(() => {
     let alive = true;
