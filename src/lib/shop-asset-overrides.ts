@@ -8,6 +8,7 @@ import florescerFrame from "@/assets/shop/florescer/frame.png";
 import florescerBackground from "@/assets/shop/florescer/background.png";
 import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
+import florescerSakura from "@/assets/shop/florescer/sakura-overlay.png";
 
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
@@ -24,7 +25,7 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.aura.florescer_celestial": { art: florescerAura },
   "cosmetic.frame.coroa_guardia": { art: florescerFrame },
   "cosmetic.effect.bosque_celestial": { art: florescerBackground },
-  "cosmetic.overlay.chuva_sakura": { art: florescerBackground },
+  "cosmetic.overlay.chuva_sakura": { art: florescerSakura },
   "cosmetic.veil.veu_celestial": { art: florescerCardframe },
   "cosmetic.companion.kitsune_florescer": { art: florescerCompanion },
 };
@@ -42,6 +43,7 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "decoration:florescer_celestial": florescerAura,
   "nameplate:coroa_guardia": florescerFrame,
   "effect:bosque_celestial": florescerBackground,
+  "overlay:chuva_sakura": florescerSakura,
   "veil:veu_celestial": florescerCardframe,
   "companion:kitsune_florescer": florescerCompanion,
 };
