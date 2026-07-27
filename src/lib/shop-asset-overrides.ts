@@ -43,6 +43,7 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "decoration:florescer_celestial": florescerAura,
   "nameplate:coroa_guardia": florescerFrame,
   "effect:bosque_celestial": florescerBackground,
+  "overlay:chuva_sakura": florescerSakura,
   "veil:veu_celestial": florescerCardframe,
   "companion:kitsune_florescer": florescerCompanion,
 };
