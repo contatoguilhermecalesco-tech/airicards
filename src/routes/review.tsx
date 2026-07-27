@@ -82,6 +82,8 @@ function Review() {
   >([]);
   const [defeatFx, setDefeatFx] = useState<string | null>(null);
   const dmgIdRef = useRef(0);
+  const combo = useCombo();
+  const comboMult = comboMultiplier(combo.count);
 
   // Digitação obrigatória da tradução
   const [typed, setTyped] = useState("");
