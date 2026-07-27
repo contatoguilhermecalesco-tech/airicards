@@ -448,7 +448,7 @@ function Home() {
       {/* Chefões pendentes — alerta gamificado */}
       {enemies.length > 0 && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-7 lg:col-start-1 lg:row-start-5 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-4 lg:mt-0"
           style={{ animationDelay: "110ms", animationFillMode: "backwards" }}
         >
 
