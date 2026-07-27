@@ -6,7 +6,7 @@ import type { ProfileId } from "@/lib/social-store";
 
 export type Cosmetic = string; // key identifier (e.g. "deck_frame:aurora")
 
-export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect";
+export type CosmeticSlot = "nameplate" | "decoration" | "badge" | "effect" | "companion";
 
 export type EquippedMap = Partial<Record<CosmeticSlot, string>>;
 

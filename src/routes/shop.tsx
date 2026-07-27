@@ -50,6 +50,14 @@ import {
   listActiveFeaturedSlots,
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
+import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
+import florescerAura from "@/assets/shop/florescer/aura.jpg";
+
+// Curated visual overrides for signature bundles, keyed by shop item id.
+// Falls back to featured_slots assets when admin uploads custom art.
+const BUNDLE_ASSET_OVERRIDES: Record<string, { splash: string; art: string }> = {
+  "bundle.florescer_celestial": { splash: florescerSplash, art: florescerAura },
+};
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -256,8 +264,8 @@ function ShopPage() {
                 ? `Contém ${u.bundleItems?.length ?? "vários"} itens`
                 : undefined),
           raw: u.raw,
-          splashUrl: slot.splash_url,
-          artUrl: slot.art_url,
+          splashUrl: slot.splash_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.splash,
+          artUrl: slot.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art,
         });
       }
       if (curated.length > 0) return curated.slice(0, 1);
@@ -287,6 +295,8 @@ function ShopPage() {
             ? `Contém ${u.bundleItems?.length ?? "vários"} itens`
             : undefined,
       raw: u.raw,
+      splashUrl: BUNDLE_ASSET_OVERRIDES[u.id]?.splash,
+      artUrl: BUNDLE_ASSET_OVERRIDES[u.id]?.art,
     }));
   }, [unified, featuredSlots]);
 
@@ -618,8 +628,8 @@ function ShopPage() {
           busy={busy === bundleOpen.id}
           onClose={() => setBundleOpen(null)}
           onBuy={() => void confirmBuyBundle(bundleOpen)}
-          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url}
-          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url}
+          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.splash}
+          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.art}
         />
       )}
     </main>

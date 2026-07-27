@@ -47,6 +47,7 @@ import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { companionFromEquipped } from "@/lib/companion-assets";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -160,9 +161,14 @@ const SLOT_META: Record<
     hint: "Brilhos e reflexos no banner.",
     icon: Zap,
   },
+  companion: {
+    label: "Companheiro",
+    hint: "Um espírito que acompanha seu perfil.",
+    icon: Heart,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
@@ -320,6 +326,7 @@ function PerfilPage() {
       decoration: [],
       badge: [],
       effect: [],
+      companion: [],
     };
     wallet.cosmetics.forEach((k) => {
       const it = byKey.get(k);
@@ -344,6 +351,7 @@ function PerfilPage() {
   const decoration = equippedItem.decoration;
   const badge = equippedItem.badge;
   const effect = equippedItem.effect;
+  const companion = companionFromEquipped(wallet.equipped);
 
   // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
   const heroItem = nameplate ?? effect ?? decoration ?? badge;
@@ -549,6 +557,24 @@ function PerfilPage() {
               </button>
             )}
           </div>
+
+          {companion && (
+            <div
+              className="pointer-events-none absolute -top-[52px] right-3 z-10 h-[92px] w-[92px] sm:right-5 sm:h-[104px] sm:w-[104px]"
+              aria-hidden
+            >
+              <div
+                className="absolute inset-0 rounded-full blur-2xl opacity-70"
+                style={{ background: `radial-gradient(circle, ${companion.glow}66, transparent 70%)` }}
+              />
+              <img
+                src={companion.src}
+                alt={companion.name}
+                className="cosmetic-avatar-float relative h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(192,132,252,0.45)]"
+                loading="lazy"
+              />
+            </div>
+          )}
         </div>
 
 
