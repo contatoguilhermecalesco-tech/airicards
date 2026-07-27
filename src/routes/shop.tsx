@@ -927,11 +927,21 @@ function ListRow({
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
   const isPowerup = item.kind === "powerup";
+  const isDeck = item.kind === "decks";
+  const isPack = item.kind === "pack";
   const puPal = isPowerup ? powerupPalette(item.accent) : null;
+  const colPal =
+    isDeck
+      ? collectionPalette(((item.raw as PublishedDeckRow).color_key as string) || item.accent)
+      : isPack
+        ? collectionPalette(item.accent)
+        : null;
   const thumbBg = isPowerup
     ? `radial-gradient(circle at 30% 20%, ${puPal!.ring}, transparent 65%), linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7))`
-    : rarity.gradient;
-  const thumbGlow = isPowerup ? puPal!.halo : rarity.glow;
+    : colPal
+      ? `radial-gradient(circle at 30% 20%, ${colPal.edge}, transparent 65%), linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.7))`
+      : rarity.gradient;
+  const thumbGlow = isPowerup ? puPal!.halo : colPal ? colPal.glow : rarity.glow;
   return (
     <li
       className={`flex items-center gap-3 rounded-2xl border ${
