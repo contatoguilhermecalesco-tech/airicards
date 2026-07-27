@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,6 +7,7 @@ import {
   Wrench,
   Wand2,
   ArrowUpRight,
+  Package,
 } from "lucide-react";
 import {
   initChangelog,
@@ -15,6 +16,11 @@ import {
   type ChangelogCategory,
   type ChangelogEntry,
 } from "@/lib/changelog-store";
+import {
+  initBundleConcepts,
+  useBundleConcepts,
+  type BundleConcept,
+} from "@/lib/bundle-concepts-store";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 
 export const Route = createFileRoute("/novidades/")({
