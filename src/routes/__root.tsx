@@ -426,7 +426,7 @@ function TopBar() {
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-6 sm:pt-4">
-        <nav className="relative flex items-center justify-between gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-3 py-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7),0_1px_0_0_rgba(255,255,255,0.05)_inset] backdrop-blur-2xl sm:rounded-full sm:px-4 sm:py-2.5 md:px-6">
+        <nav className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-3 py-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7),0_1px_0_0_rgba(255,255,255,0.05)_inset] backdrop-blur-2xl sm:rounded-full sm:px-4 sm:py-2.5 md:px-6">
           {/* Brilho interno superior */}
           <span
             aria-hidden
@@ -434,8 +434,8 @@ function TopBar() {
             style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.35), transparent)" }}
           />
 
-          {/* Esquerda: logo + sync + nav pills (desktop) */}
-          <div className="flex min-w-0 items-center gap-3 md:gap-6">
+          {/* Esquerda: logo */}
+          <div className="flex min-w-0 items-center gap-2 justify-self-start">
             <Link to="/" className="tap-target flex shrink-0 items-center gap-2" aria-label="airi — início">
               <span className="relative">
                 <img
@@ -451,33 +451,35 @@ function TopBar() {
                 <SyncIndicator minimal />
               </span>
             </Link>
-
-            {/* Nav interna em pill (desktop) */}
-            <div className="hidden items-center gap-1 rounded-full border border-white/5 bg-white/[0.03] p-1 md:flex">
-              {navItems.map((i) => (
-                <Link key={i.to} to={i.to} className={pillLink(i.active)}>
-                  {i.label}
-                </Link>
-              ))}
-              <button
-                type="button"
-                onClick={() => setMoreOpen(true)}
-                className={`${pillLink(isMoreActive)} relative`}
-                aria-haspopup="dialog"
-                aria-expanded={moreOpen}
-              >
-                Mais
-                {unreadNews > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
-                    {unreadNews}
-                  </span>
-                )}
-              </button>
-            </div>
           </div>
 
+          {/* Centro: nav em pill (desktop) */}
+          <div className="hidden items-center gap-1 justify-self-center rounded-full border border-white/5 bg-white/[0.03] p-1 md:flex">
+            {navItems.map((i) => (
+              <Link key={i.to} to={i.to} className={pillLink(i.active)}>
+                {i.label}
+              </Link>
+            ))}
+            <button
+              type="button"
+              onClick={() => setMoreOpen(true)}
+              className={`${pillLink(isMoreActive)} relative`}
+              aria-haspopup="dialog"
+              aria-expanded={moreOpen}
+            >
+              Mais
+              {unreadNews > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                  {unreadNews}
+                </span>
+              )}
+            </button>
+          </div>
+          {/* Placeholder do centro no mobile (mantém grid consistente) */}
+          <div className="md:hidden" aria-hidden />
+
           {/* Direita: rank + notif + perfil */}
-          <div className="flex shrink-0 items-center gap-2 md:gap-3">
+          <div className="flex shrink-0 items-center gap-2 justify-self-end md:gap-3">
             <span className="sm:hidden">
               <SyncIndicator minimal />
             </span>
