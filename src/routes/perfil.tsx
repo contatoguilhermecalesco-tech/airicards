@@ -48,6 +48,8 @@ import { compressAvatarFile } from "@/lib/image-compress";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
+import { CompanionRender } from "@/components/CompanionRender";
+
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
 
