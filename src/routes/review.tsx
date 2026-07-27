@@ -178,8 +178,7 @@ function Review() {
       setAskDifficulty(true);
       if (isEnemyRun && isEnemy(current)) {
         bumpCombo();
-        // reads latest combo via listener; onComboReached uses maxProgress
-        onComboReached((useComboSnapshot() ?? 0));
+        onComboReached(getComboCount());
       }
     } else {
       setShake(true);
