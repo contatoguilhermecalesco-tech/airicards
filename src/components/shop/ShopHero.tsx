@@ -173,7 +173,6 @@ export function ShopHero({
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
               className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
-
               {busyId === item.id ? (
                 <>
                   <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
@@ -198,6 +197,16 @@ export function ShopHero({
                 <span className="truncate">Faltam {item.price - wallet} ✦</span>
               )}
             </button>
+            {featured.length > 1 && (
+              <button
+                aria-label="Próximo bundle"
+                onClick={(e) => { e.stopPropagation(); advance(); }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-4 sm:text-sm"
+              >
+                <span className="hidden sm:inline">Próximo</span>
+                <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         </div>
 
