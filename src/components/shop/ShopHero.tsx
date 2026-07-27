@@ -2,6 +2,7 @@
 // Rotates through featured items automatically and on manual nav.
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { SakuraPetals } from "@/components/SakuraPetals";
 import { ArlysIcon } from "@/components/StatChip";
 import {
   ICONS,
