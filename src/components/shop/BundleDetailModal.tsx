@@ -444,14 +444,22 @@ function BundlePreview({
         {/* Card body — centered avatar + name stacked */}
         <div className="relative flex flex-col items-center px-4 pb-5 pt-0 text-center">
           <div className="relative -mt-12 h-20 w-20">
-            {/* Aura */}
+            {/* Aura glow (behind everything) */}
             {auraArt && (
-              <img
-                src={auraArt}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[140%] w-[140%] -translate-x-1/2 -translate-y-1/2 animate-[spin_18s_linear_infinite] object-contain"
-              />
+              <>
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[220%] w-[220%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl opacity-60"
+                  style={{ background: "radial-gradient(circle, rgba(192,132,252,0.55), transparent 65%)" }}
+                />
+                <img
+                  src={auraArt}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-[210%] w-[210%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_0_18px_rgba(192,132,252,0.55)]"
+                  style={{ animation: "spin 24s linear infinite" }}
+                />
+              </>
             )}
             {/* Avatar */}
             <div className="relative mx-auto grid h-20 w-20 place-items-center overflow-hidden rounded-full border-2 border-white/25 bg-gradient-to-br from-violet-500 to-fuchsia-500 text-xl font-bold text-white shadow-xl">
@@ -463,7 +471,7 @@ function BundlePreview({
                 src={frameArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2 object-contain"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[170%] w-[170%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
               />
             )}
             {/* Companion */}
