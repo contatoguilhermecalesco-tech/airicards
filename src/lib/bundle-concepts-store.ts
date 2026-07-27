@@ -1,6 +1,12 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export type ConceptGalleryItem = {
+  url: string;
+  caption?: string | null;
+  tag?: string | null;
+};
+
 export type BundleConcept = {
   id: string;
   title: string;
@@ -9,6 +15,7 @@ export type BundleConcept = {
   palette: string;
   splash_url: string | null;
   shop_bundle_id: string | null;
+  gallery: ConceptGalleryItem[];
   created_at: string;
 };
 
