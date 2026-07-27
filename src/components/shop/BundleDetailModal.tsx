@@ -152,7 +152,7 @@ export function BundleDetailModal({
           {/* Live profile preview */}
           {contents && contents.length > 0 && (
             <div className="px-4 pt-4 sm:px-6">
-              <BundlePreview contents={contents} bundleId={bundle.id} />
+              <BundlePreview contents={contents} bundleId={bundle.id} enabled={enabled} />
             </div>
           )}
 
@@ -164,7 +164,7 @@ export function BundleDetailModal({
               </h3>
               {contents && contents.length > 0 && (
                 <p className="text-[11px] font-medium text-muted-foreground">
-                  Compra tudo de uma vez
+                  Toque para ativar/desativar no preview
                 </p>
               )}
             </div>
@@ -180,7 +180,13 @@ export function BundleDetailModal({
             ) : (
               <ul className="grid gap-2 sm:grid-cols-2">
                 {contents.map((c) => (
-                  <BundleItemRow key={c.id} item={c} owned={ownedIds.has(c.id)} />
+                  <BundleItemRow
+                    key={c.id}
+                    item={c}
+                    owned={ownedIds.has(c.id)}
+                    active={enabled[c.id] ?? true}
+                    onToggle={() => toggleItem(c.id)}
+                  />
                 ))}
               </ul>
             )}
