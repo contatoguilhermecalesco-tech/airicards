@@ -300,9 +300,27 @@ function ShopPage() {
           artUrl: slot.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art,
         });
       }
-      if (curated.length > 0) return curated.slice(0, 1);
+      // Auto-append any bundles not already curated so all bundles are always in the vitrine
+      const curatedIds = new Set(curated.map((c) => c.id));
+      for (const u of unified) {
+        if (u.kind !== "bundle" || curatedIds.has(u.id)) continue;
+        curated.push({
+          id: u.id,
+          kind: "bundle",
+          name: u.name,
+          description: u.description,
+          price: u.price,
+          rarity: u.rarity,
+          icon: u.icon,
+          tagline: `Contém ${u.bundleItems?.length ?? "vários"} itens`,
+          raw: u.raw,
+          splashUrl: BUNDLE_ASSET_OVERRIDES[u.id]?.splash,
+          artUrl: BUNDLE_ASSET_OVERRIDES[u.id]?.art,
+        });
+      }
+      if (curated.length > 0) return curated.slice(0, 6);
     }
-    // Fallback: auto-pick the single top item by rarity weight + price
+    // Fallback: auto-pick top items by rarity weight + price
     const pool = unified
       .slice()
       .sort((a, b) => {
@@ -311,7 +329,7 @@ function ShopPage() {
         if (wb !== wa) return wb - wa;
         return b.price - a.price;
       })
-      .slice(0, 1);
+      .slice(0, 5);
     return pool.map<FeaturedItem>((u) => ({
       id: u.id,
       kind: u.kind === "decks" ? "deck" : u.kind,
