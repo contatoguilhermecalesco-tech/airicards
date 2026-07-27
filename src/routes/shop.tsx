@@ -311,6 +311,11 @@ function ShopPage() {
 
   async function handleBuyUnified(u: UnifiedItem) {
     if (!profile || busy) return;
+    // Bundles show a detail modal first — never buy silently.
+    if (u.kind === "bundle") {
+      setBundleOpen(u.raw as ShopItem);
+      return;
+    }
     setBusy(u.id);
     if (u.kind === "decks") {
       const r = await buyPublishedDeck(profile.id, u.raw as PublishedDeckRow);
@@ -338,6 +343,26 @@ function ShopPage() {
             ? "Você já tem este item."
             : "Não foi possível comprar.",
       );
+  }
+
+  async function confirmBuyBundle(item: ShopItem) {
+    if (!profile || busy) return;
+    setBusy(item.id);
+    const r = await buyShopItem(profile.id, item);
+    setBusy(null);
+    if (r.ok) {
+      toast("ok", r.message);
+      setBundleOpen(null);
+    } else {
+      toast(
+        "err",
+        r.reason === "insufficient"
+          ? "Arlys insuficientes."
+          : r.reason === "already_owned"
+            ? "Você já tem este item."
+            : "Não foi possível comprar.",
+      );
+    }
   }
 
   function handleBuyFeatured(f: FeaturedItem) {
