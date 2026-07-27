@@ -23,6 +23,7 @@ import {
   comboMultiplier,
   onEnemyDefeated,
   onComboReached,
+  getComboCount,
 } from "@/lib/enemy-system";
 
 
