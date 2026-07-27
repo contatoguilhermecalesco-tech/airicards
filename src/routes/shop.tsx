@@ -50,14 +50,11 @@ import {
   listActiveFeaturedSlots,
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
-import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
-import florescerAura from "@/assets/shop/florescer/aura.jpg";
+import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 
-// Curated visual overrides for signature bundles, keyed by shop item id.
-// Falls back to featured_slots assets when admin uploads custom art.
-const BUNDLE_ASSET_OVERRIDES: Record<string, { splash: string; art: string }> = {
-  "bundle.florescer_celestial": { splash: florescerSplash, art: florescerAura },
-};
+// Curated visual overrides — keyed by shop item id. Falls back to
+// featured_slots assets when admin uploads custom art.
+const BUNDLE_ASSET_OVERRIDES = SHOP_ASSET_OVERRIDES;
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
