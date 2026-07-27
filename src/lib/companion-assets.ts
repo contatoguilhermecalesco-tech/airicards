@@ -23,9 +23,11 @@ const COMPANIONS: Record<string, CompanionProfile> = {
 export function companionFromEquipped(
   equipped: Record<string, string | undefined> | undefined | null,
 ): CompanionProfile | null {
-  const key = equipped?.companion;
-  if (!key) return null;
-  return COMPANIONS[key] ?? null;
+  const raw = equipped?.companion;
+  if (!raw) return null;
+  // Wallet stores keys as "companion:<key>" — strip the slot prefix if present.
+  const key = raw.includes(":") ? raw.split(":").pop()! : raw;
+  return COMPANIONS[key] ?? COMPANIONS[raw] ?? null;
 }
 
 export function getCompanion(key: string): CompanionProfile | null {
