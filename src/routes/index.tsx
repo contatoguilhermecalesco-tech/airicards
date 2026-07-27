@@ -539,7 +539,7 @@ function Home() {
       {/* Método RRSLG */}
       {cycle && (
         <section
-          className="animate-fade-in mt-6 lg:col-span-5 lg:col-start-8 lg:row-start-3 lg:mt-0"
+          className="animate-fade-in mt-6 lg:col-span-6 lg:col-start-1 lg:row-start-5 lg:mt-0"
           style={{ animationDelay: "150ms", animationFillMode: "backwards" }}
         >
 
