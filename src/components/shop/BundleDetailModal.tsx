@@ -377,9 +377,18 @@ function slotOf(item: ShopItem): SlotName | null {
   return null;
 }
 
-function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId: string }) {
+function BundlePreview({
+  contents,
+  bundleId,
+  enabled,
+}: {
+  contents: ShopItem[];
+  bundleId: string;
+  enabled: Record<string, boolean>;
+}) {
   const bySlot = new Map<SlotName, ShopItem>();
   for (const c of contents) {
+    if (!(enabled[c.id] ?? true)) continue;
     const s = slotOf(c);
     if (s && !bySlot.has(s)) bySlot.set(s, c);
   }
@@ -396,17 +405,25 @@ function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId:
   const frameArt = artOf("nameplate");
   const veilArt = artOf("veil");
   const companionArt = artOf("companion");
-  const hasSakuraKeyword = bundleId.includes("florescer") || bySlot.get("overlay")?.id.includes("sakura");
+  const hasSakuraKeyword =
+    (bundleId.includes("florescer") || bySlot.get("overlay")?.id.includes("sakura")) &&
+    // only show falling sakura when the overlay slot is actually equipped
+    (bySlot.has("overlay") || bySlot.has("effect"));
 
   return (
     <div>
-      <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-violet-200">
-        <Sparkles className="h-3 w-3" strokeWidth={2.75} />
-        Preview no perfil
-      </p>
+      <div className="mb-2 flex items-center justify-between">
+        <p className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-violet-200">
+          <Sparkles className="h-3 w-3" strokeWidth={2.75} />
+          Preview no perfil
+        </p>
+        <p className="text-[10px] font-medium text-muted-foreground">
+          {bySlot.size} de {contents.length} ativos
+        </p>
+      </div>
       <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
         {/* Banner / capa */}
-        <div className="relative h-28 w-full overflow-hidden sm:h-32">
+        <div className="relative h-32 w-full overflow-hidden sm:h-36">
           {effectArt ? (
             <img src={effectArt} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
           ) : (
@@ -421,23 +438,23 @@ function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId:
           {veilArt && (
             <img src={veilArt} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen" />
           )}
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
         </div>
 
-        {/* Card body with avatar */}
-        <div className="relative flex items-end gap-3 px-4 pb-3 pt-0">
-          <div className="relative -mt-8 shrink-0">
+        {/* Card body — centered avatar + name stacked */}
+        <div className="relative flex flex-col items-center px-4 pb-5 pt-0 text-center">
+          <div className="relative -mt-12 h-20 w-20">
             {/* Aura */}
             {auraArt && (
               <img
                 src={auraArt}
                 alt=""
                 aria-hidden
-                className="absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] animate-[spin_18s_linear_infinite] object-contain"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[140%] w-[140%] -translate-x-1/2 -translate-y-1/2 animate-[spin_18s_linear_infinite] object-contain"
               />
             )}
             {/* Avatar */}
-            <div className="relative grid h-16 w-16 place-items-center overflow-hidden rounded-full border-2 border-white/20 bg-gradient-to-br from-violet-500 to-fuchsia-500 text-lg font-bold text-white shadow-xl">
+            <div className="relative mx-auto grid h-20 w-20 place-items-center overflow-hidden rounded-full border-2 border-white/25 bg-gradient-to-br from-violet-500 to-fuchsia-500 text-xl font-bold text-white shadow-xl">
               G
             </div>
             {/* Frame overlay */}
@@ -446,7 +463,7 @@ function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId:
                 src={frameArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute -inset-3 h-[calc(100%+24px)] w-[calc(100%+24px)] object-contain"
+                className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[150%] -translate-x-1/2 -translate-y-1/2 object-contain"
               />
             )}
             {/* Companion */}
@@ -455,24 +472,22 @@ function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId:
                 src={companionArt}
                 alt=""
                 aria-hidden
-                className="absolute -right-4 -top-3 h-10 w-10 object-contain drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]"
+                className="pointer-events-none absolute -right-5 -bottom-1 h-11 w-11 object-contain drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]"
               />
             )}
           </div>
-          <div className="min-w-0 flex-1 pb-1">
-            <p className="truncate text-sm font-bold text-white">Guilherme</p>
-            <p className="truncate text-[11px] text-white/60">
-              <span className="text-white/80">guilherme</span>
-              <span className="text-white/40">.airi.com.br</span>
-            </p>
-            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200/80">
-              {bySlot.size} de {contents.length} slots equipados
-            </p>
-          </div>
+          <p className="mt-3 text-sm font-bold text-white">Guilherme</p>
+          <p className="text-[11px] text-white/60">
+            <span className="text-white/80">guilherme</span>
+            <span className="text-white/40">.airi.com.br</span>
+          </p>
+          <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-violet-200/80">
+            {bySlot.size} de {contents.length} slots equipados
+          </p>
         </div>
       </div>
-      <p className="mt-1.5 text-[10px] text-muted-foreground">
-        Simulação de como o bundle vai aparecer no seu perfil.
+      <p className="mt-1.5 text-center text-[10px] text-muted-foreground">
+        Ative ou desative cada item abaixo para simular seu perfil.
       </p>
     </div>
   );
