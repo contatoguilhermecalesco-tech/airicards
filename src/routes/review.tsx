@@ -96,6 +96,7 @@ function Review() {
 
   useEffect(() => {
     if (!deckId && !isEnemyRun) registerHomeSession();
+    if (isEnemyRun) resetCombo();
     const source = isEnemyRun
       ? getEnemyCards(deckId).filter((c) => !isDefeated(c))
       : getDueCards(deckId, Date.now());
