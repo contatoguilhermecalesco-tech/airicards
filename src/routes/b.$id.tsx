@@ -49,8 +49,8 @@ export const Route = createFileRoute("/b/$id")({
       title: "airi — Bundle exclusivo",
       description: "Confira este bundle exclusivo da loja airi.",
     };
-    const splash = BUNDLE_SPLASH[id];
-    const image = splash ? toAbsolute(splash) : undefined;
+    const splash = BUNDLE_SPLASH[id] ?? DEFAULT_BUNDLE_SPLASH;
+    const image = toAbsolute(splash);
     const tags: Array<Record<string, string>> = [
       { title: meta.title },
       { name: "description", content: meta.description },
@@ -61,15 +61,13 @@ export const Route = createFileRoute("/b/$id")({
       { name: "twitter:title", content: meta.title },
       { name: "twitter:description", content: meta.description },
       { name: "robots", content: "noindex" },
+      { property: "og:image", content: image },
+      { property: "og:image:secure_url", content: image },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: meta.title },
+      { name: "twitter:image", content: image },
     ];
-    if (image) {
-      tags.push(
-        { property: "og:image", content: image },
-        { property: "og:image:width", content: "1200" },
-        { property: "og:image:height", content: "630" },
-        { name: "twitter:image", content: image },
-      );
-    }
     return { meta: tags };
   },
 });
