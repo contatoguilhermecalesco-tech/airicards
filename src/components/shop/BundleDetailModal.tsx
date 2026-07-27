@@ -237,16 +237,31 @@ export function BundleDetailModal({
 function BundleItemRow({ item, owned }: { item: ShopItem; owned: boolean }) {
   const rarity = RARITY_META[rarityFor(item.price)];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const override = getShopAssetOverride(item.id);
   return (
     <li
       className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition hover:bg-white/[0.05]`}
     >
-      <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-lg"
-        style={{ background: rarity.gradient, boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
-      >
-        <Icon className="h-5 w-5" strokeWidth={2.25} />
-      </span>
+      {override?.art ? (
+        <span
+          className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/15 shadow-lg"
+          style={{ boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
+        >
+          <img
+            src={override.art}
+            alt=""
+            aria-hidden
+            className="h-full w-full object-cover"
+          />
+        </span>
+      ) : (
+        <span
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-lg"
+          style={{ background: rarity.gradient, boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
+        >
+          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        </span>
+      )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <RarityChip rarity={rarityFor(item.price)} />
@@ -267,11 +282,6 @@ function BundleItemRow({ item, owned }: { item: ShopItem; owned: boolean }) {
           <Check className="h-3 w-3" strokeWidth={2.75} />
           Já tem
         </span>
-      )}
-      {item.kind === "cosmetic" && (
-        <div className="hidden sm:block">
-          <MiniProfileCard item={item} />
-        </div>
       )}
     </li>
   );
