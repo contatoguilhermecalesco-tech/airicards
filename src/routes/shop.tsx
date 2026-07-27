@@ -63,6 +63,9 @@ import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 const BUNDLE_ASSET_OVERRIDES = SHOP_ASSET_OVERRIDES;
 
 export const Route = createFileRoute("/shop")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    b: typeof search.b === "string" ? search.b : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Loja airi — Arlys ✦" },
