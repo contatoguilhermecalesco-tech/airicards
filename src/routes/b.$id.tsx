@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
+import monarcaSplash from "@/assets/shop/monarca/splash-hero.jpg";
 
 // Absolute base used to build og:image URLs so WhatsApp / social scrapers
 // can fetch the preview image without JS.
@@ -8,8 +9,11 @@ const PUBLIC_BASE = "https://airicards.lovable.app";
 
 // Curated splash art per bundle id. New bundles can be added here to get
 // a rich WhatsApp / social preview when shared via /b/<id>.
+// PATTERN: every bundle listed here shows its splash art on WhatsApp / social
+// previews instead of the site icon. Add new bundles to both maps below.
 const BUNDLE_SPLASH: Record<string, string> = {
   "bundle.florescer_celestial": florescerSplash,
+  "bundle.monarca_sombras": monarcaSplash,
 };
 
 const BUNDLE_META: Record<string, { title: string; description: string }> = {
@@ -18,7 +22,16 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
     description:
       "Bundle exclusivo com aura, moldura, capa, overlay de sakura, véu e companheiro Kitsune. Confira na loja airi.",
   },
+  "bundle.monarca_sombras": {
+    title: "airi — Monarca das Sombras",
+    description:
+      "Bundle mítico com aura sombria, coroa do soberano, portal do monarca, exército de sombras, manto e Igris, o Cavaleiro-Sombra. Confira na loja airi.",
+  },
 };
+
+// Fallback splash usada quando um bundle ainda não tem arte curada mapeada —
+// garante que o WhatsApp sempre mostre uma splash art e nunca o ícone do site.
+const DEFAULT_BUNDLE_SPLASH = florescerSplash;
 
 function toAbsolute(url: string): string {
   if (!url) return `${PUBLIC_BASE}/og-default.png`;
