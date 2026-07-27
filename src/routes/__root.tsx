@@ -526,7 +526,7 @@ function BottomBar() {
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/60 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2.5 backdrop-blur-3xl sm:hidden"
+        className="relative z-40 mt-8 w-full border-t border-white/10 bg-black/60 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2.5 backdrop-blur-3xl sm:hidden"
       >
         {/* Brilho superior sutil */}
         <span
@@ -755,7 +755,7 @@ function RootComponent() {
           - min-h-dvh cobre 100% da altura visível no Safari mobile (sem "salto" da barra).
           - pb-24 no mobile reserva espaço para a BottomBar fixa; sm:pb-0 desativa em desktop.
         */}
-        <div className="min-h-dvh pb-24 sm:pb-0">
+        <div className="min-h-dvh">
           <TopBar />
           <Outlet />
           <BottomBar />
