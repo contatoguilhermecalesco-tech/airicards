@@ -203,7 +203,7 @@ export function ShopHero({
                 onClick={(e) => { e.stopPropagation(); advance(); }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-4 sm:text-sm"
               >
-                <span className="hidden sm:inline">Próximo</span>
+                <span className="whitespace-nowrap">Próximo</span>
                 <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
             )}
