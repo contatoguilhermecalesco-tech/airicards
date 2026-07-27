@@ -1,6 +1,7 @@
 // Companion (pet) cosmetics — small character rendered next to the profile avatar.
 // Each key maps to a transparent PNG asset and a soft glow color.
 import kitsuneUrl from "@/assets/shop/florescer/companion.png";
+import igrisUrl from "@/assets/shop/monarca/companion.png";
 
 export type CompanionProfile = {
   key: string;
@@ -17,6 +18,13 @@ const COMPANIONS: Record<string, CompanionProfile> = {
     src: kitsuneUrl,
     glow: "#c084fc",
     tagline: "Espírito da cerejeira eterna.",
+  },
+  igris_cavaleiro: {
+    key: "igris_cavaleiro",
+    name: "Igris, o Cavaleiro-Sombra",
+    src: igrisUrl,
+    glow: "#a855f7",
+    tagline: "Primeiro cavaleiro do exército das sombras.",
   },
 };
 
