@@ -613,3 +613,262 @@ export function powerupBadge(payload: Record<string, unknown>): string | undefin
   return undefined;
 }
 
+/* ---------------------- Deck & Pack covers ---------------------- */
+
+const COLLECTION_PALETTE: Record<
+  string,
+  { base: string; edge: string; glow: string; spark: string; tag: string }
+> = {
+  lavender: {
+    base: "radial-gradient(120% 100% at 20% 15%, #a5b4fc 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #312e81 0%, transparent 60%), linear-gradient(160deg,#171a3a 0%,#0a0b1c 100%)",
+    edge: "#a5b4fc",
+    glow: "rgba(165,180,252,0.55)",
+    spark: "#e0e7ff",
+    tag: "Lilás",
+  },
+  violet: {
+    base: "radial-gradient(120% 100% at 20% 15%, #a78bfa 0%, transparent 55%), radial-gradient(130% 100% at 95% 95%, #3b0764 0%, transparent 60%), linear-gradient(160deg,#1e1244 0%,#0d0821 100%)",
+    edge: "#c4b5fd",
+    glow: "rgba(167,139,250,0.55)",
+    spark: "#ede9fe",
+    tag: "Arcano",
+  },
+  sky: {
+    base: "radial-gradient(120% 100% at 20% 15%, #38bdf8 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #1e3a8a 0%, transparent 60%), linear-gradient(160deg,#0c1a3b 0%,#0a1024 100%)",
+    edge: "#7dd3fc",
+    glow: "rgba(56,189,248,0.5)",
+    spark: "#e0f2fe",
+    tag: "Ártico",
+  },
+  amber: {
+    base: "radial-gradient(120% 100% at 25% 20%, #fbbf24 0%, transparent 55%), radial-gradient(140% 100% at 90% 100%, #7c2d12 0%, transparent 60%), linear-gradient(160deg,#3b1a0a 0%,#1a0b06 100%)",
+    edge: "#fcd34d",
+    glow: "rgba(251,191,36,0.5)",
+    spark: "#fef3c7",
+    tag: "Solar",
+  },
+  pink: {
+    base: "radial-gradient(120% 100% at 25% 15%, #f472b6 0%, transparent 55%), radial-gradient(120% 100% at 90% 95%, #831843 0%, transparent 60%), linear-gradient(160deg,#3a0f28 0%,#1a0713 100%)",
+    edge: "#f9a8d4",
+    glow: "rgba(244,114,182,0.5)",
+    spark: "#fce7f3",
+    tag: "Blossom",
+  },
+  emerald: {
+    base: "radial-gradient(120% 100% at 20% 15%, #34d399 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #064e3b 0%, transparent 60%), linear-gradient(160deg,#0a2e26 0%,#04140f 100%)",
+    edge: "#6ee7b7",
+    glow: "rgba(52,211,153,0.5)",
+    spark: "#d1fae5",
+    tag: "Verdejante",
+  },
+};
+
+export function collectionPalette(key: string) {
+  return COLLECTION_PALETTE[key] ?? COLLECTION_PALETTE.violet;
+}
+
+export function DeckCover({
+  accent,
+  height = "h-28",
+  cardCount,
+  owner,
+}: {
+  accent: string;
+  height?: string;
+  cardCount?: number;
+  owner?: string;
+}) {
+  const p = collectionPalette(accent);
+  return (
+    <div
+      aria-hidden
+      className={`relative w-full overflow-hidden ${height}`}
+      style={{ background: p.base }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-25"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)",
+          backgroundSize: "14px 14px",
+          maskImage:
+            "radial-gradient(120% 100% at 50% 55%, black 40%, transparent 100%)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full cosmetic-glow-pulse"
+        style={{
+          width: 150,
+          height: 150,
+          background: `radial-gradient(circle, ${p.glow} 0%, transparent 65%)`,
+          filter: "blur(8px)",
+        }}
+      />
+      {[-14, 0, 14].map((rot, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="absolute left-1/2 top-1/2 rounded-lg border backdrop-blur"
+          style={{
+            width: 46,
+            height: 62,
+            transform: `translate(-50%,-50%) rotate(${rot}deg) translateY(-2px)`,
+            background: i === 1 ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.35)",
+            borderColor: `${p.edge}${i === 1 ? "cc" : "55"}`,
+            boxShadow: i === 1 ? `0 6px 22px -4px ${p.glow}` : "none",
+          }}
+        >
+          <span
+            className="absolute left-1.5 right-1.5 top-2 h-[2px] rounded-full"
+            style={{ background: `${p.edge}aa` }}
+          />
+          <span
+            className="absolute left-1.5 top-5 h-[2px] w-6 rounded-full"
+            style={{ background: `${p.edge}66` }}
+          />
+          <span
+            className="absolute left-1.5 top-7 h-[2px] w-4 rounded-full"
+            style={{ background: `${p.edge}55` }}
+          />
+        </span>
+      ))}
+      <span
+        aria-hidden
+        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
+        }}
+      />
+      <span
+        className="absolute left-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur"
+        style={{ borderColor: `${p.edge}66`, background: "rgba(0,0,0,0.35)" }}
+      >
+        Deck · {p.tag}
+      </span>
+      {typeof cardCount === "number" && cardCount > 0 && (
+        <span
+          className="absolute right-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur"
+          style={{ borderColor: `${p.edge}55`, background: "rgba(0,0,0,0.35)" }}
+        >
+          {cardCount} cartas
+        </span>
+      )}
+      {owner && (
+        <span
+          className="absolute bottom-2 left-3 rounded-full px-2 py-0.5 text-[10px] font-medium text-white/70 backdrop-blur"
+          style={{ background: "rgba(0,0,0,0.35)" }}
+        >
+          por {owner}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function PackCover({
+  accent,
+  height = "h-28",
+  deckCount,
+}: {
+  accent: string;
+  height?: string;
+  deckCount?: number;
+}) {
+  const p = collectionPalette(accent);
+  return (
+    <div
+      aria-hidden
+      className={`relative w-full overflow-hidden ${height}`}
+      style={{ background: p.base }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-25"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)",
+          backgroundSize: "14px 14px",
+          maskImage:
+            "radial-gradient(120% 100% at 50% 55%, black 40%, transparent 100%)",
+        }}
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full cosmetic-glow-pulse"
+        style={{
+          width: 150,
+          height: 150,
+          background: `radial-gradient(circle, ${p.glow} 0%, transparent 65%)`,
+          filter: "blur(8px)",
+        }}
+      />
+      <span
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border"
+        style={{
+          width: 84,
+          height: 66,
+          background: "rgba(0,0,0,0.35)",
+          borderColor: `${p.edge}99`,
+          boxShadow: `0 10px 26px -6px ${p.glow}`,
+        }}
+      >
+        <span
+          className="absolute left-0 right-0 top-3 h-3 rounded-sm"
+          style={{ background: `${p.edge}55` }}
+        />
+        <span
+          className="absolute top-0 bottom-0 left-1/2 w-2 -translate-x-1/2"
+          style={{ background: `${p.edge}cc` }}
+        />
+        <span
+          className="absolute left-0 right-0 top-1/2 h-2 -translate-y-1/2"
+          style={{ background: `${p.edge}cc` }}
+        />
+        <span
+          className="absolute left-1/2 top-0 h-3 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ background: p.edge, boxShadow: `0 0 10px ${p.glow}` }}
+        />
+      </span>
+      {[0, 1, 2, 3].map((i) => (
+        <span
+          key={i}
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 h-1 w-1 rounded-full cosmetic-sparkle"
+          style={{
+            background: p.spark,
+            boxShadow: `0 0 8px ${p.spark}`,
+            transform: `rotate(${i * 90 + 30}deg) translate(54px) rotate(-${i * 90 + 30}deg)`,
+            animationDelay: `${i * 0.5}s`,
+          }}
+        />
+      ))}
+      <span
+        aria-hidden
+        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+        }}
+      />
+      <span
+        className="absolute left-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur"
+        style={{ borderColor: `${p.edge}66`, background: "rgba(0,0,0,0.35)" }}
+      >
+        Pack · {p.tag}
+      </span>
+      {typeof deckCount === "number" && deckCount > 0 && (
+        <span
+          className="absolute right-3 top-3 rounded-full border px-2 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur"
+          style={{ borderColor: `${p.edge}55`, background: "rgba(0,0,0,0.35)" }}
+        >
+          {deckCount} decks
+        </span>
+      )}
+    </div>
+  );
+}
+
+
