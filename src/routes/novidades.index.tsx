@@ -182,15 +182,6 @@ function NovidadesPage() {
             </p>
           </div>
         ) : (
-          <div className="mt-16 rounded-3xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
-            <p className="text-sm text-foreground/70">
-              Ainda sem novidades por aqui.
-            </p>
-            <p className="mt-1 text-xs text-foreground/45">
-              Assim que algo novo chegar, aparece nesta lista.
-            </p>
-          </div>
-        ) : (
           <>
             {/* HERO — Patch cover, Riot-style */}
             {featured && featuredMeta && (
