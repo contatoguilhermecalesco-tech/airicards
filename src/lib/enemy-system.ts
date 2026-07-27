@@ -91,6 +91,9 @@ export function resetCombo() {
   combo = { count: 0, best: 0 };
   emitCombo();
 }
+export function getComboCount(): number {
+  return combo.count;
+}
 export function bumpCombo() {
   combo = { count: combo.count + 1, best: Math.max(combo.best, combo.count + 1) };
   emitCombo();
