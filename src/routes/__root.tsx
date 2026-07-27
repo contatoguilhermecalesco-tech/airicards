@@ -23,6 +23,7 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../li
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 import { auraRingFromEquipped, auraProfileFromEquipped } from "../lib/aura";
 import { AuraRing } from "../components/AuraRing";
+import { getEquippedArt } from "../lib/shop-asset-overrides";
 import { SyncIndicator } from "../components/SyncIndicator";
 import "@/lib/presence";
 
