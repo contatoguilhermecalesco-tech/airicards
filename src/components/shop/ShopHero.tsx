@@ -151,7 +151,7 @@ export function ShopHero({
             </div>
             <button
               onClick={() => onBuy(item)}
-              disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck")}
+              disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
             >
               {busyId === item.id ? (
@@ -161,6 +161,11 @@ export function ShopHero({
                 </>
               ) : owned ? (
                 "Adquirido"
+              ) : item.kind === "bundle" ? (
+                <>
+                  <Sparkles className="h-4 w-4" strokeWidth={2.5} />
+                  Ver conteúdo
+                </>
               ) : canAfford ? (
                 <>
                   <ArlysIcon className="h-4 w-4" strokeWidth={2.5} />

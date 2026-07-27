@@ -45,6 +45,7 @@ import {
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
+import { BundleDetailModal } from "@/components/shop/BundleDetailModal";
 import {
   listActiveFeaturedSlots,
   type FeaturedSlotRow,
@@ -121,6 +122,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
 
   // Toolbar state
@@ -309,6 +311,11 @@ function ShopPage() {
 
   async function handleBuyUnified(u: UnifiedItem) {
     if (!profile || busy) return;
+    // Bundles show a detail modal first — never buy silently.
+    if (u.kind === "bundle") {
+      setBundleOpen(u.raw as ShopItem);
+      return;
+    }
     setBusy(u.id);
     if (u.kind === "decks") {
       const r = await buyPublishedDeck(profile.id, u.raw as PublishedDeckRow);
@@ -336,6 +343,26 @@ function ShopPage() {
             ? "Você já tem este item."
             : "Não foi possível comprar.",
       );
+  }
+
+  async function confirmBuyBundle(item: ShopItem) {
+    if (!profile || busy) return;
+    setBusy(item.id);
+    const r = await buyShopItem(profile.id, item);
+    setBusy(null);
+    if (r.ok) {
+      toast("ok", r.message);
+      setBundleOpen(null);
+    } else {
+      toast(
+        "err",
+        r.reason === "insufficient"
+          ? "Arlys insuficientes."
+          : r.reason === "already_owned"
+            ? "Você já tem este item."
+            : "Não foi possível comprar.",
+      );
+    }
   }
 
   function handleBuyFeatured(f: FeaturedItem) {
@@ -583,6 +610,18 @@ function ShopPage() {
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
+      {bundleOpen && (
+        <BundleDetailModal
+          bundle={bundleOpen}
+          wallet={wallet.crystals}
+          ownedIds={ownedIds}
+          busy={busy === bundleOpen.id}
+          onClose={() => setBundleOpen(null)}
+          onBuy={() => void confirmBuyBundle(bundleOpen)}
+          splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url}
+          artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url}
+        />
+      )}
     </main>
   );
 }
@@ -745,7 +784,7 @@ function UnifiedCard({
             )}
             <button
               onClick={onBuy}
-              disabled={busy || owned || (!isMineDeck && !canAfford)}
+              disabled={busy || owned || (!isMineDeck && item.kind !== "bundle" && !canAfford)}
               className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
             >
               {busy ? (
@@ -760,6 +799,8 @@ function UnifiedCard({
                 </>
               ) : isMineDeck ? (
                 "Importar"
+              ) : item.kind === "bundle" ? (
+                "Ver conteúdo"
               ) : canAfford ? (
                 "Comprar"
               ) : (

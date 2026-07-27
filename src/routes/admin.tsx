@@ -10,6 +10,7 @@ import {
   Flame,
   GraduationCap,
   KeyRound,
+  Package,
   ScrollText,
   Shield,
   ShoppingBag,
@@ -59,6 +60,7 @@ import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 import { FeaturedSlotsSection } from "@/components/admin/FeaturedSlotsSection";
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
+import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
 
 export const Route = createFileRoute("/admin")({
   component: AdminGate,
@@ -98,6 +100,7 @@ type PanelKey =
   | "backup"
   | "streak"
   | "vitrine"
+  | "bundles"
   | "shop-items";
 
 type PanelDef = {
@@ -123,6 +126,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
+  { key: "bundles", label: "Bundles", hint: "Pacotes estilo Riot com vários itens", Icon: Package, color: "#a855f7", wide: true },
   { key: "vitrine", label: "Vitrine da Loja", hint: "Curar destaques + splash arts", Icon: ShoppingBag, color: "#f472b6", wide: true },
 ];
 
@@ -291,6 +295,7 @@ function AdminPage() {
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "vitrine" && <FeaturedSlotsSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
+                {openPanel === "bundles" && <BundleBuilderSection />}
               </div>
             </>
           )}
