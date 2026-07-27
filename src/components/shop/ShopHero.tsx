@@ -169,10 +169,11 @@ export function ShopHero({
               </span>
             </div>
             <button
-              onClick={() => onBuy(item)}
+              onClick={(e) => { e.stopPropagation(); onBuy(item); }}
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
               className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
+
               {busyId === item.id ? (
                 <>
                   <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
