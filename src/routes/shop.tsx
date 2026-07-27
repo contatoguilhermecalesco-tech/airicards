@@ -45,6 +45,7 @@ import {
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
+import { BundleDetailModal } from "@/components/shop/BundleDetailModal";
 import {
   listActiveFeaturedSlots,
   type FeaturedSlotRow,
