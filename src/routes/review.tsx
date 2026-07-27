@@ -119,7 +119,15 @@ function Review() {
     () => allCards.find((c) => c.id === currentId),
     [allCards, currentId],
   );
-  const currentIsEnemy = current ? isEnemy(current) : false;
+  // Visualmente só tratamos como "inimiga" cartas que ainda estão vivas.
+  // Cartas já derrotadas mantêm o histórico (badge "Veterana") mas perdem
+  // toda a estética de ameaça no card e no fundo.
+  const currentIsEnemy = current
+    ? isEnemy(current) && !isDefeated(current)
+    : false;
+  const currentIsVeteran = current
+    ? isEnemy(current) && isDefeated(current)
+    : false;
 
   const deckName = useStore((s) =>
     deckId ? s.decks.find((d) => d.id === deckId)?.name : undefined,
