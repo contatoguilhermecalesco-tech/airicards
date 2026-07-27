@@ -338,6 +338,7 @@ function PerfilPage() {
       decoration: [],
       badge: [],
       effect: [],
+      overlay: [],
       companion: [],
       veil: [],
     };
