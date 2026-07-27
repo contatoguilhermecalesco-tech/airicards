@@ -45,6 +45,10 @@ import {
   type Rarity,
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
+import {
+  listActiveFeaturedSlots,
+  type FeaturedSlotRow,
+} from "@/lib/featured-slots";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -117,6 +121,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
 
   // Toolbar state
   const [category, setCategory] = useState<Category>("all");
@@ -133,6 +138,7 @@ function ShopPage() {
   useEffect(() => {
     listShopItems().then(setItems);
     listPublishedDecks().then(setDecks);
+    listActiveFeaturedSlots().then(setFeaturedSlots).catch(() => setFeaturedSlots([]));
   }, []);
 
   useEffect(() => {
