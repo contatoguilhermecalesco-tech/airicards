@@ -632,8 +632,17 @@ function PerfilPage() {
                         "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
                     }}
                   />
-                  <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
-                  <span className="relative">{badgePalette.tag.toUpperCase()}</span>
+                  {badgeArt ? (
+                    <img
+                      src={badgeArt}
+                      alt=""
+                      aria-hidden
+                      className="relative h-4 w-4 object-contain"
+                    />
+                  ) : (
+                    <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
+                  )}
+                  <span className="relative">{badge.name.toUpperCase()}</span>
                 </span>
               )}
             </div>
