@@ -98,6 +98,7 @@ type PanelKey =
   | "backup"
   | "streak"
   | "vitrine"
+  | "bundles"
   | "shop-items";
 
 type PanelDef = {
