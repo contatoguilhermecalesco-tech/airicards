@@ -114,6 +114,9 @@ export function ShopHero({
             "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
         }}
       />
+      {item.id === "bundle.florescer_celestial" && (
+        <SakuraPetals density="epic" seed={42} withHalo />
+      )}
 
       <div className="grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
         <div className="min-w-0 self-center">
