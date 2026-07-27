@@ -201,16 +201,19 @@ function Home() {
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
 
-        {/* soft halo behind glass */}
+        {/* soft halo behind glass — dual-tone violet→fuchsia */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-4 rounded-[40px] bg-primary/15 opacity-40 blur-2xl"
+          className="pointer-events-none absolute -inset-4 rounded-[40px] opacity-50 blur-2xl"
+          style={{
+            background:
+              "linear-gradient(120deg, rgba(167,139,250,0.28) 0%, rgba(232,121,249,0.18) 100%)",
+          }}
         />
         <div
           className={`${GLASS_BASE} rounded-[28px] p-6 sm:p-8`}
         >
           <GlassHighlight />
-          {/* specular sheen */}
           <div
             aria-hidden
             className="pointer-events-none absolute -top-24 -left-16 h-56 w-56 rounded-full bg-white/[0.04] blur-2xl"
@@ -220,42 +223,25 @@ function Home() {
             className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/15 blur-2xl"
           />
 
-          <div className="relative flex items-start justify-between gap-6">
-            {/* Left — copy */}
-            <div className="min-w-0 flex-1 space-y-1">
-              <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                Sessão de hoje
-              </p>
-              <p className="mt-1 text-[28px] font-semibold leading-none tracking-tight text-foreground tabular-nums">
-                {due}
-                <span className="ml-1.5 text-[15px] font-medium text-muted-foreground/80">
-                  {due === 1 ? "carta agora" : "cartas agora"}
-                </span>
-              </p>
-              {pending > 0 && (
-                <p className="pt-1 text-[12px] font-medium text-primary/85 tabular-nums">
-                  +{pending} voltando{nextDueInMs !== null ? ` em ${formatNextIn(nextDueInMs)}` : ""}
-                </p>
-              )}
-            </div>
-
-            {/* Right — glass ring */}
-            <div className="relative h-26 w-26 shrink-0" style={{ height: 104, width: 104 }}>
-              {/* halo behind ring */}
+          <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+            {/* Ring — hero centerpiece on mobile, right side on ≥sm */}
+            <div
+              className="relative order-1 shrink-0 sm:order-2"
+              style={{ height: 148, width: 148 }}
+            >
               <div
                 aria-hidden
-                className="absolute inset-2 rounded-full bg-primary/15 opacity-70 blur-xl"
+                className="absolute inset-3 rounded-full bg-primary/20 opacity-70 blur-xl"
               />
               <svg viewBox="0 0 104 104" className="relative h-full w-full -rotate-90">
                 <circle
                   cx="52" cy="52" r={RING_R}
-                  stroke="rgba(255,255,255,0.07)" strokeWidth="9" fill="none"
+                  stroke="rgba(255,255,255,0.07)" strokeWidth="7" fill="none"
                 />
-                {/* Pending faint arc (cartas voltando) */}
                 {pendingPct > 0 && (
                   <circle
                     cx="52" cy="52" r={RING_R}
-                    stroke="rgba(167,139,250,0.22)" strokeWidth="9" fill="none"
+                    stroke="rgba(167,139,250,0.22)" strokeWidth="7" fill="none"
                     strokeLinecap="round"
                     strokeDasharray={`${ringC * pendingPct} ${ringC}`}
                     strokeDashoffset={-ringC * reviewedPct}
@@ -263,12 +249,12 @@ function Home() {
                 )}
                 <circle
                   cx="52" cy="52" r={RING_R}
-                  stroke="url(#ringGrad)" strokeWidth="9" fill="none"
+                  stroke="url(#ringGrad)" strokeWidth="7" fill="none"
                   strokeLinecap="round"
                   strokeDasharray={ringC}
                   strokeDashoffset={ringC * (1 - reviewedPct)}
                   className="transition-[stroke-dashoffset] duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ filter: "drop-shadow(0 0 4px rgba(167,139,250,0.35))" }}
+                  style={{ filter: "drop-shadow(0 0 6px rgba(167,139,250,0.45))" }}
                 />
                 <defs>
                   <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
@@ -277,18 +263,37 @@ function Home() {
                     <stop offset="100%" stopColor="#7C6BD8" />
                   </linearGradient>
                 </defs>
-
               </svg>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-xl font-semibold leading-none tabular-nums text-foreground">
-                  {reviewedToday}
-                </p>
-                <p className="mt-1 text-[8.5px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <p className="text-[28px] font-semibold leading-none tracking-tighter tabular-nums text-foreground sm:text-[32px]">
                   {pctLabel}%
+                </p>
+                <p className="mt-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Meta diária
                 </p>
               </div>
             </div>
+
+            {/* Copy — centered on mobile, left on ≥sm */}
+            <div className="order-2 min-w-0 flex-1 space-y-1 text-center sm:order-1 sm:text-left">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary/70">
+                Sessão de hoje
+              </p>
+              <p className="mt-1.5 text-[24px] font-medium leading-tight tracking-tight text-foreground sm:text-[26px]">
+                {due === 0
+                  ? "Tudo em dia por agora"
+                  : `${due} carta${due === 1 ? "" : "s"} te esperam`}
+              </p>
+              <p className="pt-1 text-[13px] text-muted-foreground/80">
+                {pending > 0 && nextDueInMs !== null
+                  ? `+${pending} voltando em ${formatNextIn(nextDueInMs)}`
+                  : reviewedToday > 0
+                    ? `${reviewedToday} revisada${reviewedToday === 1 ? "" : "s"} hoje`
+                    : "Sua sessão diária te espera."}
+              </p>
+            </div>
           </div>
+
 
           {/* CTA */}
           <div className="relative mt-7">
@@ -441,9 +446,10 @@ function Home() {
 
       {/* Stats — glass chips */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-4 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
+        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-5 lg:col-start-8 lg:row-start-2 lg:mt-0 lg:grid-cols-2 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
+
 
         <StatChip label="Decks" value={decks.length} />
         <StatChip label="Cartas" value={cards.length} />
@@ -462,9 +468,14 @@ function Home() {
 
           <Link
             to="/study"
-            className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055]`}
+            className="group relative block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-violet-900/40 via-indigo-900/30 to-transparent p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/25 hover:from-violet-900/50"
           >
             <GlassHighlight />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-primary/20 opacity-70 blur-2xl"
+            />
+
             <div className="relative flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
                 <Sparkles className="h-4 w-4" strokeWidth={2.25} />
