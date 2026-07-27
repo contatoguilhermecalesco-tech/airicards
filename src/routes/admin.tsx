@@ -58,7 +58,7 @@ import { NotificationsSection } from "@/components/admin/NotificationsSection";
 import { ChangelogSection } from "@/components/admin/ChangelogSection";
 import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
-import { FeaturedSlotsSection } from "@/components/admin/FeaturedSlotsSection";
+
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
 
@@ -99,7 +99,6 @@ type PanelKey =
   | "changelog"
   | "backup"
   | "streak"
-  | "vitrine"
   | "bundles"
   | "shop-items";
 
@@ -126,8 +125,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
-  { key: "bundles", label: "Bundles", hint: "Pacotes estilo Riot com vários itens", Icon: Package, color: "#a855f7", wide: true },
-  { key: "vitrine", label: "Vitrine da Loja", hint: "Curar destaques + splash arts", Icon: ShoppingBag, color: "#f472b6", wide: true },
+  { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
 ];
 
 function AdminPage() {
@@ -293,7 +291,6 @@ function AdminPage() {
                 {openPanel === "changelog" && <ChangelogSection />}
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}
-                {openPanel === "vitrine" && <FeaturedSlotsSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
                 {openPanel === "bundles" && <BundleBuilderSection />}
               </div>
