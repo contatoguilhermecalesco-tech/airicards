@@ -174,7 +174,7 @@ function Home() {
       />
 
       {/* Header */}
-      <header className="animate-fade-in flex flex-col space-y-1.5">
+      <header className="animate-fade-in flex flex-col space-y-1.5 lg:col-span-12 lg:row-start-1">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {eyebrow}
