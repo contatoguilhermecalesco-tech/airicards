@@ -182,11 +182,7 @@ const WEEKLY_POOL: Omit<Mission, "id" | "progress" | "claimed">[] = [
   { kind: "combo", target: 8, rewardArlys: 100, rewardLp: 30, label: "Fúria", hint: "Alcance combo x8 na Arena." },
 ];
 
-function storageKey(): string | null {
-  const p = getCurrentProfile();
-  if (!p) return null;
-  return `airi.enemy-missions.${p.id}`;
-}
+const META_KEY = "enemyMissions";
 
 function rollDaily(): Mission[] {
   const picks = seededPick(DAILY_POOL, `d-${todayKey()}`, 2);
@@ -197,35 +193,26 @@ function rollWeekly(): Mission[] {
   return picks.map((m, i) => ({ ...m, id: `w${i}-${m.kind}`, progress: 0, claimed: false }));
 }
 
-function loadState(): MissionsState {
-  const key = storageKey();
+function reconcile(stored: MissionsState | undefined): MissionsState {
   const today = todayKey();
   const week = weekKey();
-  if (!key || typeof window === "undefined") {
+  if (!stored) {
     return { dailyKey: today, weeklyKey: week, daily: rollDaily(), weekly: rollWeekly() };
   }
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const parsed = JSON.parse(raw) as MissionsState;
-      let daily = parsed.daily;
-      let weekly = parsed.weekly;
-      let dKey = parsed.dailyKey;
-      let wKey = parsed.weeklyKey;
-      if (dKey !== today) {
-        daily = rollDaily();
-        dKey = today;
-      }
-      if (wKey !== week) {
-        weekly = rollWeekly();
-        wKey = week;
-      }
-      return { dailyKey: dKey, weeklyKey: wKey, daily, weekly };
-    }
-  } catch {
-    /* ignore */
+  let { daily, weekly, dailyKey: dKey, weeklyKey: wKey } = stored;
+  if (dKey !== today) {
+    daily = rollDaily();
+    dKey = today;
   }
-  return { dailyKey: today, weeklyKey: week, daily: rollDaily(), weekly: rollWeekly() };
+  if (wKey !== week) {
+    weekly = rollWeekly();
+    wKey = week;
+  }
+  return { dailyKey: dKey, weeklyKey: wKey, daily, weekly };
+}
+
+function loadState(): MissionsState {
+  return reconcile(getMeta<MissionsState>(META_KEY));
 }
 
 let missions: MissionsState = loadState();
@@ -234,13 +221,7 @@ function emitMissions() {
   missionsListeners.forEach((fn) => fn(structuredClone(missions)));
 }
 function persistMissions() {
-  const key = storageKey();
-  if (!key || typeof window === "undefined") return;
-  try {
-    localStorage.setItem(key, JSON.stringify(missions));
-  } catch {
-    /* ignore */
-  }
+  setMeta<MissionsState>(META_KEY, missions);
 }
 
 export function refreshMissionsForCurrentProfile() {
@@ -249,16 +230,25 @@ export function refreshMissionsForCurrentProfile() {
 }
 
 export function useMissions(): MissionsState {
+  // Ouve o meta do store; quando o cloud puxa (outro device), reconciliamos
+  // e emitimos para os componentes.
+  const remote = useMeta<MissionsState>(META_KEY);
   const [s, setS] = useState<MissionsState>(() => structuredClone(missions));
   useEffect(() => {
     const fn = (v: MissionsState) => setS(v);
     missionsListeners.add(fn);
-    // reroll caso perfil mude entre montagens
     refreshMissionsForCurrentProfile();
     return () => {
       missionsListeners.delete(fn);
     };
   }, []);
+  useEffect(() => {
+    // Quando o snapshot remoto muda (pull do cloud), reconciliamos com
+    // as chaves do dia/semana e atualizamos as listeners locais.
+    const next = reconcile(remote);
+    missions = next;
+    setS(structuredClone(next));
+  }, [remote]);
   return s;
 }
 
