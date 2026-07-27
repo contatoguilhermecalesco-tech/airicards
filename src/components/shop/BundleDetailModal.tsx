@@ -142,6 +142,13 @@ export function BundleDetailModal({
             </div>
           </div>
 
+          {/* Live profile preview */}
+          {contents && contents.length > 0 && (
+            <div className="px-4 pt-4 sm:px-6">
+              <BundlePreview contents={contents} bundleId={bundle.id} />
+            </div>
+          )}
+
           {/* Contents grid */}
           <div className="max-h-[52vh] overflow-y-auto px-4 pb-4 sm:px-6">
             <div className="mb-3 mt-4 flex items-center justify-between">
