@@ -621,6 +621,7 @@ function AuraAvatar({
   const showAura = !!ring;
   const inner = showAura ? size - 6 : size;
   const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   return (
     <AuraRing size={size} profile={showAura ? profile : null}>
