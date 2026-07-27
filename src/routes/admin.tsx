@@ -10,6 +10,7 @@ import {
   Flame,
   GraduationCap,
   KeyRound,
+  Package,
   ScrollText,
   Shield,
   ShoppingBag,
