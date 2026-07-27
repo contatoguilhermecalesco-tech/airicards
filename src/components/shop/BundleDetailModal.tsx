@@ -1,7 +1,7 @@
 // Bundle detail modal — Valorant/LoL-style. Lists everything inside a bundle,
 // shows individual total, savings and lets the user buy the whole set at once.
 import { useEffect, useState } from "react";
-import { Check, Loader2, Sparkles, X } from "lucide-react";
+import { Check, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
 import { SakuraPetals } from "@/components/SakuraPetals";
 import {
