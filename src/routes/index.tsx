@@ -468,9 +468,14 @@ function Home() {
 
           <Link
             to="/study"
-            className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055]`}
+            className="group relative block overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-violet-900/40 via-indigo-900/30 to-transparent p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/25 hover:from-violet-900/50"
           >
             <GlassHighlight />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-primary/20 opacity-70 blur-2xl"
+            />
+
             <div className="relative flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary/10 text-primary shadow-[0_0_20px_-6px_rgba(167,139,250,0.5)]">
                 <Sparkles className="h-4 w-4" strokeWidth={2.25} />
