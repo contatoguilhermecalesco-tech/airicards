@@ -64,7 +64,7 @@ export function ShopHero({
 
   return (
     <section
-      className="relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10"
+      className="relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
@@ -76,12 +76,20 @@ export function ShopHero({
             aria-hidden
             src={item.splashUrl}
             alt=""
-            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
           />
-          {/* Left-side darkening for text legibility */}
+          {/* Mobile: vertical fade so splash shows on top; Desktop: left fade for text legibility */}
           <div
             aria-hidden
-            className="absolute inset-0 -z-10"
+            className="absolute inset-0 -z-10 sm:hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.75) 70%, rgba(0,0,0,0.92) 100%)",
+            }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 hidden sm:block"
             style={{
               background:
                 "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 70%, transparent 100%)",
@@ -118,7 +126,8 @@ export function ShopHero({
         <SakuraPetals density="epic" seed={42} withHalo />
       )}
 
-      <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
+      <div className="grid gap-4 p-4 pt-56 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8 sm:pt-8">
+
         <div className="min-w-0 self-center">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur">
@@ -139,9 +148,10 @@ export function ShopHero({
               {item.tagline}
             </p>
           )}
-          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 sm:text-sm">
+          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 line-clamp-3 sm:line-clamp-none sm:text-sm">
             {item.description || "Item exclusivo da loja airi."}
           </p>
+
 
           <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
             <div className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-black/30 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
@@ -186,7 +196,7 @@ export function ShopHero({
         </div>
 
         {/* Right column: visual preview */}
-        <div className="relative self-center">
+        <div className={`relative self-center ${item.splashUrl ? "hidden sm:block" : ""}`}>
           <div className="relative mx-auto max-w-[240px] sm:max-w-[260px]">
             <div
               className="absolute -inset-3 -z-10 rounded-3xl opacity-70 blur-2xl"
