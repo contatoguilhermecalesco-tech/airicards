@@ -614,6 +614,20 @@ function EnemyHelpDialog({
             </p>
           </section>
 
+          <section className="rounded-2xl border border-success/20 bg-success/[0.04] p-4">
+            <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
+              <Check className="h-4 w-4 text-success" strokeWidth={2.5} />
+              Inimigas derrotadas
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+              Uma carta derrotada deixa de ser inimiga, mas seu histórico não é
+              esquecido. Durante as revisões normais ela aparece com o selo
+              verde <span className="font-semibold text-success">Veterana</span>,
+              discreto, para lembrar que você já a venceu — sem manter o visual
+              de batalha.
+            </p>
+          </section>
+
           <section className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
             <h3 className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-foreground">
               <Sparkles className="h-4 w-4 text-primary" strokeWidth={2.5} />
