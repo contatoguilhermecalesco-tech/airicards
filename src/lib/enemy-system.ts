@@ -1,9 +1,9 @@
 // Sistema de cartas inimigas — tiers, missões diárias/semanais e combo.
-// Mantido no frontend (localStorage por perfil) para não mexer no schema.
+// Missões são sincronizadas via profile_data.data.meta.enemyMissions para
+// PC e celular verem o mesmo progresso.
 import { useEffect, useState } from "react";
 import type { Card } from "@/lib/flashcards-store";
-import { isEnemy, isDefeated } from "@/lib/flashcards-store";
-import { getCurrentProfile } from "@/lib/profile";
+import { isEnemy, isDefeated, getMeta, setMeta, useMeta } from "@/lib/flashcards-store";
 import { earn } from "@/lib/wallet-store";
 import { awardLp } from "@/lib/rank-store";
 
