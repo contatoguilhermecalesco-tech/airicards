@@ -23,6 +23,7 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../li
 import { useCurrentProfile, signOutProfile } from "../lib/profile";
 import { auraRingFromEquipped, auraProfileFromEquipped } from "../lib/aura";
 import { AuraRing } from "../components/AuraRing";
+import { getEquippedArt } from "../lib/shop-asset-overrides";
 import { SyncIndicator } from "../components/SyncIndicator";
 import "@/lib/presence";
 
@@ -616,26 +617,48 @@ function AuraAvatar({
   ring: string | null;
   profile: ReturnType<typeof auraProfileFromEquipped>;
 }) {
+  const wallet = useWallet();
   const showAura = !!ring;
   const inner = showAura ? size - 6 : size;
+  const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const badgeArt = getEquippedArt(wallet.equipped.badge);
   return (
     <AuraRing size={size} profile={showAura ? profile : null}>
       <span
-        className="relative block overflow-hidden rounded-full ring-1 ring-white/15"
-        style={{
-          width: inner,
-          height: inner,
-          backgroundImage: avatarUrl ? undefined : gradient,
-          background: avatarUrl ? "#000" : undefined,
-          boxShadow: showAura && ring ? `0 0 10px ${ring}55` : undefined,
-        }}
+        className="relative block overflow-visible rounded-full"
+        style={{ width: inner, height: inner }}
       >
-        {avatarUrl && (
+        <span
+          className="relative block h-full w-full overflow-hidden rounded-full ring-1 ring-white/15"
+          style={{
+            backgroundImage: avatarUrl ? undefined : gradient,
+            background: avatarUrl ? "#000" : undefined,
+            boxShadow: showAura && ring ? `0 0 10px ${ring}55` : undefined,
+          }}
+        >
+          {avatarUrl && (
+            <img
+              src={avatarUrl}
+              alt=""
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+          )}
+        </span>
+        {nameplateArt && (
           <img
-            src={avatarUrl}
+            src={nameplateArt}
             alt=""
-            className="h-full w-full object-cover"
-            draggable={false}
+            aria-hidden
+            className="pointer-events-none absolute -inset-[6px] h-[calc(100%+12px)] w-[calc(100%+12px)] max-w-none object-contain drop-shadow-[0_2px_6px_rgba(192,132,252,0.55)]"
+          />
+        )}
+        {badgeArt && (
+          <img
+            src={badgeArt}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute -bottom-1 -right-1 h-[42%] w-[42%] rounded-full object-contain drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]"
           />
         )}
       </span>
