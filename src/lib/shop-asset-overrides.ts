@@ -10,6 +10,14 @@ import florescerCardframe from "@/assets/shop/florescer/cardframe.png";
 import florescerCompanion from "@/assets/shop/florescer/companion.png";
 import florescerSakura from "@/assets/shop/florescer/sakura-overlay.png";
 
+import monarcaSplash from "@/assets/shop/monarca/splash-hero.jpg";
+import monarcaAura from "@/assets/shop/monarca/aura.png";
+import monarcaFrame from "@/assets/shop/monarca/frame.png";
+import monarcaBackground from "@/assets/shop/monarca/background.png";
+import monarcaCardframe from "@/assets/shop/monarca/cardframe.png";
+import monarcaCompanion from "@/assets/shop/monarca/companion.png";
+import monarcaOverlay from "@/assets/shop/monarca/sakura-overlay.png";
+
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
   splash?: string;
@@ -18,16 +26,23 @@ export type ShopAssetOverride = {
 };
 
 export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
-  // Master bundle
+  // Master bundle — Florescer Celestial
   "bundle.florescer_celestial": { splash: florescerSplash, art: florescerAura },
-
-  // Individual items in the Florescer Celestial bundle
   "cosmetic.aura.florescer_celestial": { art: florescerAura },
   "cosmetic.frame.coroa_guardia": { art: florescerFrame },
   "cosmetic.effect.bosque_celestial": { art: florescerBackground },
   "cosmetic.overlay.chuva_sakura": { art: florescerSakura },
   "cosmetic.veil.veu_celestial": { art: florescerCardframe },
   "cosmetic.companion.kitsune_florescer": { art: florescerCompanion },
+
+  // Master bundle — Monarca das Sombras
+  "bundle.monarca_sombras": { splash: monarcaSplash, art: monarcaAura },
+  "cosmetic.aura.monarca_sombras": { art: monarcaAura },
+  "cosmetic.frame.coroa_soberano": { art: monarcaFrame },
+  "cosmetic.effect.portal_sombras": { art: monarcaBackground },
+  "cosmetic.overlay.exercito_sombras": { art: monarcaOverlay },
+  "cosmetic.veil.manto_monarca": { art: monarcaCardframe },
+  "cosmetic.companion.igris_cavaleiro": { art: monarcaCompanion },
 };
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
@@ -46,6 +61,13 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "overlay:chuva_sakura": florescerSakura,
   "veil:veu_celestial": florescerCardframe,
   "companion:kitsune_florescer": florescerCompanion,
+
+  "decoration:monarca_sombras": monarcaAura,
+  "nameplate:coroa_soberano": monarcaFrame,
+  "effect:portal_sombras": monarcaBackground,
+  "overlay:exercito_sombras": monarcaOverlay,
+  "veil:manto_monarca": monarcaCardframe,
+  "companion:igris_cavaleiro": monarcaCompanion,
 };
 
 export function getEquippedArt(walletKey: string | undefined | null): string | undefined {
