@@ -540,3 +540,34 @@
 @utility companion-sparkle {
   animation: companion-sparkle var(--dur, 2.4s) ease-in-out var(--delay, 0s) infinite;
 }
+
+/* ---- Multi-frame companion cycle (Igris: idle → bow → sword-draw) ---- */
+@keyframes companion-frame-a {
+  0%, 28% { opacity: 1; }
+  35%, 88% { opacity: 0; }
+  95%, 100% { opacity: 1; }
+}
+@keyframes companion-frame-b {
+  0%, 32% { opacity: 0; }
+  38%, 55% { opacity: 1; }
+  62%, 100% { opacity: 0; }
+}
+@keyframes companion-frame-c {
+  0%, 58% { opacity: 0; }
+  66%, 85% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+@keyframes companion-slash-flash {
+  0%, 60% { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+  66% { opacity: 0.95; transform: scale(1.15) rotate(4deg); }
+  74% { opacity: 0.55; transform: scale(1.35) rotate(10deg); }
+  85%, 100% { opacity: 0; transform: scale(1.5) rotate(14deg); }
+}
+@utility companion-frame-a { animation: companion-frame-a 9s ease-in-out infinite; }
+@utility companion-frame-b { animation: companion-frame-b 9s ease-in-out infinite; }
+@utility companion-frame-c { animation: companion-frame-c 9s ease-in-out infinite; }
+@utility companion-slash-flash {
+  animation: companion-slash-flash 9s ease-in-out infinite;
+  filter: blur(6px);
+}
+

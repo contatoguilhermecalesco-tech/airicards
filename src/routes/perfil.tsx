@@ -672,13 +672,9 @@ function PerfilPage() {
                 />
               ))}
               <div className="companion-hop absolute inset-0">
-                <img
-                  src={companion.src}
-                  alt={companion.name}
-                  className="companion-idle relative h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(192,132,252,0.55)]"
-                  loading="lazy"
-                />
+                <CompanionRender companion={companion} />
               </div>
+
             </div>
           )}
         </div>
