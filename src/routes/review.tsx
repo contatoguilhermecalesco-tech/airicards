@@ -119,7 +119,15 @@ function Review() {
     () => allCards.find((c) => c.id === currentId),
     [allCards, currentId],
   );
-  const currentIsEnemy = current ? isEnemy(current) : false;
+  // Visualmente só tratamos como "inimiga" cartas que ainda estão vivas.
+  // Cartas já derrotadas mantêm o histórico (badge "Veterana") mas perdem
+  // toda a estética de ameaça no card e no fundo.
+  const currentIsEnemy = current
+    ? isEnemy(current) && !isDefeated(current)
+    : false;
+  const currentIsVeteran = current
+    ? isEnemy(current) && isDefeated(current)
+    : false;
 
   const deckName = useStore((s) =>
     deckId ? s.decks.find((d) => d.id === deckId)?.name : undefined,
@@ -456,6 +464,21 @@ function Review() {
                 )}
               </span>
             )}
+          </div>
+        )}
+
+        {/* Selo discreto de "Veterana": carta que já foi inimiga mas já
+            foi domada. Aparece fora do modo Arena também, para o usuário
+            reconhecer o histórico sem a estética de perigo. */}
+        {current && currentIsVeteran && (
+          <div className="mt-3 flex items-center justify-center">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-success/80"
+              title="Esta carta já foi inimiga e você a dominou."
+            >
+              <span aria-hidden>🏆</span>
+              Veterana
+            </span>
           </div>
         )}
 
