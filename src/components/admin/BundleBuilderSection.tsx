@@ -209,6 +209,7 @@ export function BundleBuilderSection() {
             const featuredSlot = slotForBundle.get(b.id);
             const isFeatured = Boolean(featuredSlot);
             const rarity = RARITY_META[featuredSlot?.rarity_override ?? rarityFor(b.price)];
+            const splashUrl = featuredSlot?.splash_url ?? getShopAssetOverride(b.id)?.splash ?? getShopAssetOverride(b.id)?.art;
             return (
               <li
                 key={b.id}
@@ -220,17 +221,18 @@ export function BundleBuilderSection() {
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className="relative h-14 w-24 shrink-0 overflow-hidden rounded-xl border border-white/10"
+                    className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-white/10 sm:h-24 sm:w-40"
                     style={{ background: rarity.gradient }}
                   >
-                    {featuredSlot?.splash_url ? (
-                      <img src={featuredSlot.splash_url} alt="" className="h-full w-full object-cover" />
+                    {splashUrl ? (
+                      <img src={splashUrl} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <span className="grid h-full w-full place-items-center text-white/70">
                         <ImageIcon className="h-4 w-4" strokeWidth={2} />
                       </span>
                     )}
                   </div>
+
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
                       <p className="truncate text-[13px] font-semibold">{b.name}</p>
