@@ -272,11 +272,6 @@ function ShopPage() {
 
   /* ---------------------- Featured for hero ---------------------- */
 
-  // Bundles/cosmetics that should not be promoted in the hero vitrine
-  // even if they are active (e.g. Monarca das Sombras — its splash art
-  // focus is the bundle detail page, not the rotating showcase).
-  const VITRINE_EXCLUDED_IDS = new Set<string>(["bundle.monarca_sombras"]);
-
   const featured: FeaturedItem[] = useMemo(() => {
     // Prefer admin-curated slots when present.
     if (featuredSlots.length > 0) {
@@ -284,7 +279,7 @@ function ShopPage() {
       const curated: FeaturedItem[] = [];
       for (const slot of featuredSlots) {
         const u = byId.get(slot.item_id);
-        if (!u || VITRINE_EXCLUDED_IDS.has(u.id)) continue;
+        if (!u) continue;
         curated.push({
           id: u.id,
           kind: u.kind === "decks" ? "deck" : u.kind,
@@ -308,7 +303,7 @@ function ShopPage() {
       // Auto-append any bundles not already curated so all bundles are always in the vitrine
       const curatedIds = new Set(curated.map((c) => c.id));
       for (const u of unified) {
-        if (u.kind !== "bundle" || curatedIds.has(u.id) || VITRINE_EXCLUDED_IDS.has(u.id)) continue;
+        if (u.kind !== "bundle" || curatedIds.has(u.id)) continue;
         curated.push({
           id: u.id,
           kind: "bundle",
@@ -327,7 +322,7 @@ function ShopPage() {
     }
     // Fallback: auto-pick top items by rarity weight + price
     const pool = unified
-      .filter((u) => !VITRINE_EXCLUDED_IDS.has(u.id))
+      .slice()
       .sort((a, b) => {
         const wa = RARITY_META[a.rarity].weight + (a.kind === "bundle" ? 2 : 0);
         const wb = RARITY_META[b.rarity].weight + (b.kind === "bundle" ? 2 : 0);
