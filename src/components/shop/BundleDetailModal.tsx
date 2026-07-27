@@ -311,3 +311,129 @@ function kindLabel(k: string): string {
       return k;
   }
 }
+
+/* ---------------------- Live profile preview ---------------------- */
+
+type SlotName = "nameplate" | "decoration" | "effect" | "overlay" | "veil" | "companion" | "badge";
+
+function slotOf(item: ShopItem): SlotName | null {
+  const raw = String((item.payload as { slot?: string })?.slot ?? "").toLowerCase();
+  if (raw === "nameplate" || raw === "frame" || raw === "moldura") return "nameplate";
+  if (raw === "decoration" || raw === "aura") return "decoration";
+  if (raw === "effect" || raw === "background" || raw === "banner" || raw === "capa") return "effect";
+  if (raw === "overlay") return "overlay";
+  if (raw === "veil" || raw === "veu") return "veil";
+  if (raw === "companion" || raw === "pet") return "companion";
+  if (raw === "badge" || raw === "emblem") return "badge";
+  // Fallback by id
+  const id = item.id.toLowerCase();
+  if (id.includes(".aura.")) return "decoration";
+  if (id.includes(".frame.")) return "nameplate";
+  if (id.includes(".effect.")) return "effect";
+  if (id.includes(".overlay.") || id.includes("sakura")) return "overlay";
+  if (id.includes(".veil.") || id.includes("veu")) return "veil";
+  if (id.includes(".companion.") || id.includes("kitsune")) return "companion";
+  if (id.includes(".badge.") || id.includes(".emblem.")) return "badge";
+  return null;
+}
+
+function BundlePreview({ contents, bundleId }: { contents: ShopItem[]; bundleId: string }) {
+  const bySlot = new Map<SlotName, ShopItem>();
+  for (const c of contents) {
+    const s = slotOf(c);
+    if (s && !bySlot.has(s)) bySlot.set(s, c);
+  }
+
+  const artOf = (s: SlotName) => {
+    const it = bySlot.get(s);
+    if (!it) return null;
+    return getShopAssetOverride(it.id)?.art ?? null;
+  };
+
+  const effectArt = artOf("effect");
+  const overlayArt = artOf("overlay");
+  const auraArt = artOf("decoration");
+  const frameArt = artOf("nameplate");
+  const veilArt = artOf("veil");
+  const companionArt = artOf("companion");
+  const hasSakuraKeyword = bundleId.includes("florescer") || bySlot.get("overlay")?.id.includes("sakura");
+
+  return (
+    <div>
+      <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-violet-200">
+        <Sparkles className="h-3 w-3" strokeWidth={2.75} />
+        Preview no perfil
+      </p>
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+        {/* Banner / capa */}
+        <div className="relative h-28 w-full overflow-hidden sm:h-32">
+          {effectArt ? (
+            <img src={effectArt} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+          ) : (
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(135deg,#3b0764,#831843)" }} />
+          )}
+          {overlayArt && (
+            <img src={overlayArt} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover mix-blend-screen opacity-90" />
+          )}
+          {!overlayArt && hasSakuraKeyword && (
+            <SakuraPetals density="light" seed={5} />
+          )}
+          {veilArt && (
+            <img src={veilArt} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen" />
+          )}
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        </div>
+
+        {/* Card body with avatar */}
+        <div className="relative flex items-end gap-3 px-4 pb-3 pt-0">
+          <div className="relative -mt-8 shrink-0">
+            {/* Aura */}
+            {auraArt && (
+              <img
+                src={auraArt}
+                alt=""
+                aria-hidden
+                className="absolute -inset-2 h-[calc(100%+16px)] w-[calc(100%+16px)] animate-[spin_18s_linear_infinite] object-contain"
+              />
+            )}
+            {/* Avatar */}
+            <div className="relative grid h-16 w-16 place-items-center overflow-hidden rounded-full border-2 border-white/20 bg-gradient-to-br from-violet-500 to-fuchsia-500 text-lg font-bold text-white shadow-xl">
+              G
+            </div>
+            {/* Frame overlay */}
+            {frameArt && (
+              <img
+                src={frameArt}
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute -inset-3 h-[calc(100%+24px)] w-[calc(100%+24px)] object-contain"
+              />
+            )}
+            {/* Companion */}
+            {companionArt && (
+              <img
+                src={companionArt}
+                alt=""
+                aria-hidden
+                className="absolute -right-4 -top-3 h-10 w-10 object-contain drop-shadow-[0_0_10px_rgba(192,132,252,0.7)]"
+              />
+            )}
+          </div>
+          <div className="min-w-0 flex-1 pb-1">
+            <p className="truncate text-sm font-bold text-white">Guilherme</p>
+            <p className="truncate text-[11px] text-white/60">
+              <span className="text-white/80">guilherme</span>
+              <span className="text-white/40">.airi.com.br</span>
+            </p>
+            <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-violet-200/80">
+              {bySlot.size} de {contents.length} slots equipados
+            </p>
+          </div>
+        </div>
+      </div>
+      <p className="mt-1.5 text-[10px] text-muted-foreground">
+        Simulação de como o bundle vai aparecer no seu perfil.
+      </p>
+    </div>
+  );
+}
