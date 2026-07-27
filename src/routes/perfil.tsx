@@ -570,6 +570,7 @@ function PerfilPage() {
               >
                 <Trash2 className="h-3 w-3" strokeWidth={2.5} />
               </button>
+            )}
             {/* Aura art (decoration) — glow behind avatar */}
             {decorationArt && (
               <img
