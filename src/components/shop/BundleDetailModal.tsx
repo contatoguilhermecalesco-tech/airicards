@@ -34,18 +34,25 @@ export function BundleDetailModal({
   artUrl?: string | null;
 }) {
   const [contents, setContents] = useState<ShopItem[] | null>(null);
+  const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const rarity = RARITY_META[rarityFor(bundle.price)];
   const Icon = ICONS[bundle.icon] ?? Sparkles;
 
   useEffect(() => {
     let alive = true;
     void getBundleContents(bundle).then((r) => {
-      if (alive) setContents(r);
+      if (alive) {
+        setContents(r);
+        setEnabled(Object.fromEntries(r.map((c) => [c.id, true])));
+      }
     });
     return () => {
       alive = false;
     };
   }, [bundle.id]);
+
+  const toggleItem = (id: string) =>
+    setEnabled((prev) => ({ ...prev, [id]: !prev[id] }));
 
   const separately = (contents ?? []).reduce((sum, c) => sum + (c.price ?? 0), 0);
   const savings = Math.max(0, separately - bundle.price);
