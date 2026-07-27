@@ -167,9 +167,14 @@ const SLOT_META: Record<
     hint: "Um espírito que acompanha seu perfil.",
     icon: Heart,
   },
+  veil: {
+    label: "Véu de perfil",
+    hint: "Camada translúcida com brilhos por cima do banner.",
+    icon: Sparkles,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "companion"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "veil", "companion"];
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
