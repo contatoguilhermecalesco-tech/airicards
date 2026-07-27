@@ -621,6 +621,7 @@ function AuraAvatar({
   const showAura = !!ring;
   const inner = showAura ? size - 6 : size;
   const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   return (
     <AuraRing size={size} profile={showAura ? profile : null}>
@@ -645,6 +646,14 @@ function AuraAvatar({
             />
           )}
         </span>
+        {decorationArt && (
+          <img
+            src={decorationArt}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute -inset-[10px] h-[calc(100%+20px)] w-[calc(100%+20px)] max-w-none animate-[spin_9s_linear_infinite] object-contain drop-shadow-[0_0_10px_rgba(192,132,252,0.65)]"
+          />
+        )}
         {nameplateArt && (
           <img
             src={nameplateArt}
