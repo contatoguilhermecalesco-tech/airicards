@@ -540,7 +540,7 @@ function ShopPage() {
 
       {/* Rarity chips + affordable */}
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        {category !== "powerup" && (
+        {(category === "all" || category === "cosmetic" || category === "bundle") && (
           <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
         )}
         <button
