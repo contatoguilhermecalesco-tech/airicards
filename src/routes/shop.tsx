@@ -300,7 +300,7 @@ function ShopPage() {
           artUrl: slot.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art,
         });
       }
-      if (curated.length > 0) return curated.slice(0, 1);
+      if (curated.length > 0) return curated.slice(0, 5);
     }
     // Fallback: auto-pick the single top item by rarity weight + price
     const pool = unified
