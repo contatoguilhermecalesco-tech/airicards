@@ -83,7 +83,19 @@ type Input = {
   palette: string;
   splash_url?: string | null;
   shop_bundle_id?: string | null;
+  gallery?: ConceptGalleryItem[];
 };
+
+function normalizeGallery(g?: ConceptGalleryItem[]): ConceptGalleryItem[] {
+  if (!Array.isArray(g)) return [];
+  return g
+    .filter((it) => it && typeof it.url === "string" && it.url.trim().length > 0)
+    .map((it) => ({
+      url: it.url.trim(),
+      caption: it.caption?.trim() || null,
+      tag: it.tag?.trim() || null,
+    }));
+}
 
 export async function createBundleConcept(input: Input) {
   const { data, error } = await supabase
@@ -95,6 +107,7 @@ export async function createBundleConcept(input: Input) {
       palette: input.palette || "#a855f7",
       splash_url: input.splash_url?.trim() || null,
       shop_bundle_id: input.shop_bundle_id?.trim() || null,
+      gallery: normalizeGallery(input.gallery),
     })
     .select("*")
     .single();
@@ -113,6 +126,7 @@ export async function updateBundleConcept(id: string, input: Input) {
       palette: input.palette || "#a855f7",
       splash_url: input.splash_url?.trim() || null,
       shop_bundle_id: input.shop_bundle_id?.trim() || null,
+      gallery: normalizeGallery(input.gallery),
     })
     .eq("id", id)
     .select("*")
