@@ -159,9 +159,19 @@ function ShopPage() {
   /* ---------------------- Unified list ---------------------- */
 
   const unified: UnifiedItem[] = useMemo(() => {
+    // IDs contidos em algum bundle ativo — enquanto forem parte de um bundle,
+    // não aparecem soltos na loja (só via "ver conteúdo do bundle").
+    const bundledIds = new Set<string>();
+    (items ?? []).forEach((it) => {
+      if (it.kind !== "bundle" || it.active === false) return;
+      const arr = (it.payload as { items?: unknown })?.items;
+      if (Array.isArray(arr)) arr.forEach((x) => typeof x === "string" && bundledIds.add(x));
+    });
+
     const list: UnifiedItem[] = [];
     (items ?? []).forEach((it) => {
       const kind = (it.kind as UnifiedItem["kind"]) ?? "pack";
+      if (kind !== "bundle" && bundledIds.has(it.id)) return;
       list.push({
         id: it.id,
         kind,
