@@ -134,15 +134,17 @@ export function FeaturedSlotsSection() {
         <div>
           <h3 className="text-sm font-semibold text-foreground">Vitrine da Loja</h3>
           <p className="mt-0.5 text-[11.5px] text-foreground/50">
-            Controla o carrossel em destaque. Ative slots com splash art.
+            Apenas <strong>1 destaque</strong> por vez — o maior herói da loja.
           </p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow"
+          disabled={slots.length >= 1}
+          className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-glow disabled:cursor-not-allowed disabled:opacity-40"
+          title={slots.length >= 1 ? "Remova o destaque atual para escolher outro" : undefined}
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-          Novo slot
+          {slots.length >= 1 ? "Substituir destaque" : "Definir destaque"}
         </button>
       </div>
 

@@ -258,9 +258,9 @@ function ShopPage() {
           artUrl: slot.art_url,
         });
       }
-      if (curated.length > 0) return curated;
+      if (curated.length > 0) return curated.slice(0, 1);
     }
-    // Fallback: auto-pick top 5 by rarity weight + price
+    // Fallback: auto-pick the single top item by rarity weight + price
     const pool = unified
       .slice()
       .sort((a, b) => {
@@ -269,7 +269,7 @@ function ShopPage() {
         if (wb !== wa) return wb - wa;
         return b.price - a.price;
       })
-      .slice(0, 5);
+      .slice(0, 1);
     return pool.map<FeaturedItem>((u) => ({
       id: u.id,
       kind: u.kind === "decks" ? "deck" : u.kind,
