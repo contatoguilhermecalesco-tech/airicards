@@ -425,8 +425,8 @@ function TopBar() {
     }`;
 
   return (
-    <header className="sticky top-0 z-40 w-full">
-      <div className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-6 sm:pt-4">
+    <header className="fixed inset-x-0 top-0 z-40 w-full border-b border-white/[0.06] bg-background/70 backdrop-blur-2xl pt-[env(safe-area-inset-top)] sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-0 sm:pt-0">
+      <div className="mx-auto w-full max-w-7xl px-3 py-2 sm:px-6 sm:pt-4 sm:pb-0 sm:sticky sm:top-0 sm:z-40">
         <nav className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-3 py-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7),0_1px_0_0_rgba(255,255,255,0.05)_inset] backdrop-blur-2xl sm:rounded-full sm:px-4 sm:py-2.5 md:px-6">
           {/* Brilho interno superior */}
           <span
@@ -787,7 +787,7 @@ function RootComponent() {
           - min-h-dvh cobre 100% da altura visível no Safari mobile (sem "salto" da barra).
           - pb-24 no mobile reserva espaço para a BottomBar fixa; sm:pb-0 desativa em desktop.
         */}
-        <div className="min-h-dvh">
+        <div className="min-h-dvh pt-[68px] sm:pt-0">
           <TopBar />
           <Outlet />
           <BottomBar />
