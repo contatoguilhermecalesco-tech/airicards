@@ -609,28 +609,41 @@ function ShopPage() {
                 : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             }
           >
-            {filtered.map((u) => (
-              <UnifiedCard
-                key={`${u.kind}-${u.id}`}
-                item={u}
-                view={view}
-                owned={ownedIds.has(u.id)}
-                stack={
-                  u.kind === "powerup"
-                    ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0)
-                    : 0
-                }
-                isMineDeck={
-                  u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id
-                }
-                canAfford={wallet.crystals >= u.price}
-                busy={busy === u.id}
-                onBuy={() => handleBuyUnified(u)}
-                onPreview={
-                  u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
-                }
-              />
-            ))}
+            {filtered.map((u) => {
+              const slot = featuredSlots.find((s) => s.item_id === u.id);
+              const splashUrl =
+                u.kind === "bundle"
+                  ? (slot?.splash_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.splash ?? null)
+                  : null;
+              const artUrl =
+                u.kind === "bundle"
+                  ? (slot?.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art ?? null)
+                  : null;
+              return (
+                <UnifiedCard
+                  key={`${u.kind}-${u.id}`}
+                  item={u}
+                  view={view}
+                  owned={ownedIds.has(u.id)}
+                  stack={
+                    u.kind === "powerup"
+                      ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0)
+                      : 0
+                  }
+                  isMineDeck={
+                    u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id
+                  }
+                  canAfford={wallet.crystals >= u.price}
+                  busy={busy === u.id}
+                  onBuy={() => handleBuyUnified(u)}
+                  onPreview={
+                    u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
+                  }
+                  splashUrl={splashUrl}
+                  artUrl={artUrl}
+                />
+              );
+            })}
           </ul>
         )}
       </section>
