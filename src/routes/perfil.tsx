@@ -354,6 +354,12 @@ function PerfilPage() {
   const effect = equippedItem.effect;
   const companion = companionFromEquipped(wallet.equipped);
 
+  // Curated art for each equipped slot (bundle-specific PNGs override the generic icon).
+  const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const decorationArt = getEquippedArt(wallet.equipped.decoration);
+  const badgeArt = getEquippedArt(wallet.equipped.badge);
+  const effectArt = getEquippedArt(wallet.equipped.effect);
+
   // Hero palette: prioritize nameplate → effect → decoration → badge → default violet.
   const heroItem = nameplate ?? effect ?? decoration ?? badge;
   const heroPalette = heroItem ? paletteFor(heroItem.accent) : DISCORD_PALETTE.violet;
