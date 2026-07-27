@@ -92,7 +92,7 @@ function parseRiotBody(raw: string): Block[] {
 }
 
 function InlineRich({ text }: { text: string }) {
-  const tagRe = /\[(NOVO|REMOVIDO|BUG|NOVIDADE|AJUSTE)\]/gi;
+  const tagRe = /\[(NOVO|REMOVIDO|BUG|NOVIDADE|AJUSTE|CONCEPT|ARTE|MOVIMENTO|SOM|PALETA)\]/gi;
   const parts: Array<{ kind: "text" | "tag"; value: string }> = [];
   let lastIndex = 0;
   let m: RegExpExecArray | null;
