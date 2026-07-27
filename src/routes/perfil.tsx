@@ -367,6 +367,8 @@ function PerfilPage() {
   const effectArt = getEquippedArt(wallet.equipped.effect);
   const veilArt = getEquippedArt(wallet.equipped.veil);
   const veil = equippedItem.veil;
+  // Sakura petals from the Florescer Celestial bundle — trigger on the effect slot.
+  const showSakura = wallet.equipped.effect === "effect:bosque_celestial";
 
   // Hero palette: prioritize effect → veil → decoration → badge → default.
   // Nameplate is NOT included — it only decorates the avatar (frame), not the banner.
