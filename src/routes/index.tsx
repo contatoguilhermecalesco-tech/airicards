@@ -718,23 +718,137 @@ function Home() {
   );
 }
 
-function StatChip({ label, value, accent = false }: { label: string; value: number; accent?: boolean }) {
+function StatChip({
+  label,
+  value,
+  accent = false,
+  hint,
+  suffix,
+  icon,
+  trend = false,
+}: {
+  label: string;
+  value: number;
+  accent?: boolean;
+  hint?: string;
+  suffix?: string;
+  icon?: React.ReactNode;
+  trend?: boolean;
+}) {
   return (
     <div
-      className={`${GLASS_BASE} p-3 transition-colors hover:bg-white/[0.055] ${
+      className={`${GLASS_BASE} group p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.06] ${
         accent ? "border-primary/25 bg-primary/[0.06]" : ""
       }`}
     >
       <GlassHighlight />
-      <p className={`relative text-[10px] font-semibold uppercase tracking-[0.14em] ${accent ? "text-primary/90" : "text-muted-foreground"}`}>
-        {label}
-      </p>
-      <p className={`relative mt-1 text-[20px] font-semibold leading-none tabular-nums ${accent ? "text-primary-foreground" : "text-foreground"}`}>
+      {accent && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-primary/20 opacity-70 blur-2xl"
+        />
+      )}
+      <div className="relative flex items-center gap-1.5">
+        {icon && (
+          <span className={accent ? "text-primary" : "text-muted-foreground/70"}>{icon}</span>
+        )}
+        <p
+          className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${
+            accent ? "text-primary/90" : "text-muted-foreground"
+          }`}
+        >
+          {label}
+        </p>
+        {trend && (
+          <TrendingUp className="ml-auto h-3 w-3 text-emerald-300/80" strokeWidth={2.5} />
+        )}
+      </div>
+      <p
+        className={`relative mt-1.5 flex items-baseline gap-0.5 text-[22px] font-semibold leading-none tabular-nums ${
+          accent ? "text-primary-foreground" : "text-foreground"
+        }`}
+      >
         {value}
+        {suffix && (
+          <span className="text-[13px] font-medium text-muted-foreground">{suffix}</span>
+        )}
       </p>
+      {hint && (
+        <p className="relative mt-1.5 truncate text-[10.5px] font-medium text-muted-foreground/80">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
+
+function RankTile({ rank }: { rank: ReturnType<typeof useRank> }) {
+  const tierColor = TIER_COLORS[rank.tier];
+  const tierName = TIER_LABEL[rank.tier];
+  const divRoman = isElite(rank.tier) ? "" : DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4];
+  const lpPct = Math.min(100, Math.max(0, (rank.lp / 100) * 100));
+
+  return (
+    <section
+      className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
+      style={{ animationDelay: "135ms", animationFillMode: "backwards" }}
+    >
+      <Link
+        to="/rank"
+        className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5`}
+        style={{
+          borderColor: `${tierColor.glow}33`,
+        }}
+      >
+        <GlassHighlight />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full opacity-60 blur-2xl transition-opacity group-hover:opacity-80"
+          style={{ background: `radial-gradient(closest-side, ${tierColor.glow}55, transparent 70%)` }}
+        />
+        <div className="relative flex items-center gap-3">
+          <div
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border"
+            style={{
+              borderColor: `${tierColor.glow}55`,
+              background: `linear-gradient(180deg, ${tierColor.glow}22, ${tierColor.glow}08)`,
+              boxShadow: `0 0 24px -8px ${tierColor.glow}`,
+            }}
+          >
+            <Crown className="h-5 w-5" strokeWidth={2.25} style={{ color: tierColor.glow }} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Rank atual
+            </p>
+            <p className="mt-1 truncate text-[15px] font-semibold text-foreground">
+              {tierName} {divRoman}
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+              {rank.lp} LP · {isElite(rank.tier) ? "elite" : "próxima divisão"}
+            </p>
+          </div>
+          <ChevronRight
+            className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-muted-foreground"
+            strokeWidth={2.25}
+          />
+        </div>
+        {/* LP bar */}
+        <div className="relative mt-3 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{
+              width: `${lpPct}%`,
+              background: `linear-gradient(90deg, ${tierColor.glow}, ${tierColor.glow}cc)`,
+              boxShadow: `0 0 8px ${tierColor.glow}`,
+            }}
+          />
+        </div>
+      </Link>
+    </section>
+  );
+}
+
 
 function QuickPill({
   to,
