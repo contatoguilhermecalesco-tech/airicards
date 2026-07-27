@@ -22,7 +22,7 @@ function emit() {
 
 async function fetchAll() {
   const { data, error } = await supabase
-    .from("bundle_concepts" as never)
+    .from("bundle_concepts" as any)
     .select("*")
     .order("created_at", { ascending: false })
     .limit(200);
@@ -80,7 +80,7 @@ type Input = {
 
 export async function createBundleConcept(input: Input) {
   const { data, error } = await supabase
-    .from("bundle_concepts" as never)
+    .from("bundle_concepts" as any)
     .insert({
       title: input.title.trim(),
       tagline: input.tagline?.trim() || null,
@@ -98,7 +98,7 @@ export async function createBundleConcept(input: Input) {
 
 export async function updateBundleConcept(id: string, input: Input) {
   const { data, error } = await supabase
-    .from("bundle_concepts" as never)
+    .from("bundle_concepts" as any)
     .update({
       title: input.title.trim(),
       tagline: input.tagline?.trim() || null,
@@ -117,7 +117,7 @@ export async function updateBundleConcept(id: string, input: Input) {
 
 export async function deleteBundleConcept(id: string) {
   const { error } = await supabase
-    .from("bundle_concepts" as never)
+    .from("bundle_concepts" as any)
     .delete()
     .eq("id", id);
   if (error) throw error;
