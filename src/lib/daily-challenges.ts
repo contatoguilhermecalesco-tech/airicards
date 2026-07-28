@@ -151,6 +151,7 @@ export async function loadJourney(profileId: string) {
   ]);
 
   const rawSteps = (journeyRow?.data?.challenges ?? []) as JourneyStep[];
+  let retroactiveDuel = false;
   const merged: JourneyStep[] = STEP_TEMPLATES.map((tpl) => {
     const saved = rawSteps.find((s) => s.id === tpl.id);
     const base = {
@@ -160,6 +161,7 @@ export async function loadJourney(profileId: string) {
     };
     // Reconhece duelos finalizados antes da jornada existir.
     if (tpl.id === "step_duel" && hasDuelResult && !base.claimed && base.progress < base.target) {
+      retroactiveDuel = true;
       return { ...base, progress: base.target };
     }
     return base;
@@ -172,6 +174,7 @@ export async function loadJourney(profileId: string) {
     loaded: true,
   };
   emit();
+  if (retroactiveDuel) void persist();
 
   // Sincroniza progresso vindo de sinais externos (rank) sem esperar evento.
   refreshRankProgress();
