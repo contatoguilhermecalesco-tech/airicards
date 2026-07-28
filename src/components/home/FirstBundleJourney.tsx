@@ -58,26 +58,25 @@ export function FirstBundleJourney() {
       className="animate-fade-in mt-6 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-0"
       style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
     >
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-fuchsia-950/40 via-violet-950/30 to-black/40 p-5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_16px_40px_-24px_rgba(0,0,0,0.5)] backdrop-blur-md">
         {/* Rim light */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-300/30 to-transparent" />
-        {/* Aura */}
-        <div className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-fuchsia-500/12 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        {/* Aura sutil */}
+        <div className="pointer-events-none absolute -top-24 -right-16 h-48 w-48 rounded-full bg-violet-500/[0.06] blur-3xl" />
 
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-fuchsia-200/80">
+              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-white/50">
                 <Sparkles className="h-3 w-3" strokeWidth={2.5} />
                 Jornada · Primeiro bundle
               </div>
               <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-white">
                 Provações do primeiro bundle
               </h3>
-              <p className="mt-0.5 text-[13px] text-white/60">
+              <p className="mt-0.5 text-[13px] text-white/55">
                 Cumpra no seu ritmo — sem prazo. Recompensas somam{" "}
-                <span className="text-fuchsia-200">{totals.total} ✦</span>, o
+                <span className="text-white/80">{totals.total} ✦</span>, o
                 bastante para o seu primeiro bundle mítico.
               </p>
             </div>
@@ -85,16 +84,16 @@ export function FirstBundleJourney() {
               <span className="text-xs text-white/50">
                 {totals.completed}/{totals.count}
               </span>
-              <span className="mt-1 text-sm font-semibold text-fuchsia-100">
+              <span className="mt-1 text-sm font-semibold text-white/85">
                 {totals.earned} ✦
               </span>
             </div>
           </div>
 
           {/* Progress bar geral */}
-          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-fuchsia-400 via-violet-400 to-fuchsia-300 transition-[width] duration-700"
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-400/80 to-violet-300/80 transition-[width] duration-700"
               style={{ width: `${percent}%` }}
             />
           </div>
@@ -117,12 +116,12 @@ export function FirstBundleJourney() {
                   key={step.id}
                   className={`group flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
                     step.claimed
-                      ? "border-emerald-400/15 bg-emerald-400/[0.04]"
+                      ? "border-emerald-400/12 bg-emerald-400/[0.03]"
                       : ready
-                        ? "border-fuchsia-300/25 bg-fuchsia-400/[0.06] shadow-[0_0_0_1px_rgba(232,121,249,0.08)_inset]"
+                        ? "border-violet-300/20 bg-white/[0.04]"
                         : isCurrent
-                          ? "border-white/[0.09] bg-white/[0.03]"
-                          : "border-white/[0.05] bg-white/[0.015]"
+                          ? "border-white/[0.08] bg-white/[0.025]"
+                          : "border-white/[0.04] bg-white/[0.012]"
                   }`}
                 >
                   <StepBadge step={step} locked={locked} />
@@ -137,7 +136,7 @@ export function FirstBundleJourney() {
                       </span>
                       <span
                         className={`shrink-0 text-[11px] ${
-                          step.claimed ? "text-emerald-200/90" : "text-fuchsia-200/80"
+                          step.claimed ? "text-emerald-200/80" : "text-white/60"
                         }`}
                       >
                         +{step.reward} ✦
@@ -175,14 +174,14 @@ export function FirstBundleJourney() {
           </ul>
 
           {allClaimed && (
-            <div className="mt-4 rounded-xl border border-fuchsia-300/25 bg-fuchsia-400/[0.06] p-3 text-center">
-              <p className="text-[13px] text-fuchsia-100">
+            <div className="mt-4 rounded-xl border border-violet-300/15 bg-white/[0.03] p-3 text-center">
+              <p className="text-[13px] text-white/75">
                 Jornada completa — use seus ✦ na loja para desbloquear o
                 primeiro bundle.
               </p>
               <Link
                 to="/shop"
-                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-fuchsia-950 transition hover:bg-white"
+                className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-white"
               >
                 <Gift className="h-3.5 w-3.5" strokeWidth={2.5} />
                 Ir à loja
@@ -194,7 +193,7 @@ export function FirstBundleJourney() {
         {/* Flash de recompensa reivindicada */}
         {flash && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">
-            <div className="animate-fade-in rounded-full border border-fuchsia-300/40 bg-black/70 px-3.5 py-1.5 text-[12px] font-medium text-fuchsia-100 shadow-lg backdrop-blur">
+            <div className="animate-fade-in rounded-full border border-white/15 bg-black/70 px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-lg backdrop-blur">
               Provação cumprida · +{flash.reward} ✦
             </div>
           </div>
@@ -222,12 +221,12 @@ function StepBadge({ step, locked }: { step: JourneyStep; locked: boolean }) {
   const pct = Math.min(100, Math.round((step.progress / step.target) * 100));
   return (
     <span
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-semibold text-white ring-1 ring-fuchsia-300/25"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-semibold text-white ring-1 ring-white/10"
       style={{
-        background: `conic-gradient(#e879f9 ${pct}%, rgba(255,255,255,0.06) ${pct}%)`,
+        background: `conic-gradient(rgba(196,181,253,0.85) ${pct}%, rgba(255,255,255,0.05) ${pct}%)`,
       }}
     >
-      <span className="grid h-6 w-6 place-items-center rounded-full bg-black/70">
+      <span className="grid h-6 w-6 place-items-center rounded-full bg-black/75">
         {pct}%
       </span>
     </span>
@@ -254,7 +253,7 @@ function StepAction({
         type="button"
         onClick={onClaim}
         disabled={claiming}
-        className="shrink-0 rounded-full bg-gradient-to-r from-fuchsia-400 to-violet-400 px-3 py-1.5 text-[11.5px] font-semibold text-fuchsia-950 shadow-[0_4px_16px_-6px_rgba(232,121,249,0.6)] transition hover:brightness-110 disabled:opacity-60"
+        className="shrink-0 rounded-full bg-white/95 px-3 py-1.5 text-[11.5px] font-semibold text-black shadow-[0_4px_16px_-8px_rgba(255,255,255,0.35)] transition hover:bg-white disabled:opacity-60"
       >
         {claiming ? "..." : "Coletar"}
       </button>
