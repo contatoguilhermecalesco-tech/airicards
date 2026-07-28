@@ -368,6 +368,11 @@ export async function submitDuelResult(
     return;
   }
 
+  // Provação "Duelista": conta assim que o usuário envia seu resultado,
+  // vencendo ou perdendo — desafio do primeiro bundle é leve.
+  trackDuelWin();
+
+
   const { data: allResults } = await (supabase as any)
     .from("duel_results")
     .select("*")
