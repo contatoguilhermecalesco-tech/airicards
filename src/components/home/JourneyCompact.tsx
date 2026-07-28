@@ -21,6 +21,18 @@ export function JourneyCompact() {
   const journey = useJourney();
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("desafio") === "1") {
+      setOpen(true);
+      params.delete("desafio");
+      const qs = params.toString();
+      const url = window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash;
+      window.history.replaceState(null, "", url);
+    }
+  }, []);
+
   if (!journey.loaded || journey.hasFirstBundle) return null;
 
   const totals = journeyTotals();
