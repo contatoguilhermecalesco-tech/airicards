@@ -20,12 +20,14 @@ function stepStatus(step: JourneyStep): string {
 export function JourneyCompact() {
   const journey = useJourney();
   const [open, setOpen] = useState(false);
+  console.log("JourneyCompact render open=", open);
 
   if (!journey.loaded || journey.hasFirstBundle) return null;
 
   const totals = journeyTotals();
   const percent = Math.round((totals.earned / Math.max(1, totals.total)) * 100);
   const current = currentJourneyStep();
+
 
   return (
     <>
