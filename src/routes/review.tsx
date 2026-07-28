@@ -123,7 +123,7 @@ function Review() {
       const elapsedMin = Math.floor((Date.now() - start) / 60_000);
       if (elapsedMin > lastMinute) {
         lastMinute = elapsedMin;
-        trackStudyMinutes(elapsedMin);
+        trackStudyMinutes(1);
       }
     }, 30_000);
     return () => clearInterval(id);
