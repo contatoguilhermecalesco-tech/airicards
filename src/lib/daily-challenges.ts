@@ -127,10 +127,19 @@ async function detectFirstBundle(profileId: string): Promise<boolean> {
   return (data?.length ?? 0) > 0;
 }
 
+async function detectExistingDuelParticipation(profileId: string): Promise<boolean> {
+  const { data } = await (supabase as any)
+    .from("duel_results")
+    .select("id")
+    .eq("profile_id", profileId)
+    .limit(1);
+  return (data?.length ?? 0) > 0;
+}
+
 export async function loadJourney(profileId: string) {
   activeProfileId = profileId;
 
-  const [hasBundle, journeyRow] = await Promise.all([
+  const [hasBundle, journeyRow, hasDuelResult] = await Promise.all([
     detectFirstBundle(profileId),
     (supabase as any)
       .from("daily_challenges")
@@ -138,16 +147,22 @@ export async function loadJourney(profileId: string) {
       .eq("profile_id", profileId)
       .eq("day", JOURNEY_KEY)
       .maybeSingle(),
+    detectExistingDuelParticipation(profileId),
   ]);
 
   const rawSteps = (journeyRow?.data?.challenges ?? []) as JourneyStep[];
   const merged: JourneyStep[] = STEP_TEMPLATES.map((tpl) => {
     const saved = rawSteps.find((s) => s.id === tpl.id);
-    return {
+    const base = {
       ...tpl,
       progress: saved ? Math.min(tpl.target, saved.progress ?? 0) : 0,
       claimed: saved?.claimed ?? false,
     };
+    // Reconhece duelos finalizados antes da jornada existir.
+    if (tpl.id === "step_duel" && hasDuelResult && !base.claimed && base.progress < base.target) {
+      return { ...base, progress: base.target };
+    }
+    return base;
   });
 
   state = {
