@@ -253,7 +253,7 @@ function StepAction({
         type="button"
         onClick={onClaim}
         disabled={claiming}
-        className="shrink-0 rounded-full bg-gradient-to-r from-fuchsia-400 to-violet-400 px-3 py-1.5 text-[11.5px] font-semibold text-white shadow-[0_6px_20px_-6px_rgba(232,121,249,0.65)] transition hover:brightness-110 disabled:opacity-60"
+        className="shrink-0 rounded-full bg-white/95 px-3 py-1.5 text-[11.5px] font-semibold text-black shadow-[0_4px_16px_-8px_rgba(255,255,255,0.35)] transition hover:bg-white disabled:opacity-60"
       >
         {claiming ? "..." : "Coletar"}
       </button>
