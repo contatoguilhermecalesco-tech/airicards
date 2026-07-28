@@ -351,7 +351,8 @@ function Home() {
 
 
           {/* CTA */}
-          <div className="relative mt-7">
+          <div className="relative mt-5 sm:mt-7">
+
             {cards.length === 0 ? (
               <Link
                 to="/library"
