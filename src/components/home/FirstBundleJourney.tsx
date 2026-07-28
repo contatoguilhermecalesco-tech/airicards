@@ -58,12 +58,11 @@ export function FirstBundleJourney() {
       className="animate-fade-in mt-6 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-0"
       style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
     >
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-fuchsia-950/40 via-violet-950/30 to-black/40 p-5 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_16px_40px_-24px_rgba(0,0,0,0.5)] backdrop-blur-md">
         {/* Rim light */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-300/30 to-transparent" />
-        {/* Aura */}
-        <div className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-fuchsia-500/12 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        {/* Aura sutil */}
+        <div className="pointer-events-none absolute -top-24 -right-16 h-48 w-48 rounded-full bg-violet-500/[0.06] blur-3xl" />
 
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
