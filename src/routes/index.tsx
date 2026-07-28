@@ -25,6 +25,7 @@ import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
+import { JourneyCompact } from "@/components/home/JourneyCompact";
 
 
 
@@ -440,7 +441,7 @@ function Home() {
         />
       </section>
 
-      
+      <JourneyCompact />
 
       {/* Streak — sequência de dias */}
       <div className="contents lg:block lg:col-span-4 lg:col-start-9 lg:row-start-2 [&>section]:lg:mt-0">
