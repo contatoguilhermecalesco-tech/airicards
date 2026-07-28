@@ -220,6 +220,47 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_challenges: {
+        Row: {
+          challenges: Json
+          created_at: string
+          day: string
+          id: string
+          profile_id: string
+          surprise_claimed: boolean
+          surprise_unlocked: boolean
+          updated_at: string
+        }
+        Insert: {
+          challenges?: Json
+          created_at?: string
+          day: string
+          id?: string
+          profile_id: string
+          surprise_claimed?: boolean
+          surprise_unlocked?: boolean
+          updated_at?: string
+        }
+        Update: {
+          challenges?: Json
+          created_at?: string
+          day?: string
+          id?: string
+          profile_id?: string
+          surprise_claimed?: boolean
+          surprise_unlocked?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_challenges_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "app_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       duel_results: {
         Row: {
           accuracy: number
