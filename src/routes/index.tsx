@@ -25,7 +25,7 @@ import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
-import { FirstBundleJourney } from "@/components/home/FirstBundleJourney";
+
 
 
 export const Route = createFileRoute("/")({
