@@ -84,16 +84,16 @@ export function FirstBundleJourney() {
               <span className="text-xs text-white/50">
                 {totals.completed}/{totals.count}
               </span>
-              <span className="mt-1 text-sm font-semibold text-fuchsia-100">
+              <span className="mt-1 text-sm font-semibold text-white/85">
                 {totals.earned} ✦
               </span>
             </div>
           </div>
 
           {/* Progress bar geral */}
-          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-fuchsia-400 via-violet-400 to-fuchsia-300 transition-[width] duration-700"
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-400/80 to-violet-300/80 transition-[width] duration-700"
               style={{ width: `${percent}%` }}
             />
           </div>
