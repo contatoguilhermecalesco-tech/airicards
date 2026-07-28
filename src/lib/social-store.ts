@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROFILES } from "@/lib/profile";
+import { trackDuelWin } from "@/lib/daily-challenges";
 
 export type ProfileId = "guilherme" | "arlayne";
 
