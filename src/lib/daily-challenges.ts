@@ -1,22 +1,24 @@
-// Desafios Surpresa diários — envelope de 3 provações + recompensas em Arlys.
-// Integrado com revisão, duelos, writing e cartas inimigas para dar sensação
-// de progresso e ajudar o usuário a juntar ✦ para bundles.
+// Provações do Primeiro Bundle — jornada de boas-vindas sem prazo.
+// Substitui o antigo sistema diário: os desafios ficam abertos até serem
+// cumpridos, e a jornada inteira some assim que o usuário compra qualquer
+// bundle da loja. Recompensas somam exatamente 1.100 ✦ (preço mítico).
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
 import { earn } from "@/lib/wallet-store";
+import { getRank, TIER_ORDER, subscribeAllRanks } from "@/lib/rank-store";
 
-export type ChallengeType =
+export type JourneyStepType =
   | "review_n"
   | "correct_n"
   | "defeat_enemies"
+  | "writing"
   | "win_duel"
-  | "study_minutes"
-  | "writing";
+  | "rank_tier";
 
-export type Challenge = {
+export type JourneyStep = {
   id: string;
-  type: ChallengeType;
+  type: JourneyStepType;
   title: string;
   description: string;
   target: number;
@@ -25,91 +27,88 @@ export type Challenge = {
   claimed: boolean;
 };
 
-export type DailyChallenges = {
+export type JourneyState = {
   profileId: string;
-  day: string;
-  challenges: Challenge[];
-  surprise: Challenge | null;
-  surpriseUnlocked: boolean;
-  surpriseClaimed: boolean;
+  steps: JourneyStep[];
+  hasFirstBundle: boolean;
   loaded: boolean;
 };
 
-const CHALLENGE_TEMPLATES: Array<{
-  type: ChallengeType;
-  title: string;
-  description: string;
-  target: number;
-  reward: number;
-}> = [
-  { type: "review_n", title: "Revisor dedicado", description: "Revise {n} cartas hoje", target: 15, reward: 35 },
-  { type: "correct_n", title: "Mira afiada", description: "Acerte {n} traduções", target: 10, reward: 45 },
-  { type: "defeat_enemies", title: "Caçador de inimigos", description: "Derrote {n} cartas inimigas", target: 3, reward: 50 },
-  { type: "win_duel", title: "Duelista", description: "Vença 1 duelo", target: 1, reward: 55 },
-  { type: "study_minutes", title: "Foco total", description: "Estude por {n} minutos", target: 10, reward: 30 },
-  { type: "writing", title: "Escritor", description: "Complete 1 exercício de writing", target: 1, reward: 40 },
+const JOURNEY_KEY = "first_bundle_journey";
+
+const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
+  {
+    id: "step_review",
+    type: "review_n",
+    title: "Primeiros passos",
+    description: "Revise 30 cartas no seu ritmo",
+    target: 30,
+    reward: 80,
+  },
+  {
+    id: "step_correct",
+    type: "correct_n",
+    title: "Mira afiada",
+    description: "Acerte 50 traduções digitadas",
+    target: 50,
+    reward: 120,
+  },
+  {
+    id: "step_enemies",
+    type: "defeat_enemies",
+    title: "Caçadora de inimigos",
+    description: "Derrote 10 cartas inimigas",
+    target: 10,
+    reward: 180,
+  },
+  {
+    id: "step_writing",
+    type: "writing",
+    title: "Escritora",
+    description: "Complete 3 exercícios de writing",
+    target: 3,
+    reward: 150,
+  },
+  {
+    id: "step_duel",
+    type: "win_duel",
+    title: "Duelista",
+    description: "Vença 2 duelos semanais",
+    target: 2,
+    reward: 220,
+  },
+  {
+    id: "step_rank",
+    type: "rank_tier",
+    title: "Provação suprema",
+    description: "Alcance o rank Bronze ou superior",
+    target: 1,
+    reward: 350,
+  },
 ];
 
-const SURPRISE_TEMPLATE: Challenge = {
-  id: "surprise",
-  type: "correct_n",
-  title: "Provação suprema",
-  description: "Acerte 20 traduções sem errar para abrir o envelope dourado",
-  target: 20,
-  progress: 0,
-  reward: 120,
-  claimed: false,
-};
-
-function todayKey(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+function freshSteps(): JourneyStep[] {
+  return STEP_TEMPLATES.map((t) => ({ ...t, progress: 0, claimed: false }));
 }
 
-function seededRandom(seed: string): number {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) {
-    h = (h << 5) - h + seed.charCodeAt(i);
-    h |= 0;
-  }
-  const x = Math.sin(h) * 10000;
-  return x - Math.floor(x);
-}
+const emptyState = (id = ""): JourneyState => ({
+  profileId: id,
+  steps: freshSteps(),
+  hasFirstBundle: false,
+  loaded: false,
+});
 
-function pickChallenges(profileId: string, day: string): Challenge[] {
-  const seed = `${profileId}:${day}`;
-  const shuffled = [...CHALLENGE_TEMPLATES].sort(
-    () => seededRandom(seed + Math.random()) - 0.5,
-  );
-  return shuffled.slice(0, 3).map((t, idx) => ({
-    id: `c${idx}`,
-    type: t.type,
-    title: t.title,
-    description: t.description.replace("{n}", String(t.target)),
-    target: t.target,
-    progress: 0,
-    reward: t.reward,
-    claimed: false,
-  }));
-}
-
-function empty(profileId = ""): DailyChallenges {
-  return {
-    profileId,
-    day: todayKey(),
-    challenges: [],
-    surprise: null,
-    surpriseUnlocked: false,
-    surpriseClaimed: false,
-    loaded: false,
-  };
-}
-
-let state: DailyChallenges = empty();
+let state: JourneyState = emptyState();
 const listeners = new Set<() => void>();
 function emit() {
-  state = { ...state };
+  state = { ...state, steps: [...state.steps] };
   listeners.forEach((l) => l());
+}
+
+const claimListeners = new Set<(step: JourneyStep) => void>();
+export function onJourneyStepClaimed(cb: (step: JourneyStep) => void) {
+  claimListeners.add(cb);
+  return () => claimListeners.delete(cb);
 }
 
 function subscribe(l: () => void) {
@@ -117,187 +116,183 @@ function subscribe(l: () => void) {
   return () => listeners.delete(l);
 }
 
-export function useDailyChallenges(): DailyChallenges {
-  return useSyncExternalStore(subscribe, () => state, () => empty());
+export function useJourney(): JourneyState {
+  return useSyncExternalStore(subscribe, () => state, () => emptyState());
+}
+
+export function getJourney(): JourneyState {
+  return state;
 }
 
 let activeProfileId: string | null = null;
-let loadPromise: Promise<void> | null = null;
 
-export async function loadDailyChallenges(profileId: string, force = false) {
-  if (!force && activeProfileId === profileId && state.loaded) return;
+async function detectFirstBundle(profileId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("shop_purchases")
+    .select("id")
+    .eq("buyer_profile_id", profileId)
+    .eq("item_kind", "bundle")
+    .limit(1);
+  return (data?.length ?? 0) > 0;
+}
+
+export async function loadJourney(profileId: string) {
   activeProfileId = profileId;
-  const day = todayKey();
 
-  loadPromise = (async () => {
-    const { data, error } = await supabase
+  const [hasBundle, journeyRow] = await Promise.all([
+    detectFirstBundle(profileId),
+    (supabase as any)
       .from("daily_challenges")
-      .select("challenges, surprise_unlocked, surprise_claimed")
+      .select("challenges")
       .eq("profile_id", profileId)
-      .eq("day", day)
-      .maybeSingle();
+      .eq("day", JOURNEY_KEY)
+      .maybeSingle(),
+  ]);
 
-    if (error) {
-      console.error("[airi] daily challenges load error", error);
-      state = empty(profileId);
-      emit();
-      return;
-    }
+  const rawSteps = (journeyRow?.data?.challenges ?? []) as JourneyStep[];
+  const merged: JourneyStep[] = STEP_TEMPLATES.map((tpl) => {
+    const saved = rawSteps.find((s) => s.id === tpl.id);
+    return {
+      ...tpl,
+      progress: saved ? Math.min(tpl.target, saved.progress ?? 0) : 0,
+      claimed: saved?.claimed ?? false,
+    };
+  });
 
-    if (data) {
-      const raw = (data.challenges ?? []) as Challenge[];
-      state = {
-        profileId,
-        day,
-        challenges: raw.map((c) => ({
-          ...c,
-          progress: Math.min(c.target, c.progress ?? 0),
-          claimed: c.claimed ?? false,
-        })),
-        surprise: SURPRISE_TEMPLATE,
-        surpriseUnlocked: data.surprise_unlocked ?? false,
-        surpriseClaimed: data.surprise_claimed ?? false,
-        loaded: true,
-      };
-    } else {
-      const challenges = pickChallenges(profileId, day);
-      state = {
-        profileId,
-        day,
-        challenges,
-        surprise: SURPRISE_TEMPLATE,
-        surpriseUnlocked: false,
-        surpriseClaimed: false,
-        loaded: true,
-      };
-      await persist();
-    }
-    emit();
-  })();
-  await loadPromise;
+  state = {
+    profileId,
+    steps: merged,
+    hasFirstBundle: hasBundle,
+    loaded: true,
+  };
+  emit();
+
+  // Sincroniza progresso vindo de sinais externos (rank) sem esperar evento.
+  refreshRankProgress();
 }
 
 async function persist() {
   if (!activeProfileId) return;
-  const { error } = await supabase.from("daily_challenges").upsert(
-    {
-      profile_id: activeProfileId,
-      day: state.day,
-      challenges: state.challenges,
-      surprise_unlocked: state.surpriseUnlocked,
-      surprise_claimed: state.surpriseClaimed,
-    },
-    { onConflict: "profile_id,day" },
-  );
-  if (error) console.error("[airi] daily challenges persist error", error);
+  const { error } = await (supabase as any)
+    .from("daily_challenges")
+    .upsert(
+      {
+        profile_id: activeProfileId,
+        day: JOURNEY_KEY,
+        challenges: state.steps,
+      },
+      { onConflict: "profile_id,day" },
+    );
+  if (error) console.error("[airi] journey persist error", error);
 }
 
-function ensureLoaded() {
-  const p = getCurrentProfile();
-  if (p && (!state.loaded || state.profileId !== p.id || state.day !== todayKey())) {
-    void loadDailyChallenges(p.id);
-  }
-}
-
-if (typeof window !== "undefined") {
-  ensureLoaded();
-  subscribeProfile(() => {
-    const p = getCurrentProfile();
-    if (p) void loadDailyChallenges(p.id);
-    else {
-      state = empty();
-      emit();
-    }
-  });
-}
-
-// ---- Progress tracking ------------------------------------------------
-
-function bump(type: ChallengeType, amount = 1, predicate?: (c: Challenge) => boolean) {
-  if (!state.loaded) return;
+function bump(type: JourneyStepType, amount = 1) {
+  if (!state.loaded || state.hasFirstBundle) return;
   let changed = false;
-  state.challenges = state.challenges.map((c) => {
-    if (c.type !== type) return c;
-    if (predicate && !predicate(c)) return c;
-    const next = Math.min(c.target, c.progress + amount);
-    if (next !== c.progress) changed = true;
-    return { ...c, progress: next };
+  state.steps = state.steps.map((s) => {
+    if (s.type !== type || s.claimed) return s;
+    const next = Math.min(s.target, s.progress + amount);
+    if (next !== s.progress) changed = true;
+    return { ...s, progress: next };
   });
   if (changed) {
-    checkSurpriseUnlock();
     emit();
     void persist();
   }
 }
 
-function checkSurpriseUnlock() {
-  if (state.surpriseUnlocked || state.surpriseClaimed) return;
-  const completedStandard = state.challenges.filter((c) => c.progress >= c.target).length;
-  if (completedStandard >= 2) {
-    state.surpriseUnlocked = true;
-  }
-}
+// ---- Trackers (mesmos nomes públicos do módulo antigo) -----------------
 
 export function trackReview(correct: boolean) {
   bump("review_n", 1);
   if (correct) bump("correct_n", 1);
 }
-
 export function trackEnemyDefeated() {
   bump("defeat_enemies", 1);
 }
-
-export function trackDuelWin() {
-  bump("win_duel", 1);
-}
-
 export function trackWritingComplete() {
   bump("writing", 1);
 }
-
-export function trackStudyMinutes(minutes: number) {
-  bump("study_minutes", minutes);
+export function trackDuelWin() {
+  bump("win_duel", 1);
+}
+// Removido: `trackStudyMinutes` não faz mais sentido sem prazo.
+export function trackStudyMinutes(_minutes: number) {
+  // no-op para compat com chamadas antigas — não conta na jornada.
 }
 
-// ---- Claim rewards -----------------------------------------------------
+export function refreshRankProgress() {
+  if (!state.loaded || state.hasFirstBundle) return;
+  const rank = getRank();
+  const tierIdx = TIER_ORDER.indexOf(rank.tier);
+  const bronzeIdx = TIER_ORDER.indexOf("bronze");
+  const reached = tierIdx >= bronzeIdx ? 1 : 0;
+  const step = state.steps.find((s) => s.id === "step_rank");
+  if (step && !step.claimed && step.progress !== reached) {
+    state.steps = state.steps.map((s) =>
+      s.id === "step_rank" ? { ...s, progress: reached } : s,
+    );
+    emit();
+    void persist();
+  }
+}
 
-export async function claimChallenge(id: string): Promise<boolean> {
+export async function claimJourneyStep(id: string): Promise<boolean> {
   if (!state.loaded) return false;
-  const idx = state.challenges.findIndex((c) => c.id === id);
-  if (idx === -1) return false;
-  const c = state.challenges[idx];
-  if (c.progress < c.target || c.claimed) return false;
-  state.challenges = state.challenges.map((x, i) =>
-    i === idx ? { ...x, claimed: true } : x,
+  const step = state.steps.find((s) => s.id === id);
+  if (!step || step.claimed || step.progress < step.target) return false;
+  state.steps = state.steps.map((s) =>
+    s.id === id ? { ...s, claimed: true } : s,
   );
   emit();
-  await earn(c.reward, `Desafio: ${c.title}`);
+  await earn(step.reward, `Provação: ${step.title}`);
   await persist();
+  claimListeners.forEach((cb) => {
+    try {
+      cb(step);
+    } catch {
+      /* noop */
+    }
+  });
   return true;
 }
 
-export async function claimSurprise(): Promise<boolean> {
-  if (!state.loaded || !state.surpriseUnlocked || state.surpriseClaimed || !state.surprise) return false;
-  state.surpriseClaimed = true;
-  emit();
-  await earn(state.surprise.reward, "Envelope dourado surpresa");
-  await persist();
-  return true;
+export function markFirstBundlePurchased() {
+  if (!state.hasFirstBundle) {
+    state.hasFirstBundle = true;
+    emit();
+  }
 }
 
-export function totalEarnableToday(): number {
-  if (!state.loaded) return 0;
-  const standard = state.challenges.reduce((sum, c) => sum + c.reward, 0);
-  const surprise = state.surprise && !state.surpriseClaimed ? state.surprise.reward : 0;
-  return standard + surprise;
+// ---- Derived helpers ---------------------------------------------------
+
+export function journeyTotals() {
+  const total = state.steps.reduce((sum, s) => sum + s.reward, 0);
+  const earned = state.steps
+    .filter((s) => s.claimed)
+    .reduce((sum, s) => sum + s.reward, 0);
+  const completed = state.steps.filter((s) => s.claimed).length;
+  return { total, earned, completed, count: state.steps.length };
 }
 
-export function remainingEarnableToday(): number {
-  if (!state.loaded) return 0;
-  const standard = state.challenges
-    .filter((c) => !c.claimed && c.progress >= c.target)
-    .reduce((sum, c) => sum + c.reward, 0);
-  const surprise =
-    state.surprise && state.surpriseUnlocked && !state.surpriseClaimed ? state.surprise.reward : 0;
-  return standard + surprise;
+export function currentJourneyStep(): JourneyStep | null {
+  return state.steps.find((s) => !s.claimed) ?? null;
+}
+
+// ---- Boot & subscriptions ---------------------------------------------
+
+if (typeof window !== "undefined") {
+  const p = getCurrentProfile();
+  if (p) void loadJourney(p.id);
+
+  subscribeProfile(() => {
+    const pp = getCurrentProfile();
+    if (pp) void loadJourney(pp.id);
+    else {
+      state = emptyState();
+      emit();
+    }
+  });
+
+  subscribeAllRanks(() => refreshRankProgress());
 }
