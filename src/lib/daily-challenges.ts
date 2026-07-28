@@ -41,49 +41,49 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     id: "step_review",
     type: "review_n",
     title: "Primeiros passos",
-    description: "Revise 30 cartas no seu ritmo",
-    target: 30,
-    reward: 80,
+    description: "Revise 10 cartas no seu ritmo",
+    target: 10,
+    reward: 150,
   },
   {
     id: "step_correct",
     type: "correct_n",
-    title: "Mira afiada",
-    description: "Acerte 50 traduções digitadas",
-    target: 50,
-    reward: 120,
+    title: "Ouvido afiado",
+    description: "Acerte 15 traduções digitadas",
+    target: 15,
+    reward: 200,
   },
   {
     id: "step_enemies",
     type: "defeat_enemies",
-    title: "Caçadora de inimigos",
-    description: "Derrote 10 cartas inimigas",
-    target: 10,
-    reward: 180,
+    title: "Caçadora",
+    description: "Derrote 1 carta inimiga",
+    target: 1,
+    reward: 200,
   },
   {
     id: "step_writing",
     type: "writing",
-    title: "Escritora",
-    description: "Complete 3 exercícios de writing",
-    target: 3,
-    reward: 150,
+    title: "Escriba",
+    description: "Complete 1 exercício de writing",
+    target: 1,
+    reward: 200,
   },
   {
     id: "step_duel",
     type: "win_duel",
     title: "Duelista",
-    description: "Vença 2 duelos semanais",
-    target: 2,
-    reward: 220,
+    description: "Participe de 1 duelo (ganhando ou perdendo)",
+    target: 1,
+    reward: 150,
   },
   {
     id: "step_rank",
     type: "rank_tier",
-    title: "Provação suprema",
-    description: "Alcance o rank Bronze ou superior",
+    title: "Despertar",
+    description: "Alcance o rank Ferro I ou superior",
     target: 1,
-    reward: 350,
+    reward: 200,
   },
 ];
 
@@ -225,8 +225,8 @@ export function refreshRankProgress() {
   if (!state.loaded || state.hasFirstBundle) return;
   const rank = getRank();
   const tierIdx = TIER_ORDER.indexOf(rank.tier);
-  const bronzeIdx = TIER_ORDER.indexOf("bronze");
-  const reached = tierIdx >= bronzeIdx ? 1 : 0;
+  const ironIdx = TIER_ORDER.indexOf("iron");
+  const reached = tierIdx >= ironIdx && tierIdx >= 0 ? 1 : 0;
   const step = state.steps.find((s) => s.id === "step_rank");
   if (step && !step.claimed && step.progress !== reached) {
     state.steps = state.steps.map((s) =>
