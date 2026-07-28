@@ -1,6 +1,6 @@
 // Card compacto da Jornada do Primeiro Bundle na Home. Ao clicar, abre um
 // modal com o detalhe completo (reutilizando FirstBundleJourney).
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sparkles, ChevronRight, Gift } from "lucide-react";
 import {
   useJourney,
@@ -20,6 +20,18 @@ function stepStatus(step: JourneyStep): string {
 export function JourneyCompact() {
   const journey = useJourney();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("desafio") === "1") {
+      setOpen(true);
+      params.delete("desafio");
+      const qs = params.toString();
+      const url = window.location.pathname + (qs ? `?${qs}` : "") + window.location.hash;
+      window.history.replaceState(null, "", url);
+    }
+  }, []);
 
   if (!journey.loaded || journey.hasFirstBundle) return null;
 

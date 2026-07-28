@@ -137,7 +137,19 @@ export function NotificationsBell() {
     void markAsRead(n.id);
     if (n.action_route) {
       setOpen(false);
-      void navigate({ to: n.action_route as any });
+      const route = n.action_route;
+      const qIdx = route.indexOf("?");
+      if (qIdx >= 0) {
+        const pathname = route.slice(0, qIdx) || "/";
+        const params = new URLSearchParams(route.slice(qIdx + 1));
+        const search: Record<string, string> = {};
+        params.forEach((v, k) => {
+          search[k] = v;
+        });
+        void navigate({ to: pathname as any, search: search as any });
+      } else {
+        void navigate({ to: route as any });
+      }
     }
   };
   const ref = useRef<HTMLDivElement>(null);
