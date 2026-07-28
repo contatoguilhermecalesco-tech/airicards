@@ -193,7 +193,7 @@ export function FirstBundleJourney() {
         {/* Flash de recompensa reivindicada */}
         {flash && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-4">
-            <div className="animate-fade-in rounded-full border border-fuchsia-300/40 bg-black/70 px-3.5 py-1.5 text-[12px] font-medium text-fuchsia-100 shadow-lg backdrop-blur">
+            <div className="animate-fade-in rounded-full border border-white/15 bg-black/70 px-3.5 py-1.5 text-[12px] font-medium text-white/85 shadow-lg backdrop-blur">
               Provação cumprida · +{flash.reward} ✦
             </div>
           </div>
