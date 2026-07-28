@@ -116,12 +116,12 @@ export function FirstBundleJourney() {
                   key={step.id}
                   className={`group flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
                     step.claimed
-                      ? "border-emerald-400/15 bg-emerald-400/[0.04]"
+                      ? "border-emerald-400/12 bg-emerald-400/[0.03]"
                       : ready
-                        ? "border-fuchsia-300/25 bg-fuchsia-400/[0.06] shadow-[0_0_0_1px_rgba(232,121,249,0.08)_inset]"
+                        ? "border-violet-300/20 bg-white/[0.04]"
                         : isCurrent
-                          ? "border-white/[0.09] bg-white/[0.03]"
-                          : "border-white/[0.05] bg-white/[0.015]"
+                          ? "border-white/[0.08] bg-white/[0.025]"
+                          : "border-white/[0.04] bg-white/[0.012]"
                   }`}
                 >
                   <StepBadge step={step} locked={locked} />
@@ -136,7 +136,7 @@ export function FirstBundleJourney() {
                       </span>
                       <span
                         className={`shrink-0 text-[11px] ${
-                          step.claimed ? "text-emerald-200/90" : "text-fuchsia-200/80"
+                          step.claimed ? "text-emerald-200/80" : "text-white/60"
                         }`}
                       >
                         +{step.reward} ✦
