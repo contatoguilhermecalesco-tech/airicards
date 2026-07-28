@@ -161,6 +161,7 @@ export function addWriting(input: Omit<WritingEntry, "id" | "createdAt" | "updat
   if (s >= 90) awardLp(LP.writingGreat, "writing.great");
   else if (s >= 70) awardLp(LP.writingGood, "writing.good");
   else awardLp(Math.max(5, Math.round(s * 0.2)), "writing.good");
+  trackWritingComplete();
   return entry;
 }
 
