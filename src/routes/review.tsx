@@ -25,7 +25,7 @@ import {
   onComboReached,
   getComboCount,
 } from "@/lib/enemy-system";
-import { trackStudyMinutes } from "@/lib/daily-challenges";
+
 
 
 type ReviewMode = "due" | "enemies";
@@ -115,19 +115,7 @@ function Review() {
     setReviewed(0);
   }, [deckId, isEnemyRun]);
 
-  // Timer de estudo para desafios diários (conta minutos completos).
-  useEffect(() => {
-    const start = Date.now();
-    let lastMinute = 0;
-    const id = setInterval(() => {
-      const elapsedMin = Math.floor((Date.now() - start) / 60_000);
-      if (elapsedMin > lastMinute) {
-        lastMinute = elapsedMin;
-        trackStudyMinutes(1);
-      }
-    }, 30_000);
-    return () => clearInterval(id);
-  }, [deckId, isEnemyRun]);
+
 
   const currentId = queue[index];
   const current = useMemo(

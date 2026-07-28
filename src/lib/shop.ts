@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getWallet, spend, grantCosmetic, grantPowerup } from "@/lib/wallet-store";
 import { importPublishedDeck, type PublishedDeckRow } from "@/lib/marketplace";
+import { markFirstBundlePurchased } from "@/lib/daily-challenges";
 
 export type ShopKind = "pack" | "cosmetic" | "powerup" | "bundle";
 
@@ -132,6 +133,8 @@ export async function buyShopItem(profileId: string, item: ShopItem): Promise<Bu
           // best-effort per child
         }
       }
+      // A jornada de boas-vindas encerra com a primeira compra de bundle.
+      markFirstBundlePurchased();
     }
     await logPurchase({
       buyer_profile_id: profileId,
