@@ -67,16 +67,16 @@ export function FirstBundleJourney() {
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-fuchsia-200/80">
+              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-white/50">
                 <Sparkles className="h-3 w-3" strokeWidth={2.5} />
                 Jornada · Primeiro bundle
               </div>
               <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-white">
                 Provações do primeiro bundle
               </h3>
-              <p className="mt-0.5 text-[13px] text-white/60">
+              <p className="mt-0.5 text-[13px] text-white/55">
                 Cumpra no seu ritmo — sem prazo. Recompensas somam{" "}
-                <span className="text-fuchsia-200">{totals.total} ✦</span>, o
+                <span className="text-white/80">{totals.total} ✦</span>, o
                 bastante para o seu primeiro bundle mítico.
               </p>
             </div>
