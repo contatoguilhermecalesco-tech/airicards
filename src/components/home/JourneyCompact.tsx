@@ -32,24 +32,24 @@ export function JourneyCompact() {
   return (
     <>
       <section
-        className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
+        className="animate-fade-in mt-5 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
         style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
       >
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 text-left shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_16px_40px_-24px_rgba(0,0,0,0.45)] backdrop-blur-md transition hover:border-white/[0.14] hover:bg-white/[0.05]"
+          className="group relative flex w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5 text-left shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_16px_40px_-24px_rgba(0,0,0,0.45)] backdrop-blur-md transition hover:border-white/[0.14] hover:bg-white/[0.05]"
         >
           {/* Rim light */}
           <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           {/* Soft violet aura */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-violet-500/10 blur-2xl transition-opacity group-hover:opacity-80"
+            className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-violet-500/12 blur-2xl transition-opacity group-hover:opacity-90"
           />
 
           <div className="relative flex items-start gap-3">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-b from-violet-400/20 to-violet-600/10 ring-1 ring-violet-300/20 shadow-[0_0_24px_-8px_rgba(167,139,250,0.45)]">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-b from-violet-400/20 to-violet-600/10 ring-1 ring-violet-300/20 shadow-[0_0_24px_-8px_rgba(167,139,250,0.45)]">
               <Sparkles className="h-5 w-5 text-violet-200" strokeWidth={2.25} />
             </span>
             <div className="min-w-0 flex-1">
@@ -61,13 +61,13 @@ export function JourneyCompact() {
                   {totals.completed}/{totals.count}
                 </span>
               </div>
-              <p className="mt-1 text-[15px] font-semibold leading-tight text-white">
+              <p className="mt-1 text-[16px] font-semibold leading-tight text-white">
                 Provações do primeiro bundle
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
               <span className="text-[10px] text-white/45">recompensa</span>
-              <span className="flex items-center gap-1 text-[15px] font-semibold text-white/90">
+              <span className="flex items-center gap-1 text-[16px] font-semibold text-white/90">
                 <Gift className="h-3.5 w-3.5 text-violet-200/70" strokeWidth={2.25} />
                 {totals.total} ✦
               </span>
@@ -76,11 +76,11 @@ export function JourneyCompact() {
 
           {/* Progress */}
           <div className="relative mt-4">
-            <div className="flex items-center justify-between text-[10px] font-medium text-white/45">
+            <div className="flex items-center justify-between text-[11px] font-medium text-white/45">
               <span>Progresso</span>
               <span>{percent}%</span>
             </div>
-            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/[0.05]">
+            <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-white/[0.05]">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-violet-400 to-violet-300 transition-[width] duration-500"
                 style={{ width: `${percent}%` }}
@@ -92,7 +92,7 @@ export function JourneyCompact() {
           {current && (
             <div className="relative mt-3 rounded-xl border border-white/[0.05] bg-white/[0.03] px-3 py-2.5">
               <div className="flex items-center justify-between gap-2">
-                <p className="truncate text-[12px] font-medium text-white/85">
+                <p className="truncate text-[13px] font-medium text-white/85">
                   {current.title}
                 </p>
                 <span className="shrink-0 text-[10px] text-white/45">
@@ -120,6 +120,7 @@ export function JourneyCompact() {
           </div>
         </button>
       </section>
+
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg overflow-hidden border-white/10 bg-transparent p-0 shadow-2xl">
