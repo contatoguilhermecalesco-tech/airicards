@@ -1,6 +1,6 @@
 // Card compacto da Jornada do Primeiro Bundle na Home. Ao clicar, abre um
 // modal com o detalhe completo (reutilizando FirstBundleJourney).
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sparkles, ChevronRight, Gift } from "lucide-react";
 import {
   useJourney,
