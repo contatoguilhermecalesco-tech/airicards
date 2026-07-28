@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, LP } from "@/lib/rank-store";
+import { trackWritingComplete } from "@/lib/daily-challenges";
 import type { WritingFeedback } from "@/lib/writing.functions";
 
 export type WritingNote = {
