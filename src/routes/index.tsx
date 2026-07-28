@@ -219,7 +219,7 @@ function Home() {
 
       {/* Hero — Liquid Glass */}
       <section
-        className="animate-fade-in relative mt-7 sm:mt-8 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:row-span-2 lg:mt-0"
+        className="animate-fade-in relative mt-5 sm:mt-8 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:row-span-2 lg:mt-0"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
       >
 
@@ -233,7 +233,7 @@ function Home() {
           }}
         />
         <div
-          className={`${GLASS_BASE} rounded-[28px] p-6 sm:p-8`}
+          className={`${GLASS_BASE} rounded-[24px] p-5 sm:rounded-[28px] sm:p-8`}
         >
           <GlassHighlight />
           <div
@@ -245,12 +245,13 @@ function Home() {
             className="pointer-events-none absolute -bottom-20 -right-10 h-56 w-56 rounded-full bg-primary/15 blur-2xl"
           />
 
-          <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+          <div className="relative flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
             {/* Ring — hero centerpiece on mobile, right side on ≥sm */}
             <div
               className="relative order-1 shrink-0 sm:order-2"
-              style={{ height: 148, width: 148 }}
+              style={{ height: 128, width: 128 }}
             >
+
               <div
                 aria-hidden
                 className="absolute inset-3 rounded-full bg-primary/20 opacity-70 blur-xl"
