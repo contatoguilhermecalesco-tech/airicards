@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { getWallet, spend, grantCosmetic, grantPowerup } from "@/lib/wallet-store";
 import { importPublishedDeck, type PublishedDeckRow } from "@/lib/marketplace";
+import { markFirstBundlePurchased } from "@/lib/daily-challenges";
 
 export type ShopKind = "pack" | "cosmetic" | "powerup" | "bundle";
 
