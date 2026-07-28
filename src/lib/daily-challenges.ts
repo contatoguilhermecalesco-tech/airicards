@@ -42,7 +42,7 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     title: "Primeiros passos",
     description: "Revise 10 cartas no seu ritmo",
     target: 10,
-    reward: 150,
+    reward: 190,
   },
   {
     id: "step_correct",
@@ -50,7 +50,7 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     title: "Ouvido afiado",
     description: "Acerte 15 traduções digitadas",
     target: 15,
-    reward: 200,
+    reward: 240,
   },
   {
     id: "step_enemies",
@@ -58,7 +58,7 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     title: "Caçadora",
     description: "Derrote 1 carta inimiga",
     target: 1,
-    reward: 200,
+    reward: 240,
   },
   {
     id: "step_duel",
@@ -66,7 +66,7 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     title: "Duelista",
     description: "Participe de 1 duelo (ganhando ou perdendo)",
     target: 1,
-    reward: 150,
+    reward: 190,
   },
   {
     id: "step_rank",
@@ -74,7 +74,7 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     title: "Despertar",
     description: "Alcance o rank Ferro I ou superior",
     target: 1,
-    reward: 200,
+    reward: 240,
   },
 ];
 
