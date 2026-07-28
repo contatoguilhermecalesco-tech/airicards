@@ -11,6 +11,7 @@ import { NOTIFICATION_ICONS, resolveNotificationIcon, type NotificationIconKey }
 
 export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
   { path: "/", label: "Início" },
+  { path: "/?desafio=1", label: "Desafio (Provações)" },
   { path: "/library", label: "Biblioteca" },
   { path: "/study", label: "Estudos" },
   { path: "/study/reading", label: "Reading" },
