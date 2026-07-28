@@ -225,8 +225,8 @@ export function refreshRankProgress() {
   if (!state.loaded || state.hasFirstBundle) return;
   const rank = getRank();
   const tierIdx = TIER_ORDER.indexOf(rank.tier);
-  const bronzeIdx = TIER_ORDER.indexOf("bronze");
-  const reached = tierIdx >= bronzeIdx ? 1 : 0;
+  const ironIdx = TIER_ORDER.indexOf("iron");
+  const reached = tierIdx >= ironIdx && tierIdx >= 0 ? 1 : 0;
   const step = state.steps.find((s) => s.id === "step_rank");
   if (step && !step.claimed && step.progress !== reached) {
     state.steps = state.steps.map((s) =>
