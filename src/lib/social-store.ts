@@ -398,6 +398,7 @@ export async function submitDuelResult(
         accuracy: a.accuracy,
         opponentAccuracy: opp?.accuracy ?? 0,
       });
+      trackDuelWin();
     }
   }
 }
