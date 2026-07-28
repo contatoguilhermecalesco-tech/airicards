@@ -55,7 +55,7 @@ export function FirstBundleJourney() {
 
   return (
     <section
-      className="animate-fade-in mt-6 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-0"
+      className="animate-fade-in mt-8 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-6"
       style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
     >
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_16px_40px_-24px_rgba(0,0,0,0.5)] backdrop-blur-md">
