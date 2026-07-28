@@ -133,6 +133,8 @@ export async function buyShopItem(profileId: string, item: ShopItem): Promise<Bu
           // best-effort per child
         }
       }
+      // A jornada de boas-vindas encerra com a primeira compra de bundle.
+      markFirstBundlePurchased();
     }
     await logPurchase({
       buyer_profile_id: profileId,
