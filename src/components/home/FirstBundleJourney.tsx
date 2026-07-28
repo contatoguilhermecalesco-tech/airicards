@@ -37,10 +37,13 @@ export function FirstBundleJourney() {
   const [flash, setFlash] = useState<JourneyStep | null>(null);
 
   useEffect(() => {
-    return onJourneyStepClaimed((step) => {
+    const unsub = onJourneyStepClaimed((step) => {
       setFlash(step);
       setTimeout(() => setFlash(null), 2400);
     });
+    return () => {
+      unsub();
+    };
   }, []);
 
   if (!journey.loaded || journey.hasFirstBundle) return null;
