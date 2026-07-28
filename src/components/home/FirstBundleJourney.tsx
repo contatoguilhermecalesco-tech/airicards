@@ -17,7 +17,6 @@ const STEP_ROUTES: Record<string, string> = {
   step_review: "/review",
   step_correct: "/review",
   step_enemies: "/enemies",
-  step_writing: "/writing",
   step_duel: "/social",
   step_rank: "/rank",
 };
@@ -26,7 +25,6 @@ const STEP_CTA: Record<string, string> = {
   step_review: "Revisar cartas",
   step_correct: "Revisar cartas",
   step_enemies: "Ir à Arena",
-  step_writing: "Escrever",
   step_duel: "Ir ao Duelo",
   step_rank: "Ver o Rank",
 };
