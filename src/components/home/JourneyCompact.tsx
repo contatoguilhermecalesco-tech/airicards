@@ -18,7 +18,7 @@ export function JourneyCompact() {
   return (
     <>
       <section
-        className="animate-fade-in mt-6 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-0"
+        className="animate-fade-in mt-6 lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-0"
         style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
       >
         <button

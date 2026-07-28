@@ -409,7 +409,7 @@ function Home() {
 
       {/* Atalhos — pills discretas estilo iOS */}
       <section
-        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-12 lg:col-start-1 lg:row-start-6 lg:mt-0 lg:flex-wrap lg:overflow-visible"
+        className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-12 lg:col-start-1 lg:row-start-7 lg:mt-0 lg:flex-wrap lg:overflow-visible"
         style={{ animationDelay: "80ms", animationFillMode: "backwards" }}
       >
 
@@ -644,7 +644,7 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-7 lg:mt-4"
+          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-8 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
 
