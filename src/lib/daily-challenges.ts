@@ -201,8 +201,9 @@ export function trackReview(correct: boolean) {
 export function trackEnemyDefeated() {
   bump("defeat_enemies", 1);
 }
+// Desafio de escrita retirado da jornada — mantido como no-op para compatibilidade.
 export function trackWritingComplete() {
-  bump("writing", 1);
+  /* no-op */
 }
 export function trackDuelWin() {
   bump("win_duel", 1);
