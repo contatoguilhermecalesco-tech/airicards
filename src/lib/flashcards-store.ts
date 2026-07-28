@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
+import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
 
 export type CardMode = "word" | "sentence" | "expression";
 export type CardSource = string;
