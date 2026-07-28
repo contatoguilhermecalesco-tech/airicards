@@ -58,43 +58,42 @@ export function FirstBundleJourney() {
       className="animate-fade-in mt-12 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-6"
       style={{ animationDelay: "90ms", animationFillMode: "backwards" }}
     >
-      <div className="relative overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-gradient-to-br from-fuchsia-600/25 via-violet-700/20 to-purple-900/30 p-5 shadow-[0_1px_0_rgba(255,255,255,0.08)_inset,0_24px_60px_-30px_rgba(217,70,239,0.45)] backdrop-blur-md">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_16px_40px_-24px_rgba(0,0,0,0.5)] backdrop-blur-md">
         {/* Rim light */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-200/30 to-transparent" />
-        {/* Aura fúcsia */}
-        <div className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full bg-fuchsia-500/25 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-violet-500/20 blur-3xl" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        {/* Aura sutil */}
+        <div className="pointer-events-none absolute -top-24 -right-16 h-48 w-48 rounded-full bg-violet-500/[0.06] blur-3xl" />
 
         <div className="relative">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-fuchsia-200/80">
+              <div className="flex items-center gap-2 text-[10.5px] font-medium uppercase tracking-[0.18em] text-white/50">
                 <Sparkles className="h-3 w-3" strokeWidth={2.5} />
                 Jornada · Primeiro bundle
               </div>
               <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-white">
                 Provações do primeiro bundle
               </h3>
-              <p className="mt-0.5 text-[13px] text-white/70">
+              <p className="mt-0.5 text-[13px] text-white/55">
                 Cumpra no seu ritmo — sem prazo. Recompensas somam{" "}
-                <span className="font-semibold text-fuchsia-100">{totals.total} ✦</span>, o
+                <span className="text-white/80">{totals.total} ✦</span>, o
                 bastante para o seu primeiro bundle mítico.
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
-              <span className="text-xs text-fuchsia-200/70">
+              <span className="text-xs text-white/50">
                 {totals.completed}/{totals.count}
               </span>
-              <span className="mt-1 text-sm font-semibold text-fuchsia-100">
+              <span className="mt-1 text-sm font-semibold text-white/85">
                 {totals.earned} ✦
               </span>
             </div>
           </div>
 
           {/* Progress bar geral */}
-          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-black/30">
+          <div className="relative mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.05]">
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-fuchsia-400 to-violet-300 shadow-[0_0_12px_rgba(232,121,249,0.6)] transition-[width] duration-700"
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-400/80 to-violet-300/80 transition-[width] duration-700"
               style={{ width: `${percent}%` }}
             />
           </div>
