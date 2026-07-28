@@ -25,7 +25,7 @@ import {
   onComboReached,
   getComboCount,
 } from "@/lib/enemy-system";
-import { trackStudyMinutes } from "@/lib/daily-challenges";
+
 
 
 type ReviewMode = "due" | "enemies";
