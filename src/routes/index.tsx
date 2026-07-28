@@ -407,6 +407,8 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <JourneyCompact />
+
       {/* Atalhos — pills discretas estilo iOS */}
       <section
         className="animate-fade-in mt-6 -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:col-span-12 lg:col-start-1 lg:row-start-7 lg:mt-0 lg:flex-wrap lg:overflow-visible"
@@ -440,8 +442,6 @@ function Home() {
           accent="text-amber-200"
         />
       </section>
-
-      <JourneyCompact />
 
       {/* Streak — sequência de dias */}
       <div className="contents lg:block lg:col-span-4 lg:col-start-9 lg:row-start-2 [&>section]:lg:mt-0">
