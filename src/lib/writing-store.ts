@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, LP } from "@/lib/rank-store";
+import { trackWritingComplete } from "@/lib/daily-challenges";
 import type { WritingFeedback } from "@/lib/writing.functions";
 
 export type WritingNote = {
@@ -160,6 +161,7 @@ export function addWriting(input: Omit<WritingEntry, "id" | "createdAt" | "updat
   if (s >= 90) awardLp(LP.writingGreat, "writing.great");
   else if (s >= 70) awardLp(LP.writingGood, "writing.good");
   else awardLp(Math.max(5, Math.round(s * 0.2)), "writing.good");
+  trackWritingComplete();
   return entry;
 }
 

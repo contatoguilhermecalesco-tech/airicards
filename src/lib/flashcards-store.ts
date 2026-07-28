@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
+import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
 
 export type CardMode = "word" | "sentence" | "expression";
 export type CardSource = string;
@@ -676,20 +677,25 @@ export function reviewCard(id: string, grade: Grade) {
   };
 
   // --- Rank / LP ------------------------------------------------------
+  const isCorrect = grade !== "again";
   if (grade === "again") {
     awardLp(LP.reviewWrong, "review.wrong");
   } else {
     const delta = grade === "easy" ? LP.reviewEasy : grade === "good" ? LP.reviewGood : LP.reviewHard;
     awardLp(delta, `review.${grade}`);
   }
+  // Desafios diários: contabiliza revisão e acerto.
+  trackReview(isCorrect);
+
   // Detecta viradas de rank sobre a carta:
   const nextCard = state.cards.find((c) => c.id === id);
   if (nextCard) {
     // Inimigo derrotado (era inimigo ativo, agora defeated).
     if (wasEnemyBefore && isDefeated(nextCard)) {
       awardLp(LP.enemyDefeated, "enemy.defeated");
+      trackEnemyDefeated();
     }
-    // Virou inimigo agora (era não-inimigo, passou do threshold de lapses).
+    // Virou inimigo agora (era não-inimigo, passou o threshold de lapses).
     if (wasBelowEnemyBefore && isEnemy(nextCard) && !isDefeated(nextCard)) {
       awardLp(LP.enemyEvolved, "enemy.evolved");
     }
