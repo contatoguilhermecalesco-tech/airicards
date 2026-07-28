@@ -221,12 +221,12 @@ function StepBadge({ step, locked }: { step: JourneyStep; locked: boolean }) {
   const pct = Math.min(100, Math.round((step.progress / step.target) * 100));
   return (
     <span
-      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-semibold text-white ring-1 ring-fuchsia-300/25"
+      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[10px] font-semibold text-white ring-1 ring-white/10"
       style={{
-        background: `conic-gradient(#e879f9 ${pct}%, rgba(255,255,255,0.06) ${pct}%)`,
+        background: `conic-gradient(rgba(196,181,253,0.85) ${pct}%, rgba(255,255,255,0.05) ${pct}%)`,
       }}
     >
-      <span className="grid h-6 w-6 place-items-center rounded-full bg-black/70">
+      <span className="grid h-6 w-6 place-items-center rounded-full bg-black/75">
         {pct}%
       </span>
     </span>
