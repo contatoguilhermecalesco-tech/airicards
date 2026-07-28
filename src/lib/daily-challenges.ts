@@ -12,7 +12,6 @@ export type JourneyStepType =
   | "review_n"
   | "correct_n"
   | "defeat_enemies"
-  | "writing"
   | "win_duel"
   | "rank_tier";
 
@@ -58,14 +57,6 @@ const STEP_TEMPLATES: Omit<JourneyStep, "progress" | "claimed">[] = [
     type: "defeat_enemies",
     title: "Caçadora",
     description: "Derrote 1 carta inimiga",
-    target: 1,
-    reward: 200,
-  },
-  {
-    id: "step_writing",
-    type: "writing",
-    title: "Escriba",
-    description: "Complete 1 exercício de writing",
     target: 1,
     reward: 200,
   },
@@ -210,8 +201,9 @@ export function trackReview(correct: boolean) {
 export function trackEnemyDefeated() {
   bump("defeat_enemies", 1);
 }
+// Desafio de escrita retirado da jornada — mantido como no-op para compatibilidade.
 export function trackWritingComplete() {
-  bump("writing", 1);
+  /* no-op */
 }
 export function trackDuelWin() {
   bump("win_duel", 1);
