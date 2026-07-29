@@ -108,8 +108,7 @@ export function AvatarCrown({
 }
 
 /**
- * Para molduras circulares (nameplate legacy): mostra apenas a METADE DE CIMA
- * da arte, apoiada no topo do avatar — sem a parte de baixo envolvendo o rosto.
+ * Moldura circular completa em volta do avatar (estilo League of Legends).
  */
 export function NameplateTopCrown({
   art,
@@ -118,10 +117,10 @@ export function NameplateTopCrown({
   art: string;
   size?: number;
 }) {
-  const width = size * 1.68;
-  const artHeight = width;
-  // Recorta a arte mostrando só a faixa superior (coroa).
-  const visible = artHeight * 0.4;
+  return (
+    <AvatarRing art={art} glow="rgba(192,132,252,0.40)" size={size} />
+  );
+}
   return (
     <div
       aria-hidden
