@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { WalletState, CosmeticSlot, EquippedMap } from "@/lib/wallet-store";
 import type { RankState } from "@/lib/rank-store";
-import type { Card, Streak } from "@/lib/flashcards-store";
+import type { Streak } from "@/lib/flashcards-store";
 
 export type ProfileSnapshot = {
   profileId: string;
@@ -42,45 +42,47 @@ function normalizeWallet(row: {
 }
 
 export async function fetchProfileSnapshot(profileId: string): Promise<ProfileSnapshot | null> {
-  const [walletRes, dataRes] = await Promise.all([
-    supabase.from("wallets").select("crystals, inventory").eq("profile_id", profileId).maybeSingle(),
-    supabase.from("profile_data").select("data, home_sessions, rank, updated_at").eq("profile_id", profileId).maybeSingle(),
-  ]);
-  if (walletRes.error && dataRes.error) return null;
-  const wallet = walletRes.data
-    ? normalizeWallet(walletRes.data as { crystals: number; inventory: { cosmetics?: string[]; equipped?: EquippedMap; powerups?: Record<string, number>; bio?: string; avatarUrl?: string } | null }, profileId)
-    : normalizeWallet({ crystals: 0, inventory: null }, profileId);
+  // RPC SECURITY DEFINER: retorna apenas dados públicos do perfil (sem conteúdo
+  // das cartas), permitindo que um perfil veja o outro sem afrouxar as RLS.
+  const { data, error } = await supabase.rpc("get_public_profile_snapshot", {
+    _profile_id: profileId,
+  });
+  if (error || !data) return null;
 
-
-  const d = (dataRes.data ?? {}) as {
-    data?: { decks?: unknown[]; cards?: Card[] } | null;
-    home_sessions?: { streak?: Streak } | null;
+  const row = data as {
+    crystals?: number;
+    inventory?: {
+      cosmetics?: string[];
+      equipped?: EquippedMap;
+      powerups?: Record<string, number>;
+      bio?: string;
+      avatarUrl?: string;
+    } | null;
     rank?: RankState | null;
+    streak?: Streak | null;
+    cards_total?: number;
+    mastered?: number;
+    enemies?: number;
+    decks_count?: number;
     updated_at?: string | null;
   };
 
-  const cards = (d.data?.cards ?? []) as Card[];
-  let mastered = 0;
-  let enemies = 0;
-  for (const c of cards) {
-    const lapses = c.lapses ?? 0;
-    const successes = c.successes ?? 0;
-    if (lapses >= 3) enemies++;
-    else if (successes >= 3) mastered++;
-  }
-
   return {
     profileId,
-    wallet,
-    rank: d.rank ?? null,
-    streak: d.home_sessions?.streak ?? null,
-    cardsTotal: cards.length,
-    mastered,
-    enemies,
-    decksCount: (d.data?.decks ?? []).length,
-    lastSeenAt: d.updated_at ?? null,
+    wallet: normalizeWallet(
+      { crystals: row.crystals ?? 0, inventory: row.inventory ?? null },
+      profileId,
+    ),
+    rank: row.rank ?? null,
+    streak: row.streak ?? null,
+    cardsTotal: row.cards_total ?? 0,
+    mastered: row.mastered ?? 0,
+    enemies: row.enemies ?? 0,
+    decksCount: row.decks_count ?? 0,
+    lastSeenAt: row.updated_at ?? null,
   };
 }
+
 
 export function useProfileSnapshot(profileId: string | undefined): {
   snapshot: ProfileSnapshot | null;
