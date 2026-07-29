@@ -25,6 +25,8 @@ import eclipseBackground from "@/assets/shop/eclipse/background.png";
 import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
 import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
+import eclipseTableBack from "@/assets/shop/eclipse/table-cardback.png";
+
 
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
@@ -92,7 +94,9 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "overlay:rosas_crepusculo": eclipsePetals,
   "veil:veu_rubro": eclipseCardframe,
   "companion:corvo_carmesim": eclipseCompanion,
+  "table:mesa_eclipse": eclipseTableBack,
 };
+
 
 export function getEquippedArt(walletKey: string | undefined | null): string | undefined {
   if (!walletKey) return undefined;
