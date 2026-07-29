@@ -26,6 +26,13 @@ import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
 import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
 import eclipseTableBack from "@/assets/shop/eclipse/table-cardback.png";
+import eclipseBrasa from "@/assets/cosmetic-brasa-carmesim.png";
+import eclipseSelo from "@/assets/cosmetic-selo-eclipse.png";
+import eclipseAscensao from "@/assets/cosmetic-ascensao-carmesim.png";
+import eclipseArauto from "@/assets/cosmetic-arauto-eclipse.png";
+import eclipseVivo from "@/assets/cosmetic-eclipse-vivo.png";
+
+
 
 
 export type ShopAssetOverride = {
