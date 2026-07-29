@@ -14,6 +14,7 @@ import {
   ScrollText,
   Shield,
   ShoppingBag,
+  Undo2,
   Swords,
   Tag as TagIcon,
   Trophy,
