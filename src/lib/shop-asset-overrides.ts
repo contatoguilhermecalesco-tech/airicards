@@ -26,6 +26,7 @@ import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
 import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
 import eclipseTableBack from "@/assets/shop/eclipse/table-cardback.png";
+import monarcaTableBack from "@/assets/shop/monarca/table-cardback.png";
 
 
 export type ShopAssetOverride = {
@@ -63,6 +64,7 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.veil.veu_rubro": { art: eclipseCardframe },
   "cosmetic.companion.corvo_carmesim": { art: eclipseCompanion },
   "cosmetic.table.mesa_eclipse": { art: eclipseTableBack },
+  "cosmetic.table.mesa_monarca": { art: monarcaTableBack },
 
 };
 
@@ -97,6 +99,7 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "veil:veu_rubro": eclipseCardframe,
   "companion:corvo_carmesim": eclipseCompanion,
   "table:mesa_eclipse": eclipseTableBack,
+  "table:mesa_monarca": monarcaTableBack,
 };
 
 
