@@ -1120,6 +1120,9 @@ function ListRow({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const cosmeticArt = cosmeticArtFor(
+    ((item.raw as ShopItem).payload ?? null) as Record<string, unknown> | null,
+  );
   const isPowerup = item.kind === "powerup";
   const isDeck = item.kind === "decks";
   const isPack = item.kind === "pack";
