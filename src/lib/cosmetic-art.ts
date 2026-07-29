@@ -3,11 +3,15 @@
 import brasaCarmesim from "@/assets/cosmetic-brasa-carmesim.png";
 import seloEclipse from "@/assets/cosmetic-selo-eclipse.png";
 import ascensaoCarmesim from "@/assets/cosmetic-ascensao-carmesim.png";
+import arautoEclipse from "@/assets/cosmetic-arauto-eclipse.png";
+import eclipseVivo from "@/assets/cosmetic-eclipse-vivo.png";
 
 export const COSMETIC_ART: Record<string, string> = {
   brasa_carmesim: brasaCarmesim,
   selo_eclipse: seloEclipse,
   ascensao_carmesim: ascensaoCarmesim,
+  arauto_eclipse: arautoEclipse,
+  eclipse_vivo: eclipseVivo,
 };
 
 function normalize(value: unknown): string | null {
