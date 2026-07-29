@@ -61,6 +61,8 @@ import {
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
+import { tableSkinByKey } from "@/lib/table-skins";
+import { TableSkinPreviewModal } from "@/components/review/TableSkinPreviewModal";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
 // featured_slots assets when admin uploads custom art.
