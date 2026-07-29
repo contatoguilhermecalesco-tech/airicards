@@ -972,10 +972,10 @@ function UnifiedCard({
               alt=""
               loading="lazy"
               draggable={false}
-              className="pointer-events-none absolute -right-2 top-1/2 h-[135%] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)] transition-transform duration-500 group-hover/cover:scale-[1.06]"
             />
           )}
-          <div className="absolute inset-0 flex items-start justify-between p-3">
+          <div className="pointer-events-none absolute inset-0 flex items-start justify-between p-3">
             <RarityChip rarity={item.rarity} />
             {owned && (
               <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
@@ -990,7 +990,7 @@ function UnifiedCard({
             )}
           </div>
           {!cosmeticArt && (
-            <div className="absolute bottom-3 left-3">
+            <div className="pointer-events-none absolute bottom-3 left-3">
               <span
                 className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
                 style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
@@ -999,7 +999,14 @@ function UnifiedCard({
               </span>
             </div>
           )}
+          {onPreview && (
+            <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur transition group-hover/cover:bg-black/70">
+              <Eye className="h-3 w-3" strokeWidth={2.5} />
+              Ver prévia
+            </span>
+          )}
         </div>
+
       )}
 
       <div className="p-4">
