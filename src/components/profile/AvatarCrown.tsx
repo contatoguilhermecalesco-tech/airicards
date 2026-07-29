@@ -121,23 +121,3 @@ export function NameplateTopCrown({
     <AvatarRing art={art} glow="rgba(192,132,252,0.40)" size={size} />
   );
 }
-  return (
-    <div
-      aria-hidden
-      className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2 overflow-hidden"
-      style={{ width, height: visible, top: -size * 0.4 }}
-    >
-      <img
-        src={art}
-        alt=""
-        loading="lazy"
-        className="crown-float absolute left-0 top-0 block max-w-none object-contain"
-        style={{
-          width,
-          height: artHeight,
-          filter: "drop-shadow(0 6px 18px rgba(192,132,252,0.45))",
-        }}
-      />
-    </div>
-  );
-}
