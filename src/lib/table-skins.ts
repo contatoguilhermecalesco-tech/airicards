@@ -1,9 +1,10 @@
 // Mesas de Revisão — "skins" que tematizam a tela de revisão inteira.
 // Slot de cosmético: `table`. A mesa padrão (Vidro Airi) é gratuita e usada
 // sempre que nada estiver equipado, então todo mundo vê o sistema funcionando.
-import eclipseAmbient from "@/assets/shop/eclipse/background.png";
-import eclipseFrame from "@/assets/shop/eclipse/cardframe.png";
+import eclipseAmbient from "@/assets/shop/eclipse/table-ambient.png";
+import eclipseFrame from "@/assets/shop/eclipse/table-frame.png";
 import eclipseCrest from "@/assets/shop/eclipse/table-cardback.png";
+import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
 
 
 export type TableSkin = {
@@ -18,6 +19,8 @@ export type TableSkin = {
   frame?: string;
   /** Brasão/verso usado como marca d'água e no resumo da sessão. */
   crest?: string;
+  /** Partículas que caem sobre a mesa (opcional). */
+  particles?: string;
   /** Cor principal da mesa (CSS color). */
   accent: string;
   /** Brilho difuso usado em halos e sombras. */
@@ -49,6 +52,7 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     ambient: eclipseAmbient,
     frame: eclipseFrame,
     crest: eclipseCrest,
+    particles: eclipsePetals,
     accent: "#e0435f",
     glow: "rgba(190, 26, 56, 0.42)",
     hit: "#ff6b8a",

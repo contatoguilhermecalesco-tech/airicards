@@ -13,13 +13,13 @@ export function TableSkinAmbient({ skin }: { skin: TableSkin }) {
         src={skin.ambient}
         alt=""
         loading="lazy"
-        className="h-full w-full object-cover opacity-[0.16] blur-[2px]"
+        className="h-full w-full object-cover opacity-[0.26]"
       />
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 80% at 50% 8%, transparent 20%, hsl(var(--background) / 0.86) 68%, hsl(var(--background)) 100%)",
+            "radial-gradient(120% 80% at 50% 8%, transparent 12%, hsl(var(--background) / 0.8) 62%, hsl(var(--background) / 0.96) 100%)",
         }}
       />
       <div
@@ -28,9 +28,36 @@ export function TableSkinAmbient({ skin }: { skin: TableSkin }) {
           background: `radial-gradient(closest-side at 50% 0%, ${skin.glow}, transparent 72%)`,
         }}
       />
+      {skin.particles && (
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <span
+              key={i}
+              className="sakura-petal absolute -top-16 block"
+              style={
+                {
+                  left: `${(i * 8.5 + 4) % 96}%`,
+                  "--petal-duration": `${11 + (i % 5) * 2.5}s`,
+                  "--petal-delay": `${i * 1.3}s`,
+                  "--petal-drift": `${i % 2 ? -70 : 70}px`,
+                  "--petal-opacity": 0.35,
+                } as React.CSSProperties
+              }
+            >
+              <img
+                src={skin.particles}
+                alt=""
+                loading="lazy"
+                className="sakura-petal-inner h-5 w-5 object-contain"
+              />
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
+
 
 /** Flash de tela colorido pela mesa, disparado no acerto ou no erro. */
 export function TableSkinFlash({

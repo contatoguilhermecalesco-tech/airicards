@@ -3,34 +3,68 @@ import { isDefaultTableSkin } from "@/lib/table-skins";
 
 /**
  * Camadas visuais aplicadas por cima/atrás da carta durante a revisão:
- * brasão em marca d'água + moldura da mesa equipada.
+ * verso ornamentado em marca d'água, moldura da mesa e cantoneiras luminosas.
  */
 export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
   if (isDefaultTableSkin(skin)) return null;
   return (
     <>
+      {/* Verso ornamentado da mesa como textura da carta */}
       {skin.crest && (
-        <img
+        <div
           aria-hidden
-          src={skin.crest}
-          alt=""
-          loading="lazy"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[130%] w-auto -translate-x-1/2 -translate-y-1/2 opacity-[0.07] mix-blend-screen"
-        />
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]"
+        >
+          <img
+            src={skin.crest}
+            alt=""
+            loading="lazy"
+            className="table-skin-breathe absolute left-1/2 top-1/2 h-[150%] w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-[0.16]"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(70% 55% at 50% 50%, hsl(var(--card) / 0.92) 20%, hsl(var(--card) / 0.72) 62%, transparent 100%)",
+            }}
+          />
+        </div>
       )}
+
+      {/* Moldura pintada da mesa */}
       {skin.frame && (
         <img
           aria-hidden
           src={skin.frame}
           alt=""
           loading="lazy"
-          className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.22] mix-blend-screen"
+          className="pointer-events-none absolute inset-0 h-full w-full rounded-[28px] object-fill opacity-[0.5]"
+          style={{ maskImage: "linear-gradient(to bottom, black, black)" }}
         />
       )}
+
+      {/* Cantoneiras luminosas */}
+      {(["tl", "tr", "bl", "br"] as const).map((c) => (
+        <span
+          key={c}
+          aria-hidden
+          className={[
+            "pointer-events-none absolute h-10 w-10 rounded-[10px] opacity-70",
+            c === "tl" && "left-3 top-3 border-l border-t",
+            c === "tr" && "right-3 top-3 border-r border-t",
+            c === "bl" && "bottom-3 left-3 border-b border-l",
+            c === "br" && "bottom-3 right-3 border-b border-r",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          style={{ borderColor: `${skin.accent}66`, boxShadow: `0 0 18px -8px ${skin.accent}` }}
+        />
+      ))}
+
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-[28px]"
-        style={{ boxShadow: `inset 0 0 0 1px ${skin.accent}33, inset 0 0 60px -30px ${skin.accent}` }}
+        style={{ boxShadow: `inset 0 0 0 1px ${skin.accent}40, inset 0 0 90px -40px ${skin.accent}` }}
       />
     </>
   );
@@ -40,7 +74,7 @@ export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
 export function tableSkinCardStyle(skin: TableSkin): React.CSSProperties {
   if (isDefaultTableSkin(skin)) return {};
   return {
-    borderColor: `${skin.accent}3d`,
-    boxShadow: `0 30px 70px -34px ${skin.glow}, inset 0 1px 0 rgb(255 255 255 / 0.07)`,
+    borderColor: `${skin.accent}52`,
+    boxShadow: `0 40px 90px -40px ${skin.glow}, 0 0 0 1px ${skin.accent}1f, inset 0 1px 0 rgb(255 255 255 / 0.07)`,
   };
 }
