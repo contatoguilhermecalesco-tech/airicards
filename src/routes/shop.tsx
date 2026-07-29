@@ -183,6 +183,16 @@ function ShopPage() {
     router.navigate({ to: "/shop", search: {}, replace: true });
   }, [search.b, items, router]);
 
+  const handlePreview = (item: ShopItem) => {
+    const slot = String(item.payload.slot ?? "").toLowerCase();
+    if (slot === "table") {
+      const key = String(item.payload.key ?? item.id);
+      if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
+      return;
+    }
+    setPreview(item);
+  };
+
   /* ---------------------- Unified list ---------------------- */
 
   const unified: UnifiedItem[] = useMemo(() => {
