@@ -2,85 +2,95 @@ import type { TableSkin } from "@/lib/table-skins";
 import { isDefaultTableSkin } from "@/lib/table-skins";
 
 /**
- * Camadas visuais aplicadas por cima/atrás da carta durante a revisão:
- * verso ornamentado em marca d'água, moldura da mesa e cantoneiras luminosas.
+ * Camadas visuais da carta durante a revisão.
+ * Em vez de esticar artes rasterizadas (que deformam), a moldura é desenhada
+ * em CSS/SVG: filete duplo, cantoneiras em filigrana e um halo de eclipse.
  */
 export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
   if (isDefaultTableSkin(skin)) return null;
+  const a = skin.accent;
+
   return (
     <>
-      {/* Base interna: obsidiana escura, limpa, para o texto respirar */}
+      {/* Base interna: obsidiana profunda com clareira central para o texto */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-[28px]"
         style={{
-          background:
-            "radial-gradient(120% 100% at 50% 0%, hsl(var(--card) / 0.55) 0%, hsl(var(--card) / 0.92) 55%, hsl(var(--card) / 0.98) 100%)",
+          background: `radial-gradient(110% 90% at 50% 42%, hsl(var(--card) / 0.55) 0%, hsl(var(--card) / 0.94) 58%, #0a0407 100%)`,
         }}
       />
 
-      {/* Verso ornamentado apenas como textura muito sutil */}
-      {skin.crest && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]"
-        >
-          <img
-            src={skin.crest}
-            alt=""
-            loading="lazy"
-            className="absolute left-1/2 top-1/2 h-[130%] w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-[0.07] saturate-[0.6] blur-[1px]"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(65% 55% at 50% 50%, hsl(var(--card) / 0.96) 30%, hsl(var(--card) / 0.6) 75%, transparent 100%)",
-            }}
-          />
-        </div>
-      )}
+      {/* Halo do eclipse atrás do conteúdo */}
+      <div
+        aria-hidden
+        className="table-skin-breathe pointer-events-none absolute left-1/2 top-1/2 h-[62%] w-[62%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ background: `radial-gradient(closest-side, ${a}26, transparent 72%)` }}
+      />
 
-      {/* Moldura pintada — só nas bordas, centro totalmente limpo */}
-      {skin.frame && (
-        <img
-          aria-hidden
-          src={skin.frame}
-          alt=""
-          loading="lazy"
-          className="pointer-events-none absolute inset-0 h-full w-full rounded-[28px] object-fill opacity-[0.55]"
-          style={{
-            maskImage:
-              "radial-gradient(78% 72% at 50% 50%, transparent 42%, black 82%)",
-            WebkitMaskImage:
-              "radial-gradient(78% 72% at 50% 50%, transparent 42%, black 82%)",
-          }}
-        />
-      )}
-
-
-      {/* Cantoneiras luminosas */}
-      {(["tl", "tr", "bl", "br"] as const).map((c) => (
-        <span
-          key={c}
-          aria-hidden
-          className={[
-            "pointer-events-none absolute h-10 w-10 rounded-[10px] opacity-70",
-            c === "tl" && "left-3 top-3 border-l border-t",
-            c === "tr" && "right-3 top-3 border-r border-t",
-            c === "bl" && "bottom-3 left-3 border-b border-l",
-            c === "br" && "bottom-3 right-3 border-b border-r",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          style={{ borderColor: `${skin.accent}66`, boxShadow: `0 0 18px -8px ${skin.accent}` }}
-        />
-      ))}
-
+      {/* Filete duplo desenhado (nunca estica) */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-[28px]"
-        style={{ boxShadow: `inset 0 0 0 1px ${skin.accent}40, inset 0 0 90px -40px ${skin.accent}` }}
+        style={{ boxShadow: `inset 0 0 0 1px ${a}59, inset 0 0 60px -28px ${a}` }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-[9px] rounded-[20px]"
+        style={{
+          boxShadow: `inset 0 0 0 1px ${a}2e`,
+          background: `linear-gradient(160deg, ${a}0f, transparent 38%, transparent 62%, ${a}0f)`,
+        }}
+      />
+
+      {/* Filigranas nas quinas */}
+      {(
+        [
+          ["tl", "left-[14px] top-[14px]", ""],
+          ["tr", "right-[14px] top-[14px]", "scale-x-[-1]"],
+          ["bl", "bottom-[14px] left-[14px]", "scale-y-[-1]"],
+          ["br", "bottom-[14px] right-[14px]", "scale-[-1]"],
+        ] as const
+      ).map(([k, pos, flip]) => (
+        <svg
+          key={k}
+          aria-hidden
+          viewBox="0 0 48 48"
+          className={`pointer-events-none absolute h-9 w-9 ${pos} ${flip}`}
+          style={{ color: a, filter: `drop-shadow(0 0 8px ${a}66)` }}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.1"
+          strokeLinecap="round"
+        >
+          <path d="M2 18V6a4 4 0 0 1 4-4h12" opacity="0.9" />
+          <path d="M2 30V10a8 8 0 0 1 8-8h20" opacity="0.35" />
+          <path d="M8 8l8 8" opacity="0.5" />
+          <circle cx="8" cy="8" r="1.6" fill="currentColor" stroke="none" />
+        </svg>
+      ))}
+
+      {/* Ornamento superior/inferior: losango do eclipse */}
+      {(["top-[6px]", "bottom-[6px]"] as const).map((pos) => (
+        <span
+          key={pos}
+          aria-hidden
+          className={`pointer-events-none absolute left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 ${pos}`}
+          style={{
+            background: `linear-gradient(135deg, ${a}, transparent)`,
+            boxShadow: `0 0 12px -2px ${a}`,
+          }}
+        />
+      ))}
+
+      {/* Brilho de vidro no topo */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/3 rounded-t-[28px]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgb(255 255 255 / 0.06), transparent)",
+        }}
       />
     </>
   );
