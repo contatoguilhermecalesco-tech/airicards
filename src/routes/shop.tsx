@@ -34,14 +34,10 @@ import { listPublishedDecks, type PublishedDeckRow } from "@/lib/marketplace";
 import {
   ACCENTS,
   ICONS,
-  MiniProfileCard,
   RARITY_META,
   RARITY_ORDER,
   RarityChip,
   rarityFor,
-  slotLabel,
-  visualFor,
-  DiscordAvatar,
   PowerupCover,
   DeckCover,
   PackCover,
@@ -61,13 +57,8 @@ import {
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
-import { tableSkinByKey } from "@/lib/table-skins";
-import { TableSkinPreviewModal } from "@/components/review/TableSkinPreviewModal";
-import {
-  CosmeticSlotPreview,
-  hasSlotPreview,
-  type PreviewSlot,
-} from "@/components/shop/CosmeticSlotPreview";
+import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
+
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
@@ -147,14 +138,8 @@ function ShopPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [preview, setPreview] = useState<ShopItem | null>(null);
-  const [tablePreviewSkinKey, setTablePreviewSkinKey] = useState<string | null>(null);
-  const [slotPreview, setSlotPreview] = useState<{
-    slot: PreviewSlot;
-    key: string;
-    name: string;
-    price: number;
-  } | null>(null);
+  const [preview, setPreview] = useState<UnifiedItem | null>(null);
+
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
   const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
@@ -195,25 +180,8 @@ function ShopPage() {
     router.navigate({ to: "/shop", search: {}, replace: true });
   }, [search.b, items, router]);
 
-  const handlePreview = (item: ShopItem) => {
-    const slot = String(item.payload.slot ?? "").toLowerCase();
-    if (slot === "table") {
-      const key = `${slot}:${String(item.payload.key ?? item.id)}`;
-      if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
-      return;
-    }
-    const key = String(item.payload.key ?? item.id);
-    if (hasSlotPreview(slot, key)) {
-      setSlotPreview({
-        slot: slot as PreviewSlot,
-        key,
-        name: item.name,
-        price: item.price,
-      });
-      return;
-    }
-    setPreview(item);
-  };
+  const handlePreview = (u: UnifiedItem) => setPreview(u);
+
 
   /* ---------------------- Unified list ---------------------- */
 
@@ -693,7 +661,7 @@ function ShopPage() {
                 busy={busy === u.id}
                 onBuy={() => handleBuyUnified(u)}
                 onPreview={
-                  u.kind === "cosmetic" ? () => handlePreview(u.raw as ShopItem) : undefined
+                  u.kind === "cosmetic" ? () => handlePreview(u) : undefined
                 }
               />
             ))}
@@ -734,7 +702,7 @@ function ShopPage() {
                   busy={busy === u.id}
                   onBuy={() => handleBuyUnified(u)}
                   onPreview={
-                    u.kind === "cosmetic" ? () => handlePreview(u.raw as ShopItem) : undefined
+                    u.kind === "cosmetic" ? () => handlePreview(u) : undefined
                   }
                   splashUrl={splashUrl}
                   artUrl={artUrl}
@@ -750,23 +718,21 @@ function ShopPage() {
       </p>
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
-      {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
-      {slotPreview && (
-        <CosmeticSlotPreview
-          slot={slotPreview.slot}
-          itemKey={slotPreview.key}
-          name={slotPreview.name}
-          price={slotPreview.price}
-          onClose={() => setSlotPreview(null)}
+      {preview && (
+        <ItemPreviewModal
+          item={preview.raw as ShopItem}
+          owned={ownedIds.has(preview.id)}
+          canAfford={wallet.crystals >= preview.price}
+          busy={busy === preview.id}
+          onBuy={() => {
+            const target = preview;
+            setPreview(null);
+            void handleBuyUnified(target);
+          }}
+          onClose={() => setPreview(null)}
         />
       )}
-      {tablePreviewSkinKey && (
-        <TableSkinPreviewModal
-          skin={tableSkinByKey(tablePreviewSkinKey)!}
-          open={!!tablePreviewSkinKey}
-          onClose={() => setTablePreviewSkinKey(null)}
-        />
-      )}
+
       {bundleOpen && (
         <BundleDetailModal
           bundle={bundleOpen}
@@ -972,14 +938,26 @@ function UnifiedCard({
         </div>
       ) : (
         <div
-          aria-hidden
-          className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
+          role={onPreview ? "button" : undefined}
+          tabIndex={onPreview ? 0 : undefined}
+          onClick={onPreview}
+          onKeyDown={(e) => {
+            if (!onPreview) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onPreview();
+            }
+          }}
+          className={`group/cover relative w-full overflow-hidden ${
+            isVitrine ? "h-40" : "h-24"
+          } ${onPreview ? "cursor-pointer" : ""}`}
           style={{
             background: cosmeticArt
               ? "radial-gradient(circle at 78% 55%, rgba(244,63,94,0.28), transparent 62%), linear-gradient(135deg,#1a0710 0%,#0b0409 100%)"
               : rarity.gradient,
           }}
         >
+
           <span
             aria-hidden
             className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
@@ -994,10 +972,10 @@ function UnifiedCard({
               alt=""
               loading="lazy"
               draggable={false}
-              className="pointer-events-none absolute -right-2 top-1/2 h-[135%] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] -translate-x-1/2 -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)] transition-transform duration-500 group-hover/cover:scale-[1.06]"
             />
           )}
-          <div className="absolute inset-0 flex items-start justify-between p-3">
+          <div className="pointer-events-none absolute inset-0 flex items-start justify-between p-3">
             <RarityChip rarity={item.rarity} />
             {owned && (
               <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
@@ -1012,7 +990,7 @@ function UnifiedCard({
             )}
           </div>
           {!cosmeticArt && (
-            <div className="absolute bottom-3 left-3">
+            <div className="pointer-events-none absolute bottom-3 left-3">
               <span
                 className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
                 style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
@@ -1021,7 +999,14 @@ function UnifiedCard({
               </span>
             </div>
           )}
+          {onPreview && (
+            <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/50 px-2.5 py-1 text-[10px] font-semibold text-white/90 backdrop-blur transition group-hover/cover:bg-black/70">
+              <Eye className="h-3 w-3" strokeWidth={2.5} />
+              Ver prévia
+            </span>
+          )}
         </div>
+
       )}
 
       <div className="p-4">
@@ -1036,13 +1021,6 @@ function UnifiedCard({
             </h3>
           </div>
         </div>
-
-        {/* cosmetic gets a mini profile preview inline for vitrine mode */}
-        {isVitrine && item.kind === "cosmetic" && (
-          <div className="mt-3">
-            <MiniProfileCard item={item.raw as ShopItem} />
-          </div>
-        )}
 
         {item.kind === "bundle" && item.bundleItems && item.bundleItems.length > 0 && (
           <p className="mt-1 text-[11px] font-medium text-muted-foreground">
@@ -1067,7 +1045,7 @@ function UnifiedCard({
                 className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-semibold text-foreground/85 transition hover:bg-white/[0.08]"
               >
                 <Eye className="h-3 w-3" strokeWidth={2.5} />
-                Preview
+                Ver prévia
               </button>
             )}
             <button
@@ -1248,141 +1226,6 @@ function kindLabelBR(k: UnifiedItem["kind"]) {
     case "bundle":
       return "Bundle";
   }
-}
-
-/* ---------------------- Cosmetic preview (Discord-style) ---------------------- */
-
-function CosmeticPreview({ item, onClose }: { item: ShopItem; onClose: () => void }) {
-  const v = visualFor(item);
-  const Icon = ICONS[item.icon] ?? Sparkles;
-  const rarity = rarityFor(item.price);
-  const showBanner = v.slot === "nameplate" || v.slot === "effect";
-  const showDecoration = v.slot === "decoration";
-  const showBadge = v.slot === "badge";
-
-  return (
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/80 p-4 backdrop-blur-md"
-      onClick={onClose}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-[340px] overflow-hidden rounded-2xl border border-black/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
-        style={{ background: "#232428" }}
-      >
-        <button
-          onClick={onClose}
-          className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full bg-black/40 text-white/80 hover:bg-black/60"
-          aria-label="Fechar"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-
-        <div
-          className={`relative h-[110px] w-full overflow-hidden ${
-            showBanner ? "cosmetic-banner-animated" : ""
-          }`}
-          style={{
-            background: showBanner
-              ? v.gradient
-              : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
-          }}
-        >
-          {showBanner && (
-            <span
-              aria-hidden
-              className="cosmetic-shimmer pointer-events-none absolute inset-y-0 left-0 w-1/2"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
-              }}
-            />
-          )}
-          <div className="absolute right-3 top-3">
-            <RarityChip rarity={rarity} />
-          </div>
-        </div>
-
-        <div className="relative px-4">
-          <div
-            className={`absolute -top-[46px] left-4 rounded-full ${
-              showDecoration ? "cosmetic-avatar-float" : ""
-            }`}
-            style={{ padding: 5, background: "#232428" }}
-          >
-            <DiscordAvatar
-              size={84}
-              ring={v.ring}
-              showDecoration={showDecoration}
-              auraKey={String(item.payload.key ?? "")}
-            />
-          </div>
-        </div>
-
-        <div className="px-4 pb-4 pt-12">
-          <div className="rounded-lg p-3" style={{ background: "#111214" }}>
-            <div className="flex items-center gap-2">
-              <p className="text-[17px] font-bold text-white leading-tight">Guilherme</p>
-              {showBadge && (
-                <span
-                  className="relative inline-flex items-center gap-1 overflow-hidden rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
-                  style={{ background: v.gradient }}
-                >
-                  <span
-                    aria-hidden
-                    className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/2 w-1/2"
-                    style={{
-                      background:
-                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
-                    }}
-                  />
-                  <Icon className="relative h-3 w-3" strokeWidth={2.75} />
-                  <span className="relative">{v.tag.toUpperCase()}</span>
-                </span>
-              )}
-            </div>
-            <p className="text-[13px] text-white/60 leading-tight">
-              <span className="text-white/80">guilherme</span>
-              <span className="text-white/40">.airi.com.br</span>
-            </p>
-            <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
-            <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
-              Cosmético equipado
-            </p>
-            <div className="mt-1 flex items-center gap-2">
-              <span
-                className="grid h-8 w-8 place-items-center rounded-md text-white"
-                style={{ background: v.gradient }}
-              >
-                <Icon className="h-4 w-4" strokeWidth={2.5} />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-[13px] font-semibold text-white">{item.name}</p>
-                <p className="truncate text-[11px] text-white/50">{slotLabel(v.slot)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="flex items-center justify-between border-t px-4 py-3"
-          style={{ borderColor: "#1a1b1e", background: "#2b2d31" }}
-        >
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
-            <ArlysIcon className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
-            {item.price}
-            <span className="text-[11px] font-medium text-white/50">Arlys ✦</span>
-          </span>
-          <button
-            onClick={onClose}
-            className="rounded-md border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-white/90 transition hover:bg-white/[0.12]"
-          >
-            Fechar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 /* ---------------------- Help dialog ---------------------- */
