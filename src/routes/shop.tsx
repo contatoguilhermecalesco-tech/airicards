@@ -728,6 +728,13 @@ function ShopPage() {
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
+      {tablePreviewSkinKey && (
+        <TableSkinPreviewModal
+          skin={tableSkinByKey(tablePreviewSkinKey)!}
+          open={!!tablePreviewSkinKey}
+          onClose={() => setTablePreviewSkinKey(null)}
+        />
+      )}
       {bundleOpen && (
         <BundleDetailModal
           bundle={bundleOpen}
