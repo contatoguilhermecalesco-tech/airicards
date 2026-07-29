@@ -70,6 +70,11 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.veil.veu_rubro": { art: eclipseCardframe },
   "cosmetic.companion.corvo_carmesim": { art: eclipseCompanion },
   "cosmetic.table.mesa_eclipse": { art: eclipseTableBack },
+  "cosmetic.streak_flame.brasa_carmesim": { art: eclipseBrasa },
+  "cosmetic.streak_flame.eclipse_vivo": { art: eclipseVivo },
+  "cosmetic.enemy_seal.selo_eclipse": { art: eclipseSelo },
+  "cosmetic.title.arauto_eclipse": { art: eclipseArauto },
+  "cosmetic.victory_splash.ascensao_carmesim": { art: eclipseAscensao },
 
 };
 
