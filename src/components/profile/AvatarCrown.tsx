@@ -81,9 +81,30 @@ export function AvatarCrown({
   size?: number;
 }) {
   const width = size * 0.98;
+  // Molduras circulares já trazem o brasão no topo — nesse caso o círculo
+  // sozinho é o visual correto (estilo League of Legends).
+  if (crown.ring) {
+    return <AvatarRing art={crown.ring} glow={crown.glow} size={size} />;
+  }
   return (
-    <>
-      {crown.ring && <AvatarRing art={crown.ring} glow={crown.glow} size={size} />}
+    <></>
+  ).type === "" ? null : (
+    <></>
+  );
+}
+
+function LegacyCrown({
+  crown,
+  size,
+  width,
+}: {
+  crown: { art: string; glow: string };
+  size: number;
+  width: number;
+}) {
+  return (
+    <></>
+  );
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2"
