@@ -13,6 +13,7 @@ import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { VictorySplash } from "@/components/duel/VictorySplash";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { cosmeticArtByKey } from "@/lib/cosmetic-art";
 
 export type PreviewSlot = "streak_flame" | "enemy_seal" | "title" | "victory_splash";
 
