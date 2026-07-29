@@ -1004,38 +1004,70 @@ function FinishedState({
   reviewed,
   deckId,
   enemyRun,
+  skin,
 }: {
   reviewed: number;
   deckId?: string;
   enemyRun: boolean;
+  skin: TableSkin;
 }) {
+  const themed = !isDefaultTableSkin(skin) && !enemyRun;
   return (
     <div className="mt-20 grid place-items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div
-        className={`grid h-16 w-16 place-items-center rounded-2xl border backdrop-blur-md ${
-          enemyRun
-            ? "border-destructive/30 bg-destructive/10 text-destructive"
-            : "border-success/25 bg-success/10 text-success"
-        }`}
-        style={{
-          boxShadow: enemyRun
-            ? "0 20px 40px -20px hsl(var(--destructive) / 0.6)"
-            : "0 20px 40px -20px hsl(var(--success) / 0.5)",
-        }}
-      >
-        {enemyRun ? (
-          <Swords className="h-7 w-7" strokeWidth={2.5} />
-        ) : (
-          <Trophy className="h-7 w-7" strokeWidth={2.5} />
-        )}
-      </div>
+      {themed && skin.crest ? (
+        <div className="relative">
+          <div
+            aria-hidden
+            className="absolute inset-0 -m-8 rounded-full blur-2xl"
+            style={{ background: `radial-gradient(closest-side, ${skin.glow}, transparent 70%)` }}
+          />
+          <img
+            src={skin.crest}
+            alt=""
+            loading="lazy"
+            className="table-skin-crest-in relative h-28 w-auto rounded-2xl border object-cover"
+            style={{
+              borderColor: `${skin.accent}4d`,
+              boxShadow: `0 24px 50px -24px ${skin.accent}`,
+            }}
+          />
+        </div>
+      ) : (
+        <div
+          className={`grid h-16 w-16 place-items-center rounded-2xl border backdrop-blur-md ${
+            enemyRun
+              ? "border-destructive/30 bg-destructive/10 text-destructive"
+              : "border-success/25 bg-success/10 text-success"
+          }`}
+          style={{
+            boxShadow: enemyRun
+              ? "0 20px 40px -20px hsl(var(--destructive) / 0.6)"
+              : "0 20px 40px -20px hsl(var(--success) / 0.5)",
+          }}
+        >
+          {enemyRun ? (
+            <Swords className="h-7 w-7" strokeWidth={2.5} />
+          ) : (
+            <Trophy className="h-7 w-7" strokeWidth={2.5} />
+          )}
+        </div>
+      )}
       <h2 className="mt-5 text-2xl font-semibold">
         {enemyRun ? "Arena encerrada" : "Sessão concluída"}
       </h2>
+      {themed && (
+        <p
+          className="mt-1 text-[10px] font-bold uppercase tracking-[0.24em]"
+          style={{ color: skin.accent }}
+        >
+          {skin.name}
+        </p>
+      )}
       <p className="mt-2 text-sm text-muted-foreground">
         Você enfrentou {reviewed} carta{reviewed === 1 ? "" : "s"}.{" "}
         {enemyRun ? "Continue implacável." : "Muito bem!"}
       </p>
+
       <div className="mt-6 flex gap-2">
         {enemyRun ? (
           <Link
