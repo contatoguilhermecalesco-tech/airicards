@@ -1,0 +1,51 @@
+import florescerCrown from "@/assets/shop/florescer/crown.png";
+import monarcaCrown from "@/assets/shop/monarca/crown.png";
+import eclipseCrown from "@/assets/shop/eclipse/crown.png";
+
+/**
+ * Coroas de verdade: arte recortada que fica APOIADA no topo do avatar,
+ * em vez da moldura circular que envolvia o rosto inteiro.
+ */
+export const CROWN_ART_BY_KEY: Record<string, { art: string; glow: string }> = {
+  "nameplate:coroa_guardia": { art: florescerCrown, glow: "rgba(196, 160, 255, 0.55)" },
+  "nameplate:coroa_soberano": { art: monarcaCrown, glow: "rgba(139, 92, 246, 0.55)" },
+  "nameplate:coroa_crepusculo": { art: eclipseCrown, glow: "rgba(224, 67, 95, 0.55)" },
+};
+
+export function getCrownArt(walletKey: string | undefined | null) {
+  if (!walletKey) return undefined;
+  return CROWN_ART_BY_KEY[walletKey];
+}
+
+/**
+ * Coroa apoiada no topo do avatar. Deve ser renderizada dentro do wrapper
+ * relativo do avatar (posicionamento absoluto).
+ */
+export function AvatarCrown({
+  crown,
+  size = 112,
+}: {
+  crown: { art: string; glow: string };
+  size?: number;
+}) {
+  const width = size * 0.98;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2"
+      style={{ width, top: -size * 0.42 }}
+    >
+      <div
+        className="absolute inset-x-4 bottom-1 h-6 rounded-full blur-xl"
+        style={{ background: crown.glow }}
+      />
+      <img
+        src={crown.art}
+        alt=""
+        loading="lazy"
+        className="crown-float relative block w-full object-contain"
+        style={{ filter: `drop-shadow(0 6px 14px ${crown.glow})` }}
+      />
+    </div>
+  );
+}

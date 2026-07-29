@@ -54,6 +54,9 @@ import { CompanionRender } from "@/components/CompanionRender";
 
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
+import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { tableSkinByKey } from "@/lib/table-skins";
+import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -381,6 +384,7 @@ function PerfilPage() {
 
   // Curated art for each equipped slot (bundle-specific PNGs override the generic icon).
   const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const crownArt = getCrownArt(wallet.equipped.nameplate);
   const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
@@ -646,15 +650,17 @@ function PerfilPage() {
                 <Trash2 className="h-3 w-3" strokeWidth={2.5} />
               </button>
             )}
-            {/* Frame art (nameplate) — decorative ring around avatar (on top, centered) */}
-            {nameplateArt && (
+            {/* Coroa (nameplate) — apoiada no topo do avatar */}
+            {crownArt ? (
+              <AvatarCrown crown={crownArt} size={112} />
+            ) : nameplateArt ? (
               <img
                 src={nameplateArt}
                 alt=""
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-[45%] z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
               />
-            )}
+            ) : null}
           </div>
 
           {companion && (
@@ -876,16 +882,26 @@ function PerfilPage() {
                       <p className="truncate text-[11px] text-white/50">{meta.hint}</p>
                     </div>
                   </div>
-                  {equippedKey && (
-                    <button
-                      onClick={() => handleUnequip(slot)}
-                      disabled={busy === slot}
-                      className="shrink-0 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
-                    >
-                      Remover
-                    </button>
-                  )}
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    {slot === "table" &&
+                      (() => {
+                        const sk =
+                          tableSkinByKey(equippedKey) ??
+                          (owned[0] ? tableSkinByKey(keyOf(owned[0])) : undefined);
+                        return sk ? <TableSkinPreviewButton skin={sk} /> : null;
+                      })()}
+                    {equippedKey && (
+                      <button
+                        onClick={() => handleUnequip(slot)}
+                        disabled={busy === slot}
+                        className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
+                      >
+                        Remover
+                      </button>
+                    )}
+                  </div>
                 </div>
+
 
                 {equippedShop ? (
                   <div

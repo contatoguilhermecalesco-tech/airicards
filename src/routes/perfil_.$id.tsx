@@ -33,6 +33,7 @@ import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
+import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";
@@ -126,6 +127,7 @@ function PerfilViewer() {
 
   // Artes curadas dos cosméticos equipados (mesmas usadas no /perfil próprio).
   const nameplateArt = getEquippedArt(equipped.nameplate);
+  const crownArt = getCrownArt(equipped.nameplate);
   const decorationArt = getEquippedArt(equipped.decoration);
   const badgeArt = getEquippedArt(equipped.badge);
   const effectArt = getEquippedArt(equipped.effect);
@@ -256,14 +258,16 @@ function PerfilViewer() {
                   initial
                 )}
               </div>
-              {nameplateArt && (
+              {crownArt ? (
+                <AvatarCrown crown={crownArt} size={112} />
+              ) : nameplateArt ? (
                 <img
                   src={nameplateArt}
                   alt=""
                   aria-hidden
                   className="pointer-events-none absolute left-1/2 top-[45%] z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
                 />
-              )}
+              ) : null}
             </div>
 
             {companion && (
