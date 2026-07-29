@@ -318,6 +318,8 @@ function PerfilPage() {
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [activityOpen, setActivityOpen] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Parallax suave — reagimos ao scroll do window.
