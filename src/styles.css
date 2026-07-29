@@ -686,3 +686,12 @@
 @utility table-vignette-pulse {
   animation: table-vignette-pulse 9s ease-in-out infinite;
 }
+
+/* ---- Coroa apoiada no topo do avatar ---- */
+@keyframes crown-float {
+  0%, 100% { transform: translateY(0) rotate(-0.4deg); }
+  50%      { transform: translateY(-3px) rotate(0.4deg); }
+}
+@utility crown-float {
+  animation: crown-float 5.5s ease-in-out infinite;
+}
