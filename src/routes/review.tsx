@@ -91,6 +91,18 @@ function Review() {
   const combo = useCombo();
   const comboMult = comboMultiplier(combo.count);
 
+  // Mesa de revisão equipada (skin da sessão)
+  const wallet = useWallet();
+  const skin = tableSkinFromEquipped(wallet.equipped);
+  const skinned = !isDefaultTableSkin(skin);
+  const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
+  function pulseSkin(tone: "hit" | "miss") {
+    setSkinFlash(tone);
+    setTimeout(() => setSkinFlash(null), 700);
+  }
+
+
+
   // Digitação obrigatória da tradução
   const [typed, setTyped] = useState("");
   const [verdict, setVerdict] = useState<
