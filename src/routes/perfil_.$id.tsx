@@ -284,7 +284,11 @@ function PerfilViewer() {
                   className="relative inline-flex items-center gap-1 overflow-hidden rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
                   style={{ background: badgePalette.gradient }}
                 >
-                  <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
+                  {badgeArt ? (
+                    <img src={badgeArt} alt="" aria-hidden className="relative h-4 w-4 object-contain" />
+                  ) : (
+                    <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
+                  )}
                   <span className="relative">{badgePalette.tag.toUpperCase()}</span>
                 </span>
               )}
