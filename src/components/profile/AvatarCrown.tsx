@@ -15,17 +15,17 @@ export const CROWN_ART_BY_KEY: Record<
 > = {
   "nameplate:coroa_guardia": {
     art: florescerCrown,
-    glow: "rgba(196, 160, 255, 0.55)",
+    glow: "rgba(196, 160, 255, 0.22)",
     ring: florescerFrame,
   },
   "nameplate:coroa_soberano": {
     art: monarcaCrown,
-    glow: "rgba(139, 92, 246, 0.55)",
+    glow: "rgba(139, 92, 246, 0.22)",
     ring: monarcaFrame,
   },
   "nameplate:coroa_crepusculo": {
     art: eclipseCrown,
-    glow: "rgba(224, 67, 95, 0.55)",
+    glow: "rgba(224, 67, 95, 0.22)",
     ring: eclipseFrame,
   },
 };
