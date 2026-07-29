@@ -185,25 +185,8 @@ function ShopPage() {
     router.navigate({ to: "/shop", search: {}, replace: true });
   }, [search.b, items, router]);
 
-  const handlePreview = (item: ShopItem) => {
-    const slot = String(item.payload.slot ?? "").toLowerCase();
-    if (slot === "table") {
-      const key = `${slot}:${String(item.payload.key ?? item.id)}`;
-      if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
-      return;
-    }
-    const key = String(item.payload.key ?? item.id);
-    if (hasSlotPreview(slot, key)) {
-      setSlotPreview({
-        slot: slot as PreviewSlot,
-        key,
-        name: item.name,
-        price: item.price,
-      });
-      return;
-    }
-    setPreview(item);
-  };
+  const handlePreview = (u: UnifiedItem) => setPreview(u);
+
 
   /* ---------------------- Unified list ---------------------- */
 
