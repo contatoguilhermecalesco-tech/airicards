@@ -107,6 +107,8 @@ export function ItemPreviewModal({
   busyLabel?: string;
   onBuy: () => void;
   onClose: () => void;
+  /** Item do bundle que deve abrir selecionado no provador. */
+  initialItemId?: string | null;
 }) {
   // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
   const [contents, setContents] = useState<ShopItem[]>([]);
@@ -120,13 +122,14 @@ export function ItemPreviewModal({
     void getBundleContents(item).then((rows) => {
       if (!alive) return;
       const cosmetics = rows.filter((r) => r.kind === "cosmetic");
-      setContents(cosmetics.length ? cosmetics : rows);
-      setSelId((cosmetics.length ? cosmetics : rows)[0]?.id ?? null);
+      const list = cosmetics.length ? cosmetics : rows;
+      setContents(list);
+      setSelId(list.find((r) => r.id === initialItemId)?.id ?? list[0]?.id ?? null);
     });
     return () => {
       alive = false;
     };
-  }, [item.id, item.kind]);
+  }, [item.id, item.kind, initialItemId]);
 
   const active = useMemo(
     () => contents.find((c) => c.id === selId) ?? (contents[0] || item),
