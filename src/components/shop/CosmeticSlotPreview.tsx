@@ -162,7 +162,7 @@ function DemoFrame({ children, label }: { children: React.ReactNode; label: stri
   );
 }
 
-function StreakFlameDemo({ itemKey }: { itemKey: string }) {
+export function StreakFlameDemo({ itemKey }: { itemKey: string }) {
   const theme = STREAK_FLAME_THEMES[itemKey] ?? null;
   const [streak, setStreak] = useState(12);
 
@@ -228,7 +228,7 @@ function StreakFlameDemo({ itemKey }: { itemKey: string }) {
   );
 }
 
-function EnemySealDemo({ itemKey }: { itemKey: string }) {
+export function EnemySealDemo({ itemKey }: { itemKey: string }) {
   const theme = ENEMY_SEAL_THEMES[itemKey];
   const [tone, setTone] = useState<"hit" | "miss" | null>(null);
 
@@ -283,7 +283,7 @@ function EnemySealDemo({ itemKey }: { itemKey: string }) {
   );
 }
 
-function TitleDemo({ itemKey }: { itemKey: string }) {
+export function TitleDemo({ itemKey }: { itemKey: string }) {
   const theme = TITLE_THEMES[itemKey];
   if (!theme) return null;
 
@@ -311,7 +311,7 @@ function TitleDemo({ itemKey }: { itemKey: string }) {
   );
 }
 
-function VictorySplashDemo({ itemKey }: { itemKey: string }) {
+export function VictorySplashDemo({ itemKey }: { itemKey: string }) {
   const theme = VICTORY_SPLASH_THEMES[itemKey];
   const [playing, setPlaying] = useState(false);
   if (!theme) return null;
