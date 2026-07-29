@@ -49,15 +49,18 @@ export function EnemySealSigil({ theme }: { theme: EnemySealTheme }) {
 export function EnemySealStamp({
   theme,
   tone,
+  contained = false,
 }: {
   theme: EnemySealTheme;
   tone: "hit" | "miss";
+  /** Quando true, ocupa apenas o container pai (usado no preview da loja). */
+  contained?: boolean;
 }) {
   const label = tone === "hit" ? theme.hitLabel : theme.missLabel;
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-40 grid place-items-center"
+      className={`pointer-events-none ${contained ? "absolute" : "fixed"} inset-0 z-40 grid place-items-center`}
     >
       <div
         className="motion-safe:animate-[sealStamp_760ms_cubic-bezier(0.2,0.9,0.2,1)_forwards] rounded-xl border-2 px-6 py-2 text-[15px] font-black uppercase tracking-[0.32em]"
