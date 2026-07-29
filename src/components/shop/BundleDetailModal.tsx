@@ -187,6 +187,18 @@ export function BundleDetailModal({
             </div>
           )}
 
+          {onPreview && contents && contents.length > 0 && (
+            <div className="px-4 pt-3 sm:px-6">
+              <button
+                onClick={() => onPreview()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-violet-300/30 bg-violet-500/15 px-4 py-3 text-[13px] font-semibold text-violet-100 transition hover:bg-violet-500/25"
+              >
+                <Eye className="h-4 w-4" strokeWidth={2.5} />
+                Provar todos os itens no contexto real
+              </button>
+            </div>
+          )}
+
           {/* Contents grid */}
           <div className="max-h-[52vh] overflow-y-auto px-4 pb-4 sm:px-6">
             <div className="mb-3 mt-4 flex items-center justify-between">
@@ -195,7 +207,7 @@ export function BundleDetailModal({
               </h3>
               {contents && contents.length > 0 && (
                 <p className="text-[11px] font-medium text-muted-foreground">
-                  Toque para ativar/desativar no preview
+                  Toque na arte para ver a prévia
                 </p>
               )}
             </div>
@@ -217,11 +229,13 @@ export function BundleDetailModal({
                     owned={ownedIds.has(c.id)}
                     active={enabled[c.id] ?? true}
                     onToggle={() => toggleItem(c.id)}
+                    onPreview={onPreview ? () => onPreview(c) : undefined}
                   />
                 ))}
               </ul>
             )}
           </div>
+
 
           {/* Footer — pricing + buy */}
           <div className="border-t border-white/[0.06] bg-black/25 p-4 sm:p-5">
