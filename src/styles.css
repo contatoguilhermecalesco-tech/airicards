@@ -632,3 +632,23 @@
  }
 
 
+
+/* ---- Brasas / pétalas dentro da carta (mesas temáticas) ---- */
+@keyframes table-ember-drift {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.9); opacity: 0; }
+  12%  { opacity: var(--ember-opacity, 0.8); }
+  50%  { transform: translate3d(calc(var(--ember-drift, 26px) * 0.5), 46%, 0) rotate(160deg) scale(1); }
+  88%  { opacity: var(--ember-opacity, 0.8); }
+  100% { transform: translate3d(var(--ember-drift, 26px), 100%, 0) rotate(320deg) scale(0.85); opacity: 0; }
+}
+@utility table-ember {
+  animation: table-ember-drift var(--ember-duration, 11s) linear var(--ember-delay, 0s) infinite;
+}
+@keyframes table-sheen {
+  0%   { transform: translateX(-60%); opacity: 0; }
+  20%  { opacity: 0.55; }
+  100% { transform: translateX(160%); opacity: 0; }
+}
+@utility table-sheen {
+  animation: table-sheen 9s ease-in-out infinite;
+}
