@@ -82,8 +82,9 @@ export function SakuraPetals({
             style={{
               width: "140%",
               height: "60%",
-              background:
-                "radial-gradient(ellipse at 50% 0%, rgba(255, 214, 238, 0.35), rgba(157, 127, 224, 0.15) 45%, transparent 70%)",
+              background: crimson
+                ? "radial-gradient(ellipse at 50% 0%, rgba(244, 63, 94, 0.32), rgba(136, 19, 55, 0.18) 45%, transparent 70%)"
+                : "radial-gradient(ellipse at 50% 0%, rgba(255, 214, 238, 0.35), rgba(157, 127, 224, 0.15) 45%, transparent 70%)",
               filter: "blur(2px)",
             }}
           />
@@ -91,8 +92,9 @@ export function SakuraPetals({
             className="sakura-halo absolute inset-x-0 bottom-0"
             style={{
               height: "45%",
-              background:
-                "linear-gradient(to top, rgba(229, 120, 180, 0.18), transparent)",
+              background: crimson
+                ? "linear-gradient(to top, rgba(190, 18, 60, 0.2), transparent)"
+                : "linear-gradient(to top, rgba(229, 120, 180, 0.18), transparent)",
               animationDelay: "1.2s",
             }}
           />
