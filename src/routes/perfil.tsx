@@ -355,6 +355,11 @@ function PerfilPage() {
       companion: [],
       veil: [],
       table: [],
+      streak_flame: [],
+      enemy_seal: [],
+      title: [],
+      victory_splash: [],
+
 
     };
     wallet.cosmetics.forEach((k) => {
