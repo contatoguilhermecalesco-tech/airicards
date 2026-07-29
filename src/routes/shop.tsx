@@ -61,6 +61,8 @@ import {
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
+import { tableSkinByKey } from "@/lib/table-skins";
+import { TableSkinPreviewModal } from "@/components/review/TableSkinPreviewModal";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
 // featured_slots assets when admin uploads custom art.
@@ -140,6 +142,7 @@ function ShopPage() {
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
+  const [tablePreviewSkinKey, setTablePreviewSkinKey] = useState<string | null>(null);
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
   const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
@@ -179,6 +182,16 @@ function ShopPage() {
     // Clear the query param so refresh/close doesn't re-open.
     router.navigate({ to: "/shop", search: {}, replace: true });
   }, [search.b, items, router]);
+
+  const handlePreview = (item: ShopItem) => {
+    const slot = String(item.payload.slot ?? "").toLowerCase();
+    if (slot === "table") {
+      const key = `${slot}:${String(item.payload.key ?? item.id)}`;
+      if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
+      return;
+    }
+    setPreview(item);
+  };
 
   /* ---------------------- Unified list ---------------------- */
 
@@ -657,7 +670,7 @@ function ShopPage() {
                 busy={busy === u.id}
                 onBuy={() => handleBuyUnified(u)}
                 onPreview={
-                  u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
+                  u.kind === "cosmetic" ? () => handlePreview(u.raw as ShopItem) : undefined
                 }
               />
             ))}
@@ -698,7 +711,7 @@ function ShopPage() {
                   busy={busy === u.id}
                   onBuy={() => handleBuyUnified(u)}
                   onPreview={
-                    u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
+                    u.kind === "cosmetic" ? () => handlePreview(u.raw as ShopItem) : undefined
                   }
                   splashUrl={splashUrl}
                   artUrl={artUrl}
@@ -715,6 +728,13 @@ function ShopPage() {
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
+      {tablePreviewSkinKey && (
+        <TableSkinPreviewModal
+          skin={tableSkinByKey(tablePreviewSkinKey)!}
+          open={!!tablePreviewSkinKey}
+          onClose={() => setTablePreviewSkinKey(null)}
+        />
+      )}
       {bundleOpen && (
         <BundleDetailModal
           bundle={bundleOpen}
