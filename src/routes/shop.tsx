@@ -1146,10 +1146,20 @@ function ListRow({
       } bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
     >
       <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
+        className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl text-white"
         style={{ background: thumbBg, boxShadow: `0 6px 20px -8px ${thumbGlow}` }}
       >
-        <Icon className="h-5 w-5" strokeWidth={2.25} />
+        {cosmeticArt ? (
+          <img
+            src={cosmeticArt}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            className="h-9 w-9 object-contain"
+          />
+        ) : (
+          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        )}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
