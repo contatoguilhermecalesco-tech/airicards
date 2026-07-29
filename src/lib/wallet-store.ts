@@ -86,11 +86,15 @@ type WalletRow = {
 };
 
 // Corrige equipamentos salvos em slots errados (versões antigas mandavam
-// streak_flame/enemy_seal/title/victory_splash para o slot "effect").
-function repairEquipped(equipped: EquippedMap): EquippedMap {
+// streak_flame/enemy_seal/title/victory_splash para o slot "effect") e
+// descarta cosméticos equipados que o perfil não possui de fato (grants
+// fantasmas de versões antigas apareciam como "Equipado" sem o item existir).
+function repairEquipped(equipped: EquippedMap, owned: string[]): EquippedMap {
+  const ownedSet = new Set(owned);
   const next: EquippedMap = {};
   for (const [slot, key] of Object.entries(equipped)) {
     if (typeof key !== "string" || !key) continue;
+    if (!ownedSet.has(key)) continue;
     const real = slotFromKey(key);
     next[real] = key;
     if (real === slot) next[slot as CosmeticSlot] = key;
@@ -100,18 +104,22 @@ function repairEquipped(equipped: EquippedMap): EquippedMap {
 
 function normalize(row: WalletRow, profileId: string): WalletState {
   const inv = row.inventory ?? {};
+  const cosmetics = Array.isArray(inv.cosmetics) ? inv.cosmetics : [];
   return {
     profileId,
     crystals: row.crystals ?? 0,
-    cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
+    cosmetics,
     equipped:
-      inv.equipped && typeof inv.equipped === "object" ? repairEquipped(inv.equipped) : {},
+      inv.equipped && typeof inv.equipped === "object"
+        ? repairEquipped(inv.equipped, cosmetics)
+        : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
     bio: typeof inv.bio === "string" ? inv.bio : "",
     avatarUrl: typeof inv.avatarUrl === "string" ? inv.avatarUrl : "",
     loaded: true,
   };
 }
+
 
 
 let currentProfileId: string | null = null;
