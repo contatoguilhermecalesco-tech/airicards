@@ -32,6 +32,10 @@ import { TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
+import { getEquippedArt } from "@/lib/shop-asset-overrides";
+import { companionFromEquipped } from "@/lib/companion-assets";
+import { CompanionRender } from "@/components/CompanionRender";
+import { SakuraPetals } from "@/components/SakuraPetals";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
@@ -120,6 +124,17 @@ function PerfilViewer() {
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
   const BadgeIcon = badge ? (ICONS[badge.icon] ?? Sparkles) : Sparkles;
 
+  // Artes curadas dos cosméticos equipados (mesmas usadas no /perfil próprio).
+  const nameplateArt = getEquippedArt(equipped.nameplate);
+  const decorationArt = getEquippedArt(equipped.decoration);
+  const badgeArt = getEquippedArt(equipped.badge);
+  const effectArt = getEquippedArt(equipped.effect);
+  const veilArt = getEquippedArt(equipped.veil);
+  const overlayArt = getEquippedArt(equipped.overlay);
+  const showSakura = equipped.overlay === "overlay:chuva_sakura";
+  const companion = companionFromEquipped(equipped);
+
+
   const initial = profile.name.charAt(0).toUpperCase();
   const handleUser = profile.name.toLowerCase().replace(/\s+/g, "");
   const handleSuffix = ".airi.com.br";
@@ -148,20 +163,63 @@ function PerfilViewer() {
       </div>
 
       {/* HERO */}
-      <section className="overflow-hidden rounded-3xl border border-white/10" style={{ background: "#1e1f22" }}>
+      <section className="relative overflow-hidden rounded-3xl border border-white/10" style={{ background: "#1e1f22" }}>
         <div
-          className="relative h-28"
+          className={`relative h-40 overflow-hidden sm:h-44 ${showBanner ? "cosmetic-banner-animated" : ""}`}
           style={{
             background: showBanner ? heroPalette.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
           }}
         >
-          {effect && <div className="cosmetic-sparkle absolute inset-0 opacity-70" />}
+          {effect && (
+            <>
+              <span aria-hidden className="cosmetic-sparkle pointer-events-none absolute h-1.5 w-1.5 rounded-full bg-white" style={{ top: "22%", left: "70%", animationDelay: "0.2s" }} />
+              <span aria-hidden className="cosmetic-sparkle pointer-events-none absolute h-1 w-1 rounded-full bg-white" style={{ top: "55%", left: "18%", animationDelay: "0.9s" }} />
+              <span aria-hidden className="cosmetic-sparkle pointer-events-none absolute h-1 w-1 rounded-full bg-white" style={{ top: "35%", left: "45%", animationDelay: "1.6s" }} />
+            </>
+          )}
+          {effectArt && (
+            <img src={effectArt} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+          )}
+          {veilArt && (
+            <img
+              src={veilArt}
+              alt=""
+              aria-hidden
+              className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-screen"
+            />
+          )}
+          {showSakura && <SakuraPetals density="normal" seed={19} withHalo />}
+          {overlayArt && !showSakura && (
+            <img
+              src={overlayArt}
+              alt=""
+              aria-hidden
+              className="cosmetic-veil-float pointer-events-none absolute inset-0 h-full w-full object-cover opacity-80"
+            />
+          )}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15) 60%, transparent)" }}
+          />
         </div>
 
         <div className="relative px-5 pb-5">
           <div className="-mt-12 flex items-end justify-between">
-            <div className="relative grid place-items-center" style={{ width: 88, height: 88 }}>
-              {showDecoration && (
+            <div
+              className={`relative grid place-items-center ${showDecoration ? "cosmetic-avatar-float" : ""}`}
+              style={{ width: 88, height: 88 }}
+            >
+              {decorationArt && (
+                <img
+                  src={decorationArt}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-6 h-[calc(100%+3rem)] w-[calc(100%+3rem)] max-w-none object-contain opacity-90 mix-blend-screen"
+                  style={{ animation: "spin 24s linear infinite" }}
+                />
+              )}
+              {showDecoration && !decorationArt && (
                 <>
                   <span
                     className="cosmetic-ring-spin absolute inset-0 rounded-full"
@@ -194,8 +252,29 @@ function PerfilViewer() {
                   initial
                 )}
               </div>
+              {nameplateArt && (
+                <img
+                  src={nameplateArt}
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-[45%] z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+                />
+              )}
             </div>
+
+            {companion && (
+              <div className="pointer-events-none relative -mb-2 h-[84px] w-[84px] sm:h-[96px] sm:w-[96px]" aria-hidden>
+                <div
+                  className="companion-glow absolute inset-0 rounded-full blur-2xl"
+                  style={{ background: `radial-gradient(circle, ${companion.glow}80, transparent 70%)` }}
+                />
+                <div className="companion-hop absolute inset-0">
+                  <CompanionRender companion={companion} />
+                </div>
+              </div>
+            )}
           </div>
+
 
           <div className="mt-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -205,8 +284,12 @@ function PerfilViewer() {
                   className="relative inline-flex items-center gap-1 overflow-hidden rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
                   style={{ background: badgePalette.gradient }}
                 >
-                  <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
-                  <span className="relative">{badgePalette.tag.toUpperCase()}</span>
+                  {badgeArt ? (
+                    <img src={badgeArt} alt="" aria-hidden className="relative h-4 w-4 object-contain" />
+                  ) : (
+                    <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
+                  )}
+                  <span className="relative">{badge.name.toUpperCase()}</span>
                 </span>
               )}
               {(() => {
