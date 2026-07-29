@@ -15,6 +15,7 @@ const PUBLIC_BASE = "https://airicards.lovable.app";
 const BUNDLE_SPLASH: Record<string, string> = {
   "bundle.florescer_celestial": florescerSplash,
   "bundle.monarca_sombras": monarcaSplash,
+  "bundle.eclipse_carmesim": eclipseSplash,
 };
 
 const BUNDLE_META: Record<string, { title: string; description: string }> = {
@@ -27,6 +28,11 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
     title: "airi — Monarca das Sombras",
     description:
       "Bundle mítico com aura sombria, coroa do soberano, portal do monarca, exército de sombras, manto e Igris, o Cavaleiro-Sombra. Confira na loja airi.",
+  },
+  "bundle.eclipse_carmesim": {
+    title: "airi — Eclipse Carmesim",
+    description:
+      "Bundle lendário com aura do véu carmesim, coroa do crepúsculo, catedral do eclipse, rosas do crepúsculo, véu rubro e o Corvo do Crepúsculo. Confira na loja airi.",
   },
 };
 
