@@ -850,6 +850,9 @@ function UnifiedCard({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const cosmeticArt = cosmeticArtFor(
+    ((item.raw as ShopItem).payload ?? null) as Record<string, unknown> | null,
+  );
   const isVitrine = view === "vitrine";
   const isPowerup = item.kind === "powerup";
   const puPal = isPowerup ? powerupPalette(item.accent) : null;
