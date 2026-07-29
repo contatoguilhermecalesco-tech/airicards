@@ -920,22 +920,49 @@ function PerfilPage() {
       </section>
 
 
-      {/* ============ ACTIVITY TIMELINE ============ */}
+      {/* ============ ACTIVITY TIMELINE (modal) ============ */}
       {profile && (
         <section className="mt-6">
-          <div className="mb-3 flex items-end justify-between">
-            <div>
-              <h2 className="text-[18px] font-semibold tracking-tight text-foreground sm:text-[20px]">
+          <button
+            type="button"
+            onClick={() => setActivityOpen(true)}
+            className="group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left transition hover:bg-white/[0.05]"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
+              <Zap className="h-4 w-4" strokeWidth={2.25} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[14px] font-semibold text-foreground">
                 Atividade recente
-              </h2>
-              <p className="mt-0.5 text-[12px] text-muted-foreground">
+              </span>
+              <span className="mt-0.5 block truncate text-[12px] text-muted-foreground">
                 Linha do tempo dos seus últimos passos no airi.
-              </p>
-            </div>
-          </div>
-          <ProfileActivityFeed profileId={profile.id} />
+              </span>
+            </span>
+            <ArrowLeft
+              className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
+              strokeWidth={2.5}
+            />
+          </button>
+
+          <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
+            <DialogContent className="max-w-lg overflow-hidden border-white/10 p-0" style={{ background: "#141317" }}>
+              <DialogHeader className="border-b border-white/10 px-4 py-3 text-left">
+                <DialogTitle className="text-[15px] font-semibold text-white">
+                  Atividade recente
+                </DialogTitle>
+                <DialogDescription className="text-[11.5px] text-white/50">
+                  Linha do tempo dos seus últimos passos no airi.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[65vh] overflow-y-auto p-4">
+                <ProfileActivityFeed profileId={profile.id} />
+              </div>
+            </DialogContent>
+          </Dialog>
         </section>
       )}
+
 
       {/* ============ PARTNER LINK ============ */}
       {partner && (
