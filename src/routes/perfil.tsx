@@ -26,7 +26,9 @@ import {
   Trophy,
   UserRound,
   Zap,
+  Layers,
 } from "lucide-react";
+
 import { StatChip, ArlysIcon } from "@/components/StatChip";
 import { useCurrentProfile } from "@/lib/profile";
 import { PROFILES } from "@/lib/profile";
