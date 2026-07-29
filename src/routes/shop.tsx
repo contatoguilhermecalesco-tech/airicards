@@ -1021,7 +1021,6 @@ function UnifiedCard({
             </div>
           )}
         </div>
-        </div>
       )}
 
       <div className="p-4">
