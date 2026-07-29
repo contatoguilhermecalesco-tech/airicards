@@ -543,7 +543,10 @@ function PerfilPage() {
             </>
           )}
           {showSakura && <SakuraPetals density="normal" seed={19} withHalo />}
-          {overlayArt && !showSakura && (
+          {showCrimsonPetals && (
+            <SakuraPetals density="normal" seed={31} withHalo variant="crimson" />
+          )}
+          {overlayArt && !showSakura && !showCrimsonPetals && (
             <img
               src={overlayArt}
               alt=""
