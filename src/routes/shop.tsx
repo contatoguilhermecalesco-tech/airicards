@@ -186,7 +186,7 @@ function ShopPage() {
   const handlePreview = (item: ShopItem) => {
     const slot = String(item.payload.slot ?? "").toLowerCase();
     if (slot === "table") {
-      const key = String(item.payload.key ?? item.id);
+      const key = `${slot}:${String(item.payload.key ?? item.id)}`;
       if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
       return;
     }
