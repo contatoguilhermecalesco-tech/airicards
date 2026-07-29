@@ -38,6 +38,47 @@ export const Route = createFileRoute("/study/speaking/")({
   component: SpeakingPage,
 });
 
+const TOPIC_SUGGESTIONS = [
+  "Viagem",
+  "Trabalho",
+  "Restaurante",
+  "Compras",
+  "Saúde",
+  "Tecnologia",
+  "Família",
+  "Esportes",
+  "Filmes e séries",
+  "Rotina",
+  "Estudos",
+  "Clima",
+  "Música",
+  "Entrevista de emprego",
+  "Aeroporto",
+  "Fazer amizades",
+];
+
+const RECENT_KEY = "airi.speaking.recent.v1";
+
+function readRecent(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]");
+    return Array.isArray(raw) ? (raw as string[]).slice(0, 10) : [];
+  } catch {
+    return [];
+  }
+}
+
+function pushRecent(entry: string) {
+  if (typeof window === "undefined" || !entry.trim()) return;
+  try {
+    const next = [entry.trim(), ...readRecent().filter((r) => r !== entry.trim())].slice(0, 10);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* noop */
+  }
+}
+
 function SpeakingPage() {
   const [level, setLevel] = useState<"beginner" | "intermediate" | "advanced">("intermediate");
   const [focus, setFocus] = useState<"pronunciation" | "fluency" | "conversation">("conversation");
@@ -51,6 +92,7 @@ function SpeakingPage() {
   const [grading, setGrading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showModel, setShowModel] = useState(false);
+  const [topic, setTopic] = useState("");
 
   const gen = useServerFn(generateSpeaking);
   const grader = useServerFn(gradeSpeaking);
@@ -133,8 +175,16 @@ function SpeakingPage() {
     setGrade(null);
     setShowModel(false);
     try {
-      const p = await gen({ data: { level, focus } });
+      const p = await gen({
+        data: {
+          level,
+          focus,
+          topic: topic.trim() || undefined,
+          recent: readRecent(),
+        },
+      });
       setPrompt(p);
+      pushRecent(p.modelAnswer || p.prompt);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro.");
     } finally {
@@ -280,6 +330,53 @@ function SpeakingPage() {
             </button>
           ))}
         </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <label className="block text-xs uppercase tracking-wider text-muted-foreground">
+            Tema (opcional)
+          </label>
+          {topic && (
+            <button
+              onClick={() => setTopic("")}
+              className="text-[11px] font-semibold text-orange-300/80 transition hover:text-orange-200"
+            >
+              Limpar
+            </button>
+          )}
+        </div>
+        <input
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="Ex.: aeroporto, entrevista de emprego, academia…"
+          className="mt-2 w-full rounded-2xl border border-border bg-surface/40 px-4 py-2.5 text-sm outline-none focus:border-orange-400/40"
+        />
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {TOPIC_SUGGESTIONS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTopic((cur) => (cur === t ? "" : t))}
+              className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                topic === t
+                  ? "border-orange-400/40 bg-orange-400/15 text-orange-200"
+                  : "border-border bg-surface/40 text-foreground/70 hover:bg-accent"
+              }`}
+            >
+              {t}
+            </button>
+          ))}
+          <button
+            onClick={() =>
+              setTopic(TOPIC_SUGGESTIONS[Math.floor(Math.random() * TOPIC_SUGGESTIONS.length)])
+            }
+            className="rounded-full border border-orange-400/30 bg-orange-400/5 px-2.5 py-1 text-[11px] font-semibold text-orange-200/90 transition hover:bg-orange-400/15"
+          >
+            🎲 Surpresa
+          </button>
+        </div>
+        <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+          Sem tema, a IA escolhe um cenário diferente a cada vez. Os últimos exercícios são
+          enviados para ela não repetir.
+        </p>
 
         <button
           onClick={loadNew}
