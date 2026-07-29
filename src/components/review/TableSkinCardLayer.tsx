@@ -9,7 +9,17 @@ export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
   if (isDefaultTableSkin(skin)) return null;
   return (
     <>
-      {/* Verso ornamentado da mesa como textura da carta */}
+      {/* Base interna: obsidiana escura, limpa, para o texto respirar */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[28px]"
+        style={{
+          background:
+            "radial-gradient(120% 100% at 50% 0%, hsl(var(--card) / 0.55) 0%, hsl(var(--card) / 0.92) 55%, hsl(var(--card) / 0.98) 100%)",
+        }}
+      />
+
+      {/* Verso ornamentado apenas como textura muito sutil */}
       {skin.crest && (
         <div
           aria-hidden
@@ -19,29 +29,35 @@ export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
             src={skin.crest}
             alt=""
             loading="lazy"
-            className="table-skin-breathe absolute left-1/2 top-1/2 h-[150%] w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-[0.16]"
+            className="absolute left-1/2 top-1/2 h-[130%] w-auto min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-[0.07] saturate-[0.6] blur-[1px]"
           />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(70% 55% at 50% 50%, hsl(var(--card) / 0.92) 20%, hsl(var(--card) / 0.72) 62%, transparent 100%)",
+                "radial-gradient(65% 55% at 50% 50%, hsl(var(--card) / 0.96) 30%, hsl(var(--card) / 0.6) 75%, transparent 100%)",
             }}
           />
         </div>
       )}
 
-      {/* Moldura pintada da mesa */}
+      {/* Moldura pintada — só nas bordas, centro totalmente limpo */}
       {skin.frame && (
         <img
           aria-hidden
           src={skin.frame}
           alt=""
           loading="lazy"
-          className="pointer-events-none absolute inset-0 h-full w-full rounded-[28px] object-fill opacity-[0.5]"
-          style={{ maskImage: "linear-gradient(to bottom, black, black)" }}
+          className="pointer-events-none absolute inset-0 h-full w-full rounded-[28px] object-fill opacity-[0.55]"
+          style={{
+            maskImage:
+              "radial-gradient(78% 72% at 50% 50%, transparent 42%, black 82%)",
+            WebkitMaskImage:
+              "radial-gradient(78% 72% at 50% 50%, transparent 42%, black 82%)",
+          }}
         />
       )}
+
 
       {/* Cantoneiras luminosas */}
       {(["tl", "tr", "bl", "br"] as const).map((c) => (
