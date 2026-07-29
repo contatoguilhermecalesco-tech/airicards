@@ -141,6 +141,7 @@ function ShopPage() {
   const [preview, setPreview] = useState<UnifiedItem | null>(null);
 
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
+  const [tryOn, setTryOn] = useState<{ root: ShopItem; focusId: string | null } | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
   const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
 
