@@ -34,14 +34,10 @@ import { listPublishedDecks, type PublishedDeckRow } from "@/lib/marketplace";
 import {
   ACCENTS,
   ICONS,
-  MiniProfileCard,
   RARITY_META,
   RARITY_ORDER,
   RarityChip,
   rarityFor,
-  slotLabel,
-  visualFor,
-  DiscordAvatar,
   PowerupCover,
   DeckCover,
   PackCover,
@@ -61,7 +57,6 @@ import {
   type FeaturedSlotRow,
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
-import { tableSkinByKey } from "@/lib/table-skins";
 import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
 
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
@@ -1008,13 +1003,6 @@ function UnifiedCard({
           </div>
         </div>
 
-        {/* cosmetic gets a mini profile preview inline for vitrine mode */}
-        {isVitrine && item.kind === "cosmetic" && (
-          <div className="mt-3">
-            <MiniProfileCard item={item.raw as ShopItem} />
-          </div>
-        )}
-
         {item.kind === "bundle" && item.bundleItems && item.bundleItems.length > 0 && (
           <p className="mt-1 text-[11px] font-medium text-muted-foreground">
             Contém {item.bundleItems.length} itens
@@ -1038,7 +1026,7 @@ function UnifiedCard({
                 className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] font-semibold text-foreground/85 transition hover:bg-white/[0.08]"
               >
                 <Eye className="h-3 w-3" strokeWidth={2.5} />
-                Preview
+                Ver prévia
               </button>
             )}
             <button
