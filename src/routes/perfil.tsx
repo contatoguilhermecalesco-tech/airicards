@@ -379,6 +379,8 @@ function PerfilPage() {
   const veil = equippedItem.veil;
   // Chuva de Sakura vive no slot "overlay" — cai por cima da capa (effect).
   const showSakura = wallet.equipped.overlay === "overlay:chuva_sakura";
+  // Rosas do Crepúsculo — mesma mecânica, pétalas rubras (Eclipse Carmesim).
+  const showCrimsonPetals = wallet.equipped.overlay === "overlay:rosas_crepusculo";
   // A capa (effect) usa a imagem de fundo em cover, sem mix-blend.
   const hasCoverArt = !!effectArt;
 

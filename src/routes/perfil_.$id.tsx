@@ -132,6 +132,7 @@ function PerfilViewer() {
   const veilArt = getEquippedArt(equipped.veil);
   const overlayArt = getEquippedArt(equipped.overlay);
   const showSakura = equipped.overlay === "overlay:chuva_sakura";
+  const showCrimsonPetals = equipped.overlay === "overlay:rosas_crepusculo";
   const companion = companionFromEquipped(equipped);
 
 
