@@ -16,6 +16,8 @@ async function assertAdmin(supabaseClient: unknown) {
   if (error || data !== true) throw new Error("Forbidden: caller is not admin");
 }
 
+type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+
 export type AdminPurchaseRow = {
   id: string;
   buyer_profile_id: string;
@@ -23,7 +25,7 @@ export type AdminPurchaseRow = {
   item_id: string | null;
   deck_id: string | null;
   price_paid: number;
-  payload: Record<string, unknown>;
+  payload: Record<string, Json>;
   created_at: string;
   item_name: string | null;
 };
