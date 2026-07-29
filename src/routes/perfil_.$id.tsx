@@ -132,6 +132,7 @@ function PerfilViewer() {
   const veilArt = getEquippedArt(equipped.veil);
   const overlayArt = getEquippedArt(equipped.overlay);
   const showSakura = equipped.overlay === "overlay:chuva_sakura";
+  const showCrimsonPetals = equipped.overlay === "overlay:rosas_crepusculo";
   const companion = companionFromEquipped(equipped);
 
 
@@ -189,7 +190,10 @@ function PerfilViewer() {
             />
           )}
           {showSakura && <SakuraPetals density="normal" seed={19} withHalo />}
-          {overlayArt && !showSakura && (
+          {showCrimsonPetals && (
+            <SakuraPetals density="normal" seed={31} withHalo variant="crimson" />
+          )}
+          {overlayArt && !showSakura && !showCrimsonPetals && (
             <img
               src={overlayArt}
               alt=""

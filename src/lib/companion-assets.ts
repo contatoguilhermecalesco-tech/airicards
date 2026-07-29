@@ -7,6 +7,7 @@ import igrisRise1Url from "@/assets/shop/monarca/companion-rise1.png";
 import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
 import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
+import corvoUrl from "@/assets/shop/eclipse/companion.png";
 
 
 export type CompanionProfile = {
@@ -35,6 +36,13 @@ const COMPANIONS: Record<string, CompanionProfile> = {
     tagline: "Primeiro cavaleiro do exército das sombras.",
     frames: [igrisIdleUrl, igrisRise1Url, igrisRise2Url, igrisStandUrl, igrisDrawUrl],
     flash: true,
+  },
+  corvo_carmesim: {
+    key: "corvo_carmesim",
+    name: "Corvo do Crepúsculo",
+    src: corvoUrl,
+    glow: "#f43f5e",
+    tagline: "Arauto do eclipse, guardião das rosas.",
   },
 
 };

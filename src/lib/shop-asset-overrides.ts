@@ -18,6 +18,14 @@ import monarcaCardframe from "@/assets/shop/monarca/cardframe.png";
 import monarcaCompanion from "@/assets/shop/monarca/companion.png";
 import monarcaOverlay from "@/assets/shop/monarca/sakura-overlay.png";
 
+import eclipseSplash from "@/assets/shop/eclipse/splash-hero.jpg";
+import eclipseAura from "@/assets/shop/eclipse/aura.png";
+import eclipseFrame from "@/assets/shop/eclipse/frame.png";
+import eclipseBackground from "@/assets/shop/eclipse/background.png";
+import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
+import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
+import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
+
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
   splash?: string;
@@ -43,6 +51,15 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.overlay.exercito_sombras": { art: monarcaOverlay },
   "cosmetic.veil.manto_monarca": { art: monarcaCardframe },
   "cosmetic.companion.igris_cavaleiro": { art: monarcaCompanion },
+
+  // Master bundle — Eclipse Carmesim
+  "bundle.eclipse_carmesim": { splash: eclipseSplash, art: eclipseAura },
+  "cosmetic.aura.veu_carmesim": { art: eclipseAura },
+  "cosmetic.frame.coroa_crepusculo": { art: eclipseFrame },
+  "cosmetic.effect.catedral_eclipse": { art: eclipseBackground },
+  "cosmetic.overlay.rosas_crepusculo": { art: eclipsePetals },
+  "cosmetic.veil.veu_rubro": { art: eclipseCardframe },
+  "cosmetic.companion.corvo_carmesim": { art: eclipseCompanion },
 };
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
@@ -68,6 +85,13 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "overlay:exercito_sombras": monarcaOverlay,
   "veil:manto_monarca": monarcaCardframe,
   "companion:igris_cavaleiro": monarcaCompanion,
+
+  "decoration:veu_carmesim": eclipseAura,
+  "nameplate:coroa_crepusculo": eclipseFrame,
+  "effect:catedral_eclipse": eclipseBackground,
+  "overlay:rosas_crepusculo": eclipsePetals,
+  "veil:veu_rubro": eclipseCardframe,
+  "companion:corvo_carmesim": eclipseCompanion,
 };
 
 export function getEquippedArt(walletKey: string | undefined | null): string | undefined {
