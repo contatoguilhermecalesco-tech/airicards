@@ -94,13 +94,32 @@ export function CosmeticSlotPreview({
           <X className="h-4 w-4" />
         </button>
 
-        <div className="px-5 pt-5">
-          <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-rose-300/80">
-            <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-            {info.label}
-          </p>
-          <h3 className="mt-1 text-xl font-semibold tracking-tight text-white">{name}</h3>
-          <p className="mt-1 text-[12.5px] leading-snug text-white/55">{info.hint}</p>
+        <div className="flex items-start gap-3 px-5 pt-5">
+          {art && (
+            <span
+              className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-rose-400/20"
+              style={{
+                background:
+                  "radial-gradient(circle at 50% 40%, rgba(244,63,94,0.28), transparent 68%), linear-gradient(135deg,#1a0710,#0b0409)",
+                boxShadow: "0 12px 30px -14px rgba(244,63,94,0.6)",
+              }}
+            >
+              <img
+                src={art}
+                alt=""
+                draggable={false}
+                className="h-14 w-14 object-contain drop-shadow-[0_6px_16px_rgba(244,63,94,0.45)]"
+              />
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-rose-300/80">
+              <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+              {info.label}
+            </p>
+            <h3 className="mt-1 text-xl font-semibold tracking-tight text-white">{name}</h3>
+            <p className="mt-1 text-[12.5px] leading-snug text-white/55">{info.hint}</p>
+          </div>
         </div>
 
         <div className="px-5 py-5">
