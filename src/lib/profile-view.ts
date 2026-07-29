@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { WalletState, CosmeticSlot, EquippedMap } from "@/lib/wallet-store";
 import type { RankState } from "@/lib/rank-store";
-import type { Card, Streak } from "@/lib/flashcards-store";
+import type { Streak } from "@/lib/flashcards-store";
 
 export type ProfileSnapshot = {
   profileId: string;
