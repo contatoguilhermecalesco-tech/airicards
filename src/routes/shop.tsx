@@ -218,11 +218,11 @@ function ShopPage() {
   /* ---------------------- Unified list ---------------------- */
 
   const unified: UnifiedItem[] = useMemo(() => {
-    // IDs contidos em algum bundle ativo — enquanto forem parte de um bundle,
-    // não aparecem soltos na loja (só via "ver conteúdo do bundle").
+    // IDs contidos em algum bundle — mesmo que o bundle esteja inativo/oculto,
+    // seus itens nunca aparecem soltos na loja (só via "ver conteúdo do bundle").
     const bundledIds = new Set<string>();
     (items ?? []).forEach((it) => {
-      if (it.kind !== "bundle" || it.active === false) return;
+      if (it.kind !== "bundle") return;
       const arr = (it.payload as { items?: unknown })?.items;
       if (Array.isArray(arr)) arr.forEach((x) => typeof x === "string" && bundledIds.add(x));
     });
