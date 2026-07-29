@@ -711,7 +711,7 @@ function ShopPage() {
                   busy={busy === u.id}
                   onBuy={() => handleBuyUnified(u)}
                   onPreview={
-                    u.kind === "cosmetic" ? () => setPreview(u.raw as ShopItem) : undefined
+                    u.kind === "cosmetic" ? () => handlePreview(u.raw as ShopItem) : undefined
                   }
                   splashUrl={splashUrl}
                   artUrl={artUrl}
