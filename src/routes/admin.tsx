@@ -14,6 +14,7 @@ import {
   ScrollText,
   Shield,
   ShoppingBag,
+  Undo2,
   Swords,
   Tag as TagIcon,
   Trophy,
@@ -60,6 +61,7 @@ import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
+import { RefundsAdminSection } from "@/components/admin/RefundsAdminSection";
 import { BundleBuilderSection } from "@/components/admin/BundleBuilderSection";
 import { BundleConceptsSection } from "@/components/admin/BundleConceptsSection";
 import { initBundleConcepts } from "@/lib/bundle-concepts-store";
@@ -103,6 +105,7 @@ type PanelKey =
   | "streak"
   | "bundles"
   | "shop-items"
+  | "refunds"
   | "concepts";
 
 type PanelDef = {
@@ -128,6 +131,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
   { key: "shop-items", label: "Itens da Loja", hint: "Habilitar, preço, remover", Icon: ShoppingBag, color: "#c084fc", wide: true },
+  { key: "refunds", label: "Reembolsos", hint: "Devolver Arlys e remover itens", Icon: Undo2, color: "#fb7185", wide: true },
   { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
   { key: "concepts", label: "Bundle concepts", hint: "Diário criativo dos bundles", Icon: ScrollText, color: "#e879f9", wide: true },
 ];
@@ -297,6 +301,7 @@ function AdminPage() {
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}
                 {openPanel === "shop-items" && <ShopItemsSection />}
+                {openPanel === "refunds" && <RefundsAdminSection />}
                 {openPanel === "bundles" && <BundleBuilderSection />}
                 {openPanel === "concepts" && <BundleConceptsSection />}
               </div>

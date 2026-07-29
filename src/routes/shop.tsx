@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
-import { useWallet, loadWallet } from "@/lib/wallet-store";
+import { useWallet, loadWallet, getWallet } from "@/lib/wallet-store";
 import {
   buyPublishedDeck,
   buyShopItem,
@@ -52,6 +52,10 @@ import {
 } from "@/components/shop/shop-visuals";
 import { ShopHero, type FeaturedItem } from "@/components/shop/ShopHero";
 import { BundleDetailModal } from "@/components/shop/BundleDetailModal";
+import {
+  PurchaseSuccessOverlay,
+  type PurchaseCelebration,
+} from "@/components/shop/PurchaseSuccessOverlay";
 import {
   listActiveFeaturedSlots,
   type FeaturedSlotRow,
@@ -138,6 +142,7 @@ function ShopPage() {
   const [preview, setPreview] = useState<ShopItem | null>(null);
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
+  const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
 
   // Toolbar state
   const [category, setCategory] = useState<Category>("all");
@@ -369,6 +374,28 @@ function ShopPage() {
     setTimeout(() => setFlash(null), 2400);
   }
 
+  function celebrate(u: UnifiedItem, message: string) {
+    const override = SHOP_ASSET_OVERRIDES[u.id] ?? BUNDLE_ASSET_OVERRIDES[u.id];
+    setCelebration({
+      name: u.name,
+      kindLabel:
+        u.kind === "bundle"
+          ? "Bundle desbloqueado"
+          : u.kind === "cosmetic"
+            ? "Cosmético"
+            : u.kind === "powerup"
+              ? "Power-up"
+              : u.kind === "decks"
+                ? "Deck"
+                : "Pack",
+      price: u.price,
+      balance: Math.max(0, getWallet().crystals),
+      art: override?.art ?? null,
+      accent: RARITY_META[u.rarity]?.ring,
+      message,
+    });
+  }
+
   async function handleBuyUnified(u: UnifiedItem) {
     if (!profile || busy) return;
     // Bundles show a detail modal first — never buy silently.
@@ -381,7 +408,7 @@ function ShopPage() {
       const r = await buyPublishedDeck(profile.id, u.raw as PublishedDeckRow);
       setBusy(null);
       if (r.ok) {
-        toast("ok", r.message);
+        celebrate(u, r.message);
         if (r.deckId) setTimeout(() => router.navigate({ to: `/library/${r.deckId}` }), 700);
       } else {
         toast(
@@ -393,7 +420,7 @@ function ShopPage() {
     }
     const r = await buyShopItem(profile.id, u.raw as ShopItem);
     setBusy(null);
-    if (r.ok) toast("ok", r.message);
+    if (r.ok) celebrate(u, r.message);
     else
       toast(
         "err",
@@ -411,7 +438,8 @@ function ShopPage() {
     const r = await buyShopItem(profile.id, item);
     setBusy(null);
     if (r.ok) {
-      toast("ok", r.message);
+      const u = unified.find((x) => x.id === item.id);
+      if (u) celebrate(u, r.message);
       setBundleOpen(null);
     } else {
       toast(
@@ -587,6 +615,8 @@ function ShopPage() {
           Só o que posso comprar
         </button>
       </div>
+
+      <PurchaseSuccessOverlay data={celebration} onClose={() => setCelebration(null)} />
 
       {/* Toast */}
       {flash && (
