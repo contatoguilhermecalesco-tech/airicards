@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 
-import type { ShopItem } from "@/lib/shop";
+import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { ArlysIcon } from "@/components/StatChip";
 import { slotOf } from "@/lib/wallet-store";
 import { getShopAssetOverride, getEquippedArt } from "@/lib/shop-asset-overrides";
