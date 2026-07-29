@@ -68,7 +68,7 @@ export function SakuraPetals({
         blur: rand() < 0.25 ? 1 : 0, // some out-of-focus petals for depth
       };
     });
-  }, [density, seed]);
+  }, [density, seed, crimson]);
 
   return (
     <div
