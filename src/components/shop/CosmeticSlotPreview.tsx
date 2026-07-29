@@ -269,7 +269,12 @@ function TitleDemo({ itemKey }: { itemKey: string }) {
   return (
     <DemoFrame label="Cabeçalho do perfil">
       <div className="flex items-center gap-3.5">
-        <ProfileAvatar profileId="guilherme" size={56} />
+        <ProfileAvatar
+          profileId="guilherme"
+          initial="G"
+          gradient="linear-gradient(135deg,#7f1027,#ff5a6e)"
+          size={56}
+        />
         <div className="min-w-0">
           <p className="text-[19px] font-semibold leading-tight text-white">Guilherme</p>
           <p className="text-[12.5px] leading-tight text-white/55">
