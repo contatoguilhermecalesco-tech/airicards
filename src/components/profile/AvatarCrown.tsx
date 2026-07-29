@@ -87,42 +87,23 @@ export function AvatarCrown({
     return <AvatarRing art={crown.ring} glow={crown.glow} size={size} />;
   }
   return (
-    <></>
-  ).type === "" ? null : (
-    <></>
-  );
-}
-
-function LegacyCrown({
-  crown,
-  size,
-  width,
-}: {
-  crown: { art: string; glow: string };
-  size: number;
-  width: number;
-}) {
-  return (
-    <></>
-  );
+    <div
+      aria-hidden
+      className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2"
+      style={{ width, top: -size * 0.42 }}
+    >
       <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 z-20 -translate-x-1/2"
-        style={{ width, top: -size * 0.42 }}
-      >
-        <div
-          className="absolute inset-x-4 bottom-1 h-6 rounded-full blur-xl"
-          style={{ background: crown.glow }}
-        />
-        <img
-          src={crown.art}
-          alt=""
-          loading="lazy"
-          className="crown-float relative block w-full object-contain"
-          style={{ filter: `drop-shadow(0 6px 14px ${crown.glow})` }}
-        />
-      </div>
-    </>
+        className="absolute inset-x-4 bottom-1 h-6 rounded-full blur-xl"
+        style={{ background: crown.glow }}
+      />
+      <img
+        src={crown.art}
+        alt=""
+        loading="lazy"
+        className="crown-float relative block w-full object-contain"
+        style={{ filter: `drop-shadow(0 6px 14px ${crown.glow})` }}
+      />
+    </div>
   );
 }
 
