@@ -118,6 +118,6 @@ export function NameplateTopCrown({
   size?: number;
 }) {
   return (
-    <AvatarRing art={art} glow="rgba(192,132,252,0.40)" size={size} />
+    <AvatarRing art={art} glow="rgba(192,132,252,0.18)" size={size} />
   );
 }
