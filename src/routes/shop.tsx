@@ -143,14 +143,8 @@ function ShopPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [preview, setPreview] = useState<ShopItem | null>(null);
-  const [tablePreviewSkinKey, setTablePreviewSkinKey] = useState<string | null>(null);
-  const [slotPreview, setSlotPreview] = useState<{
-    slot: PreviewSlot;
-    key: string;
-    name: string;
-    price: number;
-  } | null>(null);
+  const [preview, setPreview] = useState<UnifiedItem | null>(null);
+
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
   const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
