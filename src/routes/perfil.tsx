@@ -59,6 +59,8 @@ import { tableSkinByKey } from "@/lib/table-skins";
 import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
+import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
+
 
 
 export const Route = createFileRoute("/perfil")({
