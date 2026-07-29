@@ -912,7 +912,7 @@ function PerfilPage() {
           equippedKeys={wallet.equipped}
           keyOf={keyOf}
           paletteFor={paletteFor}
-          iconFor={(it) => ICONS[it.icon] ?? Sparkles}
+          iconFor={(it: ShopItem) => ICONS[it.icon] ?? Sparkles}
           busy={busy}
           onEquip={handleEquip}
           onUnequip={handleUnequip}
