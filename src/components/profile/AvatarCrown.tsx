@@ -93,7 +93,7 @@ export function AvatarCrown({
       style={{ width, top: -size * 0.42 }}
     >
       <div
-        className="absolute inset-x-4 bottom-1 h-6 rounded-full blur-xl"
+        className="absolute inset-x-4 bottom-1 h-5 rounded-full blur-lg"
         style={{ background: crown.glow }}
       />
       <img
@@ -101,7 +101,7 @@ export function AvatarCrown({
         alt=""
         loading="lazy"
         className="crown-float relative block w-full object-contain"
-        style={{ filter: `drop-shadow(0 6px 14px ${crown.glow})` }}
+        style={{ filter: `drop-shadow(0 4px 10px ${crown.glow})` }}
       />
     </div>
   );
