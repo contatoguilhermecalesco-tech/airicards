@@ -23,6 +23,7 @@ export function BundleDetailModal({
   busy,
   splashUrl,
   artUrl,
+  onPreview,
 }: {
   bundle: ShopItem;
   wallet: number;
@@ -32,6 +33,8 @@ export function BundleDetailModal({
   busy: boolean;
   splashUrl?: string | null;
   artUrl?: string | null;
+  /** Abre o provador (prévia contextual) — sem item, prova o bundle inteiro. */
+  onPreview?: (item?: ShopItem) => void;
 }) {
   const [contents, setContents] = useState<ShopItem[] | null>(null);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
