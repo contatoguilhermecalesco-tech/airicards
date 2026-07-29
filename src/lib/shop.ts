@@ -20,10 +20,12 @@ export type ShopItem = {
 };
 
 export async function listShopItems(): Promise<ShopItem[]> {
+  // Traz itens ativos + TODOS os bundles (mesmo inativos/ocultos), pois a loja
+  // usa a lista de bundles para esconder os cosméticos que pertencem a eles.
   const { data, error } = await supabase
     .from("shop_items")
     .select("*")
-    .eq("active", true)
+    .or("active.eq.true,kind.eq.bundle")
     .order("sort_order", { ascending: true });
   if (error || !data) return [];
   return data as unknown as ShopItem[];
