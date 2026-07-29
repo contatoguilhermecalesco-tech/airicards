@@ -104,20 +104,47 @@ export function ItemPreviewModal({
   owned: boolean;
   canAfford: boolean;
   busy: boolean;
+  busyLabel?: string;
   onBuy: () => void;
   onClose: () => void;
 }) {
-  const slot = resolveSlot(item);
-  const key = itemKeyOf(item);
+  // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
+  const [contents, setContents] = useState<ShopItem[]>([]);
+  const [selId, setSelId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    setContents([]);
+    setSelId(null);
+    if (item.kind !== "bundle") return;
+    void getBundleContents(item).then((rows) => {
+      if (!alive) return;
+      const cosmetics = rows.filter((r) => r.kind === "cosmetic");
+      setContents(cosmetics.length ? cosmetics : rows);
+      setSelId((cosmetics.length ? cosmetics : rows)[0]?.id ?? null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [item.id, item.kind]);
+
+  const active = useMemo(
+    () => contents.find((c) => c.id === selId) ?? (contents[0] || item),
+    [contents, selId, item],
+  );
+
+  const slot = resolveSlot(active);
+  const key = itemKeyOf(active);
   const walletKey = `${slot}:${key}`;
   const rarity = rarityFor(item.price);
   const art =
-    getShopAssetOverride(item.id)?.art ??
-    cosmeticArtFor(item.payload as Record<string, unknown>) ??
+    getShopAssetOverride(active.id)?.art ??
+    cosmeticArtFor(active.payload as Record<string, unknown>) ??
     getEquippedArt(walletKey) ??
     null;
 
   const [tab, setTab] = useState<TabId>("contexto");
+  useEffect(() => setTab("contexto"), [active.id]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -175,7 +202,7 @@ export function ItemPreviewModal({
         label: "Perfil",
         hint: SLOT_WHERE[slot] ?? "Aparece no seu perfil.",
         Icon: UserRound,
-        node: <ProfileStage item={item} slot={slot} itemKey={key} art={art} />,
+        node: <ProfileStage item={active} slot={slot} itemKey={key} art={art} />,
       });
     }
 
@@ -185,18 +212,19 @@ export function ItemPreviewModal({
         label: "Prévia",
         hint: "Item cosmético exclusivo.",
         Icon: Sparkles,
-        node: <ProfileStage item={item} slot={slot} itemKey={key} art={art} />,
+        node: <ProfileStage item={active} slot={slot} itemKey={key} art={art} />,
       });
     }
     return list;
-  }, [slot, key, walletKey, item, art]);
+  }, [slot, key, walletKey, active, art]);
 
   const [ctxIndex, setCtxIndex] = useState(0);
+  useEffect(() => setCtxIndex(0), [active.id]);
   const ctx = contexts[Math.min(ctxIndex, contexts.length - 1)];
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-end justify-center bg-black/85 p-0 backdrop-blur-md sm:items-center sm:p-4"
+      className="fixed inset-0 z-[140] flex items-end justify-center bg-black/85 p-0 backdrop-blur-md sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -240,18 +268,61 @@ export function ItemPreviewModal({
               </span>
             </div>
             <h3 className="mt-1 truncate text-[19px] font-semibold tracking-tight text-white">
-              {item.name}
+              {active.name}
             </h3>
             <p className="mt-0.5 line-clamp-2 text-[12.5px] leading-snug text-white/50">
-              {item.description || SLOT_WHERE[slot] || "Item cosmético."}
+              {contents.length > 0
+                ? `${item.name} · item ${contents.findIndex((c) => c.id === active.id) + 1} de ${contents.length}`
+                : active.description || SLOT_WHERE[slot] || "Item cosmético."}
             </p>
           </div>
         </div>
 
+        {/* Rail de itens do bundle — prova item por item */}
+        {contents.length > 1 && (
+          <div className="shrink-0 px-5 pb-3">
+            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
+              Todos os itens ({contents.length})
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {contents.map((c) => {
+                const cSlot = resolveSlot(c);
+                const cArt =
+                  getShopAssetOverride(c.id)?.art ??
+                  cosmeticArtFor(c.payload as Record<string, unknown>) ??
+                  getEquippedArt(`${cSlot}:${itemKeyOf(c)}`) ??
+                  null;
+                const on = c.id === active.id;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelId(c.id)}
+                    title={c.name}
+                    className={`group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border transition ${
+                      on
+                        ? "border-violet-300/70 bg-white/[0.12] shadow-[0_0_0_2px_rgba(196,181,253,0.25)]"
+                        : "border-white/10 bg-white/[0.04] hover:bg-white/[0.09]"
+                    }`}
+                  >
+                    {cArt ? (
+                      <img src={cArt} alt="" draggable={false} className="h-12 w-12 object-contain" />
+                    ) : (
+                      <Sparkles className="h-5 w-5 text-white/70" strokeWidth={2.5} />
+                    )}
+                    <span className="absolute inset-x-0 bottom-0 truncate bg-black/65 px-1 py-[2px] text-[8px] font-semibold uppercase tracking-wide text-white/70">
+                      {(SLOT_LABEL[cSlot] ?? "Item").split(" ")[0]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {contexts.map((c, i) => {
-            const active = tab === "contexto" && i === ctxIndex;
+            const active2 = tab === "contexto" && i === ctxIndex;
             return (
               <button
                 key={c.id}
@@ -260,7 +331,7 @@ export function ItemPreviewModal({
                   setCtxIndex(i);
                 }}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition ${
-                  active
+                  active2
                     ? "border-white/25 bg-white/[0.14] text-white"
                     : "border-white/10 bg-white/[0.04] text-white/60 hover:bg-white/[0.08]"
                 }`}
@@ -294,7 +365,7 @@ export function ItemPreviewModal({
             >
               <img
                 src={art}
-                alt={item.name}
+                alt={active.name}
                 draggable={false}
                 className="max-h-[260px] w-auto object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]"
               />
@@ -306,9 +377,13 @@ export function ItemPreviewModal({
                 {ctx.hint}
               </p>
               {ctx.node}
+              {active.description && (
+                <p className="mt-3 text-[12px] leading-snug text-white/45">{active.description}</p>
+              )}
             </>
           )}
         </div>
+
 
         {/* Footer */}
         <div className="flex shrink-0 items-center justify-between gap-3 border-t border-white/[0.07] bg-black/35 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
