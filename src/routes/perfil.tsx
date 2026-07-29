@@ -180,9 +180,15 @@ const SLOT_META: Record<
     hint: "Camada translúcida com brilhos por cima do banner.",
     icon: Sparkles,
   },
+  table: {
+    label: "Mesa de revisão",
+    hint: "Tematiza a tela de revisão: brasão, moldura e efeitos.",
+    icon: Layers,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "overlay", "veil", "companion"];
+const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "overlay", "veil", "companion", "table"];
+
 
 // ---------- avatar with optional decoration ring ----------
 function DiscordAvatar({
@@ -343,6 +349,8 @@ function PerfilPage() {
       overlay: [],
       companion: [],
       veil: [],
+      table: [],
+
     };
     wallet.cosmetics.forEach((k) => {
       const it = byKey.get(k);
