@@ -32,6 +32,10 @@ import { TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
+import { getEquippedArt } from "@/lib/shop-asset-overrides";
+import { companionFromEquipped } from "@/lib/companion-assets";
+import { CompanionRender } from "@/components/CompanionRender";
+import { SakuraPetals } from "@/components/SakuraPetals";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
