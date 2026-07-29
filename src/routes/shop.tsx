@@ -68,6 +68,7 @@ import {
   hasSlotPreview,
   type PreviewSlot,
 } from "@/components/shop/CosmeticSlotPreview";
+import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
 // featured_slots assets when admin uploads custom art.
