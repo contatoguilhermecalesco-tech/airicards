@@ -60,6 +60,14 @@ import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 
 
 
