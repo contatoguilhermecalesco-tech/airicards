@@ -4,6 +4,10 @@
 import eclipseAmbient from "@/assets/shop/eclipse/background.png";
 import eclipseFrame from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCrest from "@/assets/shop/eclipse/table-cardback.png";
+import monarcaAmbient from "@/assets/shop/monarca/background.png";
+import monarcaFrame from "@/assets/shop/monarca/cardframe.png";
+import monarcaCrest from "@/assets/shop/monarca/table-cardback.png";
+
 
 export type TableSkin = {
   id: string;
