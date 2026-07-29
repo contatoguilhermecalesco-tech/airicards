@@ -11,10 +11,10 @@ import {
   Trophy,
   UserRound,
   Sparkles,
-  Image as ImageIcon,
   Layers,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
+
 
 import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { ArlysIcon } from "@/components/StatChip";
