@@ -779,6 +779,11 @@ function PerfilPage() {
               <span className="text-white/80">{handleUser}</span>
               <span className="text-white/40">{handleSuffix}</span>
             </p>
+            {cosmeticTitle && (
+              <div className="mt-1.5">
+                <CosmeticTitle theme={cosmeticTitle} />
+              </div>
+            )}
 
             <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
 
