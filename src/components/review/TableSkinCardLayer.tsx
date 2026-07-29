@@ -28,6 +28,50 @@ export function TableSkinCardLayer({ skin }: { skin: TableSkin }) {
         style={{ background: `radial-gradient(closest-side, ${a}26, transparent 72%)` }}
       />
 
+      {/* Pétalas/brasas caindo dentro da carta — nasce no topo */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]"
+      >
+        {EMBERS.map((e, i) => (
+          <span
+            key={i}
+            className="table-ember absolute -top-4"
+            style={
+              {
+                left: `${e.left}%`,
+                width: e.size,
+                height: e.size * 0.62,
+                borderRadius: "60% 40% 62% 38% / 58% 62% 38% 42%",
+                background: `linear-gradient(140deg, ${a}, ${a}33)`,
+                boxShadow: `0 0 ${e.size * 1.6}px -${e.size * 0.4}px ${a}`,
+                filter: e.size < 7 ? "blur(0.4px)" : undefined,
+                "--ember-duration": `${e.dur}s`,
+                "--ember-delay": `${e.delay}s`,
+                "--ember-drift": `${e.drift}px`,
+                "--ember-opacity": `${e.opacity}`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+
+        {/* Névoa viva no topo */}
+        <div
+          className="table-skin-breathe absolute inset-x-0 -top-6 h-24"
+          style={{
+            background: `radial-gradient(60% 100% at 50% 0%, ${a}2e, transparent 75%)`,
+          }}
+        />
+        {/* Faixa de luz que atravessa o topo */}
+        <div
+          className="table-sheen absolute -top-2 left-0 h-28 w-1/3 -skew-x-12"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${a}1f, transparent)`,
+          }}
+        />
+      </div>
+
+
       {/* Filete duplo desenhado (nunca estica) */}
       <div
         aria-hidden
