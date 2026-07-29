@@ -201,9 +201,27 @@ export async function grantCosmetic(key: string) {
 
 // Slot dentro da chave — formato "<slot>:<id>". Aceita apenas os slots
 // canônicos; qualquer outro valor cai em "effect" para não perder o item.
+const CANONICAL_SLOTS: CosmeticSlot[] = [
+  "nameplate",
+  "decoration",
+  "badge",
+  "effect",
+  "overlay",
+  "companion",
+  "veil",
+  "table",
+  "streak_flame",
+  "enemy_seal",
+  "title",
+  "victory_splash",
+];
+
 function slotFromKey(key: string): CosmeticSlot {
   const raw = key.split(":")[0]?.toLowerCase() ?? "";
-  if (raw === "table" || raw.includes("mesa")) return "table";
+  // Chaves já vêm no formato "<slot>:<id>" — respeita o slot declarado.
+  const canonical = CANONICAL_SLOTS.find((s) => s === raw);
+  if (canonical) return canonical;
+  if (raw.includes("mesa")) return "table";
   if (raw === "overlay" || raw.includes("sakura") || raw.includes("petal") || raw.includes("petala"))
     return "overlay";
 
