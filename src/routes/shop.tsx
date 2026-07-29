@@ -741,10 +741,28 @@ function ShopPage() {
           busy={busy === bundleOpen.id}
           onClose={() => setBundleOpen(null)}
           onBuy={() => void confirmBuyBundle(bundleOpen)}
+          onPreview={(it) => setTryOn({ root: bundleOpen, focusId: it?.id ?? null })}
           splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.splash}
           artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.art}
         />
       )}
+
+      {tryOn && (
+        <ItemPreviewModal
+          item={tryOn.root}
+          initialItemId={tryOn.focusId}
+          owned={ownedIds.has(tryOn.root.id)}
+          canAfford={wallet.crystals >= tryOn.root.price}
+          busy={busy === tryOn.root.id}
+          onBuy={() => {
+            const root = tryOn.root;
+            setTryOn(null);
+            void confirmBuyBundle(root);
+          }}
+          onClose={() => setTryOn(null)}
+        />
+      )}
+
     </main>
   );
 }
