@@ -52,6 +52,7 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     ambient: eclipseAmbient,
     frame: eclipseFrame,
     crest: eclipseCrest,
+    particles: eclipsePetals,
     accent: "#e0435f",
     glow: "rgba(190, 26, 56, 0.42)",
     hit: "#ff6b8a",
