@@ -721,6 +721,10 @@ export type Database = {
     }
     Functions: {
       current_profile_id: { Args: never; Returns: string }
+      get_public_profile_snapshot: {
+        Args: { _profile_id: string }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _profile_id: string
