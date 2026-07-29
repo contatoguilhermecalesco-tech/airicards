@@ -33,7 +33,7 @@ import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
-import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { AvatarCrown, NameplateTopCrown, getCrownArt } from "@/components/profile/AvatarCrown";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";

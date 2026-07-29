@@ -54,7 +54,7 @@ import { CompanionRender } from "@/components/CompanionRender";
 
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
-import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { AvatarCrown, NameplateTopCrown, getCrownArt } from "@/components/profile/AvatarCrown";
 import { tableSkinByKey } from "@/lib/table-skins";
 import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
