@@ -63,6 +63,11 @@ import {
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 import { tableSkinByKey } from "@/lib/table-skins";
 import { TableSkinPreviewModal } from "@/components/review/TableSkinPreviewModal";
+import {
+  CosmeticSlotPreview,
+  hasSlotPreview,
+  type PreviewSlot,
+} from "@/components/shop/CosmeticSlotPreview";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
 // featured_slots assets when admin uploads custom art.
@@ -143,6 +148,12 @@ function ShopPage() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [preview, setPreview] = useState<ShopItem | null>(null);
   const [tablePreviewSkinKey, setTablePreviewSkinKey] = useState<string | null>(null);
+  const [slotPreview, setSlotPreview] = useState<{
+    slot: PreviewSlot;
+    key: string;
+    name: string;
+    price: number;
+  } | null>(null);
   const [bundleOpen, setBundleOpen] = useState<ShopItem | null>(null);
   const [featuredSlots, setFeaturedSlots] = useState<FeaturedSlotRow[]>([]);
   const [celebration, setCelebration] = useState<PurchaseCelebration | null>(null);
@@ -188,6 +199,16 @@ function ShopPage() {
     if (slot === "table") {
       const key = `${slot}:${String(item.payload.key ?? item.id)}`;
       if (tableSkinByKey(key)) setTablePreviewSkinKey(key);
+      return;
+    }
+    const key = String(item.payload.key ?? item.id);
+    if (hasSlotPreview(slot, key)) {
+      setSlotPreview({
+        slot: slot as PreviewSlot,
+        key,
+        name: item.name,
+        price: item.price,
+      });
       return;
     }
     setPreview(item);
@@ -728,6 +749,15 @@ function ShopPage() {
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
       {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
+      {slotPreview && (
+        <CosmeticSlotPreview
+          slot={slotPreview.slot}
+          itemKey={slotPreview.key}
+          name={slotPreview.name}
+          price={slotPreview.price}
+          onClose={() => setSlotPreview(null)}
+        />
+      )}
       {tablePreviewSkinKey && (
         <TableSkinPreviewModal
           skin={tableSkinByKey(tablePreviewSkinKey)!}
