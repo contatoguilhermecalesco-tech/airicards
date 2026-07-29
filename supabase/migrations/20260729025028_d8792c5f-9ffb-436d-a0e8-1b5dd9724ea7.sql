@@ -1,0 +1,1 @@
+UPDATE public.shop_items SET name = 'Altar do Eclipse' WHERE name = 'Mesa do Eclipse';
