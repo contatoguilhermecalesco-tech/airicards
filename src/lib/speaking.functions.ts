@@ -4,7 +4,32 @@ import { z } from "zod";
 const GenInput = z.object({
   level: z.enum(["beginner", "intermediate", "advanced"]),
   focus: z.enum(["pronunciation", "fluency", "conversation"]).optional(),
+  // Tema livre escolhido pelo aluno (ex.: "viagem", "entrevista de emprego").
+  topic: z.string().max(200).optional(),
+  // Últimos exercícios gerados — usados para evitar repetição.
+  recent: z.array(z.string().max(300)).max(10).optional(),
 });
+
+// Ângulos rotativos — variam o cenário mesmo quando o tema é o mesmo,
+// evitando que a IA caia sempre nas mesmas frases.
+const ANGLES = [
+  "pedindo ajuda a um desconhecido",
+  "contando uma experiência que deu errado",
+  "discordando educadamente de alguém",
+  "fazendo uma reclamação em um estabelecimento",
+  "convidando alguém para algo",
+  "explicando um plano futuro",
+  "reagindo a uma notícia surpreendente",
+  "negociando preço ou prazo",
+  "dando instruções passo a passo",
+  "comparando duas opções e escolhendo uma",
+  "desculpando-se por um atraso ou erro",
+  "fazendo small talk enquanto espera",
+  "pedindo esclarecimento porque não entendeu",
+  "elogiando e fazendo uma pergunta de follow-up",
+  "recusando um convite sem soar rude",
+  "contando uma memória de infância",
+];
 
 export type SpeakingPrompt = {
   prompt: string; // pt-BR — o que o aluno deve dizer
@@ -44,6 +69,22 @@ export const generateSpeaking = createServerFn({ method: "POST" })
       `{"prompt": string, "modelAnswer": string, "translation": string, "focusPoints": string[], "altAnswers": string[]}`,
     ].join(" ");
 
+    const topic = data.topic?.trim();
+    const angle = ANGLES[Math.floor(Math.random() * ANGLES.length)];
+    const userMsg = [
+      `Nível: ${data.level}.`,
+      topic
+        ? `TEMA OBRIGATÓRIO: "${topic}". Toda a situação e a resposta modelo devem girar em torno desse tema.`
+        : "TEMA LIVRE: escolha um tema cotidiano variado e pouco óbvio (evite clichês como pedir café ou apresentar-se).",
+      `Ângulo/cenário para esta geração: ${angle}.`,
+      data.recent?.length
+        ? `NÃO repita nem parafraseie nenhum destes exercícios já usados:\n- ${data.recent.slice(0, 10).join("\n- ")}`
+        : "",
+      "Traga vocabulário e estrutura diferentes do óbvio.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
@@ -51,8 +92,9 @@ export const generateSpeaking = createServerFn({ method: "POST" })
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: system },
-          { role: "user", content: `Nível: ${data.level}. Gere um exercício variado.` },
+          { role: "user", content: userMsg },
         ],
+        temperature: 1.1,
         response_format: { type: "json_object" },
       }),
     });
