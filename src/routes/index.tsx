@@ -20,6 +20,9 @@ import {
   isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
+import { useWallet } from "@/lib/wallet-store";
+import { streakFlameFromEquipped } from "@/lib/eclipse-cosmetics";
+import { StreakFlame, streakHalo } from "@/components/StreakFlame";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
