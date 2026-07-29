@@ -62,6 +62,8 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.overlay.rosas_crepusculo": { art: eclipsePetals },
   "cosmetic.veil.veu_rubro": { art: eclipseCardframe },
   "cosmetic.companion.corvo_carmesim": { art: eclipseCompanion },
+  "cosmetic.table.mesa_eclipse": { art: eclipseTableBack },
+
 };
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
