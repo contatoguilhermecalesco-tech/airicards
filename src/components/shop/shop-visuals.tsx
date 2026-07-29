@@ -190,6 +190,11 @@ const DISCORD_PALETTE: Record<
     ring: "#a5b4fc",
     tag: "Lilás",
   },
+  crimson: {
+    gradient: "linear-gradient(135deg,#fda4af 0%,#e11d48 42%,#4c0519 100%)",
+    ring: "#f43f5e",
+    tag: "Eclipse",
+  },
 };
 
 export function visualFor(item: ShopItem): CosmeticVisual {

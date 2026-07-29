@@ -7,6 +7,7 @@ import igrisRise1Url from "@/assets/shop/monarca/companion-rise1.png";
 import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
 import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
+import corvoUrl from "@/assets/shop/eclipse/companion.png";
 
 
 export type CompanionProfile = {
