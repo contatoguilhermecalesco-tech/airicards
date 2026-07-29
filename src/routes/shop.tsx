@@ -23,7 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
-import { useWallet, loadWallet } from "@/lib/wallet-store";
+import { useWallet, loadWallet, getWallet } from "@/lib/wallet-store";
 import {
   buyPublishedDeck,
   buyShopItem,
@@ -391,7 +391,7 @@ function ShopPage() {
       price: u.price,
       balance: Math.max(0, getWallet().crystals),
       art: override?.art ?? null,
-      accent: RARITY_META[u.rarity]?.color,
+      accent: RARITY_META[u.rarity]?.ring,
       message,
     });
   }
