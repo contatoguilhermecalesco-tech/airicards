@@ -12,6 +12,8 @@ import {
   Flame,
   Gift,
   Heart,
+  Layers,
+
   Moon,
   Palette,
   Plane,
@@ -135,7 +137,9 @@ export const ICONS: Record<string, React.ComponentType<LucideProps>> = {
   trophy: Trophy,
   heart: Heart,
   gift: Gift,
+  layers: Layers,
 };
+
 
 export const ACCENTS: Record<string, string> = {
   sky: "from-sky-400/20 to-sky-500/10 text-sky-200 border-sky-400/30",

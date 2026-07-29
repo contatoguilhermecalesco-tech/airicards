@@ -25,6 +25,11 @@ import {
   onComboReached,
   getComboCount,
 } from "@/lib/enemy-system";
+import { useWallet } from "@/lib/wallet-store";
+import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
+import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
+import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
+
 
 
 
@@ -85,6 +90,20 @@ function Review() {
   const dmgIdRef = useRef(0);
   const combo = useCombo();
   const comboMult = comboMultiplier(combo.count);
+
+  // Mesa de revisão equipada (skin da sessão)
+  const wallet = useWallet();
+  const skin = tableSkinFromEquipped(wallet.equipped);
+  const skinned = !isDefaultTableSkin(skin);
+  const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
+  const [runStreak, setRunStreak] = useState(0);
+
+  function pulseSkin(tone: "hit" | "miss") {
+    setSkinFlash(tone);
+    setTimeout(() => setSkinFlash(null), 700);
+  }
+
+
 
   // Digitação obrigatória da tradução
   const [typed, setTyped] = useState("");
@@ -189,6 +208,8 @@ function Review() {
     setShowBack(true);
     if (res.correct) {
       setAskDifficulty(true);
+      setRunStreak((n) => n + 1);
+      pulseSkin("hit");
       if (isEnemyRun && isEnemy(current)) {
         bumpCombo();
         onComboReached(getComboCount());
@@ -196,9 +217,12 @@ function Review() {
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      setRunStreak(0);
+      pulseSkin("miss");
       if (isEnemyRun) breakCombo();
     }
   }
+
 
   function giveUp() {
     if (!current || verdict) return;
@@ -303,6 +327,9 @@ function Review() {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
+      {/* Mesa de revisão equipada — ambiente temático */}
+      <TableSkinAmbient skin={skin} />
+
       {/* Ambient halo — violet by default, blood-red for enemies */}
       <div
         aria-hidden
@@ -310,9 +337,15 @@ function Review() {
         style={{
           background: currentIsEnemy
             ? "radial-gradient(closest-side, hsl(var(--destructive) / 0.28), transparent 70%)"
+            : skinned
+            ? `radial-gradient(closest-side, ${skin.glow}, transparent 70%)`
             : "radial-gradient(closest-side, hsl(var(--primary) / 0.18), transparent 70%)",
         }}
       />
+
+      {/* Flash temático da mesa (acerto / erro) */}
+      {skinned && skinFlash && <TableSkinFlash skin={skin} tone={skinFlash} />}
+
 
       {/* Enemy full-screen vignette (pulsing) */}
       {currentIsEnemy && (
@@ -485,6 +518,24 @@ function Review() {
           </div>
         )}
 
+        {/* Sequência da mesa — acende progressivamente a skin equipada */}
+        {skinned && !focusMode && runStreak >= 3 && (
+          <div className="mt-3 flex items-center justify-center">
+            <span
+              key={runStreak}
+              className="combo-pop inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em]"
+              style={{
+                borderColor: `${skin.accent}59`,
+                color: skin.accent,
+                background: `${skin.accent}14`,
+                boxShadow: `0 0 ${12 + Math.min(runStreak, 10) * 3}px -6px ${skin.accent}`,
+              }}
+            >
+              <Flame className="h-3 w-3" strokeWidth={3} />
+              {runStreak >= 10 ? "Mesa desperta" : `Sequência ${runStreak}`}
+            </span>
+          </div>
+        )}
 
         {queue.length === 0 && !current ? (
           <EmptyState enemyRun={isEnemyRun} />
@@ -493,6 +544,7 @@ function Review() {
             reviewed={reviewed}
             deckId={deckId}
             enemyRun={isEnemyRun}
+            skin={skin}
           />
         ) : (
           <div className="mt-8 flex flex-1 flex-col">
@@ -517,9 +569,11 @@ function Review() {
                   targetWord={current.targetWord}
                   mode={current.mode}
                   showBack={showBack}
+                  skin={skin}
                 />
               )}
             </div>
+
 
             {/* Floating damage / heal numbers */}
             {dmgFx.length > 0 && (
@@ -675,13 +729,16 @@ function NormalCard({
   targetWord,
   mode,
   showBack,
+  skin,
 }: {
   front: string;
   back: string;
   targetWord?: string;
   mode?: "word" | "sentence" | "expression";
   showBack: boolean;
+  skin: TableSkin;
 }) {
+  const themed = !isDefaultTableSkin(skin);
   return (
     <div
       className="group relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-6 py-10 sm:py-14 animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -689,17 +746,26 @@ function NormalCard({
         backdropFilter: "blur(20px) saturate(140%)",
         boxShadow:
           "0 30px 60px -30px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+        ...tableSkinCardStyle(skin),
       }}
     >
+      <TableSkinCardLayer skin={skin} />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
       />
-      <div className="flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
-        <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70">
-          <span className="h-1 w-1 rounded-full bg-primary/70" />
+      <div className="relative flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
+        <p
+          className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70"
+          style={themed ? { color: skin.accent } : undefined}
+        >
+          <span
+            className="h-1 w-1 rounded-full bg-primary/70"
+            style={themed ? { background: skin.accent } : undefined}
+          />
           {mode === "sentence" ? "Frase" : mode === "expression" ? "Expressão" : "Inglês"}
         </p>
+
         <p className="text-balance text-[26px] font-semibold leading-tight text-foreground sm:text-[34px]">
           {mode === "sentence" && targetWord
             ? renderSentence(front, targetWord)
@@ -938,38 +1004,70 @@ function FinishedState({
   reviewed,
   deckId,
   enemyRun,
+  skin,
 }: {
   reviewed: number;
   deckId?: string;
   enemyRun: boolean;
+  skin: TableSkin;
 }) {
+  const themed = !isDefaultTableSkin(skin) && !enemyRun;
   return (
     <div className="mt-20 grid place-items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <div
-        className={`grid h-16 w-16 place-items-center rounded-2xl border backdrop-blur-md ${
-          enemyRun
-            ? "border-destructive/30 bg-destructive/10 text-destructive"
-            : "border-success/25 bg-success/10 text-success"
-        }`}
-        style={{
-          boxShadow: enemyRun
-            ? "0 20px 40px -20px hsl(var(--destructive) / 0.6)"
-            : "0 20px 40px -20px hsl(var(--success) / 0.5)",
-        }}
-      >
-        {enemyRun ? (
-          <Swords className="h-7 w-7" strokeWidth={2.5} />
-        ) : (
-          <Trophy className="h-7 w-7" strokeWidth={2.5} />
-        )}
-      </div>
+      {themed && skin.crest ? (
+        <div className="relative">
+          <div
+            aria-hidden
+            className="absolute inset-0 -m-8 rounded-full blur-2xl"
+            style={{ background: `radial-gradient(closest-side, ${skin.glow}, transparent 70%)` }}
+          />
+          <img
+            src={skin.crest}
+            alt=""
+            loading="lazy"
+            className="table-skin-crest-in relative h-28 w-auto rounded-2xl border object-cover"
+            style={{
+              borderColor: `${skin.accent}4d`,
+              boxShadow: `0 24px 50px -24px ${skin.accent}`,
+            }}
+          />
+        </div>
+      ) : (
+        <div
+          className={`grid h-16 w-16 place-items-center rounded-2xl border backdrop-blur-md ${
+            enemyRun
+              ? "border-destructive/30 bg-destructive/10 text-destructive"
+              : "border-success/25 bg-success/10 text-success"
+          }`}
+          style={{
+            boxShadow: enemyRun
+              ? "0 20px 40px -20px hsl(var(--destructive) / 0.6)"
+              : "0 20px 40px -20px hsl(var(--success) / 0.5)",
+          }}
+        >
+          {enemyRun ? (
+            <Swords className="h-7 w-7" strokeWidth={2.5} />
+          ) : (
+            <Trophy className="h-7 w-7" strokeWidth={2.5} />
+          )}
+        </div>
+      )}
       <h2 className="mt-5 text-2xl font-semibold">
         {enemyRun ? "Arena encerrada" : "Sessão concluída"}
       </h2>
+      {themed && (
+        <p
+          className="mt-1 text-[10px] font-bold uppercase tracking-[0.24em]"
+          style={{ color: skin.accent }}
+        >
+          {skin.name}
+        </p>
+      )}
       <p className="mt-2 text-sm text-muted-foreground">
         Você enfrentou {reviewed} carta{reviewed === 1 ? "" : "s"}.{" "}
         {enemyRun ? "Continue implacável." : "Muito bem!"}
       </p>
+
       <div className="mt-6 flex gap-2">
         {enemyRun ? (
           <Link
