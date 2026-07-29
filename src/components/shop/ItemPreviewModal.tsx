@@ -99,6 +99,7 @@ export function ItemPreviewModal({
   busy,
   onBuy,
   onClose,
+  initialItemId,
 }: {
   item: ShopItem;
   owned: boolean;
