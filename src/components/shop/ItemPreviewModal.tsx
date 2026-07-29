@@ -41,8 +41,6 @@ import {
   VICTORY_SPLASH_THEMES,
 } from "@/lib/eclipse-cosmetics";
 
-type TabId = "contexto" | "arte";
-
 type Ctx = {
   id: string;
   label: string;
@@ -321,17 +319,14 @@ export function ItemPreviewModal({
           </div>
         )}
 
-        {/* Tabs */}
+        {/* Context tabs */}
         <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {contexts.map((c, i) => {
-            const active2 = tab === "contexto" && i === ctxIndex;
+            const active2 = i === ctxIndex;
             return (
               <button
                 key={c.id}
-                onClick={() => {
-                  setTab("contexto");
-                  setCtxIndex(i);
-                }}
+                onClick={() => setCtxIndex(i)}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition ${
                   active2
                     ? "border-white/25 bg-white/[0.14] text-white"
@@ -343,48 +338,20 @@ export function ItemPreviewModal({
               </button>
             );
           })}
-          {art && (
-            <button
-              onClick={() => setTab("arte")}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11.5px] font-semibold transition ${
-                tab === "arte"
-                  ? "border-white/25 bg-white/[0.14] text-white"
-                  : "border-white/10 bg-white/[0.04] text-white/60 hover:bg-white/[0.08]"
-              }`}
-            >
-              <ImageIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
-              Arte
-            </button>
-          )}
         </div>
 
         {/* Stage */}
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
-          {tab === "arte" && art ? (
-            <div
-              className="grid place-items-center overflow-hidden rounded-2xl border border-white/[0.07] p-6"
-              style={{ background: RARITY_META[rarity].gradient }}
-            >
-              <img
-                src={art}
-                alt={active.name}
-                draggable={false}
-                className="max-h-[260px] w-auto object-contain drop-shadow-[0_18px_40px_rgba(0,0,0,0.6)]"
-              />
-            </div>
-          ) : (
-            <>
-              <p className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-white/40">
-                <Eye className="h-3 w-3" strokeWidth={2.5} />
-                {ctx.hint}
-              </p>
-              {ctx.node}
-              {active.description && (
-                <p className="mt-3 text-[12px] leading-snug text-white/45">{active.description}</p>
-              )}
-            </>
+          <p className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-white/40">
+            <Eye className="h-3 w-3" strokeWidth={2.5} />
+            {ctx.hint}
+          </p>
+          {ctx.node}
+          {active.description && (
+            <p className="mt-3 text-[12px] leading-snug text-white/45">{active.description}</p>
           )}
         </div>
+
 
 
         {/* Footer */}
