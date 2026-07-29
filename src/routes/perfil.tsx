@@ -880,16 +880,26 @@ function PerfilPage() {
                       <p className="truncate text-[11px] text-white/50">{meta.hint}</p>
                     </div>
                   </div>
-                  {equippedKey && (
-                    <button
-                      onClick={() => handleUnequip(slot)}
-                      disabled={busy === slot}
-                      className="shrink-0 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
-                    >
-                      Remover
-                    </button>
-                  )}
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    {slot === "table" &&
+                      (() => {
+                        const sk =
+                          tableSkinByKey(equippedKey) ??
+                          (owned[0] ? tableSkinByKey(keyOf(owned[0])) : undefined);
+                        return sk ? <TableSkinPreviewButton skin={sk} /> : null;
+                      })()}
+                    {equippedKey && (
+                      <button
+                        onClick={() => handleUnequip(slot)}
+                        disabled={busy === slot}
+                        className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
+                      >
+                        Remover
+                      </button>
+                    )}
+                  </div>
                 </div>
+
 
                 {equippedShop ? (
                   <div
