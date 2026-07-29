@@ -19,6 +19,8 @@ export type TableSkin = {
   frame?: string;
   /** Brasão/verso usado como marca d'água e no resumo da sessão. */
   crest?: string;
+  /** Partículas que caem sobre a mesa (opcional). */
+  particles?: string;
   /** Cor principal da mesa (CSS color). */
   accent: string;
   /** Brilho difuso usado em halos e sombras. */
