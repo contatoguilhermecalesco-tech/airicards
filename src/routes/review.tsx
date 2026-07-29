@@ -359,6 +359,17 @@ function Review() {
         />
       )}
 
+      {/* Selo inimigo equipado — sigilo giratório atrás da carta */}
+      {currentIsEnemy && enemySeal && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-20">
+          <EnemySealSigil theme={enemySeal} />
+        </div>
+      )}
+      {currentIsEnemy && enemySeal && skinFlash && (
+        <EnemySealStamp theme={enemySeal} tone={skinFlash} />
+      )}
+
+
       {/* Hit flash on wrong answer */}
       {hitFlash && (
         <div
