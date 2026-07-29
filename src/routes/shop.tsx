@@ -938,14 +938,26 @@ function UnifiedCard({
         </div>
       ) : (
         <div
-          aria-hidden
-          className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
+          role={onPreview ? "button" : undefined}
+          tabIndex={onPreview ? 0 : undefined}
+          onClick={onPreview}
+          onKeyDown={(e) => {
+            if (!onPreview) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onPreview();
+            }
+          }}
+          className={`group/cover relative w-full overflow-hidden ${
+            isVitrine ? "h-40" : "h-24"
+          } ${onPreview ? "cursor-pointer" : ""}`}
           style={{
             background: cosmeticArt
               ? "radial-gradient(circle at 78% 55%, rgba(244,63,94,0.28), transparent 62%), linear-gradient(135deg,#1a0710 0%,#0b0409 100%)"
               : rarity.gradient,
           }}
         >
+
           <span
             aria-hidden
             className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-70"
