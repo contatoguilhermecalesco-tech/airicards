@@ -120,6 +120,17 @@ function PerfilViewer() {
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
   const BadgeIcon = badge ? (ICONS[badge.icon] ?? Sparkles) : Sparkles;
 
+  // Artes curadas dos cosméticos equipados (mesmas usadas no /perfil próprio).
+  const nameplateArt = getEquippedArt(equipped.nameplate);
+  const decorationArt = getEquippedArt(equipped.decoration);
+  const badgeArt = getEquippedArt(equipped.badge);
+  const effectArt = getEquippedArt(equipped.effect);
+  const veilArt = getEquippedArt(equipped.veil);
+  const overlayArt = getEquippedArt(equipped.overlay);
+  const showSakura = equipped.overlay === "overlay:chuva_sakura";
+  const companion = companionFromEquipped(equipped);
+
+
   const initial = profile.name.charAt(0).toUpperCase();
   const handleUser = profile.name.toLowerCase().replace(/\s+/g, "");
   const handleSuffix = ".airi.com.br";
