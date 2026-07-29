@@ -289,7 +289,7 @@ function PerfilViewer() {
                   ) : (
                     <BadgeIcon className="relative h-3 w-3" strokeWidth={2.75} />
                   )}
-                  <span className="relative">{badgePalette.tag.toUpperCase()}</span>
+                  <span className="relative">{badge.name.toUpperCase()}</span>
                 </span>
               )}
               {(() => {
