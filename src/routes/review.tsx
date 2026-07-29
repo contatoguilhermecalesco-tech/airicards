@@ -206,6 +206,8 @@ function Review() {
     setShowBack(true);
     if (res.correct) {
       setAskDifficulty(true);
+      setRunStreak((n) => n + 1);
+      pulseSkin("hit");
       if (isEnemyRun && isEnemy(current)) {
         bumpCombo();
         onComboReached(getComboCount());
@@ -213,9 +215,12 @@ function Review() {
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 500);
+      setRunStreak(0);
+      pulseSkin("miss");
       if (isEnemyRun) breakCombo();
     }
   }
+
 
   function giveUp() {
     if (!current || verdict) return;
