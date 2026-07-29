@@ -230,6 +230,7 @@ function ShopPage() {
     const list: UnifiedItem[] = [];
     (items ?? []).forEach((it) => {
       const kind = (it.kind as UnifiedItem["kind"]) ?? "pack";
+      if (it.active === false) return; // bundles ocultos vêm só para o filtro acima
       if (kind !== "bundle" && bundledIds.has(it.id)) return;
       list.push({
         id: it.id,
