@@ -29,7 +29,6 @@ import { tableSkinByKey } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinCardLayer } from "@/components/review/TableSkinCardLayer";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
-import { titleThemeFor } from "@/components/shop/preview-helpers";
 import {
   StreakFlameDemo,
   EnemySealDemo,
@@ -418,7 +417,7 @@ function ProfileStage({
   const v = visualFor(item);
   const crown = slot === "nameplate" ? getCrownArt(`nameplate:${itemKey}`) : undefined;
   const companion = slot === "companion" ? getCompanion(itemKey) : null;
-  const title = slot === "title" ? (titleThemeFor(itemKey) ?? TITLE_THEMES[itemKey]) : null;
+  const title = slot === "title" ? (TITLE_THEMES[itemKey] ?? null) : null;
 
   const bannerArt = slot === "effect" ? art : null;
   const veilArt = slot === "veil" ? art : null;
