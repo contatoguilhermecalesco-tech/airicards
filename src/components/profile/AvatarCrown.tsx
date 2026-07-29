@@ -15,17 +15,17 @@ export const CROWN_ART_BY_KEY: Record<
 > = {
   "nameplate:coroa_guardia": {
     art: florescerCrown,
-    glow: "rgba(196, 160, 255, 0.55)",
+    glow: "rgba(196, 160, 255, 0.22)",
     ring: florescerFrame,
   },
   "nameplate:coroa_soberano": {
     art: monarcaCrown,
-    glow: "rgba(139, 92, 246, 0.55)",
+    glow: "rgba(139, 92, 246, 0.22)",
     ring: monarcaFrame,
   },
   "nameplate:coroa_crepusculo": {
     art: eclipseCrown,
-    glow: "rgba(224, 67, 95, 0.55)",
+    glow: "rgba(224, 67, 95, 0.22)",
     ring: eclipseFrame,
   },
 };
@@ -55,7 +55,7 @@ export function AvatarRing({
       style={{ width, height: width }}
     >
       <div
-        className="absolute inset-[12%] rounded-full blur-2xl"
+        className="absolute inset-[14%] rounded-full blur-lg"
         style={{ background: glow }}
       />
       <img
@@ -63,7 +63,7 @@ export function AvatarRing({
         alt=""
         loading="lazy"
         className="relative block h-full w-full max-w-none object-contain"
-        style={{ filter: `drop-shadow(0 4px 16px ${glow})` }}
+        style={{ filter: `drop-shadow(0 3px 10px ${glow})` }}
       />
     </div>
   );
@@ -93,7 +93,7 @@ export function AvatarCrown({
       style={{ width, top: -size * 0.42 }}
     >
       <div
-        className="absolute inset-x-4 bottom-1 h-6 rounded-full blur-xl"
+        className="absolute inset-x-4 bottom-1 h-5 rounded-full blur-lg"
         style={{ background: crown.glow }}
       />
       <img
@@ -101,7 +101,7 @@ export function AvatarCrown({
         alt=""
         loading="lazy"
         className="crown-float relative block w-full object-contain"
-        style={{ filter: `drop-shadow(0 6px 14px ${crown.glow})` }}
+        style={{ filter: `drop-shadow(0 4px 10px ${crown.glow})` }}
       />
     </div>
   );
@@ -118,6 +118,6 @@ export function NameplateTopCrown({
   size?: number;
 }) {
   return (
-    <AvatarRing art={art} glow="rgba(192,132,252,0.40)" size={size} />
+    <AvatarRing art={art} glow="rgba(192,132,252,0.18)" size={size} />
   );
 }
