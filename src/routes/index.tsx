@@ -961,22 +961,12 @@ function StreakCard({
         )}
 
         <div className="relative flex items-center gap-4">
-          <div
-            className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border transition-colors ${flameClasses}`}
-          >
-            <Flame
-              className={`h-[22px] w-[22px] transition-transform ${
-                flameState === "alive" && studiedToday ? "motion-safe:animate-pulse" : ""
-              } ${flameState === "risk" ? "motion-safe:animate-[flicker_1400ms_ease-in-out_infinite]" : ""} ${
-                flameState === "ashes" ? "opacity-40 rotate-6" : ""
-              }`}
-              strokeWidth={2.25}
-              fill={isActive ? "currentColor" : "none"}
-              fillOpacity={
-                flameState === "alive" ? (studiedToday ? 0.3 : 0.18) : flameState === "risk" ? 0.22 : 0
-              }
-            />
-          </div>
+          <StreakFlame
+            state={flameState}
+            studiedToday={studiedToday}
+            theme={flameTheme}
+            streak={streak.current}
+          />
 
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-1.5 flex-wrap">
