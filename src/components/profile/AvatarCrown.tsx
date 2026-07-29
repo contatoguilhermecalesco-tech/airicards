@@ -55,7 +55,7 @@ export function AvatarRing({
       style={{ width, height: width }}
     >
       <div
-        className="absolute inset-[12%] rounded-full blur-2xl"
+        className="absolute inset-[14%] rounded-full blur-lg"
         style={{ background: glow }}
       />
       <img
@@ -63,7 +63,7 @@ export function AvatarRing({
         alt=""
         loading="lazy"
         className="relative block h-full w-full max-w-none object-contain"
-        style={{ filter: `drop-shadow(0 4px 16px ${glow})` }}
+        style={{ filter: `drop-shadow(0 3px 10px ${glow})` }}
       />
     </div>
   );
