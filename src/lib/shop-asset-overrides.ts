@@ -109,6 +109,11 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "veil:veu_rubro": eclipseCardframe,
   "companion:corvo_carmesim": eclipseCompanion,
   "table:mesa_eclipse": eclipseTableBack,
+  "streak_flame:brasa_carmesim": eclipseBrasa,
+  "streak_flame:eclipse_vivo": eclipseVivo,
+  "enemy_seal:selo_eclipse": eclipseSelo,
+  "title:arauto_eclipse": eclipseArauto,
+  "victory_splash:ascensao_carmesim": eclipseAscensao,
 };
 
 
