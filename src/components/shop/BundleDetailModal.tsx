@@ -336,11 +336,13 @@ function BundleItemRow({
   owned,
   active,
   onToggle,
+  onPreview,
 }: {
   item: ShopItem;
   owned: boolean;
   active: boolean;
   onToggle: () => void;
+  onPreview?: () => void;
 }) {
   const rarity = RARITY_META[rarityFor(item.price)];
   const Icon = ICONS[item.icon] ?? Sparkles;
