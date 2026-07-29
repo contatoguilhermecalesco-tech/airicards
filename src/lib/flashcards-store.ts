@@ -7,6 +7,8 @@ import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
 
+export const ENEMY_THRESHOLD = 3;
+
 export type CardMode = "word" | "sentence" | "expression";
 export type CardSource = string;
 
@@ -625,7 +627,7 @@ export function difficultyScore(card: Card): number {
   return lapses * 2 - successes * 0.5;
 }
 
-export const ENEMY_THRESHOLD = 3;
+
 export function isEnemy(card: Card): boolean {
   return (card.lapses ?? 0) >= ENEMY_THRESHOLD;
 }
