@@ -1,6 +1,19 @@
 import type { TableSkin } from "@/lib/table-skins";
 import { isDefaultTableSkin } from "@/lib/table-skins";
 
+/** Brasas/pétalas pré-sorteadas (estáveis entre renders). */
+const EMBERS = [
+  { left: 8, size: 9, dur: 12, delay: 0, drift: 30, opacity: 0.7 },
+  { left: 19, size: 6, dur: 15, delay: 2.5, drift: -22, opacity: 0.5 },
+  { left: 31, size: 11, dur: 10.5, delay: 5, drift: 40, opacity: 0.75 },
+  { left: 44, size: 5, dur: 17, delay: 1.2, drift: -34, opacity: 0.45 },
+  { left: 57, size: 8, dur: 13, delay: 6.5, drift: 26, opacity: 0.65 },
+  { left: 68, size: 12, dur: 11, delay: 3.4, drift: -30, opacity: 0.7 },
+  { left: 79, size: 6, dur: 16, delay: 8, drift: 34, opacity: 0.5 },
+  { left: 91, size: 9, dur: 12.5, delay: 4.2, drift: -18, opacity: 0.6 },
+];
+
+
 /**
  * Camadas visuais da carta durante a revisão.
  * Em vez de esticar artes rasterizadas (que deformam), a moldura é desenhada
