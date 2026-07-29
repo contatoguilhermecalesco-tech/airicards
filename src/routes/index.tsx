@@ -925,19 +925,9 @@ function StreakCard({
         ? "alive"
         : "empty";
 
-  const flameClasses = {
-    ashes: "border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.02] text-muted-foreground/50",
-    risk: "border-amber-300/25 bg-gradient-to-b from-amber-400/15 to-amber-500/5 text-amber-200",
-    alive: "border-orange-300/25 bg-gradient-to-b from-orange-400/25 to-rose-500/10 text-orange-200",
-    empty: "border-white/[0.08] bg-white/[0.04] text-muted-foreground",
-  }[flameState];
+  const flameTheme = streakFlameFromEquipped(useWallet().equipped);
 
-  const haloBg = {
-    ashes: "radial-gradient(closest-side, rgba(148,163,184,0.15), transparent 70%)",
-    risk: "radial-gradient(closest-side, rgba(251,191,36,0.28), transparent 70%)",
-    alive: "radial-gradient(closest-side, rgba(251,146,60,0.35), transparent 70%)",
-    empty: "radial-gradient(closest-side, rgba(167,139,250,0.20), transparent 70%)",
-  }[flameState];
+  const haloBg = streakHalo(flameState, flameTheme);
 
   const haloOpacity = flameState === "alive" ? "opacity-80" : flameState === "risk" ? "opacity-60" : flameState === "ashes" ? "opacity-40" : "opacity-20";
 
