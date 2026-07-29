@@ -75,7 +75,7 @@ export const generateSpeaking = createServerFn({ method: "POST" })
       `Nível: ${data.level}.`,
       topic
         ? `TEMA OBRIGATÓRIO: "${topic}". Toda a situação e a resposta modelo devem girar em torno desse tema.`
-        : `Escolha um tema cotidiano variado e inesperado: ${ANGLES[Math.floor(Math.random() * ANGLES.length)]}.`,
+        : "TEMA LIVRE: escolha um tema cotidiano variado e pouco óbvio (evite clichês como pedir café ou apresentar-se).",
       `Ângulo/cenário para esta geração: ${angle}.`,
       data.recent?.length
         ? `NÃO repita nem parafraseie nenhum destes exercícios já usados:\n- ${data.recent.slice(0, 10).join("\n- ")}`
@@ -94,6 +94,7 @@ export const generateSpeaking = createServerFn({ method: "POST" })
           { role: "system", content: system },
           { role: "user", content: userMsg },
         ],
+        temperature: 1.1,
         response_format: { type: "json_object" },
       }),
     });
