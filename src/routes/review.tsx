@@ -729,13 +729,16 @@ function NormalCard({
   targetWord,
   mode,
   showBack,
+  skin,
 }: {
   front: string;
   back: string;
   targetWord?: string;
   mode?: "word" | "sentence" | "expression";
   showBack: boolean;
+  skin: TableSkin;
 }) {
+  const themed = !isDefaultTableSkin(skin);
   return (
     <div
       className="group relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-6 py-10 sm:py-14 animate-in fade-in slide-in-from-bottom-2 duration-300"
@@ -743,17 +746,26 @@ function NormalCard({
         backdropFilter: "blur(20px) saturate(140%)",
         boxShadow:
           "0 30px 60px -30px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+        ...tableSkinCardStyle(skin),
       }}
     >
+      <TableSkinCardLayer skin={skin} />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
       />
-      <div className="flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
-        <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70">
-          <span className="h-1 w-1 rounded-full bg-primary/70" />
+      <div className="relative flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
+        <p
+          className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70"
+          style={themed ? { color: skin.accent } : undefined}
+        >
+          <span
+            className="h-1 w-1 rounded-full bg-primary/70"
+            style={themed ? { background: skin.accent } : undefined}
+          />
           {mode === "sentence" ? "Frase" : mode === "expression" ? "Expressão" : "Inglês"}
         </p>
+
         <p className="text-balance text-[26px] font-semibold leading-tight text-foreground sm:text-[34px]">
           {mode === "sentence" && targetWord
             ? renderSentence(front, targetWord)
