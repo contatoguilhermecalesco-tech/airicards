@@ -76,6 +76,7 @@ export function CosmeticSlotPreview({
 }) {
   const info = SLOT_INFO[slot];
   const Icon = info.Icon;
+  const art = cosmeticArtByKey(itemKey);
 
   return (
     <div
