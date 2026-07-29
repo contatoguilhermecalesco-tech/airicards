@@ -652,3 +652,37 @@
 @utility table-sheen {
   animation: table-sheen 9s ease-in-out infinite;
 }
+
+/* ---- Fundo vivo da Mesa de Revisão (parallax + luz + poeira) ---- */
+@keyframes table-bg-drift {
+  0%   { transform: scale(1.12) translate3d(0, 0, 0); }
+  50%  { transform: scale(1.18) translate3d(-1.4%, -1.8%, 0); }
+  100% { transform: scale(1.12) translate3d(0, 0, 0); }
+}
+@utility table-bg-drift {
+  animation: table-bg-drift 38s ease-in-out infinite;
+}
+@keyframes table-godray {
+  0%   { opacity: 0.12; transform: translateX(-4%) skewX(-8deg) scaleY(1); }
+  50%  { opacity: 0.34; transform: translateX(3%) skewX(-11deg) scaleY(1.06); }
+  100% { opacity: 0.12; transform: translateX(-4%) skewX(-8deg) scaleY(1); }
+}
+@utility table-godray {
+  animation: table-godray var(--ray-duration, 14s) ease-in-out var(--ray-delay, 0s) infinite;
+}
+@keyframes table-dust-float {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  15%  { opacity: var(--dust-opacity, 0.5); }
+  85%  { opacity: var(--dust-opacity, 0.5); }
+  100% { transform: translate3d(var(--dust-drift, 30px), -110vh, 0); opacity: 0; }
+}
+@utility table-dust {
+  animation: table-dust-float var(--dust-duration, 22s) linear var(--dust-delay, 0s) infinite;
+}
+@keyframes table-vignette-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.9; }
+}
+@utility table-vignette-pulse {
+  animation: table-vignette-pulse 9s ease-in-out infinite;
+}
