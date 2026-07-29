@@ -56,6 +56,8 @@ import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
 import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
 import { tableSkinByKey } from "@/lib/table-skins";
+import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
+import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 
 
@@ -414,6 +416,7 @@ function PerfilPage() {
     }
   }
 
+  const cosmeticTitle = titleFromEquipped(wallet.equipped);
   const nameplate = equippedItem.nameplate;
   const decoration = equippedItem.decoration;
   const badge = equippedItem.badge;
