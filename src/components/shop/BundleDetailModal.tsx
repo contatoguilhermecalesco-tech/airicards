@@ -351,23 +351,26 @@ function BundleItemRow({
     <li
       className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition ${active ? "opacity-100" : "opacity-55"}`}
     >
-      {override?.art ? (
-        <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl">
-          <img
-            src={override.art}
-            alt=""
-            aria-hidden
-            className="h-full w-full object-contain"
-          />
-        </span>
-      ) : (
-        <span
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-lg"
-          style={{ background: rarity.gradient, boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
-        >
-          <Icon className="h-5 w-5" strokeWidth={2.25} />
-        </span>
-      )}
+      <button
+        type="button"
+        onClick={onPreview}
+        disabled={!onPreview}
+        title="Ver prévia"
+        className="group relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl"
+        style={override?.art ? undefined : { background: rarity.gradient }}
+      >
+        {override?.art ? (
+          <img src={override.art} alt="" aria-hidden className="h-full w-full object-contain" />
+        ) : (
+          <Icon className="h-5 w-5 text-white" strokeWidth={2.25} />
+        )}
+        {onPreview && (
+          <span className="absolute inset-0 grid place-items-center bg-black/60 opacity-0 transition group-hover:opacity-100">
+            <Eye className="h-4 w-4 text-white" strokeWidth={2.5} />
+          </span>
+        )}
+      </button>
+
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <RarityChip rarity={rarityFor(item.price)} />
