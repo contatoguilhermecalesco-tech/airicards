@@ -12,6 +12,8 @@ import {
   Flame,
   Gift,
   Heart,
+  Layers,
+
   Moon,
   Palette,
   Plane,
