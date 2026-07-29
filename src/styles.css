@@ -695,3 +695,42 @@
 @utility crown-float {
   animation: crown-float 5.5s ease-in-out infinite;
 }
+
+/* ---------- Cosméticos: chama de streak, selo inimigo, título, vitória ---------- */
+@keyframes emberRise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translateY(-34px) scale(0.4); opacity: 0; }
+}
+
+@keyframes emberGlow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.95; transform: scale(1.08); }
+}
+
+@keyframes sealSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sealStamp {
+  0% { transform: scale(2.4) rotate(-8deg); opacity: 0; }
+  35% { transform: scale(1) rotate(-4deg); opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: scale(1.04) rotate(-4deg); opacity: 0; }
+}
+
+@keyframes titleShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 220% 50%; }
+}
+
+@keyframes victoryRays {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes victoryTitle {
+  0% { transform: scale(1.6); opacity: 0; letter-spacing: 0.4em; }
+  100% { transform: scale(1); opacity: 1; letter-spacing: 0.12em; }
+}

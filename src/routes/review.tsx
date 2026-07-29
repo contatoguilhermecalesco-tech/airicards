@@ -29,6 +29,8 @@ import { useWallet } from "@/lib/wallet-store";
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
+import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
+import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
 
 
 
@@ -94,6 +96,7 @@ function Review() {
   // Mesa de revisão equipada (skin da sessão)
   const wallet = useWallet();
   const skin = tableSkinFromEquipped(wallet.equipped);
+  const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [runStreak, setRunStreak] = useState(0);
@@ -358,6 +361,17 @@ function Review() {
           }}
         />
       )}
+
+      {/* Selo inimigo equipado — sigilo giratório atrás da carta */}
+      {currentIsEnemy && enemySeal && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-20">
+          <EnemySealSigil theme={enemySeal} />
+        </div>
+      )}
+      {currentIsEnemy && enemySeal && skinFlash && (
+        <EnemySealStamp theme={enemySeal} tone={skinFlash} />
+      )}
+
 
       {/* Hit flash on wrong answer */}
       {hitFlash && (

@@ -20,6 +20,9 @@ import {
   isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
+import { useWallet } from "@/lib/wallet-store";
+import { streakFlameFromEquipped } from "@/lib/eclipse-cosmetics";
+import { StreakFlame, streakHalo } from "@/components/StreakFlame";
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
@@ -925,19 +928,9 @@ function StreakCard({
         ? "alive"
         : "empty";
 
-  const flameClasses = {
-    ashes: "border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.02] text-muted-foreground/50",
-    risk: "border-amber-300/25 bg-gradient-to-b from-amber-400/15 to-amber-500/5 text-amber-200",
-    alive: "border-orange-300/25 bg-gradient-to-b from-orange-400/25 to-rose-500/10 text-orange-200",
-    empty: "border-white/[0.08] bg-white/[0.04] text-muted-foreground",
-  }[flameState];
+  const flameTheme = streakFlameFromEquipped(useWallet().equipped);
 
-  const haloBg = {
-    ashes: "radial-gradient(closest-side, rgba(148,163,184,0.15), transparent 70%)",
-    risk: "radial-gradient(closest-side, rgba(251,191,36,0.28), transparent 70%)",
-    alive: "radial-gradient(closest-side, rgba(251,146,60,0.35), transparent 70%)",
-    empty: "radial-gradient(closest-side, rgba(167,139,250,0.20), transparent 70%)",
-  }[flameState];
+  const haloBg = streakHalo(flameState, flameTheme);
 
   const haloOpacity = flameState === "alive" ? "opacity-80" : flameState === "risk" ? "opacity-60" : flameState === "ashes" ? "opacity-40" : "opacity-20";
 
@@ -971,22 +964,12 @@ function StreakCard({
         )}
 
         <div className="relative flex items-center gap-4">
-          <div
-            className={`relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border transition-colors ${flameClasses}`}
-          >
-            <Flame
-              className={`h-[22px] w-[22px] transition-transform ${
-                flameState === "alive" && studiedToday ? "motion-safe:animate-pulse" : ""
-              } ${flameState === "risk" ? "motion-safe:animate-[flicker_1400ms_ease-in-out_infinite]" : ""} ${
-                flameState === "ashes" ? "opacity-40 rotate-6" : ""
-              }`}
-              strokeWidth={2.25}
-              fill={isActive ? "currentColor" : "none"}
-              fillOpacity={
-                flameState === "alive" ? (studiedToday ? 0.3 : 0.18) : flameState === "risk" ? 0.22 : 0
-              }
-            />
-          </div>
+          <StreakFlame
+            state={flameState}
+            studiedToday={studiedToday}
+            theme={flameTheme}
+            streak={streak.current}
+          />
 
           <div className="min-w-0 flex-1">
             <div className="flex items-baseline gap-1.5 flex-wrap">

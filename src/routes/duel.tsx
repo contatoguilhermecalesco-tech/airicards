@@ -2,6 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Swords, Trophy, Clock, Check, X, Sparkles, Layers, AlertCircle, TimerReset, ShieldAlert } from "lucide-react";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { useWallet } from "@/lib/wallet-store";
+import { victorySplashFromEquipped } from "@/lib/eclipse-cosmetics";
+import { VictorySplash } from "@/components/duel/VictorySplash";
 import { useCurrentProfile, PROFILES } from "@/lib/profile";
 import { useStore } from "@/lib/flashcards-store";
 import {
@@ -397,8 +400,24 @@ function DuelSummary({
 }) {
   const winner = duel.winner ? profileMeta(duel.winner) : null;
   const iWon = duel.winner === meId;
+
+  // Splash de vitória cosmético — só uma vez por duelo, por sessão.
+  const splashTheme = victorySplashFromEquipped(useWallet().equipped);
+  const [showSplash, setShowSplash] = useState(false);
+  useEffect(() => {
+    if (!iWon || !splashTheme) return;
+    const flag = `duel-splash:${duel.id}`;
+    if (typeof window === "undefined") return;
+    if (window.sessionStorage.getItem(flag)) return;
+    window.sessionStorage.setItem(flag, "1");
+    setShowSplash(true);
+  }, [iWon, splashTheme, duel.id]);
+
   return (
     <>
+      {showSplash && splashTheme && (
+        <VictorySplash theme={splashTheme} onDone={() => setShowSplash(false)} />
+      )}
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         Semana concluída · {duel.deckName}
       </p>
