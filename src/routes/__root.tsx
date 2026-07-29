@@ -629,8 +629,16 @@ function AuraAvatar({
         className="relative block overflow-visible rounded-full"
         style={{ width: inner, height: inner }}
       >
+        {decorationArt && (
+          <img
+            src={decorationArt}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 z-0 h-[160%] w-[160%] max-w-none -translate-x-1/2 -translate-y-1/2 animate-[spin_9s_linear_infinite] object-contain opacity-90 mix-blend-screen drop-shadow-[0_0_10px_rgba(192,132,252,0.55)]"
+          />
+        )}
         <span
-          className="relative block h-full w-full overflow-hidden rounded-full ring-1 ring-white/15"
+          className="relative z-[5] block h-full w-full overflow-hidden rounded-full ring-1 ring-white/15"
           style={{
             backgroundImage: avatarUrl ? undefined : gradient,
             background: avatarUrl ? "#000" : undefined,
@@ -646,14 +654,7 @@ function AuraAvatar({
             />
           )}
         </span>
-        {decorationArt && (
-          <img
-            src={decorationArt}
-            alt=""
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 h-[160%] w-[160%] max-w-none -translate-x-1/2 -translate-y-1/2 animate-[spin_9s_linear_infinite] object-contain opacity-90 mix-blend-screen drop-shadow-[0_0_10px_rgba(192,132,252,0.55)]"
-          />
-        )}
+
         {nameplateArt && (
           <img
             src={nameplateArt}
