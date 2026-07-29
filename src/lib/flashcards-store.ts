@@ -7,6 +7,8 @@ import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
 
+export const ENEMY_THRESHOLD = 3;
+
 export type CardMode = "word" | "sentence" | "expression";
 export type CardSource = string;
 
