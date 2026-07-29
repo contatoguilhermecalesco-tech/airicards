@@ -26,6 +26,13 @@ import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
 import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
 import eclipseTableBack from "@/assets/shop/eclipse/table-cardback.png";
+import eclipseBrasa from "@/assets/cosmetic-brasa-carmesim.png";
+import eclipseSelo from "@/assets/cosmetic-selo-eclipse.png";
+import eclipseAscensao from "@/assets/cosmetic-ascensao-carmesim.png";
+import eclipseArauto from "@/assets/cosmetic-arauto-eclipse.png";
+import eclipseVivo from "@/assets/cosmetic-eclipse-vivo.png";
+
+
 
 
 export type ShopAssetOverride = {
@@ -63,6 +70,11 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.veil.veu_rubro": { art: eclipseCardframe },
   "cosmetic.companion.corvo_carmesim": { art: eclipseCompanion },
   "cosmetic.table.mesa_eclipse": { art: eclipseTableBack },
+  "cosmetic.streak_flame.brasa_carmesim": { art: eclipseBrasa },
+  "cosmetic.streak_flame.eclipse_vivo": { art: eclipseVivo },
+  "cosmetic.enemy_seal.selo_eclipse": { art: eclipseSelo },
+  "cosmetic.title.arauto_eclipse": { art: eclipseArauto },
+  "cosmetic.victory_splash.ascensao_carmesim": { art: eclipseAscensao },
 
 };
 
@@ -97,6 +109,11 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "veil:veu_rubro": eclipseCardframe,
   "companion:corvo_carmesim": eclipseCompanion,
   "table:mesa_eclipse": eclipseTableBack,
+  "streak_flame:brasa_carmesim": eclipseBrasa,
+  "streak_flame:eclipse_vivo": eclipseVivo,
+  "enemy_seal:selo_eclipse": eclipseSelo,
+  "title:arauto_eclipse": eclipseArauto,
+  "victory_splash:ascensao_carmesim": eclipseAscensao,
 };
 
 
