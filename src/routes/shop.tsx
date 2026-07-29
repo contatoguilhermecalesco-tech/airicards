@@ -973,7 +973,11 @@ function UnifiedCard({
         <div
           aria-hidden
           className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
-          style={{ background: rarity.gradient }}
+          style={{
+            background: cosmeticArt
+              ? "radial-gradient(circle at 78% 55%, rgba(244,63,94,0.28), transparent 62%), linear-gradient(135deg,#1a0710 0%,#0b0409 100%)"
+              : rarity.gradient,
+          }}
         >
           <span
             aria-hidden
@@ -983,6 +987,15 @@ function UnifiedCard({
                 "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
             }}
           />
+          {cosmeticArt && (
+            <img
+              src={cosmeticArt}
+              alt=""
+              loading="lazy"
+              draggable={false}
+              className="pointer-events-none absolute -right-2 top-1/2 h-[135%] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)]"
+            />
+          )}
           <div className="absolute inset-0 flex items-start justify-between p-3">
             <RarityChip rarity={item.rarity} />
             {owned && (
@@ -997,14 +1010,17 @@ function UnifiedCard({
               </span>
             )}
           </div>
-          <div className="absolute bottom-3 left-3">
-            <span
-              className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
-              style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
-            >
-              <Icon className="h-5 w-5" strokeWidth={2.25} />
-            </span>
-          </div>
+          {!cosmeticArt && (
+            <div className="absolute bottom-3 left-3">
+              <span
+                className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
+                style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
+              >
+                <Icon className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+            </div>
+          )}
+        </div>
         </div>
       )}
 
