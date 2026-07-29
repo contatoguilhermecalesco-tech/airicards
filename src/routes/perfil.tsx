@@ -54,6 +54,7 @@ import { CompanionRender } from "@/components/CompanionRender";
 
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
+import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
 
 
 export const Route = createFileRoute("/perfil")({
@@ -381,6 +382,7 @@ function PerfilPage() {
 
   // Curated art for each equipped slot (bundle-specific PNGs override the generic icon).
   const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
+  const crownArt = getCrownArt(wallet.equipped.nameplate);
   const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
