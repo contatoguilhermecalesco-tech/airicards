@@ -723,23 +723,21 @@ function ShopPage() {
       </p>
 
       {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
-      {preview && <CosmeticPreview item={preview} onClose={() => setPreview(null)} />}
-      {slotPreview && (
-        <CosmeticSlotPreview
-          slot={slotPreview.slot}
-          itemKey={slotPreview.key}
-          name={slotPreview.name}
-          price={slotPreview.price}
-          onClose={() => setSlotPreview(null)}
+      {preview && (
+        <ItemPreviewModal
+          item={preview.raw as ShopItem}
+          owned={ownedIds.has(preview.id)}
+          canAfford={wallet.crystals >= preview.price}
+          busy={busy === preview.id}
+          onBuy={() => {
+            const target = preview;
+            setPreview(null);
+            void handleBuyUnified(target);
+          }}
+          onClose={() => setPreview(null)}
         />
       )}
-      {tablePreviewSkinKey && (
-        <TableSkinPreviewModal
-          skin={tableSkinByKey(tablePreviewSkinKey)!}
-          open={!!tablePreviewSkinKey}
-          onClose={() => setTablePreviewSkinKey(null)}
-        />
-      )}
+
       {bundleOpen && (
         <BundleDetailModal
           bundle={bundleOpen}
