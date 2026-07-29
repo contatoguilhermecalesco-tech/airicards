@@ -47,7 +47,7 @@ export function AvatarRing({
   glow: string;
   size?: number;
 }) {
-  const width = size * 1.6;
+  const width = size * 1.78;
   return (
     <div
       aria-hidden
