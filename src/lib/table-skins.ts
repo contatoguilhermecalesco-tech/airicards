@@ -47,8 +47,8 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
   "table:mesa_eclipse": {
     id: "mesa_eclipse",
     key: "table:mesa_eclipse",
-    name: "Mesa do Eclipse",
-    tagline: "Catedral em ruínas, renda carmesim e o brasão do eclipse.",
+    name: "Altar do Eclipse",
+    tagline: "A nave da catedral em ruínas: luz do eclipse, rosas e brasas carmesim.",
     ambient: eclipseAmbient,
     frame: eclipseFrame,
     crest: eclipseCrest,

@@ -55,6 +55,8 @@ import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
 import { AvatarCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { tableSkinByKey } from "@/lib/table-skins";
+import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 
 
 export const Route = createFileRoute("/perfil")({
