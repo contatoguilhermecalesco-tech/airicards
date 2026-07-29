@@ -62,12 +62,8 @@ import {
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 import { tableSkinByKey } from "@/lib/table-skins";
-import { TableSkinPreviewModal } from "@/components/review/TableSkinPreviewModal";
-import {
-  CosmeticSlotPreview,
-  hasSlotPreview,
-  type PreviewSlot,
-} from "@/components/shop/CosmeticSlotPreview";
+import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
+
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
