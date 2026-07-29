@@ -190,9 +190,42 @@ const SLOT_META: Record<
     hint: "Tematiza a tela de revisão: brasão, moldura e efeitos.",
     icon: Layers,
   },
+  streak_flame: {
+    label: "Chama de streak",
+    hint: "Troca a chama da sua sequência na Home.",
+    icon: Flame,
+  },
+  enemy_seal: {
+    label: "Selo inimigo",
+    hint: "Marca temática nas cartas inimigas durante a revisão.",
+    icon: Swords,
+  },
+  title: {
+    label: "Título",
+    hint: "Título animado exibido abaixo do seu nome.",
+    icon: Crown,
+  },
+  victory_splash: {
+    label: "Splash de vitória",
+    hint: "Animação em tela cheia ao vencer um duelo.",
+    icon: Trophy,
+  },
 };
 
-const SLOT_ORDER: CosmeticSlot[] = ["nameplate", "decoration", "badge", "effect", "overlay", "veil", "companion", "table"];
+const SLOT_ORDER: CosmeticSlot[] = [
+  "nameplate",
+  "decoration",
+  "badge",
+  "effect",
+  "overlay",
+  "veil",
+  "companion",
+  "table",
+  "streak_flame",
+  "enemy_seal",
+  "title",
+  "victory_splash",
+];
 
 
 // ---------- avatar with optional decoration ring ----------
