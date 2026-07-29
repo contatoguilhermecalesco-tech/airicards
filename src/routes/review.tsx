@@ -518,6 +518,24 @@ function Review() {
           </div>
         )}
 
+        {/* Sequência da mesa — acende progressivamente a skin equipada */}
+        {skinned && !focusMode && runStreak >= 3 && (
+          <div className="mt-3 flex items-center justify-center">
+            <span
+              key={runStreak}
+              className="combo-pop inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.18em]"
+              style={{
+                borderColor: `${skin.accent}59`,
+                color: skin.accent,
+                background: `${skin.accent}14`,
+                boxShadow: `0 0 ${12 + Math.min(runStreak, 10) * 3}px -6px ${skin.accent}`,
+              }}
+            >
+              <Flame className="h-3 w-3" strokeWidth={3} />
+              {runStreak >= 10 ? "Mesa desperta" : `Sequência ${runStreak}`}
+            </span>
+          </div>
+        )}
 
         {queue.length === 0 && !current ? (
           <EmptyState enemyRun={isEnemyRun} />
@@ -526,6 +544,7 @@ function Review() {
             reviewed={reviewed}
             deckId={deckId}
             enemyRun={isEnemyRun}
+            skin={skin}
           />
         ) : (
           <div className="mt-8 flex flex-1 flex-col">
@@ -550,9 +569,11 @@ function Review() {
                   targetWord={current.targetWord}
                   mode={current.mode}
                   showBack={showBack}
+                  skin={skin}
                 />
               )}
             </div>
+
 
             {/* Floating damage / heal numbers */}
             {dmgFx.length > 0 && (
