@@ -68,6 +68,7 @@ import {
   hasSlotPreview,
   type PreviewSlot,
 } from "@/components/shop/CosmeticSlotPreview";
+import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
 // Curated visual overrides — keyed by shop item id. Falls back to
 // featured_slots assets when admin uploads custom art.
@@ -850,6 +851,9 @@ function UnifiedCard({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const cosmeticArt = cosmeticArtFor(
+    ((item.raw as ShopItem).payload ?? null) as Record<string, unknown> | null,
+  );
   const isVitrine = view === "vitrine";
   const isPowerup = item.kind === "powerup";
   const puPal = isPowerup ? powerupPalette(item.accent) : null;
@@ -969,7 +973,11 @@ function UnifiedCard({
         <div
           aria-hidden
           className={`relative w-full overflow-hidden ${isVitrine ? "h-28" : "h-20"}`}
-          style={{ background: rarity.gradient }}
+          style={{
+            background: cosmeticArt
+              ? "radial-gradient(circle at 78% 55%, rgba(244,63,94,0.28), transparent 62%), linear-gradient(135deg,#1a0710 0%,#0b0409 100%)"
+              : rarity.gradient,
+          }}
         >
           <span
             aria-hidden
@@ -979,6 +987,15 @@ function UnifiedCard({
                 "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)",
             }}
           />
+          {cosmeticArt && (
+            <img
+              src={cosmeticArt}
+              alt=""
+              loading="lazy"
+              draggable={false}
+              className="pointer-events-none absolute -right-2 top-1/2 h-[135%] -translate-y-1/2 object-contain opacity-95 drop-shadow-[0_10px_28px_rgba(244,63,94,0.45)]"
+            />
+          )}
           <div className="absolute inset-0 flex items-start justify-between p-3">
             <RarityChip rarity={item.rarity} />
             {owned && (
@@ -993,14 +1010,16 @@ function UnifiedCard({
               </span>
             )}
           </div>
-          <div className="absolute bottom-3 left-3">
-            <span
-              className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
-              style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
-            >
-              <Icon className="h-5 w-5" strokeWidth={2.25} />
-            </span>
-          </div>
+          {!cosmeticArt && (
+            <div className="absolute bottom-3 left-3">
+              <span
+                className="grid h-11 w-11 place-items-center rounded-2xl border border-white/25 bg-black/30 text-white backdrop-blur"
+                style={{ boxShadow: `0 6px 20px -6px ${rarity.glow}` }}
+              >
+                <Icon className="h-5 w-5" strokeWidth={2.25} />
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -1101,6 +1120,9 @@ function ListRow({
 }) {
   const rarity = RARITY_META[item.rarity];
   const Icon = ICONS[item.icon] ?? Sparkles;
+  const cosmeticArt = cosmeticArtFor(
+    ((item.raw as ShopItem).payload ?? null) as Record<string, unknown> | null,
+  );
   const isPowerup = item.kind === "powerup";
   const isDeck = item.kind === "decks";
   const isPack = item.kind === "pack";
@@ -1124,10 +1146,20 @@ function ListRow({
       } bg-white/[0.03] p-3 transition hover:bg-white/[0.06]`}
     >
       <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white"
+        className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl text-white"
         style={{ background: thumbBg, boxShadow: `0 6px 20px -8px ${thumbGlow}` }}
       >
-        <Icon className="h-5 w-5" strokeWidth={2.25} />
+        {cosmeticArt ? (
+          <img
+            src={cosmeticArt}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            className="h-9 w-9 object-contain"
+          />
+        ) : (
+          <Icon className="h-5 w-5" strokeWidth={2.25} />
+        )}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
