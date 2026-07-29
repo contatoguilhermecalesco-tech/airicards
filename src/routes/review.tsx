@@ -96,6 +96,8 @@ function Review() {
   const skin = tableSkinFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
+  const [runStreak, setRunStreak] = useState(0);
+
   function pulseSkin(tone: "hit" | "miss") {
     setSkinFlash(tone);
     setTimeout(() => setSkinFlash(null), 700);
