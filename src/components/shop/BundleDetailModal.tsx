@@ -1,7 +1,7 @@
 // Bundle detail modal — Valorant/LoL-style. Lists everything inside a bundle,
 // shows individual total, savings and lets the user buy the whole set at once.
 import { useEffect, useState } from "react";
-import { Check, Loader2, Share2, Sparkles, X } from "lucide-react";
+import { Check, Eye, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
 import { SakuraPetals } from "@/components/SakuraPetals";
 import {
@@ -23,6 +23,7 @@ export function BundleDetailModal({
   busy,
   splashUrl,
   artUrl,
+  onPreview,
 }: {
   bundle: ShopItem;
   wallet: number;
@@ -32,6 +33,8 @@ export function BundleDetailModal({
   busy: boolean;
   splashUrl?: string | null;
   artUrl?: string | null;
+  /** Abre o provador (prévia contextual) — sem item, prova o bundle inteiro. */
+  onPreview?: (item?: ShopItem) => void;
 }) {
   const [contents, setContents] = useState<ShopItem[] | null>(null);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
@@ -184,6 +187,18 @@ export function BundleDetailModal({
             </div>
           )}
 
+          {onPreview && contents && contents.length > 0 && (
+            <div className="px-4 pt-3 sm:px-6">
+              <button
+                onClick={() => onPreview()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-violet-300/30 bg-violet-500/15 px-4 py-3 text-[13px] font-semibold text-violet-100 transition hover:bg-violet-500/25"
+              >
+                <Eye className="h-4 w-4" strokeWidth={2.5} />
+                Provar todos os itens no contexto real
+              </button>
+            </div>
+          )}
+
           {/* Contents grid */}
           <div className="max-h-[52vh] overflow-y-auto px-4 pb-4 sm:px-6">
             <div className="mb-3 mt-4 flex items-center justify-between">
@@ -192,7 +207,7 @@ export function BundleDetailModal({
               </h3>
               {contents && contents.length > 0 && (
                 <p className="text-[11px] font-medium text-muted-foreground">
-                  Toque para ativar/desativar no preview
+                  Toque na arte para ver a prévia
                 </p>
               )}
             </div>
@@ -214,11 +229,13 @@ export function BundleDetailModal({
                     owned={ownedIds.has(c.id)}
                     active={enabled[c.id] ?? true}
                     onToggle={() => toggleItem(c.id)}
+                    onPreview={onPreview ? () => onPreview(c) : undefined}
                   />
                 ))}
               </ul>
             )}
           </div>
+
 
           {/* Footer — pricing + buy */}
           <div className="border-t border-white/[0.06] bg-black/25 p-4 sm:p-5">
@@ -319,11 +336,13 @@ function BundleItemRow({
   owned,
   active,
   onToggle,
+  onPreview,
 }: {
   item: ShopItem;
   owned: boolean;
   active: boolean;
   onToggle: () => void;
+  onPreview?: () => void;
 }) {
   const rarity = RARITY_META[rarityFor(item.price)];
   const Icon = ICONS[item.icon] ?? Sparkles;
@@ -332,23 +351,26 @@ function BundleItemRow({
     <li
       className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition ${active ? "opacity-100" : "opacity-55"}`}
     >
-      {override?.art ? (
-        <span className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl">
-          <img
-            src={override.art}
-            alt=""
-            aria-hidden
-            className="h-full w-full object-contain"
-          />
-        </span>
-      ) : (
-        <span
-          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white shadow-lg"
-          style={{ background: rarity.gradient, boxShadow: `0 8px 22px -12px ${rarity.glow}` }}
-        >
-          <Icon className="h-5 w-5" strokeWidth={2.25} />
-        </span>
-      )}
+      <button
+        type="button"
+        onClick={onPreview}
+        disabled={!onPreview}
+        title="Ver prévia"
+        className="group relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl"
+        style={override?.art ? undefined : { background: rarity.gradient }}
+      >
+        {override?.art ? (
+          <img src={override.art} alt="" aria-hidden className="h-full w-full object-contain" />
+        ) : (
+          <Icon className="h-5 w-5 text-white" strokeWidth={2.25} />
+        )}
+        {onPreview && (
+          <span className="absolute inset-0 grid place-items-center bg-black/60 opacity-0 transition group-hover:opacity-100">
+            <Eye className="h-4 w-4 text-white" strokeWidth={2.5} />
+          </span>
+        )}
+      </button>
+
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <RarityChip rarity={rarityFor(item.price)} />
