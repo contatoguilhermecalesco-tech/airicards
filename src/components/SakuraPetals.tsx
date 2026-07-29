@@ -27,23 +27,35 @@ const PETAL_TINTS = [
   "linear-gradient(135deg, #f0e6ff 0%, #c9b6f5 60%, #9d7fe0 100%)", // lavender accent
 ];
 
+// Variante "Rosas do Crepúsculo" (bundle Eclipse Carmesim) — pétalas rubras.
+const CRIMSON_TINTS = [
+  "linear-gradient(135deg, #ffb3c1 0%, #e11d48 55%, #7f1d1d 100%)",
+  "linear-gradient(135deg, #fda4af 0%, #be123c 60%, #4c0519 100%)",
+  "linear-gradient(135deg, #fecdd3 0%, #f43f5e 55%, #881337 100%)",
+  "linear-gradient(135deg, #f5d0d6 0%, #9f1239 60%, #3b0212 100%)",
+];
+
 export function SakuraPetals({
   density = "normal",
   seed = 7,
   className = "",
   withHalo = false,
+  variant = "sakura",
 }: {
   density?: Density;
   seed?: number;
   className?: string;
   withHalo?: boolean;
+  variant?: "sakura" | "crimson";
 }) {
+  const crimson = variant === "crimson";
   const petals = useMemo(() => {
     const rand = seeded(seed);
+    const tints = crimson ? CRIMSON_TINTS : PETAL_TINTS;
     const count = DENSITY_COUNT[density];
     return Array.from({ length: count }, (_, i) => {
       const size = 10 + Math.floor(rand() * 16); // 10-26px
-      const tint = PETAL_TINTS[Math.floor(rand() * PETAL_TINTS.length)];
+      const tint = tints[Math.floor(rand() * tints.length)];
       return {
         id: i,
         left: `${rand() * 100}%`,
