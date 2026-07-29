@@ -147,14 +147,12 @@ export function ItemPreviewModal({
     getEquippedArt(walletKey) ??
     null;
 
-  const [tab, setTab] = useState<TabId>("contexto");
-  useEffect(() => setTab("contexto"), [active.id]);
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+
 
   const contexts = useMemo<Ctx[]>(() => {
     const list: Ctx[] = [];
