@@ -94,6 +94,7 @@ function Review() {
   // Mesa de revisão equipada (skin da sessão)
   const wallet = useWallet();
   const skin = tableSkinFromEquipped(wallet.equipped);
+  const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [runStreak, setRunStreak] = useState(0);
