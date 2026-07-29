@@ -57,7 +57,21 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     hit: "#ff6b8a",
     miss: "#8e0b22",
   },
+  "table:mesa_monarca": {
+    id: "mesa_monarca",
+    key: "table:mesa_monarca",
+    name: "Mesa do Monarca",
+    tagline: "Trono de obsidiana, chama violeta e o brasão do soberano.",
+    ambient: monarcaAmbient,
+    frame: monarcaFrame,
+    crest: monarcaCrest,
+    accent: "#a855f7",
+    glow: "rgba(124, 58, 237, 0.42)",
+    hit: "#c084fc",
+    miss: "#4c1d95",
+  },
 };
+
 
 export function tableSkinFromEquipped(
   equipped: Record<string, string | undefined> | undefined | null,
