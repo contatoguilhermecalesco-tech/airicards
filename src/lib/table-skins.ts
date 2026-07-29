@@ -1,9 +1,10 @@
 // Mesas de Revisão — "skins" que tematizam a tela de revisão inteira.
 // Slot de cosmético: `table`. A mesa padrão (Vidro Airi) é gratuita e usada
 // sempre que nada estiver equipado, então todo mundo vê o sistema funcionando.
-import eclipseAmbient from "@/assets/shop/eclipse/background.png";
-import eclipseFrame from "@/assets/shop/eclipse/cardframe.png";
+import eclipseAmbient from "@/assets/shop/eclipse/table-ambient.png";
+import eclipseFrame from "@/assets/shop/eclipse/table-frame.png";
 import eclipseCrest from "@/assets/shop/eclipse/table-cardback.png";
+import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
 
 
 export type TableSkin = {
