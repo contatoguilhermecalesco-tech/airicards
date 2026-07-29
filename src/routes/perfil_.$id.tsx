@@ -256,14 +256,16 @@ function PerfilViewer() {
                   initial
                 )}
               </div>
-              {nameplateArt && (
+              {crownArt ? (
+                <AvatarCrown crown={crownArt} size={112} />
+              ) : nameplateArt ? (
                 <img
                   src={nameplateArt}
                   alt=""
                   aria-hidden
                   className="pointer-events-none absolute left-1/2 top-[45%] z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
                 />
-              )}
+              ) : null}
             </div>
 
             {companion && (
