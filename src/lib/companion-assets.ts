@@ -37,6 +37,13 @@ const COMPANIONS: Record<string, CompanionProfile> = {
     frames: [igrisIdleUrl, igrisRise1Url, igrisRise2Url, igrisStandUrl, igrisDrawUrl],
     flash: true,
   },
+  corvo_carmesim: {
+    key: "corvo_carmesim",
+    name: "Corvo do Crepúsculo",
+    src: corvoUrl,
+    glow: "#f43f5e",
+    tagline: "Arauto do eclipse, guardião das rosas.",
+  },
 
 };
 

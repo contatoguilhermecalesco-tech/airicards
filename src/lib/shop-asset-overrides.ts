@@ -18,6 +18,14 @@ import monarcaCardframe from "@/assets/shop/monarca/cardframe.png";
 import monarcaCompanion from "@/assets/shop/monarca/companion.png";
 import monarcaOverlay from "@/assets/shop/monarca/sakura-overlay.png";
 
+import eclipseSplash from "@/assets/shop/eclipse/splash-hero.jpg";
+import eclipseAura from "@/assets/shop/eclipse/aura.png";
+import eclipseFrame from "@/assets/shop/eclipse/frame.png";
+import eclipseBackground from "@/assets/shop/eclipse/background.png";
+import eclipseCardframe from "@/assets/shop/eclipse/cardframe.png";
+import eclipseCompanion from "@/assets/shop/eclipse/companion.png";
+import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
+
 export type ShopAssetOverride = {
   /** Wide hero splash (shop hero + bundle modal background). */
   splash?: string;
