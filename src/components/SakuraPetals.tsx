@@ -122,8 +122,9 @@ export function SakuraPetals({
             style={{
               background: p.tint,
               borderRadius: "100% 0 100% 0",
-              boxShadow:
-                "0 0 6px rgba(255, 190, 225, 0.55), inset 0 0 4px rgba(255,255,255,0.35)",
+              boxShadow: crimson
+                ? "0 0 7px rgba(244, 63, 94, 0.55), inset 0 0 4px rgba(255,255,255,0.25)"
+                : "0 0 6px rgba(255, 190, 225, 0.55), inset 0 0 4px rgba(255,255,255,0.35)",
             }}
           />
         </span>
