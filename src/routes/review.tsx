@@ -327,6 +327,9 @@ function Review() {
 
   return (
     <main className="relative min-h-screen overflow-hidden">
+      {/* Mesa de revisão equipada — ambiente temático */}
+      <TableSkinAmbient skin={skin} />
+
       {/* Ambient halo — violet by default, blood-red for enemies */}
       <div
         aria-hidden
@@ -334,9 +337,15 @@ function Review() {
         style={{
           background: currentIsEnemy
             ? "radial-gradient(closest-side, hsl(var(--destructive) / 0.28), transparent 70%)"
+            : skinned
+            ? `radial-gradient(closest-side, ${skin.glow}, transparent 70%)`
             : "radial-gradient(closest-side, hsl(var(--primary) / 0.18), transparent 70%)",
         }}
       />
+
+      {/* Flash temático da mesa (acerto / erro) */}
+      {skinned && skinFlash && <TableSkinFlash skin={skin} tone={skinFlash} />}
+
 
       {/* Enemy full-screen vignette (pulsing) */}
       {currentIsEnemy && (
