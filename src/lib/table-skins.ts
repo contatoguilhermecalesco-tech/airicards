@@ -4,9 +4,6 @@
 import eclipseAmbient from "@/assets/shop/eclipse/background.png";
 import eclipseFrame from "@/assets/shop/eclipse/cardframe.png";
 import eclipseCrest from "@/assets/shop/eclipse/table-cardback.png";
-import monarcaAmbient from "@/assets/shop/monarca/background.png";
-import monarcaFrame from "@/assets/shop/monarca/cardframe.png";
-import monarcaCrest from "@/assets/shop/monarca/table-cardback.png";
 
 
 export type TableSkin = {
@@ -56,19 +53,6 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     glow: "rgba(190, 26, 56, 0.42)",
     hit: "#ff6b8a",
     miss: "#8e0b22",
-  },
-  "table:mesa_monarca": {
-    id: "mesa_monarca",
-    key: "table:mesa_monarca",
-    name: "Mesa do Monarca",
-    tagline: "Trono de obsidiana, chama violeta e o brasão do soberano.",
-    ambient: monarcaAmbient,
-    frame: monarcaFrame,
-    crest: monarcaCrest,
-    accent: "#a855f7",
-    glow: "rgba(124, 58, 237, 0.42)",
-    hit: "#c084fc",
-    miss: "#4c1d95",
   },
 };
 
