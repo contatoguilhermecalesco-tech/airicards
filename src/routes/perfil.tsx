@@ -59,6 +59,8 @@ import { tableSkinByKey } from "@/lib/table-skins";
 import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
+import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
+
 
 
 export const Route = createFileRoute("/perfil")({
@@ -890,8 +892,7 @@ function PerfilPage() {
               Meus cosméticos
             </h2>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
-              Equipe até 4 itens — um por slot. Trocas são instantâneas e aparecem aqui no seu
-              perfil.
+              Um item por slot. Toque num slot para abrir seu inventário e trocar.
             </p>
           </div>
           <Link
@@ -903,141 +904,21 @@ function PerfilPage() {
           </Link>
         </div>
 
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-          {SLOT_ORDER.map((slot) => {
-            const meta = SLOT_META[slot];
-            const owned = ownedBySlot[slot];
-            const equippedKey = wallet.equipped[slot];
-            const equippedShop = equippedItem[slot];
-            return (
-              <li
-                key={slot}
-                className="relative overflow-hidden rounded-2xl border border-white/10 p-4"
-                style={{ background: "#1e1f22" }}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span
-                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10"
-                      style={{ background: "rgba(255,255,255,0.04)" }}
-                    >
-                      <meta.icon className="h-4 w-4 text-foreground/80" strokeWidth={2.25} />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[13px] font-semibold text-white">{meta.label}</p>
-                      <p className="truncate text-[11px] text-white/50">{meta.hint}</p>
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    {slot === "table" &&
-                      (() => {
-                        const sk =
-                          tableSkinByKey(equippedKey) ??
-                          (owned[0] ? tableSkinByKey(keyOf(owned[0])) : undefined);
-                        return sk ? <TableSkinPreviewButton skin={sk} /> : null;
-                      })()}
-                    {equippedKey && (
-                      <button
-                        onClick={() => handleUnequip(slot)}
-                        disabled={busy === slot}
-                        className="rounded-lg border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] font-semibold text-white/80 transition hover:bg-white/[0.1] disabled:opacity-50"
-                      >
-                        Remover
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-
-                {equippedShop ? (
-                  <div
-                    className="mt-3 flex items-center gap-2 rounded-xl p-2"
-                    style={{ background: paletteFor(equippedShop.accent).gradient }}
-                  >
-                    <span
-                      className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg bg-black/25 text-white backdrop-blur"
-                    >
-                      {(() => {
-                        const art = getEquippedArt(wallet.equipped[slot]);
-                        if (art) {
-                          return (
-                            <img src={art} alt="" aria-hidden className="h-8 w-8 object-contain" />
-                          );
-                        }
-                        const Icon = ICONS[equippedShop.icon] ?? Sparkles;
-                        return <Icon className="h-4 w-4" strokeWidth={2.5} />;
-                      })()}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-white">
-                        {equippedShop.name}
-                      </p>
-                      <p className="truncate text-[11px] font-medium text-white/85">
-                        Equipado
-                      </p>
-                    </div>
-                    <Check
-                      className="ml-auto h-4 w-4 shrink-0 text-white"
-                      strokeWidth={2.75}
-                    />
-                  </div>
-                ) : (
-                  <p className="mt-3 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-3 py-2.5 text-[12px] text-white/50">
-                    Nenhum item equipado neste slot.
-                  </p>
-                )}
-
-                {owned.length > 0 ? (
-                  <div className="mt-3 space-y-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
-                      Disponíveis ({owned.length})
-                    </p>
-                    <ul className="flex flex-wrap gap-1.5">
-                      {owned.map((it) => {
-                        const k = keyOf(it);
-                        const isEquipped = equippedKey === k;
-                        const p = paletteFor(it.accent);
-                        return (
-                          <li key={k}>
-                            <button
-                              onClick={() => (isEquipped ? handleUnequip(slot) : handleEquip(it))}
-                              disabled={busy === k}
-                              className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-semibold transition disabled:opacity-50 ${
-                                isEquipped
-                                  ? "border-emerald-400/40 bg-emerald-400/15 text-emerald-100"
-                                  : "border-white/10 bg-white/[0.04] text-white/85 hover:bg-white/[0.1]"
-                              }`}
-                              title={isEquipped ? "Equipado — clique para remover" : "Equipar"}
-                            >
-                              <span
-                                className="h-2 w-2 rounded-full"
-                                style={{ background: p.ring }}
-                              />
-                              <span className="max-w-[9rem] truncate">{it.name}</span>
-                              {isEquipped && <Check className="h-3 w-3" strokeWidth={2.75} />}
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ) : (
-                  <div className="mt-3 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2">
-                    <p className="text-[12px] text-white/55">Nenhum item deste tipo ainda.</p>
-                    <Link
-                      to="/shop"
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-violet-300 hover:text-violet-200"
-                    >
-                      Ver na loja
-                      <ArrowLeft className="h-3 w-3 rotate-180" strokeWidth={2.5} />
-                    </Link>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        <CosmeticInventory
+          slotOrder={SLOT_ORDER}
+          slotMeta={SLOT_META}
+          ownedBySlot={ownedBySlot}
+          equippedItem={equippedItem}
+          equippedKeys={wallet.equipped}
+          keyOf={keyOf}
+          paletteFor={paletteFor}
+          iconFor={(it: ShopItem) => ICONS[it.icon] ?? Sparkles}
+          busy={busy}
+          onEquip={handleEquip}
+          onUnequip={handleUnequip}
+        />
       </section>
+
 
       {/* ============ ACTIVITY TIMELINE ============ */}
       {profile && (
