@@ -155,10 +155,8 @@ export function CosmeticInventory({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
           className={[
-            "left-0 top-0 h-[100dvh] max-h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0",
-            "flex flex-col grid-cols-1 gap-0 rounded-none border-0 p-0 overflow-hidden",
-            "sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[86dvh] sm:w-[calc(100%-3rem)] sm:max-w-3xl",
-            "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[26px] sm:border sm:border-white/10",
+            "flex max-h-[80dvh] w-[calc(100%-1.5rem)] max-w-lg flex-col grid-cols-1 gap-0",
+            "overflow-hidden rounded-[26px] border border-white/10 p-0 sm:max-w-2xl",
             "[&>button]:hidden",
           ].join(" ")}
           style={{
@@ -166,31 +164,53 @@ export function CosmeticInventory({
               "radial-gradient(120% 80% at 50% -10%, rgba(139,92,246,0.20), transparent 60%), #121016",
           }}
         >
-          {/* ---------- topo ---------- */}
-          <div
-            className="relative shrink-0 px-4 pb-3 sm:px-5"
-            style={{ paddingTop: "max(0.9rem, env(safe-area-inset-top))" }}
-          >
-            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-white/15 sm:hidden" />
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300/70">
-                  Inventário
+          {/* ---------- topo com navegação lateral ---------- */}
+          <div className="relative shrink-0 px-4 pt-4 pb-3 sm:px-5">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => goSlot(-1)}
+                aria-label="Slot anterior"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 transition active:scale-95"
+              >
+                <ChevronLeft className="h-4.5 w-4.5" strokeWidth={2.5} />
+              </button>
+
+              <div className="min-w-0 flex-1 text-center">
+                <p className="text-[9.5px] font-bold uppercase tracking-[0.18em] text-violet-300/70">
+                  Inventário · {slotIndex + 1}/{slotOrder.length}
                 </p>
-                <h3 className="mt-0.5 truncate text-[22px] font-semibold leading-tight text-white sm:text-[20px]">
+                <h3 className="mt-0.5 truncate text-[17px] font-semibold leading-tight text-white">
                   {activeMeta.label}
                 </h3>
-                <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-white/45">
-                  {activeMeta.hint}
-                </p>
               </div>
+
+              <button
+                onClick={() => goSlot(1)}
+                aria-label="Próximo slot"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 transition active:scale-95"
+              >
+                <ChevronRight className="h-4.5 w-4.5" strokeWidth={2.5} />
+              </button>
+
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fechar"
-                className="mt-0.5 grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 backdrop-blur transition active:scale-95"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-white/60 transition active:scale-95"
               >
-                <X className="h-4.5 w-4.5" strokeWidth={2.5} />
+                <X className="h-4 w-4" strokeWidth={2.5} />
               </button>
+            </div>
+
+            {/* pontinhos de progresso dos slots */}
+            <div className="mt-2.5 flex justify-center gap-1">
+              {slotOrder.map((s, i) => (
+                <span
+                  key={s}
+                  className={`h-1 rounded-full transition-all ${
+                    i === slotIndex ? "w-4 bg-violet-400" : "w-1 bg-white/20"
+                  }`}
+                />
+              ))}
             </div>
           </div>
 
@@ -203,7 +223,7 @@ export function CosmeticInventory({
               const Icon = eq ? iconFor(eq) : activeMeta.icon;
               return (
                 <div
-                  className="relative flex items-center gap-3.5 overflow-hidden rounded-3xl border border-white/10 p-3.5"
+                  className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-white/10 p-3"
                   style={{ background: "rgba(255,255,255,0.035)" }}
                 >
                   {p && (
@@ -213,17 +233,17 @@ export function CosmeticInventory({
                       style={{ background: p.gradient }}
                     />
                   )}
-                  <span className="relative grid h-[68px] w-[68px] shrink-0 place-items-center overflow-hidden rounded-2xl border border-white/12 bg-black/45">
-                    <ItemArt art={art} Icon={Icon} size={54} />
+                  <span className="relative grid h-[58px] w-[58px] shrink-0 place-items-center overflow-hidden rounded-xl border border-white/12 bg-black/45">
+                    <ItemArt art={art} Icon={Icon} size={46} />
                   </span>
                   <div className="relative min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                    <p className="text-[9.5px] font-bold uppercase tracking-[0.16em] text-white/45">
                       {eq ? "Equipado agora" : "Nada equipado"}
                     </p>
-                    <p className="mt-0.5 truncate text-[15px] font-semibold text-white">
-                      {eq ? eq.name : "Escolha um item abaixo"}
+                    <p className="mt-0.5 truncate text-[14px] font-semibold text-white">
+                      {eq ? eq.name : activeMeta.hint}
                     </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {activeSlot === "table" &&
                         (() => {
                           const sk =
@@ -235,7 +255,7 @@ export function CosmeticInventory({
                         <button
                           onClick={() => onUnequip(activeSlot)}
                           disabled={busy === activeSlot}
-                          className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1.5 text-[11px] font-semibold text-white/85 transition active:scale-95 disabled:opacity-50"
+                          className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1 text-[11px] font-semibold text-white/85 transition active:scale-95 disabled:opacity-50"
                         >
                           Remover
                         </button>
@@ -247,43 +267,6 @@ export function CosmeticInventory({
             })()}
           </div>
 
-          {/* ---------- trilha de slots (chips) ---------- */}
-          <div className="mt-3 shrink-0 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <ul className="flex w-max gap-2 px-4 pb-1 sm:px-5">
-              {slotOrder.map((slot) => {
-                const meta = slotMeta[slot];
-                const on = slot === activeSlot;
-                const count = ownedBySlot[slot].length;
-                return (
-                  <li key={slot} className="shrink-0">
-                    <button
-                      onClick={() => {
-                        setActiveSlot(slot);
-                        setQuery("");
-                      }}
-                      className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12.5px] font-semibold transition active:scale-95 ${
-                        on
-                          ? "border-violet-400/40 bg-violet-500/25 text-violet-50"
-                          : "border-white/10 bg-white/[0.04] text-white/60"
-                      }`}
-                    >
-                      <meta.icon className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />
-                      {meta.label}
-                      <span
-                        className={`rounded-full px-1.5 text-[10px] font-bold ${
-                          equippedKeys[slot]
-                            ? "bg-emerald-400/20 text-emerald-200"
-                            : "bg-black/25 text-white/45"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
 
           {/* ---------- grade de itens ---------- */}
           <div
