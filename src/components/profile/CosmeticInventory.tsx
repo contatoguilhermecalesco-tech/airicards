@@ -264,7 +264,7 @@ export function CosmeticInventory({
                   )}
                 </div>
               ) : (
-                <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <ul className="grid w-full min-w-0 grid-cols-2 gap-2 sm:grid-cols-3">
                   {listed.map((it) => {
                     const k = keyOf(it);
                     const isEquipped = activeEquippedKey === k;
