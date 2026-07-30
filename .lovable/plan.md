@@ -1,41 +1,39 @@
-# Provações do Primeiro Bundle
+## Objetivo
+Renomear o bundle **Crepúsculo Carmesim** para **Véu do Crepúsculo** e equilibrar a curva de preços/raridades dos bundles, já que ele tem mais itens (11) que os outros.
 
-Vamos refazer o sistema de desafios para virar uma **jornada de boas-vindas** que só existe até o usuário comprar o primeiro bundle. Sem horários, sem reset diário — ela pode fazer no ritmo dela.
+## Proposta de equilíbrio
 
-## O que muda na ideia
+| Bundle | Itens | Preço atual | Preço novo | Raridade nova |
+|--------|-------|-------------|------------|---------------|
+| **Véu do Crepúsculo** | 11 | 300 ✦ | **1.100 ✦** | Mítico |
+| **Monarca das Sombras** | 7 | 1.100 ✦ | **700 ✦** | Lendário |
+| **Florescer Celestial** | 6 | 1.100 ✦ | **500 ✦** | Épico |
 
-- **Sem prazo.** Os desafios ficam abertos até serem cumpridos. A Arlayne pode voltar semanas depois e continuar de onde parou.
-- **Só para quem ainda não tem bundle.** Assim que o usuário compra qualquer bundle da loja, as provações somem da Home e do menu — a missão foi cumprida.
-- **Foco em juntar Arlys para o primeiro bundle.** As recompensas somam ~1.100 ✦ (o preço de um bundle mítico), então terminar tudo garante a primeira compra sem depender de sorte diária.
-- **Progresso contínuo.** Cada revisão, duelo e redação empurra a barra até 100%. Nada expira à meia-noite.
+### Por quê isso funciona
+- **Véu do Crepúsculo** vira o bundle mais valioso: 11 itens, incluindo skin de mesa, streak flame, selo, título e splash de vitória.
+- **Monarca das Sombras** fica no meio: 7 itens, temática dark premium, preço de "bundle lendário".
+- **Florescer Celestial** vira o bundle de entrada: 6 itens, mais acessível para quem completa a jornada de boas-vindas.
+- A jornada de boas-vindas continua premiando **1.100 ✦**, mas agora direciona para o bundle **Véu do Crepúsculo** (o mais caro), dando um objetivo claro de longo prazo.
+- Os preços individuais dos cosméticos continuam altos como "preço de referência", então o modal de bundle mostrará economias grandes e atrativas.
 
-## As 6 provações (jornada única)
+## O que será alterado
 
-Cada uma abre a próxima quando é reivindicada, criando ritmo sem pressão:
+### Banco de dados
+1. Atualizar `shop_items`:
+   - `bundle.eclipse_carmesim`: nome → **Véu do Crepúsculo**, preço → **1.100**
+   - `bundle.monarca_sombras`: preço → **700**
+   - `bundle.florescer_celestial`: preço → **500**
 
-1. **Primeiros passos** — Revise 30 cartas · **80 ✦**
-2. **Mira afiada** — Acerte 50 traduções · **120 ✦**
-3. **Caçadora de inimigos** — Derrote 10 cartas inimigas · **180 ✦**
-4. **Escritora** — Complete 3 exercícios de writing · **150 ✦**
-5. **Duelista** — Vença 2 duelos · **220 ✦**
-6. **Provação suprema** — Alcance rank Bronze ou superior · **350 ✦**
+### Código
+1. `src/routes/b.$id.tsx` — atualizar meta título/descrição do bundle `bundle.eclipse_carmesim` para "Véu do Crepúsculo".
+2. `src/components/home/FirstBundleJourney.tsx` — trocar o texto/link do bundle alvo de "Florescer Celestial" para "Véu do Crepúsculo" (`bundle.eclipse_carmesim`).
+3. `src/lib/daily-challenges.ts` — atualizar comentário sobre o bundle mítico alvo.
+4. `src/lib/shop-asset-overrides.ts` — atualizar comentário do bundle.
 
-Total: **1.100 ✦** — exatamente o preço de um bundle mítico.
+### Opcional (se necessário)
+- Ajustar descrição do bundle `bundle_concepts` se o título atual conflitar com a nova curva.
 
-## Como aparece na Home
-
-- Um único card "Provações do primeiro bundle" abaixo do hero, com barra geral (ex: 3/6 concluídas) e a próxima provação em destaque.
-- Ao completar uma, aparece um overlay curto de "Provação cumprida · +X ✦" e a próxima destrava suavemente.
-- Ao comprar o primeiro bundle, o card some e um pequeno pop de "Jornada concluída" toca uma vez.
-
-## Detalhes técnicos
-
-- Substituir `daily_challenges` (por dia) por um estado único por perfil em `profile_data.first_bundle_journey` (JSONB): lista de provações + índice atual + `completedAt` de cada uma. Sem migração destrutiva — o `daily_challenges` fica ignorado.
-- `src/lib/daily-challenges.ts` vira `src/lib/first-bundle-journey.ts`. Mesmas funções de tracking (`trackReview`, `trackEnemyDefeated`, `trackDuelWin`, `trackWritingComplete`), mas sem `todayKey` nem reset.
-- Guardar `hasAnyBundle` derivado do inventário (`wallets.inventory.cosmetics` já contém itens comprados) + histórico em `shop_purchases`. Se `true`, os hooks viram no-op e a UI esconde o card.
-- Atualizar imports em `flashcards-store.ts`, `social-store.ts`, `writing-store.ts`, `review.tsx` para as novas funções.
-- Novo componente `src/components/home/FirstBundleJourney.tsx` renderizado condicionalmente em `src/routes/index.tsx`.
-- Overlay `src/components/ProvacaoCumpridaOverlay.tsx` reutilizando a estética do `GiftReceivedOverlay` (hexágono roxo, som curto).
-- Remover `study_minutes` como challenge (não faz sentido sem prazo) e o `setInterval` que adicionei no `review.tsx`.
-
-Confirma que faço nesse formato?
+## Resultado esperado
+- Loja mostra três bundles em tiers claros: Épico (500 ✦), Lendário (700 ✦) e Mítico (1.100 ✦).
+- A jornada de boas-vindas guia o usuário ao bundle mais caro, aumentando retenção.
+- Nenhum jogador perde itens já comprados — só o preço de novas compras muda.
