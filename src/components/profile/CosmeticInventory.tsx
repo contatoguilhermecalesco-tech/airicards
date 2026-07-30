@@ -154,11 +154,11 @@ export function CosmeticInventory({
       {/* ---------- modal de inventário ---------- */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="max-w-3xl gap-0 overflow-hidden border-white/10 p-0"
+          className="grid-cols-1 max-w-3xl gap-0 overflow-hidden border-white/10 p-0"
           style={{ background: "#141317" }}
         >
-          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3">
-            <div className="min-w-0">
+          <div className="flex w-full min-w-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
+            <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/45">
                 Inventário
               </p>
@@ -185,17 +185,18 @@ export function CosmeticInventory({
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fechar"
-                className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-white/70 transition hover:bg-white/[0.1]"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-white/70 transition hover:bg-white/[0.1]"
               >
                 <X className="h-4 w-4" strokeWidth={2.5} />
               </button>
             </div>
           </div>
 
-          <div className="flex max-h-[70vh] flex-col sm:flex-row">
+          <div className="flex w-full min-w-0 max-h-[70dvh] flex-col overflow-hidden sm:flex-row">
             {/* abas de slot */}
-            <div className="shrink-0 overflow-x-auto border-b border-white/10 sm:max-h-[70vh] sm:w-52 sm:overflow-y-auto sm:border-b-0 sm:border-r">
-              <ul className="flex gap-1 p-2 sm:flex-col">
+            <div className="w-full min-w-0 shrink-0 overflow-x-auto overscroll-x-contain border-b border-white/10 sm:max-h-[70dvh] sm:w-52 sm:overflow-x-hidden sm:overflow-y-auto sm:border-b-0 sm:border-r">
+              <ul className="flex w-max gap-1 p-2 sm:w-full sm:flex-col">
+
                 {slotOrder.map((slot) => {
                   const meta = slotMeta[slot];
                   const on = slot === activeSlot;
