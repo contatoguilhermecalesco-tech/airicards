@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
 import monarcaSplash from "@/assets/shop/monarca/splash-hero.jpg";
 import eclipseSplash from "@/assets/shop/eclipse/splash-hero.jpg";
+import espiritoSplash from "@/assets/shop/espirito/splash-hero.jpg";
 
 // Absolute base used to build og:image URLs so WhatsApp / social scrapers
 // can fetch the preview image without JS.
@@ -16,6 +17,7 @@ const BUNDLE_SPLASH: Record<string, string> = {
   "bundle.florescer_celestial": florescerSplash,
   "bundle.monarca_sombras": monarcaSplash,
   "bundle.eclipse_carmesim": eclipseSplash,
+  "bundle.nevoa_espiritual": espiritoSplash,
 };
 
 const BUNDLE_META: Record<string, { title: string; description: string }> = {
@@ -33,6 +35,11 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
     title: "airi — Véu do Crepúsculo",
     description:
       "Bundle mítico com aura do véu carmesim, coroa do crepúsculo, catedral do eclipse, rosas do crepúsculo, véu rubro, Corvo do Crepúsculo e itens de streak, selo, título, vitória e skin de mesa. Confira na loja airi.",
+  },
+  "bundle.nevoa_espiritual": {
+    title: "airi — Névoa Espiritual",
+    description:
+      "Bundle mítico com aura da névoa, coroa da névoa, santuário espiritual, pétalas espectrais, véu espectral, Cordeiro Espiritual e itens de streak, selo, título, vitória e o Altar da Névoa. Confira na loja airi.",
   },
 };
 
