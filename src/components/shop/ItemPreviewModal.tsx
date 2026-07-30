@@ -1,7 +1,7 @@
 // Prévia unificada da loja — mostra o cosmético no contexto real onde ele
 // aparece (perfil, mesa de revisão, home, arena, duelo) + a arte em alta,
 // com compra direta a partir da prévia.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X,
   Check,
@@ -12,6 +12,8 @@ import {
   UserRound,
   Sparkles,
   Layers,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 
@@ -112,6 +114,36 @@ export function ItemPreviewModal({
   // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
   const [contents, setContents] = useState<ShopItem[]>([]);
   const [selId, setSelId] = useState<string | null>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    const el = railRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    const el = railRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    const ro = new ResizeObserver(checkScroll);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      ro.disconnect();
+    };
+  }, [contents.length]);
+
+  const scrollRail = (dir: "left" | "right") => {
+    const el = railRef.current;
+    if (!el) return;
+    const step = Math.max(el.clientWidth * 0.75, 120);
+    el.scrollBy({ left: dir === "left" ? -step : step, behavior: "smooth" });
+  };
 
   useEffect(() => {
     let alive = true;
@@ -284,37 +316,68 @@ export function ItemPreviewModal({
             <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
               Todos os itens ({contents.length})
             </p>
-            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {contents.map((c) => {
-                const cSlot = resolveSlot(c);
-                const cArt =
-                  getShopAssetOverride(c.id)?.art ??
-                  cosmeticArtFor(c.payload as Record<string, unknown>) ??
-                  getEquippedArt(`${cSlot}:${itemKeyOf(c)}`) ??
-                  null;
-                const on = c.id === active.id;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelId(c.id)}
-                    title={c.name}
-                    className={`group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border transition ${
-                      on
-                        ? "border-violet-300/70 bg-white/[0.12] shadow-[0_0_0_2px_rgba(196,181,253,0.25)]"
-                        : "border-white/10 bg-white/[0.04] hover:bg-white/[0.09]"
-                    }`}
-                  >
-                    {cArt ? (
-                      <img src={cArt} alt="" draggable={false} className="h-12 w-12 object-contain" />
-                    ) : (
-                      <Sparkles className="h-5 w-5 text-white/70" strokeWidth={2.5} />
-                    )}
-                    <span className="absolute inset-x-0 bottom-0 truncate bg-black/65 px-1 py-[2px] text-[8px] font-semibold uppercase tracking-wide text-white/70">
-                      {(SLOT_LABEL[cSlot] ?? "Item").split(" ")[0]}
-                    </span>
-                  </button>
-                );
-              })}
+            <div className="group/rail relative">
+              {/* seta esquerda */}
+              <button
+                type="button"
+                onClick={() => scrollRail("left")}
+                disabled={!canScrollLeft}
+                aria-label="Itens anteriores"
+                className={`absolute left-0 top-1/2 z-10 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/70 text-white/90 shadow-lg backdrop-blur transition sm:h-8 sm:w-8 ${
+                  canScrollLeft ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+              >
+                <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+
+              {/* seta direita */}
+              <button
+                type="button"
+                onClick={() => scrollRail("right")}
+                disabled={!canScrollRight}
+                aria-label="Próximos itens"
+                className={`absolute right-0 top-1/2 z-10 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-black/70 text-white/90 shadow-lg backdrop-blur transition sm:h-8 sm:w-8 ${
+                  canScrollRight ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+              >
+                <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+
+              <div
+                ref={railRef}
+                className="flex gap-2 overflow-x-auto px-1 py-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {contents.map((c) => {
+                  const cSlot = resolveSlot(c);
+                  const cArt =
+                    getShopAssetOverride(c.id)?.art ??
+                    cosmeticArtFor(c.payload as Record<string, unknown>) ??
+                    getEquippedArt(`${cSlot}:${itemKeyOf(c)}`) ??
+                    null;
+                  const on = c.id === active.id;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelId(c.id)}
+                      title={c.name}
+                      className={`group relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border transition ${
+                        on
+                          ? "border-violet-300/70 bg-white/[0.12] shadow-[0_0_0_2px_rgba(196,181,253,0.25)]"
+                          : "border-white/10 bg-white/[0.04] hover:bg-white/[0.09]"
+                      }`}
+                    >
+                      {cArt ? (
+                        <img src={cArt} alt="" draggable={false} className="h-12 w-12 object-contain" />
+                      ) : (
+                        <Sparkles className="h-5 w-5 text-white/70" strokeWidth={2.5} />
+                      )}
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-black/65 px-1 py-[2px] text-[8px] font-semibold uppercase tracking-wide text-white/70">
+                        {(SLOT_LABEL[cSlot] ?? "Item").split(" ")[0]}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
