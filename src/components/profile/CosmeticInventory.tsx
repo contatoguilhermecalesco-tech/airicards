@@ -154,15 +154,25 @@ export function CosmeticInventory({
       {/* ---------- modal de inventário ---------- */}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="grid-cols-1 max-w-3xl gap-0 overflow-hidden border-white/10 p-0"
+          className={[
+            // MOBILE: folha vertical em tela cheia, feita pro celular
+            "left-0 top-0 h-[100dvh] max-h-[100dvh] w-screen max-w-none translate-x-0 translate-y-0",
+            "flex flex-col grid-cols-1 gap-0 rounded-none border-0 p-0 overflow-hidden",
+            // DESKTOP: volta ao modal centralizado
+            "sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[85dvh] sm:w-[calc(100%-3rem)] sm:max-w-3xl",
+            "sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border sm:border-white/10",
+          ].join(" ")}
           style={{ background: "#141317" }}
         >
-          <div className="flex w-full min-w-0 items-center justify-between gap-2 border-b border-white/10 px-3 py-3 sm:px-4">
+          <div
+            className="flex w-full min-w-0 items-center justify-between gap-2 border-b border-white/10 px-4 py-3"
+            style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
+          >
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/45">
                 Inventário
               </p>
-              <h3 className="truncate text-[15px] font-semibold text-white">{activeMeta.label}</h3>
+              <h3 className="truncate text-[16px] font-semibold text-white">{activeMeta.label}</h3>
               <p className="truncate text-[11px] text-white/50">{activeMeta.hint}</p>
             </div>
             <div className="flex shrink-0 items-center gap-1.5">
@@ -185,18 +195,17 @@ export function CosmeticInventory({
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fechar"
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-white/70 transition hover:bg-white/[0.1]"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/70 transition hover:bg-white/[0.1]"
               >
                 <X className="h-4 w-4" strokeWidth={2.5} />
               </button>
             </div>
           </div>
 
-          <div className="flex w-full min-w-0 max-h-[70dvh] flex-col overflow-hidden sm:flex-row">
-            {/* abas de slot */}
+          <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden sm:flex-row">
+            {/* abas de slot — chips roláveis no mobile, coluna no desktop */}
             <div className="w-full min-w-0 shrink-0 overflow-x-auto overscroll-x-contain border-b border-white/10 sm:max-h-[70dvh] sm:w-52 sm:overflow-x-hidden sm:overflow-y-auto sm:border-b-0 sm:border-r">
-              <ul className="flex w-max gap-1 p-2 sm:w-full sm:flex-col">
-
+              <ul className="flex w-max gap-1.5 p-2.5 sm:w-full sm:flex-col sm:gap-1 sm:p-2">
                 {slotOrder.map((slot) => {
                   const meta = slotMeta[slot];
                   const on = slot === activeSlot;
@@ -208,7 +217,7 @@ export function CosmeticInventory({
                           setActiveSlot(slot);
                           setQuery("");
                         }}
-                        className={`flex w-full items-center gap-2 whitespace-nowrap rounded-xl px-2.5 py-2 text-left text-[12px] font-semibold transition ${
+                        className={`flex w-full items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 text-left text-[12.5px] font-semibold transition sm:rounded-xl sm:px-2.5 ${
                           on
                             ? "bg-violet-500/20 text-violet-100 ring-1 ring-violet-400/30"
                             : "text-white/70 hover:bg-white/[0.06]"
@@ -232,8 +241,12 @@ export function CosmeticInventory({
               </ul>
             </div>
 
+
             {/* grade de itens */}
-            <div className="min-h-0 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain p-3">
+            <div
+              className="min-h-0 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain p-3"
+              style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+            >
               {ownedBySlot[activeSlot].length > 3 && (
                 <div className="mb-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
                   <Search className="h-3.5 w-3.5 text-white/40" strokeWidth={2.5} />
