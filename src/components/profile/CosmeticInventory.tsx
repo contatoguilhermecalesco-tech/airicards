@@ -94,6 +94,13 @@ export function CosmeticInventory({
 
   const activeMeta = slotMeta[activeSlot];
   const activeEquippedKey = equippedKeys[activeSlot];
+  const slotIndex = Math.max(0, slotOrder.indexOf(activeSlot));
+
+  function goSlot(dir: -1 | 1) {
+    const next = (slotIndex + dir + slotOrder.length) % slotOrder.length;
+    setActiveSlot(slotOrder[next]);
+    setQuery("");
+  }
 
   return (
     <>
