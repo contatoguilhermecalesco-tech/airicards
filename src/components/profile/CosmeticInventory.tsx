@@ -233,7 +233,7 @@ export function CosmeticInventory({
             </div>
 
             {/* grade de itens */}
-            <div className="min-w-0 flex-1 overflow-y-auto p-3">
+            <div className="min-h-0 w-full min-w-0 flex-1 overflow-y-auto overscroll-contain p-3">
               {ownedBySlot[activeSlot].length > 3 && (
                 <div className="mb-3 flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
                   <Search className="h-3.5 w-3.5 text-white/40" strokeWidth={2.5} />
