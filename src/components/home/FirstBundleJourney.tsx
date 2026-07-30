@@ -76,7 +76,7 @@ export function FirstBundleJourney() {
                 Cumpra no seu ritmo — sem prazo. Recompensas somam{" "}
                 <span className="text-white/80">{totals.total} ✦</span>, o
                 bastante para o bundle mítico{" "}
-                <span className="text-white/80">Florescer Celestial</span>.
+                <span className="text-white/80">Véu do Crepúsculo</span>.
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
@@ -176,11 +176,11 @@ export function FirstBundleJourney() {
             <div className="mt-4 rounded-xl border border-violet-300/15 bg-white/[0.03] p-3 text-center">
               <p className="text-[13px] text-white/75">
                 Jornada completa — use seus ✦ para desbloquear o bundle
-                Florescer Celestial.
+                Véu do Crepúsculo.
               </p>
               <Link
                 to="/shop"
-                search={{ b: "bundle.florescer_celestial" }}
+                search={{ b: "bundle.eclipse_carmesim" }}
                 className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-white"
               >
                 <Gift className="h-3.5 w-3.5" strokeWidth={2.5} />
