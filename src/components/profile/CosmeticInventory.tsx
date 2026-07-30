@@ -2,7 +2,7 @@
 // Mostra uma grade compacta com os 12 slots (só o que está equipado) e abre
 // um modal estilo "inventário de jogo" para trocar itens por slot.
 import { useMemo, useState } from "react";
-import { Check, Search, Sparkles, ShoppingBag, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Search, Sparkles, ShoppingBag, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
