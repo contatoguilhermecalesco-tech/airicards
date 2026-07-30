@@ -1,7 +1,7 @@
 // Prévia unificada da loja — mostra o cosmético no contexto real onde ele
 // aparece (perfil, mesa de revisão, home, arena, duelo) + a arte em alta,
 // com compra direta a partir da prévia.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X,
   Check,
