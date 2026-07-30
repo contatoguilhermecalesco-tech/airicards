@@ -12,6 +12,8 @@ import {
   UserRound,
   Sparkles,
   Layers,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 
