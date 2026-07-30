@@ -32,6 +32,19 @@ import eclipseAscensao from "@/assets/cosmetic-ascensao-carmesim.png";
 import eclipseArauto from "@/assets/cosmetic-arauto-eclipse.png";
 import eclipseVivo from "@/assets/cosmetic-eclipse-vivo.png";
 
+import espiritoSplash from "@/assets/shop/espirito/splash-hero.jpg";
+import espiritoAura from "@/assets/shop/espirito/aura.png";
+import espiritoFrame from "@/assets/shop/espirito/frame.png";
+import espiritoBackground from "@/assets/shop/espirito/background.png";
+import espiritoCardframe from "@/assets/shop/espirito/cardframe.png";
+import espiritoCompanion from "@/assets/shop/espirito/companion.png";
+import espiritoPetals from "@/assets/shop/espirito/petals-overlay.png";
+import espiritoTableBack from "@/assets/shop/espirito/table-cardback.png";
+import espiritoChama from "@/assets/cosmetic-chama-espiritual.png";
+import espiritoSelo from "@/assets/cosmetic-selo-espiritual.png";
+import espiritoAscensao from "@/assets/cosmetic-ascensao-espiritual.png";
+import espiritoTitulo from "@/assets/cosmetic-guardia-nevoa.png";
+
 
 
 
@@ -76,6 +89,19 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.title.arauto_eclipse": { art: eclipseArauto },
   "cosmetic.victory_splash.ascensao_carmesim": { art: eclipseAscensao },
 
+  // Master bundle — Névoa Espiritual (Mítico)
+  "bundle.nevoa_espiritual": { splash: espiritoSplash, art: espiritoAura },
+  "cosmetic.aura.nevoa_espiritual": { art: espiritoAura },
+  "cosmetic.frame.coroa_nevoa": { art: espiritoFrame },
+  "cosmetic.effect.santuario_espiritual": { art: espiritoBackground },
+  "cosmetic.overlay.petalas_espectrais": { art: espiritoPetals },
+  "cosmetic.veil.veu_espectral": { art: espiritoCardframe },
+  "cosmetic.companion.cordeiro_espiritual": { art: espiritoCompanion },
+  "cosmetic.table.mesa_espiritual": { art: espiritoTableBack },
+  "cosmetic.streak_flame.chama_espiritual": { art: espiritoChama },
+  "cosmetic.enemy_seal.selo_espiritual": { art: espiritoSelo },
+  "cosmetic.title.guardia_nevoa": { art: espiritoTitulo },
+  "cosmetic.victory_splash.ascensao_espiritual": { art: espiritoAscensao },
 };
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
@@ -114,6 +140,18 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "enemy_seal:selo_eclipse": eclipseSelo,
   "title:arauto_eclipse": eclipseArauto,
   "victory_splash:ascensao_carmesim": eclipseAscensao,
+
+  "decoration:nevoa_espiritual": espiritoAura,
+  "nameplate:coroa_nevoa": espiritoFrame,
+  "effect:santuario_espiritual": espiritoBackground,
+  "overlay:petalas_espectrais": espiritoPetals,
+  "veil:veu_espectral": espiritoCardframe,
+  "companion:cordeiro_espiritual": espiritoCompanion,
+  "table:mesa_espiritual": espiritoTableBack,
+  "streak_flame:chama_espiritual": espiritoChama,
+  "enemy_seal:selo_espiritual": espiritoSelo,
+  "title:guardia_nevoa": espiritoTitulo,
+  "victory_splash:ascensao_espiritual": espiritoAscensao,
 };
 
 

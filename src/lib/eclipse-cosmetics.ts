@@ -44,6 +44,15 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
     ring: "border-amber-200/25 bg-gradient-to-b from-amber-500/15 to-black/50 text-amber-100",
     halo: "radial-gradient(closest-side, rgba(251,191,36,0.30), transparent 70%)",
   },
+  chama_espiritual: {
+    key: "chama_espiritual",
+    name: "Chama Espiritual",
+    glyph: "rune",
+    color: "#7dd3fc",
+    accent: "#0c2c66",
+    ring: "border-sky-400/30 bg-gradient-to-b from-sky-500/20 to-black/45 text-sky-100",
+    halo: "radial-gradient(closest-side, rgba(56,189,248,0.36), transparent 70%)",
+  },
 };
 
 export function streakFlameFromEquipped(equipped: EquippedMap): StreakFlameTheme | null {
@@ -73,6 +82,14 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
     missLabel: "MARCADO",
     hitLabel: "SELO ROMPIDO",
   },
+  selo_espiritual: {
+    key: "selo_espiritual",
+    name: "Selo Espiritual",
+    color: "#60a5fa",
+    accent: "#0b1c3f",
+    missLabel: "ASSOMBRADO",
+    hitLabel: "ESPÍRITO LIBERTO",
+  },
 };
 
 export function enemySealFromEquipped(equipped: EquippedMap): EnemySealTheme | null {
@@ -96,6 +113,12 @@ export const TITLE_THEMES: Record<string, TitleTheme> = {
     name: "Arauto do Eclipse",
     text: "Arauto do Eclipse",
     gradient: "linear-gradient(90deg,#7f1027,#ff5a6e,#ffd6a5,#ff5a6e,#7f1027)",
+  },
+  guardia_nevoa: {
+    key: "guardia_nevoa",
+    name: "Guardião da Névoa",
+    text: "Guardião da Névoa",
+    gradient: "linear-gradient(90deg,#1e3a8a,#60a5fa,#e0f2fe,#60a5fa,#1e3a8a)",
   },
 };
 
@@ -123,6 +146,14 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     subline: "O eclipse reconhece seu nome",
     color: "#ff5a6e",
     accent: "#2a0410",
+  },
+  ascensao_espiritual: {
+    key: "ascensao_espiritual",
+    name: "Ascensão Espiritual",
+    headline: "VITÓRIA",
+    subline: "As lâminas do santuário se curvam a você",
+    color: "#7dd3fc",
+    accent: "#0b1c3f",
   },
 };
 

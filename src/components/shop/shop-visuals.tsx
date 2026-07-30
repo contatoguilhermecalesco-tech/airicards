@@ -148,6 +148,8 @@ export const ACCENTS: Record<string, string> = {
   violet: "from-violet-400/20 to-purple-500/10 text-violet-200 border-violet-400/30",
   emerald: "from-emerald-400/20 to-teal-500/10 text-emerald-200 border-emerald-400/30",
   lavender: "from-indigo-400/20 to-violet-500/10 text-indigo-200 border-indigo-400/30",
+  crimson: "from-rose-400/20 to-red-600/10 text-rose-200 border-rose-400/30",
+  azure: "from-sky-400/20 to-blue-600/10 text-sky-200 border-sky-400/30",
 };
 
 /* ---------------------- Cosmetic slots & profile preview ---------------------- */
@@ -198,6 +200,11 @@ const DISCORD_PALETTE: Record<
     gradient: "linear-gradient(135deg,#fda4af 0%,#e11d48 42%,#4c0519 100%)",
     ring: "#f43f5e",
     tag: "Eclipse",
+  },
+  azure: {
+    gradient: "linear-gradient(135deg,#bae6fd 0%,#3b82f6 42%,#0b1c3f 100%)",
+    ring: "#60a5fa",
+    tag: "Espírito",
   },
 };
 

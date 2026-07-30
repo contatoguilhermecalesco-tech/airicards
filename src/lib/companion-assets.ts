@@ -8,6 +8,7 @@ import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
 import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
 import corvoUrl from "@/assets/shop/eclipse/companion.png";
+import cordeiroUrl from "@/assets/shop/espirito/companion.png";
 
 
 export type CompanionProfile = {
@@ -43,6 +44,13 @@ const COMPANIONS: Record<string, CompanionProfile> = {
     src: corvoUrl,
     glow: "#f43f5e",
     tagline: "Arauto do eclipse, guardião das rosas.",
+  },
+  cordeiro_espiritual: {
+    key: "cordeiro_espiritual",
+    name: "Cordeiro Espiritual",
+    src: cordeiroUrl,
+    glow: "#60a5fa",
+    tagline: "Espírito do santuário, guia das almas na névoa.",
   },
 
 };

@@ -5,6 +5,10 @@ import eclipseAmbient from "@/assets/shop/eclipse/table-ambient.jpg";
 import eclipseFrame from "@/assets/shop/eclipse/table-frame.png";
 import eclipseCrest from "@/assets/shop/eclipse/table-cardback.png";
 import eclipsePetals from "@/assets/shop/eclipse/petals-overlay.png";
+import espiritoAmbient from "@/assets/shop/espirito/table-ambient.jpg";
+import espiritoTableFrame from "@/assets/shop/espirito/table-frame.png";
+import espiritoCrest from "@/assets/shop/espirito/table-cardback.png";
+import espiritoPetals from "@/assets/shop/espirito/petals-overlay.png";
 
 
 export type TableSkin = {
@@ -57,6 +61,20 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     glow: "rgba(190, 26, 56, 0.42)",
     hit: "#ff6b8a",
     miss: "#8e0b22",
+  },
+  "table:mesa_espiritual": {
+    id: "mesa_espiritual",
+    key: "table:mesa_espiritual",
+    name: "Altar da Névoa",
+    tagline: "O santuário sob a lua: névoa azul, lâminas espirituais e pétalas brancas.",
+    ambient: espiritoAmbient,
+    frame: espiritoTableFrame,
+    crest: espiritoCrest,
+    particles: espiritoPetals,
+    accent: "#60a5fa",
+    glow: "rgba(56, 132, 255, 0.42)",
+    hit: "#7dd3fc",
+    miss: "#1e3a8a",
   },
 };
 

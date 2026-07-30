@@ -5,6 +5,10 @@ import seloEclipse from "@/assets/cosmetic-selo-eclipse.png";
 import ascensaoCarmesim from "@/assets/cosmetic-ascensao-carmesim.png";
 import arautoEclipse from "@/assets/cosmetic-arauto-eclipse.png";
 import eclipseVivo from "@/assets/cosmetic-eclipse-vivo.png";
+import chamaEspiritual from "@/assets/cosmetic-chama-espiritual.png";
+import seloEspiritual from "@/assets/cosmetic-selo-espiritual.png";
+import ascensaoEspiritual from "@/assets/cosmetic-ascensao-espiritual.png";
+import guardiaNevoa from "@/assets/cosmetic-guardia-nevoa.png";
 
 export const COSMETIC_ART: Record<string, string> = {
   brasa_carmesim: brasaCarmesim,
@@ -12,6 +16,10 @@ export const COSMETIC_ART: Record<string, string> = {
   ascensao_carmesim: ascensaoCarmesim,
   arauto_eclipse: arautoEclipse,
   eclipse_vivo: eclipseVivo,
+  chama_espiritual: chamaEspiritual,
+  selo_espiritual: seloEspiritual,
+  ascensao_espiritual: ascensaoEspiritual,
+  guardia_nevoa: guardiaNevoa,
 };
 
 function normalize(value: unknown): string | null {
