@@ -1,7 +1,8 @@
 // Provações do Primeiro Bundle — jornada de boas-vindas sem prazo.
 // Substitui o antigo sistema diário: os desafios ficam abertos até serem
 // cumpridos, e a jornada inteira some assim que o usuário compra qualquer
-// bundle da loja. Recompensas somam exatamente 1.100 ✦ (preço mítico).
+// bundle da loja. Recompensas somam exatamente 1.100 ✦, o preço do bundle
+// mítico Florescer Celestial.
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
