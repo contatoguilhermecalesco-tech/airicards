@@ -30,9 +30,9 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
       "Bundle mítico com aura sombria, coroa do soberano, portal do monarca, exército de sombras, manto e Igris, o Cavaleiro-Sombra. Confira na loja airi.",
   },
   "bundle.eclipse_carmesim": {
-    title: "airi — Eclipse Carmesim",
+    title: "airi — Crepúsculo Carmesim",
     description:
-      "Bundle lendário com aura do véu carmesim, coroa do crepúsculo, catedral do eclipse, rosas do crepúsculo, véu rubro e o Corvo do Crepúsculo. Confira na loja airi.",
+      "Bundle épico com aura do véu carmesim, coroa do crepúsculo, catedral do eclipse, rosas do crepúsculo, véu rubro, Corvo do Crepúsculo e itens de streak, selo, título e vitória. Confira na loja airi.",
   },
 };
 
