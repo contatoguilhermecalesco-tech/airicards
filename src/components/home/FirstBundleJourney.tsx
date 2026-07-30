@@ -75,7 +75,8 @@ export function FirstBundleJourney() {
               <p className="mt-0.5 text-[13px] text-white/55">
                 Cumpra no seu ritmo — sem prazo. Recompensas somam{" "}
                 <span className="text-white/80">{totals.total} ✦</span>, o
-                bastante para o seu primeiro bundle mítico.
+                bastante para o bundle mítico{" "}
+                <span className="text-white/80">Florescer Celestial</span>.
               </p>
             </div>
             <div className="flex shrink-0 flex-col items-end">
