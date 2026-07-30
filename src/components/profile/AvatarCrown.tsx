@@ -4,6 +4,8 @@ import eclipseCrown from "@/assets/shop/eclipse/crown.png";
 import florescerFrame from "@/assets/shop/florescer/frame.png";
 import monarcaFrame from "@/assets/shop/monarca/frame.png";
 import eclipseFrame from "@/assets/shop/eclipse/frame.png";
+import espiritoCrown from "@/assets/shop/espirito/crown.png";
+import espiritoFrame from "@/assets/shop/espirito/frame.png";
 
 /**
  * Coroas: arte apoiada no topo do avatar + círculo ornamentado em volta do
@@ -27,6 +29,11 @@ export const CROWN_ART_BY_KEY: Record<
     art: eclipseCrown,
     glow: "rgba(224, 67, 95, 0.22)",
     ring: eclipseFrame,
+  },
+  "nameplate:coroa_nevoa": {
+    art: espiritoCrown,
+    glow: "rgba(96, 165, 250, 0.22)",
+    ring: espiritoFrame,
   },
 };
 
