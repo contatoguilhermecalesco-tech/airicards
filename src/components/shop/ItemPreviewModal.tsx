@@ -114,6 +114,36 @@ export function ItemPreviewModal({
   // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
   const [contents, setContents] = useState<ShopItem[]>([]);
   const [selId, setSelId] = useState<string | null>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    const el = railRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    const el = railRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    const ro = new ResizeObserver(checkScroll);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      ro.disconnect();
+    };
+  }, [contents.length]);
+
+  const scrollRail = (dir: "left" | "right") => {
+    const el = railRef.current;
+    if (!el) return;
+    const step = Math.max(el.clientWidth * 0.75, 120);
+    el.scrollBy({ left: dir === "left" ? -step : step, behavior: "smooth" });
+  };
 
   useEffect(() => {
     let alive = true;
