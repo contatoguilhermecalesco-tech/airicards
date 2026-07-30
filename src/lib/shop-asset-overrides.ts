@@ -61,7 +61,7 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.veil.manto_monarca": { art: monarcaCardframe },
   "cosmetic.companion.igris_cavaleiro": { art: monarcaCompanion },
 
-  // Master bundle — Crepúsculo Carmesim (Épico)
+  // Master bundle — Véu do Crepúsculo (Mítico)
   "bundle.eclipse_carmesim": { splash: eclipseSplash, art: eclipseAura },
   "cosmetic.aura.veu_carmesim": { art: eclipseAura },
   "cosmetic.frame.coroa_crepusculo": { art: eclipseFrame },
