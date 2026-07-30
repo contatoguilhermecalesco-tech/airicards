@@ -101,10 +101,10 @@ export const RARITY_META: Record<
 };
 
 export function rarityFor(price: number): Rarity {
-  if (price >= 501) return "mythic";
-  if (price >= 351) return "legendary";
-  if (price >= 201) return "epic";
-  if (price >= 101) return "rare";
+  if (price >= 1000) return "mythic";
+  if (price >= 600) return "legendary";
+  if (price >= 300) return "epic";
+  if (price >= 120) return "rare";
   return "common";
 }
 
