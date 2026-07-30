@@ -27,7 +27,7 @@ const PETAL_TINTS = [
   "linear-gradient(135deg, #f0e6ff 0%, #c9b6f5 60%, #9d7fe0 100%)", // lavender accent
 ];
 
-// Variante "Rosas do Crepúsculo" (bundle Eclipse Carmesim) — pétalas rubras.
+// Variante "Rosas do Crepúsculo" (bundle Crepúsculo Carmesim) — pétalas rubras.
 const CRIMSON_TINTS = [
   "linear-gradient(135deg, #ffb3c1 0%, #e11d48 55%, #7f1d1d 100%)",
   "linear-gradient(135deg, #fda4af 0%, #be123c 60%, #4c0519 100%)",
