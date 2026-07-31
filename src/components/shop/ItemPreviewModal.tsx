@@ -170,7 +170,7 @@ export function ItemPreviewModal({
   const slot = resolveSlot(active);
   const key = itemKeyOf(active);
   const walletKey = `${slot}:${key}`;
-  const rarity = rarityFor(item.price);
+  const rarity = rarityOfItem(item);
   const art =
     getShopAssetOverride(active.id)?.art ??
     cosmeticArtFor(active.payload as Record<string, unknown>) ??

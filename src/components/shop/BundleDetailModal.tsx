@@ -39,7 +39,7 @@ export function BundleDetailModal({
   const [contents, setContents] = useState<ShopItem[] | null>(null);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [shareState, setShareState] = useState<"idle" | "copied">("idle");
-  const rarity = RARITY_META[rarityFor(bundle.price)];
+  const rarity = RARITY_META[rarityOfItem(bundle)];
   const Icon = ICONS[bundle.icon] ?? Sparkles;
 
   const shareUrl =
@@ -146,7 +146,7 @@ export function BundleDetailModal({
             <div className="flex flex-col gap-4 p-5 pr-14 sm:flex-row sm:items-center sm:gap-6 sm:p-8 sm:pr-8">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <RarityChip rarity={rarityFor(bundle.price)} size="md" />
+                  <RarityChip rarity={rarityOfItem(bundle)} size="md" />
                   <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/30 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90 backdrop-blur">
                     Bundle · {contents?.length ?? "…"} itens
                   </span>
@@ -344,7 +344,7 @@ function BundleItemRow({
   onToggle: () => void;
   onPreview?: () => void;
 }) {
-  const rarity = RARITY_META[rarityFor(item.price)];
+  const rarity = RARITY_META[rarityOfItem(item)];
   const Icon = ICONS[item.icon] ?? Sparkles;
   const override = getShopAssetOverride(item.id);
   return (
@@ -373,7 +373,7 @@ function BundleItemRow({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <RarityChip rarity={rarityFor(item.price)} />
+          <RarityChip rarity={rarityOfItem(item)} />
           <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {kindLabel(item.kind)}
           </span>

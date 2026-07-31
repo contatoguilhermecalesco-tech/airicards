@@ -209,7 +209,7 @@ function ShopPage() {
         price: it.price,
         accent: it.accent,
         icon: it.icon,
-        rarity: rarityFor(it.price),
+        rarity: rarityOfItem(it),
         createdAt: 0,
         raw: it,
         bundleItems: Array.isArray((it.payload as { items?: unknown })?.items)
