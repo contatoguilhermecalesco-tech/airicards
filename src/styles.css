@@ -740,3 +740,85 @@
   30% { opacity: 0.85; }
   to { transform: scale(1); opacity: 0.8; }
 }
+
+/* ===== Mesa de Revisão — VFX de impacto (acerto / erro) ===== */
+@keyframes table-impact-flash {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@utility table-impact-flash {
+  animation: table-impact-flash 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes table-impact-ring {
+  0% { transform: scale(0.2); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+@utility table-impact-ring {
+  animation: table-impact-ring 0.9s cubic-bezier(0.15, 0.75, 0.25, 1) both;
+}
+@utility table-impact-ring-late {
+  animation-delay: 0.12s;
+  animation-duration: 1.05s;
+}
+
+@keyframes table-impact-shard {
+  0% { transform: rotate(var(--shard-angle)) translateY(0) rotate(0deg) scale(0.4); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: rotate(var(--shard-angle)) translateY(calc(var(--shard-distance) * -1)) rotate(var(--shard-spin)) scale(1); opacity: 0; }
+}
+@utility table-impact-shard {
+  transform-origin: 50% 0%;
+  animation: table-impact-shard 0.8s cubic-bezier(0.16, 0.86, 0.28, 1) var(--shard-delay, 0s) both;
+}
+
+@keyframes table-impact-cracks {
+  0% { opacity: 0; transform: scale(1.06); }
+  14% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@utility table-impact-cracks {
+  animation: table-impact-cracks 0.95s ease-out both;
+}
+
+@keyframes table-impact-frost {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@utility table-impact-frost {
+  animation: table-impact-frost 1.1s ease-out both;
+}
+
+@keyframes table-impact-beam {
+  0% { opacity: 0; transform: translateX(-50%) scaleY(0.6); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) scaleY(1.05); }
+}
+@utility table-impact-beam {
+  transform-origin: bottom center;
+  animation: table-impact-beam 1s ease-out both;
+}
+
+@keyframes table-quake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  15% { transform: translate3d(-7px, 4px, 0) rotate(-0.4deg); }
+  32% { transform: translate3d(6px, -3px, 0) rotate(0.35deg); }
+  52% { transform: translate3d(-4px, 2px, 0); }
+  74% { transform: translate3d(3px, -1px, 0); }
+}
+@utility table-quake {
+  animation: table-quake 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes table-bloom {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.035); }
+  100% { transform: scale(1); }
+}
+@utility table-bloom {
+  animation: table-bloom 0.6s ease-out both;
+}

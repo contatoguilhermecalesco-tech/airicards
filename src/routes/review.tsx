@@ -28,6 +28,8 @@ import {
 import { useWallet } from "@/lib/wallet-store";
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
+import { TableSkinImpact } from "@/components/review/TableSkinImpact";
+
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
 import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
@@ -99,12 +101,22 @@ function Review() {
   const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
+  const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
 
   function pulseSkin(tone: "hit" | "miss") {
     setSkinFlash(tone);
-    setTimeout(() => setSkinFlash(null), 700);
+    setImpactSeed((n) => n + 1);
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(tone === "hit" ? [12, 40, 18] : [45, 30, 70]);
+      } catch {
+        /* ignore */
+      }
+    }
+    setTimeout(() => setSkinFlash(null), 1100);
   }
+
 
 
 
@@ -329,7 +341,17 @@ function Review() {
 
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main
+      className={`relative min-h-screen overflow-hidden ${
+        skinned && skinFlash === "miss"
+          ? "table-quake"
+          : skinned && skinFlash === "hit"
+          ? "table-bloom"
+          : ""
+      }`}
+    >
+
+
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
 
@@ -346,8 +368,14 @@ function Review() {
         }}
       />
 
-      {/* Flash temático da mesa (acerto / erro) */}
-      {skinned && skinFlash && <TableSkinFlash skin={skin} tone={skinFlash} />}
+      {/* Flash + impacto cinematográfico da mesa (acerto / erro) */}
+      {skinned && skinFlash && (
+        <>
+          <TableSkinFlash skin={skin} tone={skinFlash} />
+          <TableSkinImpact skin={skin} tone={skinFlash} seed={impactSeed} />
+        </>
+      )}
+
 
 
       {/* Enemy full-screen vignette (pulsing) */}
