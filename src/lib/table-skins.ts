@@ -9,8 +9,10 @@ import espiritoAmbient from "@/assets/shop/espirito/table-ambient.jpg";
 import espiritoTableFrame from "@/assets/shop/espirito/table-frame.png";
 import espiritoCrest from "@/assets/shop/espirito/table-cardback.png";
 import espiritoPetals from "@/assets/shop/espirito/petals-overlay.png";
-import princesaAmbient from "@/assets/shop/princesa/background.png";
+import princesaAmbient from "@/assets/shop/princesa/table-ambient.jpg";
+import princesaTableFrame from "@/assets/shop/princesa/table-frame.png";
 import princesaCrest from "@/assets/shop/princesa/table-cardback.png";
+import princesaFrost from "@/assets/shop/princesa/frost-overlay.png";
 
 
 
@@ -83,13 +85,15 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     id: "mesa_vigilia_prateada",
     key: "table:mesa_vigilia_prateada",
     name: "Mesa do Rito de Gelo",
-    tagline: "Uma mesa selada por safiras frias, ferro prateado e velas azuis eternas.",
+    tagline: "A cripta congelada da vigília: velas de safira, espinhos de prata e gelo eterno.",
     ambient: princesaAmbient,
+    frame: princesaTableFrame,
     crest: princesaCrest,
-    accent: "#7db8ff",
-    glow: "rgba(125, 184, 255, 0.34)",
-    hit: "#dbe9ff",
-    miss: "#3e5f91",
+    particles: princesaFrost,
+    accent: "#8ec5ff",
+    glow: "rgba(110, 170, 255, 0.45)",
+    hit: "#a9d8ff",
+    miss: "#2f4d80",
   },
 };
 
