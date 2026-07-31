@@ -1,4 +1,5 @@
 // Cosméticos temáticos além dos slots de perfil clássicos.
+import { COSMETIC_ART } from "@/lib/cosmetic-art";
 // Cada slot aqui é lido direto do `equipped` da wallet (formato `slot:key`).
 import type { EquippedMap } from "@/lib/wallet-store";
 
@@ -49,7 +50,8 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
     name: "Chama Espiritual",
     glyph: "rune",
     color: "#8fc7f5",
-    accent: "#8e1b2b",
+    accent: "#0a1430",
+    art: COSMETIC_ART.ascensao_espiritual,
     ring: "border-sky-300/30 bg-gradient-to-b from-sky-400/18 to-[#2a0410]/60 text-sky-50",
     halo: "radial-gradient(closest-side, rgba(143,199,245,0.34), rgba(142,27,43,0.22) 55%, transparent 72%)",
   },
@@ -86,7 +88,8 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
     key: "selo_espiritual",
     name: "Selo Espiritual",
     color: "#8fc7f5",
-    accent: "#8e1b2b",
+    accent: "#0a1430",
+    art: COSMETIC_ART.ascensao_espiritual,
     missLabel: "SELO SANGRADO",
     hitLabel: "GELO ROMPIDO",
   },
@@ -136,6 +139,7 @@ export type VictorySplashTheme = {
   subline: string;
   color: string;
   accent: string;
+  art?: string;
 };
 
 export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
@@ -146,6 +150,7 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     subline: "O eclipse reconhece seu nome",
     color: "#ff5a6e",
     accent: "#2a0410",
+    art: COSMETIC_ART.ascensao_carmesim,
   },
   ascensao_espiritual: {
     key: "ascensao_espiritual",
@@ -153,7 +158,8 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     headline: "VITÓRIA",
     subline: "O gelo se parte e o sangue da lua reconhece você",
     color: "#8fc7f5",
-    accent: "#8e1b2b",
+    accent: "#0a1430",
+    art: COSMETIC_ART.ascensao_espiritual,
   },
 };
 
