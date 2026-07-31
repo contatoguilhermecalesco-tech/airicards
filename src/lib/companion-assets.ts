@@ -50,10 +50,12 @@ const COMPANIONS: Record<string, CompanionProfile> = {
   },
   cordeiro_espiritual: {
     key: "cordeiro_espiritual",
-    name: "Cordeiro Espiritual",
-    src: cordeiroUrl,
-    glow: "#60a5fa",
-    tagline: "Espírito do santuário, guia das almas na névoa.",
+    name: "Espírito das Lâminas",
+    src: nevoaIdleUrl,
+    glow: "#7dd3fc",
+    tagline: "Alma da névoa que desperta lâminas de gelo.",
+    frames: [nevoaIdleUrl, nevoaWakeUrl, nevoaOrbitUrl, nevoaStrikeUrl, nevoaWakeUrl],
+    flash: true,
   },
 
 };
