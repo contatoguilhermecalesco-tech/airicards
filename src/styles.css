@@ -734,3 +734,9 @@
   0% { transform: scale(1.6); opacity: 0; letter-spacing: 0.4em; }
   100% { transform: scale(1); opacity: 1; letter-spacing: 0.12em; }
 }
+
+@keyframes victorySplashZoom {
+  from { transform: scale(1.12); opacity: 0; }
+  30% { opacity: 0.85; }
+  to { transform: scale(1); opacity: 0.8; }
+}
