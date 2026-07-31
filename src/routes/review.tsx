@@ -339,7 +339,17 @@ function Review() {
 
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main
+      className={`relative min-h-screen overflow-hidden ${
+        skinned && skinFlash === "miss"
+          ? "table-quake"
+          : skinned && skinFlash === "hit"
+          ? "table-bloom"
+          : ""
+      }`}
+      key={`shell-${skinFlash ? impactSeed : "idle"}`}
+    >
+
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
 
