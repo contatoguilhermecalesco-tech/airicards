@@ -1,4 +1,5 @@
 // Cosméticos temáticos além dos slots de perfil clássicos.
+import { COSMETIC_ART } from "@/lib/cosmetic-art";
 // Cada slot aqui é lido direto do `equipped` da wallet (formato `slot:key`).
 import type { EquippedMap } from "@/lib/wallet-store";
 
@@ -136,6 +137,7 @@ export type VictorySplashTheme = {
   subline: string;
   color: string;
   accent: string;
+  art?: string;
 };
 
 export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
@@ -146,6 +148,7 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     subline: "O eclipse reconhece seu nome",
     color: "#ff5a6e",
     accent: "#2a0410",
+    art: COSMETIC_ART.ascensao_carmesim,
   },
   ascensao_espiritual: {
     key: "ascensao_espiritual",
@@ -153,7 +156,8 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     headline: "VITÓRIA",
     subline: "O gelo se parte e o sangue da lua reconhece você",
     color: "#8fc7f5",
-    accent: "#8e1b2b",
+    accent: "#0a1430",
+    art: COSMETIC_ART.ascensao_espiritual,
   },
 };
 

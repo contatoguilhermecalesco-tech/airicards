@@ -38,6 +38,25 @@ export function VictorySplash({
         }}
       />
 
+      {theme.art && (
+        <>
+          <img
+            aria-hidden
+            src={theme.art}
+            alt=""
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover opacity-80 motion-safe:animate-[victorySplashZoom_5200ms_ease-out_forwards]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(to bottom, ${theme.accent}66 0%, transparent 28%, ${theme.accent}cc 78%, #05030a 100%)`,
+            }}
+          />
+        </>
+      )}
+
       {/* Raios */}
       <div
         aria-hidden
