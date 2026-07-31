@@ -46,7 +46,6 @@ import espiritoAscensao from "@/assets/cosmetic-ascensao-espiritual.png";
 import espiritoTitulo from "@/assets/cosmetic-guardia-nevoa.png";
 import princesaSplash from "@/assets/shop/princesa/splash-hero.png";
 import princesaAura from "@/assets/shop/princesa/aura.png";
-import princesaCrown from "@/assets/shop/princesa/crown.png";
 import princesaFrame from "@/assets/shop/princesa/frame.png";
 import princesaBackground from "@/assets/shop/princesa/background.png";
 import princesaCardframe from "@/assets/shop/princesa/cardframe.png";
