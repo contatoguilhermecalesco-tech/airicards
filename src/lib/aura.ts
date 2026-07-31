@@ -54,6 +54,9 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
 
   // Névoa Espiritual (bundle) — gelo azul com brasa carmesim
   nevoa_espiritual: { ring: "#8fc7f5", secondary: "#8e1b2b", kind: "crystal", speed: "slow" },
+
+  // Princesa Espinho de Prata — safira glacial e prata ritual
+  espinho_prata: { ring: "#7db8ff", secondary: "#dbe9ff", kind: "crystal", speed: "slow" },
 };
 
 export const AURA_RING: Record<string, string> = Object.fromEntries(
