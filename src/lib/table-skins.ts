@@ -82,7 +82,7 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
   "table:mesa_vigilia_prateada": {
     id: "mesa_vigilia_prateada",
     key: "table:mesa_vigilia_prateada",
-    name: "Mesa da Vigília Prateada",
+    name: "Mesa do Rito de Gelo",
     tagline: "Uma mesa selada por safiras frias, ferro prateado e velas azuis eternas.",
     ambient: princesaAmbient,
     crest: princesaCrest,
