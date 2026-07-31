@@ -52,8 +52,8 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
   abyss:     { ring: "#14b8a6", secondary: "#0f172a", kind: "dual", speed: "slow" },
   cosmic:    { ring: "#a78bfa", secondary: "#22d3ee", kind: "cosmic" },
 
-  // Névoa Espiritual (bundle)
-  nevoa_espiritual: { ring: "#60a5fa", secondary: "#a5f3fc", kind: "crystal", speed: "slow" },
+  // Névoa Espiritual (bundle) — gelo azul com brasa carmesim
+  nevoa_espiritual: { ring: "#8fc7f5", secondary: "#8e1b2b", kind: "crystal", speed: "slow" },
 };
 
 export const AURA_RING: Record<string, string> = Object.fromEntries(
