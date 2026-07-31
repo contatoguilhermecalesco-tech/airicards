@@ -319,14 +319,32 @@ export function VictorySplashDemo({ itemKey }: { itemKey: string }) {
   return (
     <div className="space-y-3">
       <div
-        className="relative grid h-[170px] place-items-center overflow-hidden rounded-2xl border border-white/[0.07]"
+        className="relative grid h-[190px] place-items-center overflow-hidden rounded-2xl border border-white/[0.07]"
         style={{
           background: `radial-gradient(80% 60% at 50% 45%, ${theme.color}33, ${theme.accent}f2 60%, #05030a 100%)`,
         }}
       >
+        {theme.art && (
+          <>
+            <img
+              aria-hidden
+              src={theme.art}
+              alt=""
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-cover opacity-80"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to bottom, ${theme.accent}66 0%, transparent 30%, ${theme.accent}cc 80%, #05030a 100%)`,
+              }}
+            />
+          </>
+        )}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40 motion-safe:animate-[victoryRays_18000ms_linear_infinite]"
+          className="pointer-events-none absolute inset-0 opacity-30 motion-safe:animate-[victoryRays_18000ms_linear_infinite]"
           style={{
             background: `repeating-conic-gradient(from 0deg at 50% 50%, ${theme.color}22 0deg 6deg, transparent 6deg 16deg)`,
           }}
@@ -334,11 +352,13 @@ export function VictorySplashDemo({ itemKey }: { itemKey: string }) {
         <div className="relative text-center">
           <p
             className="text-3xl font-black tracking-[0.16em] text-white"
-            style={{ textShadow: `0 0 26px ${theme.color}` }}
+            style={{ textShadow: `0 0 26px ${theme.color}, 0 2px 10px rgba(0,0,0,0.8)` }}
           >
             {theme.headline}
           </p>
-          <p className="mt-1 text-[12px] text-white/60">{theme.subline}</p>
+          <p className="mt-1 text-[12px] text-white/70 drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+            {theme.subline}
+          </p>
         </div>
       </div>
 
