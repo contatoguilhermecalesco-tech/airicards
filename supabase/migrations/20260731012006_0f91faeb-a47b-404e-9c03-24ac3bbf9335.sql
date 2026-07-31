@@ -1,0 +1,1 @@
+UPDATE public.shop_items SET name = 'Espírito das Lâminas', description = 'Companheiro: um espírito da névoa com máscara de porcelana que desperta lâminas de gelo orbitando ao seu redor.' WHERE id = 'cosmetic.companion.cordeiro_espiritual';
