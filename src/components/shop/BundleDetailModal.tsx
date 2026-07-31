@@ -9,7 +9,7 @@ import {
   MiniProfileCard,
   RARITY_META,
   RarityChip,
-  rarityFor,
+  rarityOfItem,
 } from "@/components/shop/shop-visuals";
 import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { getShopAssetOverride } from "@/lib/shop-asset-overrides";

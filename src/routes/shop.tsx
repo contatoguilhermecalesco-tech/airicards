@@ -38,6 +38,7 @@ import {
   RARITY_ORDER,
   RarityChip,
   rarityFor,
+  rarityOfItem,
   PowerupCover,
   DeckCover,
   PackCover,
