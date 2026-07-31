@@ -90,10 +90,10 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     frame: princesaTableFrame,
     crest: princesaCrest,
     particles: princesaFrost,
-    accent: "#8ec5ff",
-    glow: "rgba(110, 170, 255, 0.45)",
-    hit: "#a9d8ff",
-    miss: "#2f4d80",
+    accent: "#9fd2ff",
+    glow: "rgba(120, 185, 255, 0.55)",
+    hit: "#dff1ff",
+    miss: "#3f7fd6",
   },
 };
 
