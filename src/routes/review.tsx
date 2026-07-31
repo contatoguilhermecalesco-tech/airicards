@@ -366,8 +366,14 @@ function Review() {
         }}
       />
 
-      {/* Flash temático da mesa (acerto / erro) */}
-      {skinned && skinFlash && <TableSkinFlash skin={skin} tone={skinFlash} />}
+      {/* Flash + impacto cinematográfico da mesa (acerto / erro) */}
+      {skinned && skinFlash && (
+        <>
+          <TableSkinFlash skin={skin} tone={skinFlash} />
+          <TableSkinImpact skin={skin} tone={skinFlash} seed={impactSeed} />
+        </>
+      )}
+
 
 
       {/* Enemy full-screen vignette (pulsing) */}
