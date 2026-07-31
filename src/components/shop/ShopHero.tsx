@@ -130,7 +130,7 @@ export function ShopHero({
         }}
       />
 
-      <div className="relative z-10 grid gap-4 p-4 sm:aspect-[16/9] sm:max-h-[68vh] sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
+      <div className="relative z-10 grid gap-4 p-4 pb-7 sm:aspect-[16/9] sm:max-h-[68vh] sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
 
 
         <div className="min-w-0 self-center">
@@ -218,18 +218,18 @@ export function ShopHero({
           <button
             aria-label="Anterior"
             onClick={(e) => { e.stopPropagation(); setIdx((i) => (i - 1 + featured.length) % featured.length); }}
-            className="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
+            className="absolute left-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </button>
           <button
             aria-label="Próximo"
             onClick={(e) => { e.stopPropagation(); advance(); }}
-            className="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
+            className="absolute right-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
           </button>
-          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5" onClick={stop}>
+          <div className="absolute inset-x-0 bottom-2.5 z-20 flex justify-center gap-1.5" onClick={stop}>
             {featured.map((_, i) => (
               <button
                 key={i}
