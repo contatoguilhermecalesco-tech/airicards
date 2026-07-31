@@ -8,7 +8,10 @@ import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
 import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
 import corvoUrl from "@/assets/shop/eclipse/companion.png";
-import cordeiroUrl from "@/assets/shop/espirito/companion.png";
+import nevoaIdleUrl from "@/assets/shop/espirito/companion-idle.png";
+import nevoaWakeUrl from "@/assets/shop/espirito/companion-wake.png";
+import nevoaOrbitUrl from "@/assets/shop/espirito/companion-orbit.png";
+import nevoaStrikeUrl from "@/assets/shop/espirito/companion-strike.png";
 
 
 export type CompanionProfile = {
