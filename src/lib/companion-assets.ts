@@ -8,7 +8,10 @@ import igrisRise2Url from "@/assets/shop/monarca/companion-rise2.png";
 import igrisStandUrl from "@/assets/shop/monarca/companion-stand.png";
 import igrisDrawUrl from "@/assets/shop/monarca/companion-draw.png";
 import corvoUrl from "@/assets/shop/eclipse/companion.png";
-import cordeiroUrl from "@/assets/shop/espirito/companion.png";
+import nevoaIdleUrl from "@/assets/shop/espirito/companion-idle.png";
+import nevoaWakeUrl from "@/assets/shop/espirito/companion-wake.png";
+import nevoaOrbitUrl from "@/assets/shop/espirito/companion-orbit.png";
+import nevoaStrikeUrl from "@/assets/shop/espirito/companion-strike.png";
 
 
 export type CompanionProfile = {
@@ -47,10 +50,12 @@ const COMPANIONS: Record<string, CompanionProfile> = {
   },
   cordeiro_espiritual: {
     key: "cordeiro_espiritual",
-    name: "Cordeiro Espiritual",
-    src: cordeiroUrl,
-    glow: "#60a5fa",
-    tagline: "Espírito do santuário, guia das almas na névoa.",
+    name: "Espírito das Lâminas",
+    src: nevoaIdleUrl,
+    glow: "#7dd3fc",
+    tagline: "Alma da névoa que desperta lâminas de gelo.",
+    frames: [nevoaIdleUrl, nevoaWakeUrl, nevoaOrbitUrl, nevoaStrikeUrl, nevoaWakeUrl],
+    flash: true,
   },
 
 };
