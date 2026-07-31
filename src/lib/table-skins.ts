@@ -9,6 +9,9 @@ import espiritoAmbient from "@/assets/shop/espirito/table-ambient.jpg";
 import espiritoTableFrame from "@/assets/shop/espirito/table-frame.png";
 import espiritoCrest from "@/assets/shop/espirito/table-cardback.png";
 import espiritoPetals from "@/assets/shop/espirito/petals-overlay.png";
+import princesaAmbient from "@/assets/shop/princesa/background.png";
+import princesaCrest from "@/assets/shop/princesa/table-cardback.png";
+
 
 
 export type TableSkin = {
@@ -75,6 +78,18 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     glow: "rgba(143, 199, 245, 0.38)",
     hit: "#bfe4ff",
     miss: "#8e1b2b",
+  },
+  "table:mesa_vigilia_prateada": {
+    id: "mesa_vigilia_prateada",
+    key: "table:mesa_vigilia_prateada",
+    name: "Mesa da Vigília Prateada",
+    tagline: "Uma mesa selada por safiras frias, ferro prateado e velas azuis eternas.",
+    ambient: princesaAmbient,
+    crest: princesaCrest,
+    accent: "#7db8ff",
+    glow: "rgba(125, 184, 255, 0.34)",
+    hit: "#dbe9ff",
+    miss: "#3e5f91",
   },
 };
 
