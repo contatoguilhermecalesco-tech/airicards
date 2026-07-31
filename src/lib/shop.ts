@@ -43,13 +43,19 @@ export async function listAllShopItems(): Promise<ShopItem[]> {
 
 export async function updateShopItem(
   id: string,
-  patch: Partial<Pick<ShopItem, "active" | "sort_order" | "price" | "name" | "description">>,
+  patch: Partial<
+    Pick<
+      ShopItem,
+      "active" | "sort_order" | "price" | "name" | "description" | "icon" | "accent" | "payload"
+    >
+  >,
 ): Promise<void> {
   const { error } = await supabase
     .from("shop_items")
     .update(patch as never)
     .eq("id", id);
   if (error) throw error;
+
 }
 
 export async function deleteShopItem(id: string): Promise<void> {
