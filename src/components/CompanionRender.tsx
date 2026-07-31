@@ -38,7 +38,8 @@ export function CompanionRender({ companion }: { companion: CompanionProfile }) 
           src={src}
           alt={i === 0 ? companion.name : ""}
           aria-hidden={i !== 0}
-          className={`${frameClass[i] ?? "companion-seq-0"} absolute inset-0 h-full w-full object-contain drop-shadow-[0_8px_20px_rgba(168,85,247,0.55)]`}
+          className={`${frameClass[i] ?? "companion-seq-0"} absolute inset-0 h-full w-full object-contain`}
+          style={{ filter: `drop-shadow(0 8px 20px ${companion.glow}8c)` }}
           loading="lazy"
         />
       ))}
@@ -47,8 +48,7 @@ export function CompanionRender({ companion }: { companion: CompanionProfile }) 
           aria-hidden
           className="companion-slash-flash pointer-events-none absolute inset-0"
           style={{
-            background:
-              "radial-gradient(circle at 55% 40%, rgba(216,180,254,0.9), rgba(168,85,247,0.4) 30%, transparent 65%)",
+            background: `radial-gradient(circle at 55% 45%, ${companion.glow}e6, ${companion.glow}66 30%, transparent 65%)`,
             mixBlendMode: "screen",
           }}
         />
