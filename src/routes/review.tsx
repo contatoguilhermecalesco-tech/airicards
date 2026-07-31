@@ -99,12 +99,22 @@ function Review() {
   const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
+  const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
 
   function pulseSkin(tone: "hit" | "miss") {
     setSkinFlash(tone);
-    setTimeout(() => setSkinFlash(null), 700);
+    setImpactSeed((n) => n + 1);
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(tone === "hit" ? [12, 40, 18] : [45, 30, 70]);
+      } catch {
+        /* ignore */
+      }
+    }
+    setTimeout(() => setSkinFlash(null), 1100);
   }
+
 
 
 
