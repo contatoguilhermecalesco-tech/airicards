@@ -49,7 +49,7 @@ import princesaAura from "@/assets/shop/princesa/aura.png";
 import princesaFrame from "@/assets/shop/princesa/frame.png";
 import princesaBackground from "@/assets/shop/princesa/background.png";
 import princesaCardframe from "@/assets/shop/princesa/cardframe.png";
-import princesaTableBack from "@/assets/shop/princesa/table-cardback.png";
+import princesaTableBack from "@/assets/shop/princesa/table-ambient.jpg";
 import princesaChama from "@/assets/shop/princesa/chama.png";
 import princesaSelo from "@/assets/shop/princesa/selo.png";
 import princesaAscensao from "@/assets/shop/princesa/ascensao.png";
