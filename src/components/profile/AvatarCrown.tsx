@@ -32,8 +32,8 @@ export const CROWN_ART_BY_KEY: Record<
   },
   "nameplate:coroa_nevoa": {
     art: espiritoCrown,
-    glow: "rgba(96, 165, 250, 0.22)",
-    ring: espiritoFrame,
+    glow: "rgba(143, 199, 245, 0.22)",
+    ring: espiritoRing,
   },
 };
 
