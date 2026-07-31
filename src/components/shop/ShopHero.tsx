@@ -59,40 +59,50 @@ export function ShopHero({
 
   return (
     <section
-      className={`relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 min-h-[520px] sm:min-h-0 ${featured.length > 1 ? "cursor-pointer" : ""}`}
+      className={`relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 bg-[#0a0611] ${featured.length > 1 ? "cursor-pointer" : ""}`}
       onClick={() => featured.length > 1 && advance()}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
     >
 
-      {/* Backdrop — admin splash art if present, else rarity gradient */}
+      {/* Backdrop — admin splash art if present, else rarity gradient.
+          Mobile: splash inteira no topo (aspect 16/9, sem corte).
+          Desktop: splash preenche o hero (16/9) com o texto por cima. */}
       {item.splashUrl ? (
-        <>
+        <div className="relative w-full aspect-[16/9] sm:absolute sm:inset-0 sm:z-0 sm:aspect-auto sm:h-full">
           <img
             aria-hidden
             src={item.splashUrl}
             alt=""
-            className="absolute inset-0 -z-10 h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-center"
           />
-          {/* Mobile: vertical fade so splash shows on top; Desktop: left fade for text legibility */}
+          {/* Mobile: fade curto só na base, para emendar com o bloco de texto */}
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 sm:hidden"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:hidden"
             style={{
               background:
-                "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 35%, rgba(0,0,0,0.75) 70%, rgba(0,0,0,0.92) 100%)",
+                "linear-gradient(180deg, transparent 0%, rgba(10,6,17,0.55) 55%, #0a0611 100%)",
             }}
           />
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 hidden sm:block"
+            className="pointer-events-none absolute inset-0 hidden sm:block"
             style={{
               background:
-                "linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 70%, transparent 100%)",
+                "linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.12) 68%, transparent 100%)",
             }}
           />
-        </>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-1/2 sm:block"
+            style={{
+              background:
+                "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 100%)",
+            }}
+          />
+        </div>
       ) : (
         <>
           <div
@@ -113,14 +123,15 @@ export function ShopHero({
       {/* Grain-ish shimmer */}
       <span
         aria-hidden
-        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 opacity-40"
+        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 z-10 w-1/3 opacity-40"
         style={{
           background:
             "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
         }}
       />
 
-      <div className="grid gap-4 p-4 pt-56 sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8 sm:pt-8">
+      <div className="relative z-10 grid gap-4 p-4 pb-7 sm:aspect-[16/9] sm:max-h-[68vh] sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
+
 
         <div className="min-w-0 self-center">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -207,18 +218,18 @@ export function ShopHero({
           <button
             aria-label="Anterior"
             onClick={(e) => { e.stopPropagation(); setIdx((i) => (i - 1 + featured.length) % featured.length); }}
-            className="absolute left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
+            className="absolute left-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
           </button>
           <button
             aria-label="Próximo"
             onClick={(e) => { e.stopPropagation(); advance(); }}
-            className="absolute right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
+            className="absolute right-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
           >
             <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
           </button>
-          <div className="absolute inset-x-0 bottom-2.5 flex justify-center gap-1.5" onClick={stop}>
+          <div className="absolute inset-x-0 bottom-2.5 z-20 flex justify-center gap-1.5" onClick={stop}>
             {featured.map((_, i) => (
               <button
                 key={i}
