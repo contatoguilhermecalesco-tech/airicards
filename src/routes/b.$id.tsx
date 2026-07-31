@@ -39,7 +39,7 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
   "bundle.nevoa_espiritual": {
     title: "airi — Névoa Espiritual",
     description:
-      "Bundle mítico com aura da névoa, coroa da névoa, santuário espiritual, pétalas espectrais, véu espectral, Espírito das Lâminas e itens de streak, selo, título, vitória e o Altar da Névoa. Confira na loja airi.",
+      "Bundle mítico com aura da névoa, coroa da névoa, santuário espiritual, pétalas espectrais, véu espectral, Lobo Espectral da Névoa e itens de streak, selo, título, vitória e o Altar da Névoa. Confira na loja airi.",
   },
 };
 
