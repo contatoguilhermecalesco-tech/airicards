@@ -50,10 +50,10 @@ const COMPANIONS: Record<string, CompanionProfile> = {
   },
   cordeiro_espiritual: {
     key: "cordeiro_espiritual",
-    name: "Espírito das Lâminas",
+    name: "Lobo Espectral da Névoa",
     src: nevoaIdleUrl,
     glow: "#7dd3fc",
-    tagline: "Alma da névoa que desperta lâminas de gelo.",
+    tagline: "Guardião de gelo que caça com lâminas de cristal.",
     frames: [nevoaIdleUrl, nevoaWakeUrl, nevoaOrbitUrl, nevoaStrikeUrl, nevoaWakeUrl],
     flash: true,
   },
