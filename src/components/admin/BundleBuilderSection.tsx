@@ -219,7 +219,7 @@ export function BundleBuilderSection() {
             const ids = bundleItemIds(b);
             const featuredSlot = slotForBundle.get(b.id);
             const isFeatured = Boolean(featuredSlot);
-            const rarity = RARITY_META[featuredSlot?.rarity_override ?? rarityFor(b.price)];
+            const rarity = RARITY_META[(featuredSlot?.rarity_override as Rarity | undefined) ?? rarityOfItem(b)];
             const splashUrl = featuredSlot?.splash_url ?? getShopAssetOverride(b.id)?.splash ?? getShopAssetOverride(b.id)?.art;
             return (
               <li
