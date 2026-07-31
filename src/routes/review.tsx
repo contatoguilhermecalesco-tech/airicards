@@ -347,8 +347,8 @@ function Review() {
           ? "table-bloom"
           : ""
       }`}
-      key={`shell-${skinFlash ? impactSeed : "idle"}`}
     >
+
 
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
