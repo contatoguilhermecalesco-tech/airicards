@@ -6,6 +6,8 @@ import monarcaFrame from "@/assets/shop/monarca/frame.png";
 import eclipseFrame from "@/assets/shop/eclipse/frame.png";
 import espiritoCrown from "@/assets/shop/espirito/crown.png";
 import espiritoFrame from "@/assets/shop/espirito/frame.png";
+import princesaCrown from "@/assets/shop/princesa/crown.png";
+import princesaFrame from "@/assets/shop/princesa/frame.png";
 
 
 /**
@@ -35,6 +37,11 @@ export const CROWN_ART_BY_KEY: Record<
     art: espiritoCrown,
     glow: "rgba(143, 199, 245, 0.22)",
     ring: espiritoFrame,
+  },
+  "nameplate:coroa_espinho_prata": {
+    art: princesaCrown,
+    glow: "rgba(147, 197, 253, 0.24)",
+    ring: princesaFrame,
   },
 };
 

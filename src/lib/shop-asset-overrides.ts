@@ -46,7 +46,7 @@ import espiritoAscensao from "@/assets/cosmetic-ascensao-espiritual.png";
 import espiritoTitulo from "@/assets/cosmetic-guardia-nevoa.png";
 import princesaSplash from "@/assets/shop/princesa/splash-hero.png";
 import princesaAura from "@/assets/shop/princesa/aura.png";
-import princesaCrown from "@/assets/shop/princesa/crown.png";
+import princesaFrame from "@/assets/shop/princesa/frame.png";
 import princesaBackground from "@/assets/shop/princesa/background.png";
 import princesaCardframe from "@/assets/shop/princesa/cardframe.png";
 import princesaTableBack from "@/assets/shop/princesa/table-cardback.png";
@@ -116,7 +116,7 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   // Master bundle — Princesa Espinho de Prata (Mítico)
   "bundle.princesa_espinho_prata": { splash: princesaSplash, art: princesaAura },
   "cosmetic.aura.espinho_prata": { art: princesaAura },
-  "cosmetic.frame.coroa_espinho_prata": { art: princesaCrown },
+  "cosmetic.frame.coroa_espinho_prata": { art: princesaFrame },
   "cosmetic.effect.capela_vigilia": { art: princesaBackground },
   "cosmetic.veil.veu_espinho_prata": { art: princesaCardframe },
   "cosmetic.table.mesa_vigilia_prateada": { art: princesaTableBack },
@@ -175,7 +175,7 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "victory_splash:ascensao_espiritual": espiritoAscensao,
 
   "decoration:espinho_prata": princesaAura,
-  "nameplate:coroa_espinho_prata": princesaCrown,
+  "nameplate:coroa_espinho_prata": princesaFrame,
   "effect:capela_vigilia": princesaBackground,
   "veil:veu_espinho_prata": princesaCardframe,
   "table:mesa_vigilia_prateada": princesaTableBack,
