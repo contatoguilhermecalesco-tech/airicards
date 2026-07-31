@@ -48,10 +48,10 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
     key: "chama_espiritual",
     name: "Chama Espiritual",
     glyph: "rune",
-    color: "#7dd3fc",
-    accent: "#0c2c66",
-    ring: "border-sky-400/30 bg-gradient-to-b from-sky-500/20 to-black/45 text-sky-100",
-    halo: "radial-gradient(closest-side, rgba(56,189,248,0.36), transparent 70%)",
+    color: "#8fc7f5",
+    accent: "#8e1b2b",
+    ring: "border-sky-300/30 bg-gradient-to-b from-sky-400/18 to-[#2a0410]/60 text-sky-50",
+    halo: "radial-gradient(closest-side, rgba(143,199,245,0.34), rgba(142,27,43,0.22) 55%, transparent 72%)",
   },
 };
 
@@ -85,10 +85,10 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
   selo_espiritual: {
     key: "selo_espiritual",
     name: "Selo Espiritual",
-    color: "#60a5fa",
-    accent: "#0b1c3f",
-    missLabel: "ASSOMBRADO",
-    hitLabel: "ESPÍRITO LIBERTO",
+    color: "#8fc7f5",
+    accent: "#8e1b2b",
+    missLabel: "SELO SANGRADO",
+    hitLabel: "GELO ROMPIDO",
   },
 };
 
@@ -151,9 +151,9 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     key: "ascensao_espiritual",
     name: "Ascensão Espiritual",
     headline: "VITÓRIA",
-    subline: "As lâminas do santuário se curvam a você",
-    color: "#7dd3fc",
-    accent: "#0b1c3f",
+    subline: "O gelo se parte e o sangue da lua reconhece você",
+    color: "#8fc7f5",
+    accent: "#8e1b2b",
   },
 };
 
