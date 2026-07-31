@@ -6,6 +6,8 @@ import monarcaFrame from "@/assets/shop/monarca/frame.png";
 import eclipseFrame from "@/assets/shop/eclipse/frame.png";
 import espiritoCrown from "@/assets/shop/espirito/crown.png";
 import espiritoFrame from "@/assets/shop/espirito/frame.png";
+import princesaCrown from "@/assets/shop/princesa/crown.png";
+import princesaFrame from "@/assets/shop/princesa/frame.png";
 
 
 /**
