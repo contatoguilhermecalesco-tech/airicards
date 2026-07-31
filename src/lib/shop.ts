@@ -43,13 +43,19 @@ export async function listAllShopItems(): Promise<ShopItem[]> {
 
 export async function updateShopItem(
   id: string,
-  patch: Partial<Pick<ShopItem, "active" | "sort_order" | "price" | "name" | "description">>,
+  patch: Partial<
+    Pick<
+      ShopItem,
+      "active" | "sort_order" | "price" | "name" | "description" | "icon" | "accent" | "payload"
+    >
+  >,
 ): Promise<void> {
   const { error } = await supabase
     .from("shop_items")
     .update(patch as never)
     .eq("id", id);
   if (error) throw error;
+
 }
 
 export async function deleteShopItem(id: string): Promise<void> {
@@ -192,17 +198,21 @@ export async function createShopBundle(input: {
   icon?: string;
   accent?: string;
   sort_order?: number;
+  rarity?: string | null;
+  active?: boolean;
 }): Promise<ShopItem> {
+  const payload: Record<string, unknown> = { items: input.items };
+  if (input.rarity) payload.rarity = input.rarity;
   const row = {
     id: input.id,
     kind: "bundle",
     name: input.name,
     description: input.description,
     price: Math.max(0, Math.round(input.price)),
-    payload: { items: input.items },
+    payload,
     icon: input.icon ?? "crown",
     accent: input.accent ?? "lavender",
-    active: true,
+    active: input.active ?? true,
     sort_order: input.sort_order ?? 0,
   };
   const { data, error } = await supabase
@@ -224,6 +234,10 @@ export async function updateShopBundle(
     icon?: string;
     accent?: string;
     active?: boolean;
+    sort_order?: number;
+    rarity?: string | null;
+    /** payload atual, para preservar chaves extras ao regravar */
+    basePayload?: Record<string, unknown>;
   },
 ): Promise<void> {
   const row: Record<string, unknown> = {};
@@ -233,10 +247,46 @@ export async function updateShopBundle(
   if (patch.icon !== undefined) row.icon = patch.icon;
   if (patch.accent !== undefined) row.accent = patch.accent;
   if (patch.active !== undefined) row.active = patch.active;
-  if (patch.items !== undefined) row.payload = { items: patch.items };
+  if (patch.sort_order !== undefined) row.sort_order = patch.sort_order;
+  if (patch.items !== undefined || patch.rarity !== undefined) {
+    const payload: Record<string, unknown> = { ...(patch.basePayload ?? {}) };
+    if (patch.items !== undefined) payload.items = patch.items;
+    if (patch.rarity !== undefined) {
+      if (patch.rarity) payload.rarity = patch.rarity;
+      else delete payload.rarity;
+    }
+    row.payload = payload;
+  }
   const { error } = await supabase.from("shop_items").update(row as never).eq("id", id);
   if (error) throw error;
 }
+
+/**
+ * Admin — edita um item que vive dentro de um bundle (preço, nome, raridade,
+ * quantidade de usos do power-up) preservando o restante do payload.
+ */
+export async function updateBundleChildItem(
+  item: ShopItem,
+  patch: { name?: string; price?: number; rarity?: string | null; uses?: number | null },
+): Promise<void> {
+  const row: Partial<ShopItem> = {};
+  if (patch.name !== undefined) row.name = patch.name;
+  if (patch.price !== undefined) row.price = Math.max(0, Math.round(patch.price));
+  if (patch.rarity !== undefined || patch.uses !== undefined) {
+    const payload: Record<string, unknown> = { ...(item.payload ?? {}) };
+    if (patch.rarity !== undefined) {
+      if (patch.rarity) payload.rarity = patch.rarity;
+      else delete payload.rarity;
+    }
+    if (patch.uses !== undefined) {
+      if (patch.uses && patch.uses > 0) payload.uses = Math.round(patch.uses);
+      else delete payload.uses;
+    }
+    row.payload = payload;
+  }
+  await updateShopItem(item.id, row);
+}
+
 
 export async function buyPublishedDeck(
   profileId: string,

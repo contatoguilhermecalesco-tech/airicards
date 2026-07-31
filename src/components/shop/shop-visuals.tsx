@@ -116,6 +116,22 @@ export const RARITY_ORDER: Rarity[] = [
   "mythic",
 ];
 
+/**
+ * Raridade efetiva de um item da loja: usa o override salvo em
+ * `payload.rarity` (definido no admin) e, na ausência dele, deriva do preço.
+ */
+export function rarityOfItem(item: {
+  price: number;
+  payload?: Record<string, unknown> | null;
+}): Rarity {
+  const raw = item.payload?.rarity;
+  if (typeof raw === "string" && (RARITY_ORDER as string[]).includes(raw)) {
+    return raw as Rarity;
+  }
+  return rarityFor(item.price);
+}
+
+
 /* ---------------------- Icons & accents ---------------------- */
 
 export const ICONS: Record<string, React.ComponentType<LucideProps>> = {

@@ -23,7 +23,7 @@ import { ArlysIcon } from "@/components/StatChip";
 import { slotOf } from "@/lib/wallet-store";
 import { getShopAssetOverride, getEquippedArt } from "@/lib/shop-asset-overrides";
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
-import { RarityChip, rarityFor, RARITY_META, visualFor, DiscordAvatar } from "@/components/shop/shop-visuals";
+import { RarityChip, rarityOfItem, RARITY_META, visualFor, DiscordAvatar } from "@/components/shop/shop-visuals";
 import { getCrownArt, AvatarCrown } from "@/components/profile/AvatarCrown";
 import { getCompanion } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
@@ -170,7 +170,7 @@ export function ItemPreviewModal({
   const slot = resolveSlot(active);
   const key = itemKeyOf(active);
   const walletKey = `${slot}:${key}`;
-  const rarity = rarityFor(item.price);
+  const rarity = rarityOfItem(item);
   const art =
     getShopAssetOverride(active.id)?.art ??
     cosmeticArtFor(active.payload as Record<string, unknown>) ??
