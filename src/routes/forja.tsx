@@ -334,7 +334,7 @@ function ForjaPage() {
         </div>
 
         {stacks.length > 0 && (
-          <div className="mt-3 flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/4 p-1 no-scrollbar">
+          <div className="mt-3 flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(
               [
                 ["todos", `Todos ${stacks.length}`],
