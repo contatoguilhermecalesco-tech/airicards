@@ -166,7 +166,9 @@ export const ACCENTS: Record<string, string> = {
   lavender: "from-indigo-400/20 to-violet-500/10 text-indigo-200 border-indigo-400/30",
   crimson: "from-rose-400/20 to-red-600/10 text-rose-200 border-rose-400/30",
   azure: "from-sky-400/20 to-blue-600/10 text-sky-200 border-sky-400/30",
+  cyan: "from-cyan-400/20 to-teal-500/10 text-cyan-200 border-cyan-400/30",
 };
+
 
 /* ---------------------- Cosmetic slots & profile preview ---------------------- */
 
