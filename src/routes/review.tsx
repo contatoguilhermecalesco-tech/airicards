@@ -33,8 +33,8 @@ import { TableSkinImpact } from "@/components/review/TableSkinImpact";
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
 import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
-import { rollLuminho, type LuminhoDrop } from "@/lib/relic-hunt";
-import { LuminhoDropToast } from "@/components/hunt/LuminhoDropToast";
+import { rollShard, type ShardDrop } from "@/lib/relic-hunt";
+import { ShardDropToast } from "@/components/hunt/ShardDropToast";
 
 
 
@@ -105,8 +105,8 @@ function Review() {
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
-  // Caça aos Luminhos — drop aleatório ao acertar.
-  const [luminho, setLuminho] = useState<(LuminhoDrop & { id: number }) | null>(null);
+  // Caça aos Fragmentos — drop aleatório ao acertar.
+  const [luminho, setLuminho] = useState<(ShardDrop & { uid: number }) | null>(null);
   const luminhoIdRef = useRef(0);
 
   function pulseSkin(tone: "hit" | "miss") {
@@ -230,11 +230,12 @@ function Review() {
       setAskDifficulty(true);
       setRunStreak((n) => n + 1);
       pulseSkin("hit");
-      const drop = rollLuminho({
+      void rollShard({
         runStreak: runStreak + 1,
         isEnemy: isEnemy(current) && !isDefeated(current),
+      }).then((drop) => {
+        if (drop) setLuminho({ ...drop, uid: ++luminhoIdRef.current });
       });
-      if (drop) setLuminho({ ...drop, id: ++luminhoIdRef.current });
       if (isEnemyRun && isEnemy(current)) {
         bumpCombo();
         onComboReached(getComboCount());
@@ -410,10 +411,10 @@ function Review() {
         <EnemySealStamp theme={enemySeal} tone={skinFlash} />
       )}
 
-      {/* Caça aos Luminhos */}
+      {/* Caça aos Fragmentos */}
       {luminho && (
-        <LuminhoDropToast
-          key={luminho.id}
+        <ShardDropToast
+          key={luminho.uid}
           drop={luminho}
           onDone={() => setLuminho(null)}
         />
