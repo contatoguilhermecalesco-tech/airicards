@@ -69,7 +69,7 @@ import marioneteAscensao from "@/assets/shop/marionete/ascensao.png";
 
 import piscinaSplash from "@/assets/shop/piscina/splash-hero.jpg";
 import piscinaAura from "@/assets/shop/piscina/aura.png";
-import piscinaFrame from "@/assets/shop/piscina/frame.png";
+import piscinaFrame from "@/assets/shop/piscina/ring.png";
 import piscinaTableAmbient from "@/assets/shop/piscina/table-ambient.jpg";
 import piscinaTableFrame from "@/assets/shop/piscina/table-frame.png";
 import piscinaTableBack from "@/assets/shop/piscina/table-cardback.png";
