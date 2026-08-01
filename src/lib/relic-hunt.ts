@@ -53,8 +53,11 @@ export type HuntState = {
   variants: Record<string, ForgeVariant>;
   /** Arlys já sacados por dissolução nesta semana (teto anti-inflação). */
   dissolveWeek: { week: string; arlys: number };
+  /** Controle de drops do dia (teto diário + intervalo entre quedas). */
+  dropDay: { day: string; count: number; lastAt: number };
   log: ForgeLogEntry[];
 };
+
 
 const META_KEY = "relicHunt";
 
@@ -77,6 +80,12 @@ export const DISSOLVE_WEEKLY_CAP = 300;
 /** Chance de forja crítica (variante áurea) e de variante platina. */
 export const CRIT_FORGE_CHANCE = 0.14;
 export const PLATINA_FORGE_CHANCE = 0.04;
+/** Máximo de fragmentos que podem cair por dia. */
+export const DROP_DAILY_CAP = 3;
+/** Intervalo mínimo entre dois fragmentos (min). */
+export const DROP_COOLDOWN_MIN = 12;
+/** Chance base de drop por acerto. */
+export const DROP_BASE_CHANCE = 0.045;
 
 export const VARIANT_META: Record<ForgeVariant, { label: string; color: string }> = {
   aurea: { label: "Áurea", color: "#f3c969" },
@@ -118,6 +127,12 @@ function weekKey(d = new Date()): string {
   ).padStart(2, "0")}`;
 }
 
+function dayKey(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
+}
+
 const EMPTY: HuntState = {
   shards: [],
   forged: 0,
@@ -125,8 +140,10 @@ const EMPTY: HuntState = {
   rerolls: { week: weekKey(), used: 0 },
   variants: {},
   dissolveWeek: { week: weekKey(), arlys: 0 },
+  dropDay: { day: dayKey(), count: 0, lastAt: 0 },
   log: [],
 };
+
 
 
 function tierFor(price: number): ShardTier {
@@ -176,6 +193,14 @@ function normalize(raw: Partial<HuntState> | undefined): HuntState {
             arlys: Math.max(0, Math.floor(raw.dissolveWeek.arlys ?? 0)),
           }
         : { week: currentWeek, arlys: 0 },
+    dropDay:
+      raw.dropDay && raw.dropDay.day === dayKey()
+        ? {
+            day: dayKey(),
+            count: Math.max(0, Math.floor(raw.dropDay.count ?? 0)),
+            lastAt: Number(raw.dropDay.lastAt ?? 0),
+          }
+        : { day: dayKey(), count: 0, lastAt: 0 },
     log: Array.isArray(raw.log) ? raw.log.slice(0, 30) : [],
 
   };
@@ -384,9 +409,9 @@ async function candidatePool(exclude?: string): Promise<Candidate[]> {
 
 function weightedPick(pool: Candidate[]): Candidate | null {
   if (pool.length === 0) return null;
-  // Itens mais caros são mais raros de cair.
+  // Itens mais caros são bem mais raros de cair.
   const weights = pool.map((c) =>
-    c.tier === "mitico" ? 1 : c.tier === "epico" ? 2 : c.tier === "raro" ? 4 : 6,
+    c.tier === "mitico" ? 1 : c.tier === "epico" ? 3 : c.tier === "raro" ? 8 : 16,
   );
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -405,9 +430,23 @@ function makeShard(pick: Candidate): Shard {
   };
 }
 
+/** Fragmentos que ainda podem cair hoje. */
+export function dropsLeftToday(s: HuntState = state): number {
+  const used = s.dropDay?.day === dayKey() ? s.dropDay.count : 0;
+  return Math.max(0, DROP_DAILY_CAP - used);
+}
+
+/** Minutos restantes de espera até o próximo fragmento poder cair. */
+export function dropCooldownLeft(s: HuntState = state, now = Date.now()): number {
+  const last = s.dropDay?.day === dayKey() ? (s.dropDay.lastAt ?? 0) : 0;
+  if (!last) return 0;
+  const passed = (now - last) / 60_000;
+  return Math.max(0, Math.ceil(DROP_COOLDOWN_MIN - passed));
+}
+
 /**
- * Sorteia um fragmento após um acerto. Streak da sessão e cartas inimigas
- * aumentam levemente a chance — esforço vira sorte, sem virar obrigação.
+ * Sorteia um fragmento após um acerto. Chance baixa por acerto, com teto
+ * diário e intervalo mínimo entre quedas — esforço vira sorte, sem inflação.
  */
 export async function rollShard(opts: {
   runStreak: number;
@@ -415,10 +454,13 @@ export async function rollShard(opts: {
 }): Promise<ShardDrop | null> {
   // Inventário cheio: nada cai até você forjar, fundir ou dissolver.
   if (shardSlotsLeft() <= 0) return null;
-  const base = 0.09;
-  const streakBonus = Math.min(0.08, opts.runStreak * 0.01);
-  const enemyBonus = opts.isEnemy ? 0.05 : 0;
-  if (Math.random() > base + streakBonus + enemyBonus) return null;
+  // Teto diário e intervalo mínimo entre fragmentos.
+  if (dropsLeftToday() <= 0) return null;
+  if (dropCooldownLeft() > 0) return null;
+
+  const streakBonus = Math.min(0.03, Math.floor(opts.runStreak / 5) * 0.01);
+  const enemyBonus = opts.isEnemy ? 0.015 : 0;
+  if (Math.random() > DROP_BASE_CHANCE + streakBonus + enemyBonus) return null;
 
   const pick = weightedPick(await candidatePool());
   if (!pick) return null;
@@ -426,6 +468,8 @@ export async function rollShard(opts: {
   const shard = makeShard(pick);
   state.shards = [shard, ...state.shards].slice(0, SHARD_CAP);
   state.lifetime += 1;
+  const prev = state.dropDay?.day === dayKey() ? state.dropDay.count : 0;
+  state.dropDay = { day: dayKey(), count: prev + 1, lastAt: shard.at };
   pushLog({
     at: shard.at,
     tone: "drop",

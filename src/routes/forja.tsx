@@ -36,6 +36,9 @@ import {
   FORGE_ARLYS_COST,
   REROLL_WEEKLY_LIMIT,
   SHARD_CAP,
+  DROP_DAILY_CAP,
+  DROP_COOLDOWN_MIN,
+  dropsLeftToday,
   FUSION_INPUT,
   DISSOLVE_WEEKLY_CAP,
   CRIT_FORGE_CHANCE,
@@ -358,6 +361,7 @@ function ForjaPage() {
                 </span>
               </span>
               <span className="text-muted-foreground">
+                Quedas hoje: {DROP_DAILY_CAP - dropsLeftToday(hunt)}/{DROP_DAILY_CAP} ·
                 Saque semanal: {cashLeft}/{DISSOLVE_WEEKLY_CAP} ✦
               </span>
             </div>
@@ -948,9 +952,11 @@ function HelpModal({ onClose }: { onClose: () => void }) {
             você escolher.
           </HelpItem>
           <HelpItem n={6} title="Bancada limitada e brilho">
-            A bancada guarda até {SHARD_CAP} fragmentos — cheia, nada novo cai. Fragmentos
-            parados mais de 2 semanas perdem brilho e valem menos ao dissolver, e o saque
-            por dissolução tem teto de {DISSOLVE_WEEKLY_CAP} ✦ por semana.
+            A bancada guarda até {SHARD_CAP} fragmentos — cheia, nada novo cai. Os drops são
+            raros: no máximo {DROP_DAILY_CAP} fragmentos por dia, com pelo menos{" "}
+            {DROP_COOLDOWN_MIN} min entre um e outro. Fragmentos parados mais de 2 semanas
+            perdem brilho e valem menos ao dissolver, e o saque por dissolução tem teto de{" "}
+            {DISSOLVE_WEEKLY_CAP} ✦ por semana.
           </HelpItem>
           <HelpItem n={7} title="Não gostou? Troque ou dissolva">
             Trocar transforma o fragmento em outro cosmético — você tem{" "}
