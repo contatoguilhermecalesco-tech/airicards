@@ -67,6 +67,20 @@ import marioneteChama from "@/assets/shop/marionete/chama.png";
 import marioneteSelo from "@/assets/shop/marionete/selo.png";
 import marioneteAscensao from "@/assets/shop/marionete/ascensao.png";
 
+import piscinaSplash from "@/assets/shop/piscina/splash-hero.jpg";
+import piscinaAura from "@/assets/shop/piscina/aura.png";
+import piscinaFrame from "@/assets/shop/piscina/frame.png";
+import piscinaCardframe from "@/assets/shop/piscina/cardframe.png";
+import piscinaTableAmbient from "@/assets/shop/piscina/table-ambient.jpg";
+import piscinaTableFrame from "@/assets/shop/piscina/table-frame.png";
+import piscinaTableBack from "@/assets/shop/piscina/table-cardback.png";
+import piscinaChama from "@/assets/shop/piscina/chama.png";
+import piscinaSelo from "@/assets/shop/piscina/selo.png";
+import piscinaAscensao from "@/assets/shop/piscina/ascensao.png";
+
+
+
+
 
 
 
