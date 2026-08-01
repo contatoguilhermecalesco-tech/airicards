@@ -528,7 +528,15 @@ const POWERUP_PALETTE: Record<
     spark: "#d1fae5",
     tag: "Verdejante",
   },
+  cyan: {
+    base: "radial-gradient(120% 100% at 20% 15%, #22d3ee 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #155e75 0%, transparent 60%), linear-gradient(160deg,#083344 0%,#022c36 100%)",
+    halo: "rgba(34,211,238,0.55)",
+    ring: "#67e8f9",
+    spark: "#cffafe",
+    tag: "Oceano",
+  },
 };
+
 
 export function powerupPalette(accent: string) {
   return POWERUP_PALETTE[accent] ?? POWERUP_PALETTE.violet;
