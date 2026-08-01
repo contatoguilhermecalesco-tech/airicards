@@ -235,7 +235,7 @@ function SmallAction({
   );
 }
 
-/** Card compacto usado nas prateleiras horizontais. */
+/** Card compacto usado na visão em grade. */
 export function ShardTile({
   stack: st,
   crystals,
@@ -250,7 +250,7 @@ export function ShardTile({
 
   return (
     <div
-      className="relative w-[172px] shrink-0 snap-start overflow-hidden rounded-2xl border p-3 transition"
+      className="relative w-full overflow-hidden rounded-2xl border p-3 transition"
       style={{
         borderColor: st.ready ? `${tier.color}70` : `${tier.color}26`,
         background: st.ready
@@ -258,6 +258,7 @@ export function ShardTile({
           : "linear-gradient(160deg, rgba(22,13,36,0.85), rgba(12,7,22,0.92))",
       }}
     >
+
       <span
         className="relative mx-auto grid h-[104px] w-full place-items-center rounded-xl border"
         style={{
