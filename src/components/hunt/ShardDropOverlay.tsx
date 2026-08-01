@@ -1,7 +1,6 @@
 // Pop-up de drop — aviso discreto no topo durante a revisão.
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Check, X, Sparkles } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import {
   TIER_META,
   SLOT_LABEL,
@@ -20,11 +19,10 @@ export function ShardDropOverlay({
 }) {
   const tier = TIER_META[drop.tier];
   const [count] = useState(() => Math.min(SHARDS_PER_FORGE, shardCountFor(drop.key)));
-  const missing = Math.max(0, SHARDS_PER_FORGE - count);
   const art = getEquippedArt(drop.key);
 
   useEffect(() => {
-    const t = setTimeout(onClose, 5200);
+    const t = setTimeout(onClose, 2200);
     return () => clearTimeout(t);
   }, [onClose]);
 
@@ -93,44 +91,14 @@ export function ShardDropOverlay({
           </p>
         </div>
 
-        {/* Progresso compacto */}
-        <div className="flex shrink-0 gap-1">
-          {Array.from({ length: SHARDS_PER_FORGE }).map((_, i) => (
-            <span
-              key={i}
-              className="grid h-6 w-6 place-items-center rounded-md border text-[10px]"
-              style={{
-                borderColor: i < count ? tier.color : "rgba(255,255,255,0.12)",
-                background: i < count ? `${tier.color}22` : "transparent",
-                color: i < count ? tier.color : "rgba(255,255,255,0.35)",
-              }}
-            >
-              {i < count ? <Check className="h-3 w-3" /> : i + 1}
-            </span>
-          ))}
-        </div>
-
-        {/* Ações */}
-        <div className="flex shrink-0 flex-col gap-1.5">
-          <Link
-            to="/forja"
-            className="grid h-7 place-items-center rounded-lg px-2.5 text-[10px] font-bold"
-            style={{
-              background: `linear-gradient(120deg, ${tier.color}, ${tier.color}aa)`,
-              color: "#170c26",
-            }}
-          >
-            Forja
-          </Link>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Fechar"
-            className="grid h-6 w-6 place-items-center self-center rounded-full border border-white/10 text-muted-foreground transition hover:text-foreground"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Fechar"
+          className="grid h-7 w-7 shrink-0 place-items-center self-center rounded-full border border-white/10 text-muted-foreground transition hover:text-foreground"
+        >
+          <X className="h-3 w-3" />
+        </button>
       </div>
     </div>
   );
