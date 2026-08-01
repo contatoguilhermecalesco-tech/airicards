@@ -366,10 +366,39 @@ function ForjaPage() {
           <h2 className="flex items-center gap-2 text-sm font-bold tracking-tight">
             <Gem className="h-4 w-4 text-muted-foreground" /> Inventário de fragmentos
           </h2>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
-            <Shuffle className="h-3 w-3" />
-            {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
+              <Shuffle className="h-3 w-3" />
+              {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
+            </span>
+            <div
+              role="group"
+              aria-label="Modo de visualização"
+              className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1"
+            >
+              {(
+                [
+                  ["grade", "Grade", LayoutGrid],
+                  ["prateleira", "Prateleira", Rows3],
+                ] as [View, string, typeof LayoutGrid][]
+              ).map(([id, label, Icon]) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={view === id}
+                  onClick={() => pickView(id)}
+                  className={`tap-target inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition ${
+                    view === id
+                      ? "bg-primary/22 text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {stacks.length > 0 && (
