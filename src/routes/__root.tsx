@@ -810,7 +810,7 @@ function RootComponent() {
           </Suspense>
         </div>
       </ProfileGate>
-
+      <Toaster />
     </QueryClientProvider>
   );
 }
