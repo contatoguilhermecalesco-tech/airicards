@@ -4,6 +4,8 @@ import florescerSplash from "@/assets/shop/florescer/splash-hero.jpg";
 import monarcaSplash from "@/assets/shop/monarca/splash-hero.jpg";
 import eclipseSplash from "@/assets/shop/eclipse/splash-hero.jpg";
 import espiritoSplash from "@/assets/shop/espirito/splash-hero.jpg";
+import piscinaSplash from "@/assets/shop/piscina/splash-hero.jpg";
+
 
 // Absolute base used to build og:image URLs so WhatsApp / social scrapers
 // can fetch the preview image without JS.
