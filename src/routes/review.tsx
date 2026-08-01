@@ -410,6 +410,15 @@ function Review() {
         <EnemySealStamp theme={enemySeal} tone={skinFlash} />
       )}
 
+      {/* Caça aos Luminhos */}
+      {luminho && (
+        <LuminhoDropToast
+          key={luminho.id}
+          drop={luminho}
+          onDone={() => setLuminho(null)}
+        />
+      )}
+
 
       {/* Hit flash on wrong answer */}
       {hitFlash && (
