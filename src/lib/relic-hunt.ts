@@ -451,9 +451,10 @@ export async function dissolveAll(key: string): Promise<number> {
 
 /** Limpa fragmentos de cosméticos que o perfil já possui (comprou na loja). */
 export function pruneOwnedShards() {
-  const owned = new Set(getWallet().cosmetics);
+  const owned = ownedKeys();
   const before = state.shards.length;
-  state.shards = state.shards.filter((s) => !owned.has(s.key));
+  state.shards = state.shards.filter((s) => !isOwnedKey(s.key, owned));
+
   if (state.shards.length !== before) {
     emit();
     persist();
