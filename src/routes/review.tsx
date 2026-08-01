@@ -34,7 +34,7 @@ import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/Tabl
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
 import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
 import { rollShard, type ShardDrop } from "@/lib/relic-hunt";
-import { ShardDropToast } from "@/components/hunt/ShardDropToast";
+import { ShardDropOverlay } from "@/components/hunt/ShardDropOverlay";
 
 
 
@@ -413,10 +413,10 @@ function Review() {
 
       {/* Caça aos Fragmentos */}
       {luminho && (
-        <ShardDropToast
+        <ShardDropOverlay
           key={luminho.uid}
           drop={luminho}
-          onDone={() => setLuminho(null)}
+          onClose={() => setLuminho(null)}
         />
       )}
 
