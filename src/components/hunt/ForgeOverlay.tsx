@@ -53,7 +53,14 @@ export function ForgeOverlay({
           className={revealed ? "relic-burst" : "relic-shake"}
           style={{ filter: `drop-shadow(0 0 40px ${tier.color})` }}
         >
-          <ShardIcon accent={stack.accent} tier={tier.color} size={132} />
+          <ShardArt
+            cosmeticKey={stack.key}
+            accent={stack.accent}
+            tierColor={tier.color}
+            size={132}
+            complete
+          />
+
         </div>
 
         <p
