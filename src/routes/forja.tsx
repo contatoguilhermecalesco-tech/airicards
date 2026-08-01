@@ -685,3 +685,133 @@ function StatBox({
     </div>
   );
 }
+
+type ForgeLog = ReturnType<typeof useHunt>["log"];
+
+function HistoryModal({
+  log,
+  myId,
+  onClose,
+}: {
+  log: ForgeLog;
+  myId: string | undefined;
+  onClose: () => void;
+}) {
+  const [tab, setTab] = useState<"forja" | "trocas">("forja");
+  return (
+    <div
+      className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Histórico da forja"
+    >
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+      />
+      <div
+        className="relative max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-white/12 p-5 sm:rounded-3xl sm:p-6"
+        style={{
+          background:
+            "radial-gradient(110% 70% at 50% 0%, rgba(167,139,250,0.16), transparent 62%), linear-gradient(165deg, rgba(24,14,40,0.98), rgba(11,6,20,0.99))",
+        }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-primary">
+              Registro
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-tight">Histórico</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/6 text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mt-4 flex gap-1.5 rounded-2xl border border-white/8 bg-white/4 p-1">
+          {(
+            [
+              ["forja", "Forja"],
+              ["trocas", "Trocas"],
+            ] as ["forja" | "trocas", string][]
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className={`tap-target flex-1 rounded-xl px-3 py-2 text-[12.5px] font-semibold transition ${
+                tab === id
+                  ? "bg-primary/22 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4">
+          {tab === "trocas" ? (
+            <ShardGiftsPanel myId={myId} />
+          ) : log.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground">Nada por aqui ainda.</p>
+          ) : (
+            <ul className="divide-y divide-white/6">
+              {log.map((e, i) => {
+                const Icon =
+                  e.tone === "forge"
+                    ? Hammer
+                    : e.tone === "dissolve"
+                      ? Coins
+                      : e.tone === "reroll"
+                        ? Shuffle
+                        : Sparkles;
+                const accent =
+                  e.tone === "forge"
+                    ? "#fbbf24"
+                    : e.tone === "dissolve"
+                      ? "#7dd3fc"
+                      : e.tone === "reroll"
+                        ? "#34d399"
+                        : "#d8b4fe";
+                return (
+                  <li key={`${e.at}-${i}`} className="flex items-center gap-3 py-3">
+                    <span
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+                      style={{
+                        background: `${accent}1f`,
+                        border: `1px solid ${accent}33`,
+                      }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: accent }} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-semibold">
+                        {e.label}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {e.detail}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {new Date(e.at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                      })}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
