@@ -14,6 +14,11 @@ import princesaTableFrame from "@/assets/shop/princesa/table-frame.png";
 import princesaCrest from "@/assets/shop/princesa/table-cardback.png";
 import princesaFrost from "@/assets/shop/princesa/frost-overlay.png";
 
+import marioneteAmbient from "@/assets/shop/marionete/table-ambient.jpg";
+import marioneteTableFrame from "@/assets/shop/marionete/table-frame.png";
+import marioneteCrest from "@/assets/shop/marionete/table-cardback.png";
+import marionetePetals from "@/assets/shop/marionete/petals-overlay.png";
+
 
 
 export type TableSkin = {
@@ -94,6 +99,20 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     glow: "rgba(120, 185, 255, 0.55)",
     hit: "#dff1ff",
     miss: "#3f7fd6",
+  },
+  "table:mesa_marionetes": {
+    id: "mesa_marionetes",
+    key: "table:mesa_marionetes",
+    name: "Mesa da Corte das Marionetes",
+    tagline: "O palco gótico do teatro eterno: cortinas de veludo rubro, máscaras de porcelana e pétalas que caem como fios.",
+    ambient: marioneteAmbient,
+    frame: marioneteTableFrame,
+    crest: marioneteCrest,
+    particles: marionetePetals,
+    accent: "#d9445f",
+    glow: "rgba(185, 28, 60, 0.45)",
+    hit: "#ff8aa0",
+    miss: "#7a1329",
   },
 };
 

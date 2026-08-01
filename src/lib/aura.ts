@@ -57,6 +57,9 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
 
   // Princesa Espinho de Prata — safira glacial e prata ritual
   espinho_prata: { ring: "#7db8ff", secondary: "#dbe9ff", kind: "crystal", speed: "slow" },
+
+  // Corte das Marionetes — carmim e porcelana
+  corte_marionetes: { ring: "#d9445f", secondary: "#f8e8ec", kind: "dual", speed: "slow" },
 };
 
 export const AURA_RING: Record<string, string> = Object.fromEntries(
