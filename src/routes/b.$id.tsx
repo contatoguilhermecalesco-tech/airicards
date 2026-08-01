@@ -20,6 +20,7 @@ const BUNDLE_SPLASH: Record<string, string> = {
   "bundle.monarca_sombras": monarcaSplash,
   "bundle.eclipse_carmesim": eclipseSplash,
   "bundle.nevoa_espiritual": espiritoSplash,
+  "bundle.piscina_infinita": piscinaSplash,
 };
 
 const BUNDLE_META: Record<string, { title: string; description: string }> = {
@@ -43,7 +44,13 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
     description:
       "Bundle mítico com aura da névoa, coroa da névoa, santuário espiritual, pétalas espectrais, véu espectral, Lobo Espectral da Névoa e itens de streak, selo, título, vitória e o Altar da Névoa. Confira na loja airi.",
   },
+  "bundle.piscina_infinita": {
+    title: "airi — Piscina Infinita",
+    description:
+      "Bundle épico de verão com aura azul-piscina, coroa dourada de piscina, véu com boia e peixe bôbo, mesa da piscina, chama tropical, selo solar e splash de verão. Confira na loja airi.",
+  },
 };
+
 
 // Fallback splash usada quando um bundle ainda não tem arte curada mapeada —
 // garante que o WhatsApp sempre mostre uma splash art e nunca o ícone do site.
