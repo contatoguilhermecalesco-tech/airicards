@@ -218,39 +218,33 @@ function ForjaPage() {
         </button>
       </div>
 
-      {/* ---- Cofre de espólios ---- */}
-      <section
-        className="loot-clip relative overflow-hidden border"
-        style={{
-          borderColor: "rgba(200,170,110,0.34)",
-          background:
-            "radial-gradient(120% 100% at 50% -20%, rgba(200,170,110,0.16), transparent 62%), linear-gradient(170deg, rgba(12,17,26,0.96), rgba(4,6,11,0.98))",
-        }}
-      >
-        <span aria-hidden className="loot-hexgrid absolute inset-0 opacity-60" />
+      {/* ---- Cabeçalho da Forja ---- */}
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-surface/60 backdrop-blur-2xl">
         <span
           aria-hidden
-          className="absolute inset-x-0 top-0 h-[2px]"
+          className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, transparent, rgba(200,170,110,0.9), transparent)",
+              "radial-gradient(110% 90% at 50% -25%, hsl(var(--primary)/0.20), transparent 65%)",
+          }}
+        />
+        <span
+          aria-hidden
+          className="absolute inset-x-6 top-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, hsl(var(--primary)/0.55), transparent)",
           }}
         />
 
         <div className="relative p-5 sm:p-6">
           <div className="flex items-start gap-3.5">
-            <span
-              className="loot-clip-sm grid h-12 w-12 shrink-0 place-items-center border sm:h-14 sm:w-14"
-              style={{
-                borderColor: "rgba(200,170,110,0.55)",
-                background: "rgba(200,170,110,0.12)",
-              }}
-            >
-              <Hammer className="h-6 w-6" style={{ color: "#f0e6d2" }} />
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/25 bg-primary/12 sm:h-14 sm:w-14">
+              <Hammer className="h-6 w-6 text-primary" />
             </span>
             <div className="min-w-0">
-              <p className="loot-label" style={{ color: "#c8aa6e" }}>
-                Cofre de espólios
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">
+                Forja
               </p>
               <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
                 Forja de Fragmentos
@@ -262,9 +256,7 @@ function ForjaPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-4"
-            style={{ borderColor: "rgba(200,170,110,0.22)", background: "rgba(200,170,110,0.18)" }}
-          >
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <VaultStat label="Fragmentos" value={hunt.shards.length} icon={Gem} />
             <VaultStat label="Prontos" value={ready} icon={Hammer} highlight={ready > 0} />
             <VaultStat label="Forjados" value={hunt.forged} icon={Flame} />
@@ -275,16 +267,11 @@ function ForjaPage() {
             <button
               type="button"
               onClick={() => setFilter("prontos")}
-              className="tap-target loot-clip-sm mt-3 flex w-full items-center gap-3 border px-4 py-3 text-left transition hover:brightness-110"
-              style={{
-                borderColor: "rgba(200,170,110,0.6)",
-                background:
-                  "linear-gradient(90deg, rgba(200,170,110,0.20), rgba(200,170,110,0.05))",
-              }}
+              className="tap-target mt-3 flex w-full items-center gap-3 rounded-2xl border border-primary/30 bg-primary/12 px-4 py-3 text-left transition hover:bg-primary/18"
             >
-              <Hammer className="h-4 w-4 shrink-0" style={{ color: "#f0e6d2" }} />
+              <Hammer className="h-4 w-4 shrink-0 text-primary" />
               <span className="min-w-0 flex-1">
-                <span className="block loot-label" style={{ color: "#f0e6d2" }}>
+                <span className="block text-[13px] font-semibold tracking-tight">
                   {ready} conjunto{ready > 1 ? "s" : ""} pronto{ready > 1 ? "s" : ""} para
                   forjar
                 </span>
@@ -295,39 +282,27 @@ function ForjaPage() {
                     .join(" · ")}
                 </span>
               </span>
-              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: "#c8aa6e" }} />
+              <ChevronRight className="h-4 w-4 shrink-0 text-primary/80" />
             </button>
           )}
         </div>
       </section>
 
-
       {/* ---- Inventário ---- */}
       <section className="mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 loot-label" style={{ color: "#c8aa6e" }}>
-            <Gem className="h-4 w-4" /> Inventário de espólios
+          <h2 className="flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            <Gem className="h-4 w-4 text-primary/80" /> Inventário
           </h2>
           <div className="flex flex-wrap items-center gap-2">
-            <span
-              className="loot-clip-sm inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-[11px] text-muted-foreground"
-              style={{
-                borderColor: "rgba(200,170,110,0.22)",
-                background: "rgba(200,170,110,0.06)",
-              }}
-            >
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1.5 text-[11px] text-muted-foreground">
               <Shuffle className="h-3 w-3" />
               {left}/{REROLL_WEEKLY_LIMIT} trocas
             </span>
             <button
               type="button"
               onClick={() => setHistoryOpen(true)}
-              className="tap-target loot-clip-sm inline-flex h-9 items-center gap-1.5 border px-3 loot-label transition hover:brightness-125"
-              style={{
-                borderColor: "rgba(200,170,110,0.35)",
-                background: "rgba(200,170,110,0.10)",
-                color: "#f0e6d2",
-              }}
+              className="tap-target inline-flex h-9 items-center gap-1.5 rounded-full border border-white/10 bg-white/6 px-3 text-[12px] font-semibold text-foreground/85 transition hover:bg-white/10"
             >
               <History className="h-3.5 w-3.5" strokeWidth={2.4} />
               Histórico
@@ -335,11 +310,7 @@ function ForjaPage() {
             <div
               role="group"
               aria-label="Modo de visualização"
-              className="flex items-center gap-0.5 border p-1"
-              style={{
-                borderColor: "rgba(200,170,110,0.22)",
-                background: "rgba(6,9,15,0.7)",
-              }}
+              className="flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5 p-1"
             >
               {VIEWS.map(([id, label, Icon]) => (
                 <button
@@ -349,12 +320,11 @@ function ForjaPage() {
                   aria-label={label}
                   title={label}
                   onClick={() => pickView(id)}
-                  className="grid h-8 w-8 place-items-center transition"
-                  style={
+                  className={`grid h-8 w-8 place-items-center rounded-full transition ${
                     view === id
-                      ? { background: "rgba(200,170,110,0.85)", color: "#0a0c12" }
-                      : { color: "rgba(240,230,210,0.55)" }
-                  }
+                      ? "bg-primary text-primary-foreground shadow-[0_6px_16px_-8px_hsl(var(--primary)/0.9)]"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   <Icon className="h-4 w-4" strokeWidth={2.25} />
                 </button>
@@ -363,12 +333,8 @@ function ForjaPage() {
           </div>
         </div>
 
-
         {stacks.length > 0 && (
-          <div
-            className="mt-3 flex border-b"
-            style={{ borderColor: "rgba(200,170,110,0.25)" }}
-          >
+          <div className="mt-3 flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {(
               [
                 ["todos", `Todos ${stacks.length}`],
@@ -380,23 +346,18 @@ function ForjaPage() {
                 key={id}
                 type="button"
                 onClick={() => setFilter(id)}
-                className="tap-target flex-1 px-3 py-2.5 loot-label transition"
-                style={
+                className={`tap-target flex-1 whitespace-nowrap rounded-full px-3 py-2 text-[12.5px] font-semibold transition ${
                   filter === id
-                    ? {
-                        color: "#f0e6d2",
-                        borderBottom: "2px solid #c8aa6e",
-                        background:
-                          "linear-gradient(180deg, transparent, rgba(200,170,110,0.12))",
-                      }
-                    : { color: "rgba(240,230,210,0.5)", borderBottom: "2px solid transparent" }
-                }
+                    ? "bg-primary/18 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {label}
               </button>
             ))}
           </div>
         )}
+
 
 
         {stacks.length === 0 ? (
@@ -606,22 +567,27 @@ function VaultStat({
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   highlight?: boolean;
 }) {
-  const color = highlight ? "#f0e6d2" : "#c8aa6e";
   return (
     <div
-      className="flex items-center gap-2.5 px-3 py-2.5"
-      style={{ background: "rgba(6,9,15,0.92)" }}
+      className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 ${
+        highlight
+          ? "border-primary/30 bg-primary/12"
+          : "border-white/8 bg-white/[0.04]"
+      }`}
     >
-      <Icon className="h-4 w-4 shrink-0" style={{ color }} />
+      <Icon className={`h-4 w-4 shrink-0 ${highlight ? "text-primary" : "text-muted-foreground"}`} />
       <div className="min-w-0">
-        <p className="text-[15px] font-bold tabular-nums" style={{ color }}>
+        <p className={`text-[15px] font-bold tabular-nums ${highlight ? "text-primary" : "text-foreground"}`}>
           {value}
         </p>
-        <p className="loot-label truncate text-muted-foreground">{label}</p>
+        <p className="truncate text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+          {label}
+        </p>
       </div>
     </div>
   );
 }
+
 
 type ForgeLog = ReturnType<typeof useHunt>["log"];
 
