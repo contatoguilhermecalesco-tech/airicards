@@ -127,7 +127,7 @@ export function ChangelogSection() {
         resetForm();
         setOk("Novidade publicada.");
       }
-      setTimeout(() => setOk(null), 3000);
+      setTimeout(() => setOk(null), 2000);
     } catch (e) {
       setErr((e as Error).message);
     } finally {

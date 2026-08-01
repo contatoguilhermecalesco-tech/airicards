@@ -10,7 +10,7 @@ export function ShardDropToast({
   onDone: () => void;
 }) {
   useEffect(() => {
-    const t = setTimeout(onDone, 3200);
+    const t = setTimeout(onDone, 2000);
     return () => clearTimeout(t);
   }, [onDone, drop]);
 

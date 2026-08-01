@@ -349,7 +349,7 @@ function PerfilPage() {
       setTimeout(() => setFlash(null), 1600);
     } catch (err) {
       setFlash(err instanceof Error ? err.message : "Não foi possível ler a imagem.");
-      setTimeout(() => setFlash(null), 2200);
+      setTimeout(() => setFlash(null), 2000);
     } finally {
       setUploadingAvatar(false);
     }

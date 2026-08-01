@@ -90,7 +90,7 @@ export function NotificationsSection() {
       setActionLabel("");
       setActionRoute("");
       setOk("Notificação enviada para os perfis.");
-      setTimeout(() => setOk(null), 3000);
+      setTimeout(() => setOk(null), 2000);
     } catch (e) {
       setErr((e as Error).message);
     } finally {

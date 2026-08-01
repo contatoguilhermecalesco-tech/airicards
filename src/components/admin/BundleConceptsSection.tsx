@@ -87,7 +87,7 @@ export function BundleConceptsSection() {
         if (draft.concept) setConcept(draft.concept);
       }
       setOk("Rascunho gerado pela IA.");
-      setTimeout(() => setOk(null), 2500);
+      setTimeout(() => setOk(null), 2000);
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -208,7 +208,7 @@ export function BundleConceptsSection() {
         setOk("Bundle publicado.");
       }
       resetForm();
-      setTimeout(() => setOk(null), 3000);
+      setTimeout(() => setOk(null), 2000);
     } catch (e) {
       setErr((e as Error).message);
     } finally {

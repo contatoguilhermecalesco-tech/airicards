@@ -142,7 +142,7 @@ function MarketplacePage() {
             : "Não foi possível adquirir o deck. Tente novamente.",
       });
     }
-    setTimeout(() => setToast(null), 3200);
+    setTimeout(() => setToast(null), 2000);
   }
 
   function handlePrimary(row: PublishedDeckRow) {
