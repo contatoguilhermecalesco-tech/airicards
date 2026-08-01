@@ -1090,3 +1090,38 @@
 @utility relic-idle {
   animation: relic-idle 2.6s ease-in-out infinite;
 }
+
+/* ---- Forja de Fragmentos ------------------------------------------- */
+@keyframes forge-spark {
+  0%   { transform: translate3d(0, 0, 0) scale(0.6); opacity: 0; }
+  15%  { opacity: var(--spark-opacity, 0.75); }
+  85%  { opacity: var(--spark-opacity, 0.75); }
+  100% { transform: translate3d(var(--spark-drift, 18px), -120px, 0) scale(1.05); opacity: 0; }
+}
+@utility forge-spark {
+  animation: forge-spark var(--spark-duration, 7s) linear var(--spark-delay, 0s) infinite;
+}
+
+@keyframes forge-breathe {
+  0%, 100% { box-shadow: 0 0 46px -26px var(--forge-glow, #d8b4fe); }
+  50%      { box-shadow: 0 0 78px -14px var(--forge-glow, #d8b4fe); }
+}
+@utility forge-breathe {
+  animation: forge-breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes forge-sheen {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+@utility forge-sheen {
+  animation: forge-sheen 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes forge-anvil {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%      { transform: translateY(-6px) rotate(4deg); }
+}
+@utility forge-anvil {
+  animation: forge-anvil 5s ease-in-out infinite;
+}
