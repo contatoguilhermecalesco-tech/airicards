@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
+import { trackJourneyReview, trackJourneyEnemyDefeated } from "@/lib/journey-store";
 
 export const ENEMY_THRESHOLD = 3;
 
