@@ -377,7 +377,7 @@ function ShopPage() {
 
   function toast(kind: "ok" | "err", msg: string) {
     setFlash({ kind, msg });
-    setTimeout(() => setFlash(null), 2400);
+    setTimeout(() => setFlash(null), 2000);
   }
 
   function celebrate(u: UnifiedItem, message: string) {
