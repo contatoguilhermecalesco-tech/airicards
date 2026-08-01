@@ -305,18 +305,29 @@ function ForjaPage() {
       {/* ---- Inventário ---- */}
       <section className="mt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-sm font-bold tracking-tight">
-            <Gem className="h-4 w-4 text-muted-foreground" /> Inventário de fragmentos
+          <h2 className="flex items-center gap-2 loot-label" style={{ color: "#c8aa6e" }}>
+            <Gem className="h-4 w-4" /> Inventário de espólios
           </h2>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
+            <span
+              className="loot-clip-sm inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-[11px] text-muted-foreground"
+              style={{
+                borderColor: "rgba(200,170,110,0.22)",
+                background: "rgba(200,170,110,0.06)",
+              }}
+            >
               <Shuffle className="h-3 w-3" />
-              {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
+              {left}/{REROLL_WEEKLY_LIMIT} trocas
             </span>
             <button
               type="button"
               onClick={() => setHistoryOpen(true)}
-              className="tap-target inline-flex h-9 items-center gap-1.5 rounded-[14px] border border-white/10 bg-white/[0.03] px-3 text-[12.5px] font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.06]"
+              className="tap-target loot-clip-sm inline-flex h-9 items-center gap-1.5 border px-3 loot-label transition hover:brightness-125"
+              style={{
+                borderColor: "rgba(200,170,110,0.35)",
+                background: "rgba(200,170,110,0.10)",
+                color: "#f0e6d2",
+              }}
             >
               <History className="h-3.5 w-3.5" strokeWidth={2.4} />
               Histórico
@@ -324,7 +335,11 @@ function ForjaPage() {
             <div
               role="group"
               aria-label="Modo de visualização"
-              className="flex items-center gap-0.5 rounded-[14px] border border-white/10 bg-white/[0.03] p-1 backdrop-blur-md"
+              className="flex items-center gap-0.5 border p-1"
+              style={{
+                borderColor: "rgba(200,170,110,0.22)",
+                background: "rgba(6,9,15,0.7)",
+              }}
             >
               {VIEWS.map(([id, label, Icon]) => (
                 <button
@@ -334,19 +349,20 @@ function ForjaPage() {
                   aria-label={label}
                   title={label}
                   onClick={() => pickView(id)}
-                  className={`grid h-8 w-8 place-items-center rounded-[10px] transition ${
+                  className="grid h-8 w-8 place-items-center transition"
+                  style={
                     view === id
-                      ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                      : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
-                  }`}
+                      ? { background: "rgba(200,170,110,0.85)", color: "#0a0c12" }
+                      : { color: "rgba(240,230,210,0.55)" }
+                  }
                 >
                   <Icon className="h-4 w-4" strokeWidth={2.25} />
                 </button>
               ))}
             </div>
           </div>
-
         </div>
+
 
         {stacks.length > 0 && (
           <div className="mt-3 flex gap-1.5 rounded-2xl border border-white/8 bg-white/4 p-1">
