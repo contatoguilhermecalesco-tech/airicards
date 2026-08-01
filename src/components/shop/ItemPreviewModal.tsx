@@ -30,6 +30,7 @@ import { CompanionRender } from "@/components/CompanionRender";
 import { tableSkinByKey } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinCardLayer } from "@/components/review/TableSkinCardLayer";
+import { TableSkinImpact } from "@/components/review/TableSkinImpact";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import {
   StreakFlameDemo,
@@ -459,10 +460,16 @@ export function ItemPreviewModal({
 function TableStage({ walletKey }: { walletKey: string }) {
   const skin = tableSkinByKey(walletKey);
   const [flash, setFlash] = useState<"hit" | "miss" | null>(null);
+  const [seed, setSeed] = useState(0);
+
+  function simulate(tone: "hit" | "miss") {
+    setSeed((s) => s + 1);
+    setFlash(tone);
+  }
 
   useEffect(() => {
     if (!flash) return;
-    const t = setTimeout(() => setFlash(null), 700);
+    const t = setTimeout(() => setFlash(null), 1500);
     return () => clearTimeout(t);
   }, [flash]);
 
@@ -488,17 +495,24 @@ function TableStage({ walletKey }: { walletKey: string }) {
             </div>
           </div>
         </div>
-        {flash && <TableSkinFlash skin={skin} tone={flash} />}
+        {flash && (
+          <>
+            <TableSkinFlash skin={skin} tone={flash} />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden"><div className="absolute left-1/2 top-1/2 h-screen w-screen -translate-x-1/2 -translate-y-1/2 scale-[0.34]">
+              <TableSkinImpact skin={skin} tone={flash} seed={seed} />
+            </div></div>
+          </>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-2">
         <button
-          onClick={() => setFlash("hit")}
+          onClick={() => simulate("hit")}
           className="rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-400/20"
         >
           Simular acerto
         </button>
         <button
-          onClick={() => setFlash("miss")}
+          onClick={() => simulate("miss")}
           className="rounded-xl border border-rose-400/25 bg-rose-400/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-400/20"
         >
           Simular erro

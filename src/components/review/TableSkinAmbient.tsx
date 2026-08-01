@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { TableSkin } from "@/lib/table-skins";
 import { isDefaultTableSkin } from "@/lib/table-skins";
+import { PuppetAmbient } from "./PuppetTableFX";
 
 /** Poeira/faíscas em suspensão — configuração estável entre renders. */
 const DUST = Array.from({ length: 18 }).map((_, i) => ({
@@ -61,6 +62,9 @@ export function TableSkinAmbient({ skin }: { skin: TableSkin }) {
           className="table-bg-drift h-full w-full object-cover opacity-[0.32] will-change-transform"
         />
       </div>
+
+      {/* Palco exclusivo da Corte das Marionetes */}
+      {skin.vfx === "puppet" && <PuppetAmbient skin={skin} />}
 
       {/* Raios de luz descendo da abóbada */}
       <div className="absolute inset-x-0 top-0 h-[75vh] mix-blend-screen">
