@@ -6,7 +6,6 @@ import {
   TIER_META,
   SLOT_LABEL,
   SHARDS_PER_FORGE,
-  FORGE_ARLYS_COST,
   shardCountFor,
   type ShardDrop,
 } from "@/lib/relic-hunt";
