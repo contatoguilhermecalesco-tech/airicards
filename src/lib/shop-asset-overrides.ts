@@ -54,6 +54,19 @@ import princesaChama from "@/assets/shop/princesa/chama.png";
 import princesaSelo from "@/assets/shop/princesa/selo.png";
 import princesaAscensao from "@/assets/shop/princesa/ascensao.png";
 
+import marioneteSplash from "@/assets/shop/marionete/splash-hero.jpg";
+import marioneteAura from "@/assets/shop/marionete/aura.png";
+import marioneteFrame from "@/assets/shop/marionete/frame.png";
+import marioneteBackground from "@/assets/shop/marionete/background.png";
+import marioneteCardframe from "@/assets/shop/marionete/cardframe.png";
+import marioneteTableAmbient from "@/assets/shop/marionete/table-ambient.jpg";
+import marioneteTableFrame from "@/assets/shop/marionete/table-frame.png";
+import marioneteTableBack from "@/assets/shop/marionete/table-cardback.png";
+import marionetePetals from "@/assets/shop/marionete/petals-overlay.png";
+import marioneteChama from "@/assets/shop/marionete/chama.png";
+import marioneteSelo from "@/assets/shop/marionete/selo.png";
+import marioneteAscensao from "@/assets/shop/marionete/ascensao.png";
+
 
 
 
@@ -123,6 +136,17 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.streak_flame.chama_vigilia": { art: princesaChama },
   "cosmetic.enemy_seal.olho_vigilia": { art: princesaSelo },
   "cosmetic.victory_splash.ascensao_vigilia": { art: princesaAscensao },
+
+  // Master bundle — Corte das Marionetes (Mítico)
+  "bundle.corte_marionetes": { splash: marioneteSplash, art: marioneteAura },
+  "cosmetic.aura.corte_marionetes": { art: marioneteAura },
+  "cosmetic.frame.coroa_marionete": { art: marioneteFrame },
+  "cosmetic.effect.teatro_marionetes": { art: marioneteBackground },
+  "cosmetic.veil.veu_marionete": { art: marioneteCardframe },
+  "cosmetic.table.mesa_marionetes": { art: marioneteTableAmbient },
+  "cosmetic.streak_flame.chama_marionete": { art: marioneteChama },
+  "cosmetic.enemy_seal.selo_marionete": { art: marioneteSelo },
+  "cosmetic.victory_splash.ascensao_marionete": { art: marioneteAscensao },
 };
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
@@ -182,6 +206,15 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "streak_flame:chama_vigilia": princesaChama,
   "enemy_seal:olho_vigilia": princesaSelo,
   "victory_splash:ascensao_vigilia": princesaAscensao,
+
+  "decoration:corte_marionetes": marioneteAura,
+  "nameplate:coroa_marionete": marioneteFrame,
+  "effect:teatro_marionetes": marioneteBackground,
+  "veil:veu_marionete": marioneteCardframe,
+  "table:mesa_marionetes": marioneteTableAmbient,
+  "streak_flame:chama_marionete": marioneteChama,
+  "enemy_seal:selo_marionete": marioneteSelo,
+  "victory_splash:ascensao_marionete": marioneteAscensao,
 };
 
 
