@@ -192,3 +192,57 @@ export async function declineShardGift(gift: ShardGift): Promise<boolean> {
   await fetchShardGifts();
   return true;
 }
+
+// ---- Devolução de presentes recusados --------------------------------------
+// Quando o outro perfil recusa, o fragmento volta para quem enviou. Só o
+// cliente do remetente consegue mexer no inventário dele, então marcamos
+// localmente os presentes já devolvidos para não duplicar.
+const RECLAIM_KEY = "airi.shardGifts.reclaimed.v1";
+
+function reclaimedIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(RECLAIM_KEY);
+    return new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+function markReclaimed(ids: Set<string>) {
+  try {
+    localStorage.setItem(RECLAIM_KEY, JSON.stringify([...ids].slice(-100)));
+  } catch {
+    /* noop */
+  }
+}
+
+/** Devolve ao inventário os fragmentos de presentes recusados. */
+export function reclaimDeclinedShardGifts(myId: string | undefined): number {
+  if (!myId || typeof window === "undefined") return 0;
+  const done = reclaimedIds();
+  let n = 0;
+  for (const g of state.gifts) {
+    if (g.fromProfile !== myId || g.status !== "declined" || done.has(g.id)) continue;
+    restoreShard(
+      {
+        key: g.shardKey,
+        name: g.shardName,
+        slot: g.slot,
+        price: g.price,
+        accent: g.accent,
+        tier: g.tier,
+      },
+      `${partnerOf(myId).name} recusou o presente — fragmento devolvido.`,
+    );
+    done.add(g.id);
+    n += 1;
+  }
+  if (n > 0) markReclaimed(done);
+  return n;
+}
+
+/** Histórico curto de trocas (aceitos/recusados) entre os dois perfis. */
+export function useShardGiftHistory(limit = 8): ShardGift[] {
+  const { gifts } = useGifts();
+  return gifts.filter((g) => g.status !== "pending").slice(0, limit);
+}
