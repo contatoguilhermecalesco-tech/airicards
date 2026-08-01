@@ -460,6 +460,8 @@ function PerfilPage() {
   const showDecoration = !!decoration;
   const decorationPalette = decoration ? paletteFor(decoration.accent) : heroPalette;
   const badgePalette = badge ? paletteFor(badge.accent) : heroPalette;
+  // A cor do anel/blur em volta do avatar segue sempre a coroa equipada.
+  const avatarRing = crownAccent ?? decorationPalette.ring;
   const BadgeIcon = badge ? (ICONS[badge.icon] ?? Sparkles) : Sparkles;
 
   const initial = (profile?.name ?? "?").trim().charAt(0).toUpperCase() || "?";
