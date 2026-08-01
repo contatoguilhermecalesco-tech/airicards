@@ -623,7 +623,254 @@ function ForjaPage() {
 }
 
 
+/**
+ * Fusão: escolhe 3 fragmentos de cosméticos DIFERENTES da mesma raridade e
+ * troca por 1 fragmento de um cosmético escolhido — sem ficar com sobras.
+ */
+function FusionModal({
+  stacks,
+  onClose,
+  onDone,
+}: {
+  stacks: ShardStack[];
+  onClose: () => void;
+  onDone: (name: string) => void;
+}) {
+  const tiers = useMemo(() => {
+    const counts = new Map<ShardTier, number>();
+    for (const s of stacks) counts.set(s.tier, (counts.get(s.tier) ?? 0) + 1);
+    return (["mitico", "epico", "raro", "comum"] as ShardTier[]).filter(
+      (t) => (counts.get(t) ?? 0) > 0,
+    );
+  }, [stacks]);
+
+  const [tier, setTier] = useState<ShardTier | null>(tiers[0] ?? null);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [targets, setTargets] = useState<FusionTarget[]>([]);
+  const [target, setTarget] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const pool = useMemo(
+    () => (tier ? stacks.filter((s) => s.tier === tier) : []),
+    [stacks, tier],
+  );
+
+  useEffect(() => {
+    setPicked([]);
+    setTarget(null);
+    setTargets([]);
+    if (!tier) return;
+    let alive = true;
+    void fusionTargets(tier)
+      .then((t) => {
+        if (alive) setTargets(t);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [tier]);
+
+  function toggle(key: string) {
+    setPicked((cur) =>
+      cur.includes(key)
+        ? cur.filter((k) => k !== key)
+        : cur.length >= FUSION_INPUT
+          ? cur
+          : [...cur, key],
+    );
+  }
+
+  const ready = picked.length === FUSION_INPUT && Boolean(target);
+
+  async function run() {
+    if (!ready || !target) return;
+    setBusy(true);
+    const res = await fuseShards(picked, target);
+    setBusy(false);
+    if (!res.ok) {
+      toast.error(
+        res.error === "need_three"
+          ? `Escolha ${FUSION_INPUT} cosméticos diferentes.`
+          : res.error === "same_item"
+            ? "Os fragmentos precisam ser de cosméticos diferentes."
+            : res.error === "mixed_tier"
+              ? "Todos os fragmentos precisam ser da mesma raridade."
+              : res.error === "bad_target"
+                ? "Escolha um cosmético da mesma raridade."
+                : "Fragmento não encontrado.",
+      );
+      return;
+    }
+    onDone(res.shard.name);
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fundir fragmentos"
+    >
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+      />
+      <div className="relative flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-surface/95 backdrop-blur-2xl sm:rounded-3xl">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.07] px-5 py-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">
+              Fusão
+            </p>
+            <h2 className="mt-1 text-lg font-bold tracking-tight">
+              {FUSION_INPUT} diferentes → 1 escolhido
+            </h2>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Mesma raridade. Você decide qual fragmento sai da bancada.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/6 text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          {tiers.length === 0 ? (
+            <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-[13px] text-muted-foreground">
+              Você ainda não tem fragmentos para fundir.
+            </p>
+          ) : (
+            <>
+              <div className="flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {tiers.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTier(t)}
+                    className={`tap-target flex-1 whitespace-nowrap rounded-full px-3 py-2 text-[12.5px] font-semibold transition ${
+                      tier === t
+                        ? "bg-primary/18 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={tier === t ? { color: TIER_META[t].color } : undefined}
+                  >
+                    {TIER_META[t].label}
+                  </button>
+                ))}
+              </div>
+
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Sacrificar · {picked.length}/{FUSION_INPUT}
+              </p>
+              {pool.length < FUSION_INPUT ? (
+                <p className="mt-2 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-[12.5px] text-muted-foreground">
+                  Você precisa de {FUSION_INPUT} cosméticos diferentes desta raridade.
+                </p>
+              ) : (
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {pool.map((s) => {
+                    const on = picked.includes(s.key);
+                    return (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => toggle(s.key)}
+                        className={`tap-target flex items-center gap-2 rounded-2xl border p-2 text-left transition ${
+                          on
+                            ? "border-primary/45 bg-primary/12"
+                            : "border-white/8 bg-white/[0.04] hover:bg-white/[0.07]"
+                        }`}
+                      >
+                        <ShardArt
+                          cosmeticKey={s.key}
+                          accent={s.accent}
+                          tierColor={TIER_META[s.tier].color}
+                          size={38}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[12.5px] font-semibold">
+                            {s.name}
+                          </span>
+                          <span className="block text-[10.5px] text-muted-foreground">
+                            x{s.count}
+                          </span>
+                        </span>
+                        {on && <Check className="h-4 w-4 shrink-0 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Receber
+              </p>
+              <div className="mt-2 space-y-1.5">
+                {targets.length === 0 ? (
+                  <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-[12.5px] text-muted-foreground">
+                    Nenhum cosmético desta raridade disponível agora.
+                  </p>
+                ) : (
+                  targets.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => setTarget(t.key)}
+                      className={`tap-target flex w-full items-center gap-2.5 rounded-2xl border px-3 py-2 text-left transition ${
+                        target === t.key
+                          ? "border-primary/45 bg-primary/12"
+                          : "border-white/8 bg-white/[0.04] hover:bg-white/[0.07]"
+                      }`}
+                    >
+                      <ShardArt
+                        cosmeticKey={t.key}
+                        accent={t.accent}
+                        tierColor={TIER_META[t.tier].color}
+                        size={34}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[13px] font-semibold">
+                          {t.name}
+                        </span>
+                        <span className="block truncate text-[10.5px] text-muted-foreground">
+                          {SLOT_LABEL[t.slot] ?? t.slot}
+                        </span>
+                      </span>
+                      {target === t.key && (
+                        <Check className="h-4 w-4 shrink-0 text-primary" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t border-white/[0.07] bg-black/25 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => void run()}
+            disabled={!ready || busy}
+            className="tap-target w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition disabled:opacity-40"
+          >
+            {busy ? "Fundindo…" : `Fundir ${FUSION_INPUT} fragmentos`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HelpModal({ onClose }: { onClose: () => void }) {
+
   return (
     <div
       className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
