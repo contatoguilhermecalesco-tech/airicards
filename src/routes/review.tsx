@@ -105,6 +105,9 @@ function Review() {
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
+  // Caça aos Luminhos — drop aleatório ao acertar.
+  const [luminho, setLuminho] = useState<(LuminhoDrop & { id: number }) | null>(null);
+  const luminhoIdRef = useRef(0);
 
   function pulseSkin(tone: "hit" | "miss") {
     setSkinFlash(tone);
