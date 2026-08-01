@@ -8,6 +8,9 @@ import espiritoCrown from "@/assets/shop/espirito/crown.png";
 import espiritoFrame from "@/assets/shop/espirito/frame.png";
 import princesaCrown from "@/assets/shop/princesa/crown.png";
 import princesaFrame from "@/assets/shop/princesa/frame.png";
+import piscinaCrown from "@/assets/shop/piscina/crown.png";
+import piscinaFrame from "@/assets/shop/piscina/frame.png";
+
 
 
 /**
