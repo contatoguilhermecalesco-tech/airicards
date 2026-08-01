@@ -31,6 +31,8 @@ import {
   type ShardStack,
 } from "@/lib/relic-hunt";
 import { ShardIcon } from "@/components/hunt/ShardDropToast";
+import { ShardArt } from "@/components/hunt/ShardArt";
+
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
 import { useWallet } from "@/lib/wallet-store";
 import { toast } from "sonner";
