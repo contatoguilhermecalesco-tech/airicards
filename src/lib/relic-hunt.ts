@@ -193,6 +193,14 @@ function normalize(raw: Partial<HuntState> | undefined): HuntState {
             arlys: Math.max(0, Math.floor(raw.dissolveWeek.arlys ?? 0)),
           }
         : { week: currentWeek, arlys: 0 },
+    dropDay:
+      raw.dropDay && raw.dropDay.day === dayKey()
+        ? {
+            day: dayKey(),
+            count: Math.max(0, Math.floor(raw.dropDay.count ?? 0)),
+            lastAt: Number(raw.dropDay.lastAt ?? 0),
+          }
+        : { day: dayKey(), count: 0, lastAt: 0 },
     log: Array.isArray(raw.log) ? raw.log.slice(0, 30) : [],
 
   };
