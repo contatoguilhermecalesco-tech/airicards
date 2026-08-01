@@ -144,7 +144,17 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
     hitLabel: "FIOS CORTADOS",
     art: COSMETIC_ART.selo_marionete,
   },
+  selo_piscina: {
+    key: "selo_piscina",
+    name: "Selo Solar",
+    color: "#fbbf24",
+    accent: "#0891b2",
+    missLabel: "QUEIMOU",
+    hitLabel: "MERGULHOU",
+    art: COSMETIC_ART.selo_piscina,
+  },
 };
+
 
 export function enemySealFromEquipped(equipped: EquippedMap): EnemySealTheme | null {
   const k = keyFrom(equipped.enemy_seal);
