@@ -76,7 +76,18 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
     halo: "radial-gradient(closest-side, rgba(255,77,99,0.36), rgba(245,231,221,0.14) 52%, transparent 74%)",
     art: COSMETIC_ART.chama_marionete,
   },
+  chama_piscina: {
+    key: "chama_piscina",
+    name: "Chama Tropical",
+    glyph: "rune",
+    color: "#fbbf24",
+    accent: "#06b6d4",
+    ring: "border-cyan-300/30 bg-gradient-to-b from-amber-400/20 to-cyan-900/30 text-amber-50",
+    halo: "radial-gradient(closest-side, rgba(251,191,36,0.35), rgba(6,182,212,0.18) 55%, transparent 72%)",
+    art: COSMETIC_ART.chama_piscina,
+  },
 };
+
 
 export function streakFlameFromEquipped(equipped: EquippedMap): StreakFlameTheme | null {
   const k = keyFrom(equipped.streak_flame);
