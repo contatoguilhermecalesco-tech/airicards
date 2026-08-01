@@ -33,6 +33,8 @@ import { TableSkinImpact } from "@/components/review/TableSkinImpact";
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
 import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
+import { rollLuminho, type LuminhoDrop } from "@/lib/relic-hunt";
+import { LuminhoDropToast } from "@/components/hunt/LuminhoDropToast";
 
 
 
