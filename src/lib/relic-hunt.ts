@@ -409,9 +409,9 @@ async function candidatePool(exclude?: string): Promise<Candidate[]> {
 
 function weightedPick(pool: Candidate[]): Candidate | null {
   if (pool.length === 0) return null;
-  // Itens mais caros são mais raros de cair.
+  // Itens mais caros são bem mais raros de cair.
   const weights = pool.map((c) =>
-    c.tier === "mitico" ? 1 : c.tier === "epico" ? 2 : c.tier === "raro" ? 4 : 6,
+    c.tier === "mitico" ? 1 : c.tier === "epico" ? 3 : c.tier === "raro" ? 8 : 16,
   );
   const total = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * total;
@@ -430,9 +430,23 @@ function makeShard(pick: Candidate): Shard {
   };
 }
 
+/** Fragmentos que ainda podem cair hoje. */
+export function dropsLeftToday(s: HuntState = state): number {
+  const used = s.dropDay?.day === dayKey() ? s.dropDay.count : 0;
+  return Math.max(0, DROP_DAILY_CAP - used);
+}
+
+/** Minutos restantes de espera até o próximo fragmento poder cair. */
+export function dropCooldownLeft(s: HuntState = state, now = Date.now()): number {
+  const last = s.dropDay?.day === dayKey() ? (s.dropDay.lastAt ?? 0) : 0;
+  if (!last) return 0;
+  const passed = (now - last) / 60_000;
+  return Math.max(0, Math.ceil(DROP_COOLDOWN_MIN - passed));
+}
+
 /**
- * Sorteia um fragmento após um acerto. Streak da sessão e cartas inimigas
- * aumentam levemente a chance — esforço vira sorte, sem virar obrigação.
+ * Sorteia um fragmento após um acerto. Chance baixa por acerto, com teto
+ * diário e intervalo mínimo entre quedas — esforço vira sorte, sem inflação.
  */
 export async function rollShard(opts: {
   runStreak: number;
@@ -440,10 +454,13 @@ export async function rollShard(opts: {
 }): Promise<ShardDrop | null> {
   // Inventário cheio: nada cai até você forjar, fundir ou dissolver.
   if (shardSlotsLeft() <= 0) return null;
-  const base = 0.09;
-  const streakBonus = Math.min(0.08, opts.runStreak * 0.01);
-  const enemyBonus = opts.isEnemy ? 0.05 : 0;
-  if (Math.random() > base + streakBonus + enemyBonus) return null;
+  // Teto diário e intervalo mínimo entre fragmentos.
+  if (dropsLeftToday() <= 0) return null;
+  if (dropCooldownLeft() > 0) return null;
+
+  const streakBonus = Math.min(0.03, Math.floor(opts.runStreak / 5) * 0.01);
+  const enemyBonus = opts.isEnemy ? 0.015 : 0;
+  if (Math.random() > DROP_BASE_CHANCE + streakBonus + enemyBonus) return null;
 
   const pick = weightedPick(await candidatePool());
   if (!pick) return null;
@@ -451,6 +468,8 @@ export async function rollShard(opts: {
   const shard = makeShard(pick);
   state.shards = [shard, ...state.shards].slice(0, SHARD_CAP);
   state.lifetime += 1;
+  const prev = state.dropDay?.day === dayKey() ? state.dropDay.count : 0;
+  state.dropDay = { day: dayKey(), count: prev + 1, lastAt: shard.at };
   pushLog({
     at: shard.at,
     tone: "drop",
