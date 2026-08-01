@@ -13,6 +13,7 @@ import {
 } from "@/components/shop/shop-visuals";
 import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { getShopAssetOverride } from "@/lib/shop-asset-overrides";
+import { getRingScaleForArt, DEFAULT_RING_SCALE } from "@/components/profile/AvatarCrown";
 
 export function BundleDetailModal({
   bundle,
