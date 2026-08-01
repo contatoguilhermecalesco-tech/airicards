@@ -14,6 +14,8 @@ import {
   Gem,
   Flame,
   ChevronRight,
+  LayoutGrid,
+  Rows3,
 } from "lucide-react";
 import {
   useHunt,
