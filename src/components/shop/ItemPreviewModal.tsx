@@ -101,6 +101,10 @@ export function ItemPreviewModal({
   onBuy,
   onClose,
   initialItemId,
+  actionLabel,
+  priceLabel,
+  priceValue,
+  blockedLabel,
 }: {
   item: ShopItem;
   owned: boolean;
@@ -111,7 +115,16 @@ export function ItemPreviewModal({
   onClose: () => void;
   /** Item do bundle que deve abrir selecionado no provador. */
   initialItemId?: string | null;
+  /** Texto do botão principal (padrão: "Comprar agora"). */
+  actionLabel?: string;
+  /** Legenda do preço (padrão: "Arlys ✦"). */
+  priceLabel?: string;
+  /** Valor exibido no preço (padrão: preço do item). */
+  priceValue?: number;
+  /** Texto quando não há Arlys suficientes. */
+  blockedLabel?: string;
 }) {
+
   // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
   const [contents, setContents] = useState<ShopItem[]>([]);
   const [selId, setSelId] = useState<string | null>(null);
@@ -422,8 +435,10 @@ export function ItemPreviewModal({
         <div className="flex shrink-0 items-center justify-between gap-3 border-t border-white/[0.07] bg-black/35 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
           <span className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-white">
             <ArlysIcon className="h-4 w-4 text-violet-300" strokeWidth={2.25} />
-            {item.price}
-            <span className="text-[11px] font-medium text-white/45">Arlys ✦</span>
+            {priceValue ?? item.price}
+            <span className="text-[11px] font-medium text-white/45">
+              {priceLabel ?? "Arlys ✦"}
+            </span>
           </span>
           <button
             onClick={owned ? onClose : onBuy}
@@ -444,12 +459,13 @@ export function ItemPreviewModal({
                 Você já tem
               </>
             ) : canAfford ? (
-              "Comprar agora"
+              (actionLabel ?? "Comprar agora")
             ) : (
-              "Arlys insuficiente"
+              (blockedLabel ?? "Arlys insuficiente")
             )}
           </button>
         </div>
+
       </div>
     </div>
   );

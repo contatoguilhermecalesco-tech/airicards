@@ -243,13 +243,24 @@ export function ShardCard({
           icon={Recycle}
           label={`+${st.dissolveValue}`}
           disabled={disabled}
-          title={`Dissolver 1 fragmento por ${st.dissolveValue} ✦`}
+          title={
+            st.dull
+              ? `Fragmento perdendo brilho — dissolve por apenas ${st.dissolveValue} ✦`
+              : `Dissolver 1 fragmento por ${st.dissolveValue} ✦`
+          }
           onClick={() => onDissolve(st)}
         />
       </div>
+      {st.dull && (
+        <p className="mt-2 text-[11px] font-medium text-amber-300/80">
+          Guardado há muito tempo — brilho em {Math.round(st.shine * 100)}%, valor de
+          dissolução reduzido.
+        </p>
+      )}
     </div>
   );
 }
+
 
 /** Tile (visão Grade). */
 export function ShardTile({

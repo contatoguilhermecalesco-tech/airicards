@@ -26,20 +26,38 @@ import {
   rerollShard,
   rerollsLeft,
   pruneOwnedShards,
+  shardSlotsLeft,
+  dissolveLeft,
+  fuseShards,
+  fusionTargets,
+  TIER_META,
+  SLOT_LABEL,
   SHARDS_PER_FORGE,
   FORGE_ARLYS_COST,
   REROLL_WEEKLY_LIMIT,
+  SHARD_CAP,
+  FUSION_INPUT,
+  DISSOLVE_WEEKLY_CAP,
+  CRIT_FORGE_CHANCE,
+  PLATINA_FORGE_CHANCE,
   type ShardStack,
+  type ShardTier,
+  type ForgeVariant,
+  type FusionTarget,
 } from "@/lib/relic-hunt";
 import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
+import { ShardArt } from "@/components/hunt/ShardArt";
 import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
 import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
 import { useAutoClaimShardGifts } from "@/lib/shard-gifts";
 
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
+import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
+import { listShopItems, type ShopItem } from "@/lib/shop";
 import { useWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { toast } from "sonner";
+
 
 
 const SEEN_KEY = "airi.forja.tutorial.v2";
@@ -83,12 +101,19 @@ function ForjaPage() {
   const profile = useCurrentProfile();
   const [forging, setForging] = useState<ShardStack | null>(null);
   const [done, setDone] = useState(false);
+  const [variant, setVariant] = useState<ForgeVariant | null>(null);
   const [help, setHelp] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("todos");
   const [view, setView] = useState<View>("grade");
   const [gifting, setGifting] = useState<ShardStack | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [fusionOpen, setFusionOpen] = useState(false);
+  const [preview, setPreview] = useState<{ stack: ShardStack; item: ShopItem } | null>(
+    null,
+  );
+  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+
 
   useAutoClaimShardGifts(profile?.id, (g) =>
     toast.success(`Fragmento recebido: ${g.shardName}`),
@@ -97,6 +122,20 @@ function ForjaPage() {
   useEffect(() => {
     pruneOwnedShards();
   }, [wallet.cosmetics.length]);
+
+  // Catálogo da loja para abrir o provador antes de forjar.
+  useEffect(() => {
+    let alive = true;
+    void listShopItems()
+      .then((items) => {
+        if (alive) setShopItems(items);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
 
   useEffect(() => {
     try {
@@ -125,6 +164,9 @@ function ForjaPage() {
   const readyStacks = stacks.filter((s) => s.ready);
   const ready = readyStacks.length;
   const left = rerollsLeft(hunt);
+  const slots = shardSlotsLeft(hunt);
+  const cashLeft = dissolveLeft(hunt);
+  const full = slots <= 0;
 
   const visible = useMemo(
     () =>
@@ -145,7 +187,32 @@ function ForjaPage() {
     [visible],
   );
 
+  /** Encontra o item da loja correspondente ao fragmento (para o provador). */
+  function shopItemFor(stack: ShardStack): ShopItem | null {
+    return (
+      shopItems.find((i) => {
+        if (i.kind !== "cosmetic") return false;
+        const key = String(i.payload?.key ?? i.id);
+        const slot = String(i.payload?.slot ?? "cosmetic");
+        return `${slot}:${key}` === stack.key;
+      }) ?? null
+    );
+  }
 
+  /** Abre o provador antes da forja; sem item na loja, forja direto. */
+  function askForge(stack: ShardStack) {
+    if (forging) return;
+    if (!stack.ready) {
+      toast.error(`Faltam ${stack.missing} fragmento(s) deste cosmético.`);
+      return;
+    }
+    const item = shopItemFor(stack);
+    if (!item) {
+      void forge(stack);
+      return;
+    }
+    setPreview({ stack, item });
+  }
 
   async function forge(stack: ShardStack) {
     if (forging) return;
@@ -158,6 +225,7 @@ function ForjaPage() {
       return;
     }
     setDone(false);
+    setVariant(null);
     setForging(stack);
     const res = await forgeShard(stack.key);
     if (!res.ok) {
@@ -173,15 +241,27 @@ function ForjaPage() {
       );
       return;
     }
+    setVariant(res.variant);
     setDone(true);
   }
 
   async function dissolve(stack: ShardStack) {
     setBusy(stack.key);
-    const v = await dissolveShard(stack.key);
+    const res = await dissolveShard(stack.key);
     setBusy(null);
-    if (v > 0) toast.success(`+${v} ✦ pela dissolução do fragmento.`);
+    if (res.paid > 0) {
+      toast.success(
+        res.capped > 0
+          ? `+${res.paid} ✦ — teto semanal de ${DISSOLVE_WEEKLY_CAP} ✦ atingido.`
+          : `+${res.paid} ✦ pela dissolução do fragmento.`,
+      );
+    } else if (res.capped > 0) {
+      toast.error(
+        `Teto semanal de ${DISSOLVE_WEEKLY_CAP} ✦ atingido — dissolva na próxima semana.`,
+      );
+    }
   }
+
 
   async function swap(stack: ShardStack) {
     setBusy(stack.key);
@@ -251,17 +331,62 @@ function ForjaPage() {
               </h1>
               <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted-foreground">
                 {SHARDS_PER_FORGE} fragmentos iguais + {FORGE_ARLYS_COST} ✦ = cosmético
-                permanente.
+                permanente. Toda forja tem chance de sair crítica.
               </p>
             </div>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <VaultStat label="Fragmentos" value={hunt.shards.length} icon={Gem} />
+            <VaultStat
+              label="Fragmentos"
+              value={`${hunt.shards.length}/${SHARD_CAP}`}
+              icon={Gem}
+              highlight={full}
+            />
             <VaultStat label="Prontos" value={ready} icon={Hammer} highlight={ready > 0} />
             <VaultStat label="Forjados" value={hunt.forged} icon={Flame} />
             <VaultStat label="Arlys ✦" value={wallet.crystals} icon={Sparkles} />
           </div>
+
+          {/* Capacidade do inventário — força decisões */}
+          <div className="mt-3 rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3">
+            <div className="flex items-center justify-between gap-3 text-[11.5px] font-medium">
+              <span className="text-muted-foreground">
+                Capacidade da bancada
+                <span className={full ? "ml-1.5 text-rose-300" : "ml-1.5 text-foreground/80"}>
+                  {hunt.shards.length}/{SHARD_CAP}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Saque semanal: {cashLeft}/{DISSOLVE_WEEKLY_CAP} ✦
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/8">
+              <span
+                className="block h-full rounded-full transition-all"
+                style={{
+                  width: `${Math.min(100, (hunt.shards.length / SHARD_CAP) * 100)}%`,
+                  background: full
+                    ? "linear-gradient(90deg,#f43f5e,#fb7185)"
+                    : "linear-gradient(90deg,hsl(var(--primary)),#d1a8ff)",
+                }}
+              />
+            </div>
+            <p className="mt-2 text-[11.5px] leading-relaxed text-muted-foreground">
+              {full
+                ? "Bancada cheia: nenhum fragmento novo cai até você forjar, fundir ou dissolver."
+                : `${slots} espaço(s) livre(s). Fragmentos guardados mais de duas semanas perdem brilho e valem menos ao dissolver.`}
+            </p>
+            <button
+              type="button"
+              onClick={() => setFusionOpen(true)}
+              className="tap-target mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/6 px-4 py-2.5 text-[12.5px] font-semibold text-foreground/90 transition hover:bg-white/10"
+            >
+              <Recycle className="h-4 w-4 text-primary" />
+              Fundir {FUSION_INPUT} fragmentos diferentes
+            </button>
+          </div>
+
 
           {ready > 0 && (
             <button
@@ -393,7 +518,7 @@ function ForjaPage() {
                 disabled={busy === st.key || forging !== null}
                 rerollsLeft={left}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onSwap={(s) => void swap(s)}
                 onDissolve={(s) => void dissolve(s)}
                 onGift={(s) => setGifting(s)}
@@ -409,7 +534,7 @@ function ForjaPage() {
                 crystals={wallet.crystals}
                 disabled={busy === st.key || forging !== null}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onGift={(s) => setGifting(s)}
               />
             ))}
@@ -423,7 +548,7 @@ function ForjaPage() {
                 crystals={wallet.crystals}
                 disabled={busy === st.key || forging !== null}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onGift={(s) => setGifting(s)}
               />
             ))}
@@ -450,22 +575,302 @@ function ForjaPage() {
         />
       )}
 
+      {preview && (
+        <ItemPreviewModal
+          item={preview.item}
+          owned={false}
+          canAfford={wallet.crystals >= FORGE_ARLYS_COST}
+          busy={false}
+          actionLabel="Forjar agora"
+          blockedLabel="Arlys insuficientes"
+          priceValue={FORGE_ARLYS_COST}
+          priceLabel="✦ da forja"
+          onBuy={() => {
+            const target = preview.stack;
+            setPreview(null);
+            void forge(target);
+          }}
+          onClose={() => setPreview(null)}
+        />
+      )}
+
+      {fusionOpen && (
+        <FusionModal
+          stacks={stacks}
+          onClose={() => setFusionOpen(false)}
+          onDone={(name) => {
+            setFusionOpen(false);
+            toast.success(`Fusão concluída: fragmento de ${name}.`);
+          }}
+        />
+      )}
+
       {forging && (
         <ForgeOverlay
           stack={forging}
           done={done}
+          variant={variant}
           onClose={() => {
             setForging(null);
             setDone(false);
+            setVariant(null);
           }}
         />
       )}
+
     </main>
   );
 }
 
 
+/**
+ * Fusão: escolhe 3 fragmentos de cosméticos DIFERENTES da mesma raridade e
+ * troca por 1 fragmento de um cosmético escolhido — sem ficar com sobras.
+ */
+function FusionModal({
+  stacks,
+  onClose,
+  onDone,
+}: {
+  stacks: ShardStack[];
+  onClose: () => void;
+  onDone: (name: string) => void;
+}) {
+  const tiers = useMemo(() => {
+    const counts = new Map<ShardTier, number>();
+    for (const s of stacks) counts.set(s.tier, (counts.get(s.tier) ?? 0) + 1);
+    return (["mitico", "epico", "raro", "comum"] as ShardTier[]).filter(
+      (t) => (counts.get(t) ?? 0) > 0,
+    );
+  }, [stacks]);
+
+  const [tier, setTier] = useState<ShardTier | null>(tiers[0] ?? null);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [targets, setTargets] = useState<FusionTarget[]>([]);
+  const [target, setTarget] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const pool = useMemo(
+    () => (tier ? stacks.filter((s) => s.tier === tier) : []),
+    [stacks, tier],
+  );
+
+  useEffect(() => {
+    setPicked([]);
+    setTarget(null);
+    setTargets([]);
+    if (!tier) return;
+    let alive = true;
+    void fusionTargets(tier)
+      .then((t) => {
+        if (alive) setTargets(t);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [tier]);
+
+  function toggle(key: string) {
+    setPicked((cur) =>
+      cur.includes(key)
+        ? cur.filter((k) => k !== key)
+        : cur.length >= FUSION_INPUT
+          ? cur
+          : [...cur, key],
+    );
+  }
+
+  const ready = picked.length === FUSION_INPUT && Boolean(target);
+
+  async function run() {
+    if (!ready || !target) return;
+    setBusy(true);
+    const res = await fuseShards(picked, target);
+    setBusy(false);
+    if (!res.ok) {
+      toast.error(
+        res.error === "need_three"
+          ? `Escolha ${FUSION_INPUT} cosméticos diferentes.`
+          : res.error === "same_item"
+            ? "Os fragmentos precisam ser de cosméticos diferentes."
+            : res.error === "mixed_tier"
+              ? "Todos os fragmentos precisam ser da mesma raridade."
+              : res.error === "bad_target"
+                ? "Escolha um cosmético da mesma raridade."
+                : "Fragmento não encontrado.",
+      );
+      return;
+    }
+    onDone(res.shard.name);
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Fundir fragmentos"
+    >
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+      />
+      <div className="relative flex max-h-[88vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-surface/95 backdrop-blur-2xl sm:rounded-3xl">
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-white/[0.07] px-5 py-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/80">
+              Fusão
+            </p>
+            <h2 className="mt-1 text-lg font-bold tracking-tight">
+              {FUSION_INPUT} diferentes → 1 escolhido
+            </h2>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
+              Mesma raridade. Você decide qual fragmento sai da bancada.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/6 text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          {tiers.length === 0 ? (
+            <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 text-center text-[13px] text-muted-foreground">
+              Você ainda não tem fragmentos para fundir.
+            </p>
+          ) : (
+            <>
+              <div className="flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {tiers.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setTier(t)}
+                    className={`tap-target flex-1 whitespace-nowrap rounded-full px-3 py-2 text-[12.5px] font-semibold transition ${
+                      tier === t
+                        ? "bg-primary/18 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={tier === t ? { color: TIER_META[t].color } : undefined}
+                  >
+                    {TIER_META[t].label}
+                  </button>
+                ))}
+              </div>
+
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Sacrificar · {picked.length}/{FUSION_INPUT}
+              </p>
+              {pool.length < FUSION_INPUT ? (
+                <p className="mt-2 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-[12.5px] text-muted-foreground">
+                  Você precisa de {FUSION_INPUT} cosméticos diferentes desta raridade.
+                </p>
+              ) : (
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {pool.map((s) => {
+                    const on = picked.includes(s.key);
+                    return (
+                      <button
+                        key={s.key}
+                        type="button"
+                        onClick={() => toggle(s.key)}
+                        className={`tap-target flex items-center gap-2 rounded-2xl border p-2 text-left transition ${
+                          on
+                            ? "border-primary/45 bg-primary/12"
+                            : "border-white/8 bg-white/[0.04] hover:bg-white/[0.07]"
+                        }`}
+                      >
+                        <ShardArt
+                          cosmeticKey={s.key}
+                          accent={s.accent}
+                          tierColor={TIER_META[s.tier].color}
+                          size={38}
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[12.5px] font-semibold">
+                            {s.name}
+                          </span>
+                          <span className="block text-[10.5px] text-muted-foreground">
+                            x{s.count}
+                          </span>
+                        </span>
+                        {on && <Check className="h-4 w-4 shrink-0 text-primary" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                Receber
+              </p>
+              <div className="mt-2 space-y-1.5">
+                {targets.length === 0 ? (
+                  <p className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-[12.5px] text-muted-foreground">
+                    Nenhum cosmético desta raridade disponível agora.
+                  </p>
+                ) : (
+                  targets.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => setTarget(t.key)}
+                      className={`tap-target flex w-full items-center gap-2.5 rounded-2xl border px-3 py-2 text-left transition ${
+                        target === t.key
+                          ? "border-primary/45 bg-primary/12"
+                          : "border-white/8 bg-white/[0.04] hover:bg-white/[0.07]"
+                      }`}
+                    >
+                      <ShardArt
+                        cosmeticKey={t.key}
+                        accent={t.accent}
+                        tierColor={TIER_META[t.tier].color}
+                        size={34}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[13px] font-semibold">
+                          {t.name}
+                        </span>
+                        <span className="block truncate text-[10.5px] text-muted-foreground">
+                          {SLOT_LABEL[t.slot] ?? t.slot}
+                        </span>
+                      </span>
+                      {target === t.key && (
+                        <Check className="h-4 w-4 shrink-0 text-primary" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="shrink-0 border-t border-white/[0.07] bg-black/25 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => void run()}
+            disabled={!ready || busy}
+            className="tap-target w-full rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition disabled:opacity-40"
+          >
+            {busy ? "Fundindo…" : `Fundir ${FUSION_INPUT} fragmentos`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HelpModal({ onClose }: { onClose: () => void }) {
+
   return (
     <div
       className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
@@ -513,14 +918,31 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           </HelpItem>
           <HelpItem n={3} title={`${SHARDS_PER_FORGE} iguais + ${FORGE_ARLYS_COST} ✦`}>
             Junte {SHARDS_PER_FORGE} fragmentos do mesmo cosmético e pague{" "}
-            {FORGE_ARLYS_COST} Arlys ✦ para forjá-lo. O item fica permanente na sua conta.
+            {FORGE_ARLYS_COST} Arlys ✦ para forjá-lo. Antes de confirmar você prova o item
+            no provador, vendo como ele fica equipado.
           </HelpItem>
-          <HelpItem n={4} title="Não gostou? Troque ou dissolva">
+          <HelpItem n={4} title="Forja crítica">
+            Toda forja tem {Math.round(CRIT_FORGE_CHANCE * 100)}% de chance de sair na
+            variante Áurea e {Math.round(PLATINA_FORGE_CHANCE * 100)}% de sair Platina —
+            versões especiais do mesmo cosmético.
+          </HelpItem>
+          <HelpItem n={5} title={`Fusão: ${FUSION_INPUT} diferentes → 1 escolhido`}>
+            Sobrou fragmento de item que você não quer? Funda {FUSION_INPUT} fragmentos de
+            cosméticos diferentes da mesma raridade e receba 1 fragmento do cosmético que
+            você escolher.
+          </HelpItem>
+          <HelpItem n={6} title="Bancada limitada e brilho">
+            A bancada guarda até {SHARD_CAP} fragmentos — cheia, nada novo cai. Fragmentos
+            parados mais de 2 semanas perdem brilho e valem menos ao dissolver, e o saque
+            por dissolução tem teto de {DISSOLVE_WEEKLY_CAP} ✦ por semana.
+          </HelpItem>
+          <HelpItem n={7} title="Não gostou? Troque ou dissolva">
             Trocar transforma o fragmento em outro cosmético — você tem{" "}
             {REROLL_WEEKLY_LIMIT} trocas por semana. Dissolver devolve Arlys ✦ conforme a
             raridade (20 a 60 ✦).
           </HelpItem>
         </ul>
+
 
         <button
           type="button"
@@ -563,10 +985,11 @@ function VaultStat({
   highlight,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   highlight?: boolean;
 }) {
+
   return (
     <div
       className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 ${
