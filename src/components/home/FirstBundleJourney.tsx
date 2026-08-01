@@ -37,7 +37,7 @@ export function FirstBundleJourney() {
   useEffect(() => {
     const unsub = onJourneyStepClaimed((step) => {
       setFlash(step);
-      setTimeout(() => setFlash(null), 2400);
+      setTimeout(() => setFlash(null), 2000);
     });
     return () => {
       unsub();
