@@ -291,14 +291,43 @@ function ExamPage() {
 function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: () => void }) {
   const state = useExamState();
   const current = state.current!;
-  const q = current.questions[current.currentIndex];
-  const totalAnswered = Object.keys(current.answers).length;
-  const isLast = current.currentIndex === current.questions.length - 1;
-  const selected = current.answers[q.id];
+  const total = current.questions.length;
+  const index = Math.max(0, Math.min(total - 1, current.currentIndex));
+  const q = current.questions[index];
+  const totalAnswered = current.questions.filter(
+    (item) => current.answers[item.id] !== undefined && current.answers[item.id] !== null,
+  ).length;
+  const isLast = index === total - 1;
+  const selected = q ? current.answers[q.id] : undefined;
+
+  useEffect(() => {
+    if (current.currentIndex !== index) goToIndex(index);
+  }, [current.currentIndex, index]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [current.currentIndex]);
+  }, [index]);
+
+  if (!q) {
+    return (
+      <main className="mx-auto max-w-md px-5 py-16 text-center">
+        <div className="ios-card rounded-3xl p-8">
+          <h1 className="text-xl font-semibold">Prova indisponível</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Não foi possível carregar as questões desta prova. Cancele e inicie novamente.
+          </p>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Cancelar prova
+          </button>
+        </div>
+      </main>
+    );
+  }
+
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-8">
