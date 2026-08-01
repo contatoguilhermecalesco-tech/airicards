@@ -46,7 +46,13 @@ export const CROWN_ART_BY_KEY: Record<
     glow: "rgba(147, 197, 253, 0.24)",
     ring: princesaFrame,
   },
+  "nameplate:coroa_piscina": {
+    art: piscinaCrown,
+    glow: "rgba(34, 211, 238, 0.24)",
+    ring: piscinaFrame,
+  },
 };
+
 
 export function getCrownArt(walletKey: string | undefined | null) {
   if (!walletKey) return undefined;
