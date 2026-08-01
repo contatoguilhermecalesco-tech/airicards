@@ -47,7 +47,7 @@ export function ShardDropToast({
             {drop.name}
           </span>
           <span className="truncate text-[11px] text-white/55">
-            {SLOT_LABEL[drop.slot] ?? drop.slot} · forje na Forja com Arlys ✦
+            {SLOT_LABEL[drop.slot] ?? drop.slot} · guardado para depois da revisão
           </span>
         </span>
       </div>
