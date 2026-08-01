@@ -567,7 +567,7 @@ function BundlePreview({
               />
             )}
           </div>
-          <p className="mt-7 text-sm font-bold text-white">Guilherme</p>
+          <p className="mt-10 text-sm font-bold text-white">Guilherme</p>
           <p className="text-[11px] text-white/60">
             <span className="text-white/80">guilherme</span>
             <span className="text-white/40">.airi.com.br</span>
