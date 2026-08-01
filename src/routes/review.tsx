@@ -230,6 +230,11 @@ function Review() {
       setAskDifficulty(true);
       setRunStreak((n) => n + 1);
       pulseSkin("hit");
+      const drop = rollLuminho({
+        runStreak: runStreak + 1,
+        isEnemy: isEnemy(current) && !isDefeated(current),
+      });
+      if (drop) setLuminho({ ...drop, id: ++luminhoIdRef.current });
       if (isEnemyRun && isEnemy(current)) {
         bumpCombo();
         onComboReached(getComboCount());
