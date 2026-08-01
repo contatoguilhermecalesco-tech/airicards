@@ -240,7 +240,16 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "streak_flame:chama_marionete": marioneteChama,
   "enemy_seal:selo_marionete": marioneteSelo,
   "victory_splash:ascensao_marionete": marioneteAscensao,
+
+  "decoration:piscina_infinita": piscinaAura,
+  "nameplate:coroa_piscina": piscinaFrame,
+  "veil:veu_piscina": piscinaCardframe,
+  "table:mesa_piscina": piscinaTableAmbient,
+  "streak_flame:chama_piscina": piscinaChama,
+  "enemy_seal:selo_piscina": piscinaSelo,
+  "victory_splash:ascensao_piscina": piscinaAscensao,
 };
+
 
 
 export function getEquippedArt(walletKey: string | undefined | null): string | undefined {
