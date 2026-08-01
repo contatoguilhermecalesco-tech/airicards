@@ -179,3 +179,17 @@ export function NameplateTopCrown({
     <AvatarRing art={art} glow="rgba(192,132,252,0.18)" size={size} />
   );
 }
+
+/**
+ * Escala do anel para uma arte de moldura específica. Usada por previews da
+ * loja (bundle/provador) para desenhar o círculo no mesmo encaixe do perfil.
+ */
+export const DEFAULT_RING_SCALE = 1.78;
+
+export function getRingScaleForArt(art: string | undefined | null): number {
+  if (!art) return DEFAULT_RING_SCALE;
+  for (const crown of Object.values(CROWN_ART_BY_KEY)) {
+    if (crown.ring === art) return crown.ringScale ?? DEFAULT_RING_SCALE;
+  }
+  return DEFAULT_RING_SCALE;
+}
