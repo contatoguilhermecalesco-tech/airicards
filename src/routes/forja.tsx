@@ -358,6 +358,7 @@ function ForjaPage() {
                 </span>
               </span>
               <span className="text-muted-foreground">
+                Quedas hoje: {DROP_DAILY_CAP - dropsLeftToday(hunt)}/{DROP_DAILY_CAP} ·
                 Saque semanal: {cashLeft}/{DISSOLVE_WEEKLY_CAP} ✦
               </span>
             </div>
