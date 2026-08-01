@@ -38,6 +38,8 @@ export type ForgeLogEntry = {
   tone: "forge" | "dissolve" | "drop" | "reroll";
 };
 
+export type ForgeVariant = "aurea" | "platina";
+
 export type HuntState = {
   /** Fragmentos guardados no inventário. */
   shards: Shard[];
@@ -47,6 +49,10 @@ export type HuntState = {
   lifetime: number;
   /** Controle de trocas (rerolls) por semana. */
   rerolls: { week: string; used: number };
+  /** Variantes conquistadas em forjas críticas: chave do cosmético → variante. */
+  variants: Record<string, ForgeVariant>;
+  /** Arlys já sacados por dissolução nesta semana (teto anti-inflação). */
+  dissolveWeek: { week: string; arlys: number };
   log: ForgeLogEntry[];
 };
 
@@ -58,6 +64,24 @@ export const SHARDS_PER_FORGE = 3;
 export const FORGE_ARLYS_COST = 150;
 /** Quantas trocas de fragmento por semana. */
 export const REROLL_WEEKLY_LIMIT = 3;
+/** Limite de fragmentos no inventário — força decisões. */
+export const SHARD_CAP = 10;
+/** Fragmentos consumidos numa fusão (raridades iguais, cosméticos diferentes). */
+export const FUSION_INPUT = 3;
+/** Dias até o fragmento começar a perder brilho. */
+export const DULL_AFTER_DAYS = 14;
+/** Dias até o fragmento ficar totalmente opaco. */
+export const DULL_MAX_DAYS = 30;
+/** Teto semanal de Arlys sacados por dissolução. */
+export const DISSOLVE_WEEKLY_CAP = 300;
+/** Chance de forja crítica (variante áurea) e de variante platina. */
+export const CRIT_FORGE_CHANCE = 0.14;
+export const PLATINA_FORGE_CHANCE = 0.04;
+
+export const VARIANT_META: Record<ForgeVariant, { label: string; color: string }> = {
+  aurea: { label: "Áurea", color: "#f3c969" },
+  platina: { label: "Platina", color: "#dbe7f3" },
+};
 
 /** Arlys devolvidos ao dissolver 1 fragmento, por raridade. */
 const DISSOLVE_BY_TIER: Record<ShardTier, number> = {
@@ -66,6 +90,24 @@ const DISSOLVE_BY_TIER: Record<ShardTier, number> = {
   epico: 45,
   mitico: 60,
 };
+
+const DAY = 86_400_000;
+
+/** Fator de brilho (1 → intacto, 0.5 → totalmente opaco). */
+export function shineFactor(at: number, now = Date.now()): number {
+  const days = Math.max(0, (now - at) / DAY);
+  if (days <= DULL_AFTER_DAYS) return 1;
+  if (days >= DULL_MAX_DAYS) return 0.5;
+  const t = (days - DULL_AFTER_DAYS) / (DULL_MAX_DAYS - DULL_AFTER_DAYS);
+  return 1 - 0.5 * t;
+}
+
+/** Valor real de dissolução de 1 fragmento, já com perda de brilho. */
+export function shardDissolveValue(shard: Shard, now = Date.now()): number {
+  const base = DISSOLVE_BY_TIER[shard.tier] ?? 20;
+  return Math.max(5, Math.round(base * shineFactor(shard.at, now)));
+}
+
 
 function weekKey(d = new Date()): string {
   const t = new Date(d);
@@ -81,8 +123,11 @@ const EMPTY: HuntState = {
   forged: 0,
   lifetime: 0,
   rerolls: { week: weekKey(), used: 0 },
+  variants: {},
+  dissolveWeek: { week: weekKey(), arlys: 0 },
   log: [],
 };
+
 
 function tierFor(price: number): ShardTier {
   if (price >= 500) return "mitico";
@@ -109,14 +154,30 @@ function normalize(raw: Partial<HuntState> | undefined): HuntState {
         tier: s.price ? tierFor(s.price) : (s.tier ?? "comum"),
         at: Number(s.at ?? Date.now()),
       }))
-      .slice(0, 120),
+      .slice(0, SHARD_CAP),
     forged: Math.max(0, Math.floor(raw.forged ?? 0)),
     lifetime: Math.max(0, Math.floor(raw.lifetime ?? 0)),
     rerolls:
       rr && rr.week === currentWeek
         ? { week: currentWeek, used: Math.max(0, Math.floor(rr.used ?? 0)) }
         : { week: currentWeek, used: 0 },
+    variants:
+      raw.variants && typeof raw.variants === "object"
+        ? Object.fromEntries(
+            Object.entries(raw.variants).filter(
+              ([, v]) => v === "aurea" || v === "platina",
+            ),
+          )
+        : {},
+    dissolveWeek:
+      raw.dissolveWeek && raw.dissolveWeek.week === currentWeek
+        ? {
+            week: currentWeek,
+            arlys: Math.max(0, Math.floor(raw.dissolveWeek.arlys ?? 0)),
+          }
+        : { week: currentWeek, arlys: 0 },
     log: Array.isArray(raw.log) ? raw.log.slice(0, 30) : [],
+
   };
 }
 
@@ -160,6 +221,22 @@ export function rerollsLeft(s: HuntState = state): number {
   return Math.max(0, REROLL_WEEKLY_LIMIT - rr);
 }
 
+/** Arlys ainda sacáveis por dissolução nesta semana. */
+export function dissolveLeft(s: HuntState = state): number {
+  const used = s.dissolveWeek?.week === weekKey() ? s.dissolveWeek.arlys : 0;
+  return Math.max(0, DISSOLVE_WEEKLY_CAP - used);
+}
+
+/** Vagas livres no inventário. */
+export function shardSlotsLeft(s: HuntState = state): number {
+  return Math.max(0, SHARD_CAP - s.shards.length);
+}
+
+/** Variante conquistada em forja crítica (ou null). */
+export function variantOf(key: string, s: HuntState = state): ForgeVariant | null {
+  return s.variants?.[key] ?? null;
+}
+
 // ---- Inventário / preços ---------------------------------------------
 
 /** Agrupa fragmentos por cosmético. */
@@ -178,21 +255,34 @@ export type ShardStack = {
   ready: boolean;
   /** Custo fixo em Arlys da forja. */
   cost: number;
-  /** Arlys devolvidos ao dissolver 1 fragmento. */
+  /** Arlys devolvidos ao dissolver 1 fragmento (já com perda de brilho). */
   dissolveValue: number;
+  /** Brilho do fragmento mais antigo da pilha (1 → intacto). */
+  shine: number;
+  /** Fragmento perdendo valor por tempo guardado. */
+  dull: boolean;
 };
 
 export function dissolveValue(tier: ShardTier): number {
   return DISSOLVE_BY_TIER[tier] ?? 20;
 }
 
+
 export function shardStacks(s: HuntState = state): ShardStack[] {
+  const now = Date.now();
   const map = new Map<string, ShardStack>();
   for (const sh of s.shards) {
+    const shine = shineFactor(sh.at, now);
+    const value = shardDissolveValue(sh, now);
     const cur = map.get(sh.key);
     if (cur) {
       cur.count += 1;
       cur.ids.push(sh.id);
+      // A pilha mostra o fragmento mais desbotado (o primeiro a ser dissolvido).
+      if (shine < cur.shine) {
+        cur.shine = shine;
+        cur.dissolveValue = value;
+      }
     } else {
       map.set(sh.key, {
         key: sh.key,
@@ -206,7 +296,9 @@ export function shardStacks(s: HuntState = state): ShardStack[] {
         missing: SHARDS_PER_FORGE - 1,
         ready: false,
         cost: FORGE_ARLYS_COST,
-        dissolveValue: dissolveValue(sh.tier),
+        dissolveValue: value,
+        shine,
+        dull: false,
       });
     }
   }
@@ -214,7 +306,9 @@ export function shardStacks(s: HuntState = state): ShardStack[] {
   for (const st of out) {
     st.missing = Math.max(0, SHARDS_PER_FORGE - st.count);
     st.ready = st.count >= SHARDS_PER_FORGE;
+    st.dull = st.shine < 1;
   }
+
   const order: Record<ShardTier, number> = { mitico: 0, epico: 1, raro: 2, comum: 3 };
   return out.sort(
     (a, b) =>
@@ -319,6 +413,8 @@ export async function rollShard(opts: {
   runStreak: number;
   isEnemy: boolean;
 }): Promise<ShardDrop | null> {
+  // Inventário cheio: nada cai até você forjar, fundir ou dissolver.
+  if (shardSlotsLeft() <= 0) return null;
   const base = 0.09;
   const streakBonus = Math.min(0.08, opts.runStreak * 0.01);
   const enemyBonus = opts.isEnemy ? 0.05 : 0;
@@ -328,7 +424,7 @@ export async function rollShard(opts: {
   if (!pick) return null;
 
   const shard = makeShard(pick);
-  state.shards = [shard, ...state.shards].slice(0, 120);
+  state.shards = [shard, ...state.shards].slice(0, SHARD_CAP);
   state.lifetime += 1;
   pushLog({
     at: shard.at,
@@ -339,6 +435,7 @@ export async function rollShard(opts: {
   return shard;
 }
 
+
 /** Quantos fragmentos do mesmo cosmético você já tem (para o pop-up de drop). */
 export function shardCountFor(key: string, s: HuntState = state): number {
   return s.shards.filter((x) => x.key === key).length;
@@ -347,12 +444,13 @@ export function shardCountFor(key: string, s: HuntState = state): number {
 // ---- Forja / troca / dissolução ---------------------------------------
 
 export type ForgeResult =
-  | { ok: true; stack: ShardStack }
+  | { ok: true; stack: ShardStack; variant: ForgeVariant | null }
   | { ok: false; error: "no_shard" | "incomplete" | "owned" | "insufficient" };
 
 /**
  * Forja o cosmético consumindo 3 fragmentos + 150 Arlys ✦.
  * Fragmentos extras do mesmo cosmético continuam no inventário.
+ * Há chance de FORJA CRÍTICA: o item nasce numa variante áurea ou platina.
  */
 export async function forgeShard(key: string): Promise<ForgeResult> {
   const stack = shardStacks().find((s) => s.key === key);
@@ -379,14 +477,29 @@ export async function forgeShard(key: string): Promise<ForgeResult> {
     return true;
   });
   state.forged += 1;
+
+  const roll = Math.random();
+  const variant: ForgeVariant | null =
+    roll < PLATINA_FORGE_CHANCE
+      ? "platina"
+      : roll < PLATINA_FORGE_CHANCE + CRIT_FORGE_CHANCE
+        ? "aurea"
+        : null;
+  if (variant) {
+    state.variants = { ...state.variants, [key]: variant };
+  }
+
   pushLog({
     at: Date.now(),
     tone: "forge",
-    label: stack.name,
-    detail: `Forjado por ${SHARDS_PER_FORGE} fragmentos + ${FORGE_ARLYS_COST} ✦ — equipe no seu perfil.`,
+    label: variant ? `${stack.name} · ${VARIANT_META[variant].label}` : stack.name,
+    detail: variant
+      ? `Forja crítica! Variante ${VARIANT_META[variant].label} conquistada.`
+      : `Forjado por ${SHARDS_PER_FORGE} fragmentos + ${FORGE_ARLYS_COST} ✦ — equipe no seu perfil.`,
   });
-  return { ok: true, stack };
+  return { ok: true, stack, variant };
 }
+
 
 export type RerollResult =
   | { ok: true; shard: Shard; left: number }
@@ -416,38 +529,141 @@ export async function rerollShard(key: string): Promise<RerollResult> {
   return { ok: true, shard, left: rerollsLeft() };
 }
 
-/** Dissolve 1 fragmento em Arlys. */
-export async function dissolveShard(key: string): Promise<number> {
-  const idx = state.shards.findIndex((s) => s.key === key);
-  if (idx < 0) return 0;
-  const shard = state.shards[idx];
-  const value = dissolveValue(shard.tier);
-  state.shards = state.shards.filter((_, i) => i !== idx);
-  await earn(value, "shard.dissolve");
+/** Credita Arlys de dissolução respeitando o teto semanal. */
+async function payDissolve(value: number): Promise<{ paid: number; capped: number }> {
+  const left = dissolveLeft();
+  const paid = Math.max(0, Math.min(value, left));
+  if (paid > 0) {
+    await earn(paid, "shard.dissolve");
+    state.dissolveWeek = {
+      week: weekKey(),
+      arlys: (state.dissolveWeek?.week === weekKey() ? state.dissolveWeek.arlys : 0) + paid,
+    };
+  }
+  return { paid, capped: value - paid };
+}
+
+export type DissolveResult = { paid: number; capped: number };
+
+/** Dissolve 1 fragmento em Arlys (sempre o mais desbotado da pilha). */
+export async function dissolveShard(key: string): Promise<DissolveResult> {
+  const rows = state.shards.filter((s) => s.key === key);
+  if (rows.length === 0) return { paid: 0, capped: 0 };
+  // O fragmento mais antigo (menos brilhante) sai primeiro.
+  const target = rows.reduce((a, b) => (a.at <= b.at ? a : b));
+  const value = shardDissolveValue(target);
+  state.shards = state.shards.filter((s) => s.id !== target.id);
+  const res = await payDissolve(value);
   pushLog({
     at: Date.now(),
     tone: "dissolve",
-    label: `+${value} ✦`,
-    detail: `Fragmento de ${shard.name} dissolvido.`,
+    label: `+${res.paid} ✦`,
+    detail: res.capped
+      ? `Fragmento de ${target.name} dissolvido — teto semanal atingido (${res.capped} ✦ perdidos).`
+      : `Fragmento de ${target.name} dissolvido.`,
   });
-  return value;
+  return res;
 }
 
 /** Dissolve todos os fragmentos de um cosmético. */
 export async function dissolveAll(key: string): Promise<number> {
   const rows = state.shards.filter((s) => s.key === key);
   if (rows.length === 0) return 0;
-  const value = rows.reduce((a, s) => a + dissolveValue(s.tier), 0);
+  const value = rows.reduce((a, s) => a + shardDissolveValue(s), 0);
   state.shards = state.shards.filter((s) => s.key !== key);
-  await earn(value, "shard.dissolve");
+  const res = await payDissolve(value);
   pushLog({
     at: Date.now(),
     tone: "dissolve",
-    label: `+${value} ✦`,
-    detail: `${rows.length} fragmento(s) de ${rows[0].name} dissolvido(s).`,
+    label: `+${res.paid} ✦`,
+    detail: res.capped
+      ? `${rows.length} fragmento(s) de ${rows[0].name} dissolvido(s) — teto semanal atingido.`
+      : `${rows.length} fragmento(s) de ${rows[0].name} dissolvido(s).`,
   });
-  return value;
+  return res.paid;
 }
+
+// ---- Fusão -----------------------------------------------------------
+
+export type FusionTarget = {
+  key: string;
+  name: string;
+  slot: string;
+  price: number;
+  accent: string;
+  tier: ShardTier;
+};
+
+/**
+ * Cosméticos que podem ser escolhidos como alvo de uma fusão daquela raridade.
+ */
+export async function fusionTargets(tier: ShardTier): Promise<FusionTarget[]> {
+  const pool = await candidatePool();
+  return pool
+    .filter((c) => c.tier === tier)
+    .map((c) => ({
+      key: c.key,
+      name: c.name,
+      slot: c.slot,
+      price: c.price,
+      accent: c.accent,
+      tier: c.tier,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+}
+
+/** Fragmentos de cosméticos DIFERENTES disponíveis para fundir, por raridade. */
+export function fusionPool(tier: ShardTier, s: HuntState = state): ShardStack[] {
+  return shardStacks(s).filter((st) => st.tier === tier);
+}
+
+export type FusionResult =
+  | { ok: true; shard: Shard }
+  | { ok: false; error: "need_three" | "same_item" | "mixed_tier" | "no_shard" | "bad_target" };
+
+/**
+ * Funde 3 fragmentos de cosméticos DIFERENTES da MESMA raridade em 1 fragmento
+ * de um cosmético escolhido por você (mesma raridade).
+ */
+export async function fuseShards(
+  keys: string[],
+  targetKey: string,
+): Promise<FusionResult> {
+  const unique = [...new Set(keys)];
+  if (unique.length !== FUSION_INPUT) {
+    return { ok: false, error: unique.length < keys.length ? "same_item" : "need_three" };
+  }
+
+  const picked: Shard[] = [];
+  for (const k of unique) {
+    const rows = state.shards.filter(
+      (s) => s.key === k && !picked.some((p) => p.id === s.id),
+    );
+    if (rows.length === 0) return { ok: false, error: "no_shard" };
+    picked.push(rows.reduce((a, b) => (a.at <= b.at ? a : b)));
+  }
+  const tier = picked[0].tier;
+  if (picked.some((p) => p.tier !== tier)) return { ok: false, error: "mixed_tier" };
+
+  const targets = await fusionTargets(tier);
+  const target = targets.find((t) => t.key === targetKey);
+  if (!target) return { ok: false, error: "bad_target" };
+
+  const ids = new Set(picked.map((p) => p.id));
+  const shard = makeShard(target);
+  state.shards = [shard, ...state.shards.filter((s) => !ids.has(s.id))].slice(
+    0,
+    SHARD_CAP,
+  );
+  pushLog({
+    at: shard.at,
+    tone: "reroll",
+    label: `Fusão → ${shard.name}`,
+    detail: `${FUSION_INPUT} fragmentos ${TIER_META[tier].label.toLowerCase()}s fundidos no fragmento escolhido.`,
+  });
+  return { ok: true, shard };
+}
+
 
 /**
  * Retira 1 fragmento do inventário para enviar de presente. Devolve o
@@ -470,7 +686,7 @@ export function takeShardForGift(key: string, toName: string): Shard | null {
 /** Devolve um fragmento ao inventário (presente recusado / cancelado). */
 export function restoreShard(shard: Omit<Shard, "id" | "at">, detail: string) {
   const full = makeShard(shard as Candidate);
-  state.shards = [full, ...state.shards].slice(0, 120);
+  state.shards = [full, ...state.shards].slice(0, SHARD_CAP);
   pushLog({
     at: full.at,
     tone: "drop",
@@ -485,7 +701,7 @@ export function receiveGiftedShard(
   fromName: string,
 ): Shard {
   const full = makeShard(shard as Candidate);
-  state.shards = [full, ...state.shards].slice(0, 120);
+  state.shards = [full, ...state.shards].slice(0, SHARD_CAP);
   state.lifetime += 1;
   pushLog({
     at: full.at,

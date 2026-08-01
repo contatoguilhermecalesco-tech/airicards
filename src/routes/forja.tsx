@@ -26,20 +26,38 @@ import {
   rerollShard,
   rerollsLeft,
   pruneOwnedShards,
+  shardSlotsLeft,
+  dissolveLeft,
+  fuseShards,
+  fusionTargets,
+  TIER_META,
+  SLOT_LABEL,
   SHARDS_PER_FORGE,
   FORGE_ARLYS_COST,
   REROLL_WEEKLY_LIMIT,
+  SHARD_CAP,
+  FUSION_INPUT,
+  DISSOLVE_WEEKLY_CAP,
+  CRIT_FORGE_CHANCE,
+  PLATINA_FORGE_CHANCE,
   type ShardStack,
+  type ShardTier,
+  type ForgeVariant,
+  type FusionTarget,
 } from "@/lib/relic-hunt";
 import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
+import { ShardArt } from "@/components/hunt/ShardArt";
 import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
 import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
 import { useAutoClaimShardGifts } from "@/lib/shard-gifts";
 
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
+import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
+import { listShopItems, type ShopItem } from "@/lib/shop";
 import { useWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { toast } from "sonner";
+
 
 
 const SEEN_KEY = "airi.forja.tutorial.v2";
@@ -83,12 +101,19 @@ function ForjaPage() {
   const profile = useCurrentProfile();
   const [forging, setForging] = useState<ShardStack | null>(null);
   const [done, setDone] = useState(false);
+  const [variant, setVariant] = useState<ForgeVariant | null>(null);
   const [help, setHelp] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("todos");
   const [view, setView] = useState<View>("grade");
   const [gifting, setGifting] = useState<ShardStack | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [fusionOpen, setFusionOpen] = useState(false);
+  const [preview, setPreview] = useState<{ stack: ShardStack; item: ShopItem } | null>(
+    null,
+  );
+  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+
 
   useAutoClaimShardGifts(profile?.id, (g) =>
     toast.success(`Fragmento recebido: ${g.shardName}`),
@@ -97,6 +122,20 @@ function ForjaPage() {
   useEffect(() => {
     pruneOwnedShards();
   }, [wallet.cosmetics.length]);
+
+  // Catálogo da loja para abrir o provador antes de forjar.
+  useEffect(() => {
+    let alive = true;
+    void listShopItems()
+      .then((items) => {
+        if (alive) setShopItems(items);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, []);
+
 
   useEffect(() => {
     try {
@@ -125,6 +164,9 @@ function ForjaPage() {
   const readyStacks = stacks.filter((s) => s.ready);
   const ready = readyStacks.length;
   const left = rerollsLeft(hunt);
+  const slots = shardSlotsLeft(hunt);
+  const cashLeft = dissolveLeft(hunt);
+  const full = slots <= 0;
 
   const visible = useMemo(
     () =>
@@ -145,7 +187,32 @@ function ForjaPage() {
     [visible],
   );
 
+  /** Encontra o item da loja correspondente ao fragmento (para o provador). */
+  function shopItemFor(stack: ShardStack): ShopItem | null {
+    return (
+      shopItems.find((i) => {
+        if (i.kind !== "cosmetic") return false;
+        const key = String(i.payload?.key ?? i.id);
+        const slot = String(i.payload?.slot ?? "cosmetic");
+        return `${slot}:${key}` === stack.key;
+      }) ?? null
+    );
+  }
 
+  /** Abre o provador antes da forja; sem item na loja, forja direto. */
+  function askForge(stack: ShardStack) {
+    if (forging) return;
+    if (!stack.ready) {
+      toast.error(`Faltam ${stack.missing} fragmento(s) deste cosmético.`);
+      return;
+    }
+    const item = shopItemFor(stack);
+    if (!item) {
+      void forge(stack);
+      return;
+    }
+    setPreview({ stack, item });
+  }
 
   async function forge(stack: ShardStack) {
     if (forging) return;
@@ -158,6 +225,7 @@ function ForjaPage() {
       return;
     }
     setDone(false);
+    setVariant(null);
     setForging(stack);
     const res = await forgeShard(stack.key);
     if (!res.ok) {
@@ -173,15 +241,27 @@ function ForjaPage() {
       );
       return;
     }
+    setVariant(res.variant);
     setDone(true);
   }
 
   async function dissolve(stack: ShardStack) {
     setBusy(stack.key);
-    const v = await dissolveShard(stack.key);
+    const res = await dissolveShard(stack.key);
     setBusy(null);
-    if (v > 0) toast.success(`+${v} ✦ pela dissolução do fragmento.`);
+    if (res.paid > 0) {
+      toast.success(
+        res.capped > 0
+          ? `+${res.paid} ✦ — teto semanal de ${DISSOLVE_WEEKLY_CAP} ✦ atingido.`
+          : `+${res.paid} ✦ pela dissolução do fragmento.`,
+      );
+    } else if (res.capped > 0) {
+      toast.error(
+        `Teto semanal de ${DISSOLVE_WEEKLY_CAP} ✦ atingido — dissolva na próxima semana.`,
+      );
+    }
   }
+
 
   async function swap(stack: ShardStack) {
     setBusy(stack.key);
@@ -251,17 +331,62 @@ function ForjaPage() {
               </h1>
               <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted-foreground">
                 {SHARDS_PER_FORGE} fragmentos iguais + {FORGE_ARLYS_COST} ✦ = cosmético
-                permanente.
+                permanente. Toda forja tem chance de sair crítica.
               </p>
             </div>
           </div>
 
           <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <VaultStat label="Fragmentos" value={hunt.shards.length} icon={Gem} />
+            <VaultStat
+              label="Fragmentos"
+              value={`${hunt.shards.length}/${SHARD_CAP}`}
+              icon={Gem}
+              highlight={full}
+            />
             <VaultStat label="Prontos" value={ready} icon={Hammer} highlight={ready > 0} />
             <VaultStat label="Forjados" value={hunt.forged} icon={Flame} />
             <VaultStat label="Arlys ✦" value={wallet.crystals} icon={Sparkles} />
           </div>
+
+          {/* Capacidade do inventário — força decisões */}
+          <div className="mt-3 rounded-2xl border border-white/8 bg-white/[0.04] px-4 py-3">
+            <div className="flex items-center justify-between gap-3 text-[11.5px] font-medium">
+              <span className="text-muted-foreground">
+                Capacidade da bancada
+                <span className={full ? "ml-1.5 text-rose-300" : "ml-1.5 text-foreground/80"}>
+                  {hunt.shards.length}/{SHARD_CAP}
+                </span>
+              </span>
+              <span className="text-muted-foreground">
+                Saque semanal: {cashLeft}/{DISSOLVE_WEEKLY_CAP} ✦
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/8">
+              <span
+                className="block h-full rounded-full transition-all"
+                style={{
+                  width: `${Math.min(100, (hunt.shards.length / SHARD_CAP) * 100)}%`,
+                  background: full
+                    ? "linear-gradient(90deg,#f43f5e,#fb7185)"
+                    : "linear-gradient(90deg,hsl(var(--primary)),#d1a8ff)",
+                }}
+              />
+            </div>
+            <p className="mt-2 text-[11.5px] leading-relaxed text-muted-foreground">
+              {full
+                ? "Bancada cheia: nenhum fragmento novo cai até você forjar, fundir ou dissolver."
+                : `${slots} espaço(s) livre(s). Fragmentos guardados mais de duas semanas perdem brilho e valem menos ao dissolver.`}
+            </p>
+            <button
+              type="button"
+              onClick={() => setFusionOpen(true)}
+              className="tap-target mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/6 px-4 py-2.5 text-[12.5px] font-semibold text-foreground/90 transition hover:bg-white/10"
+            >
+              <Recycle className="h-4 w-4 text-primary" />
+              Fundir {FUSION_INPUT} fragmentos diferentes
+            </button>
+          </div>
+
 
           {ready > 0 && (
             <button
@@ -393,7 +518,7 @@ function ForjaPage() {
                 disabled={busy === st.key || forging !== null}
                 rerollsLeft={left}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onSwap={(s) => void swap(s)}
                 onDissolve={(s) => void dissolve(s)}
                 onGift={(s) => setGifting(s)}
@@ -409,7 +534,7 @@ function ForjaPage() {
                 crystals={wallet.crystals}
                 disabled={busy === st.key || forging !== null}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onGift={(s) => setGifting(s)}
               />
             ))}
@@ -423,7 +548,7 @@ function ForjaPage() {
                 crystals={wallet.crystals}
                 disabled={busy === st.key || forging !== null}
                 canGift={Boolean(profile?.id)}
-                onForge={(s) => void forge(s)}
+                onForge={(s) => askForge(s)}
                 onGift={(s) => setGifting(s)}
               />
             ))}
@@ -450,16 +575,49 @@ function ForjaPage() {
         />
       )}
 
+      {preview && (
+        <ItemPreviewModal
+          item={preview.item}
+          owned={false}
+          canAfford={wallet.crystals >= FORGE_ARLYS_COST}
+          busy={false}
+          actionLabel="Forjar agora"
+          blockedLabel="Arlys insuficientes"
+          priceValue={FORGE_ARLYS_COST}
+          priceLabel="✦ da forja"
+          onBuy={() => {
+            const target = preview.stack;
+            setPreview(null);
+            void forge(target);
+          }}
+          onClose={() => setPreview(null)}
+        />
+      )}
+
+      {fusionOpen && (
+        <FusionModal
+          stacks={stacks}
+          onClose={() => setFusionOpen(false)}
+          onDone={(name) => {
+            setFusionOpen(false);
+            toast.success(`Fusão concluída: fragmento de ${name}.`);
+          }}
+        />
+      )}
+
       {forging && (
         <ForgeOverlay
           stack={forging}
           done={done}
+          variant={variant}
           onClose={() => {
             setForging(null);
             setDone(false);
+            setVariant(null);
           }}
         />
       )}
+
     </main>
   );
 }
@@ -563,10 +721,11 @@ function VaultStat({
   highlight,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   highlight?: boolean;
 }) {
+
   return (
     <div
       className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 ${
