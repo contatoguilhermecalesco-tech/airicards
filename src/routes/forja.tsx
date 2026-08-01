@@ -71,9 +71,15 @@ export const Route = createFileRoute("/forja")({
 });
 
 type Filter = "todos" | "prontos" | "progresso";
-type View = "grade" | "prateleira";
+type View = "grade" | "lista" | "detalhado";
 
-const VIEW_KEY = "airi.forja.view.v1";
+const VIEW_KEY = "airi.forja.view.v2";
+const VIEWS: [View, string, typeof LayoutGrid][] = [
+  ["grade", "Grade", LayoutGrid],
+  ["lista", "Lista", ListIcon],
+  ["detalhado", "Detalhado", Rows3],
+];
+
 
 function ForjaPage() {
   const hunt = useHunt();
