@@ -5,11 +5,21 @@ import type { EnemySealTheme } from "@/lib/eclipse-cosmetics";
 export function EnemySealSigil({ theme }: { theme: EnemySealTheme }) {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-0 grid place-items-center">
+      {theme.art && (
+        <img
+          src={theme.art}
+          alt=""
+          draggable={false}
+          className="absolute h-[190px] w-[190px] object-contain opacity-[0.34] motion-safe:animate-[sealSpin_46000ms_linear_infinite]"
+          style={{ filter: `drop-shadow(0 0 22px ${theme.color}88)` }}
+        />
+      )}
       <svg
         viewBox="0 0 200 200"
         className="h-[260px] w-[260px] opacity-[0.22] motion-safe:animate-[sealSpin_28000ms_linear_infinite]"
         style={{ filter: `drop-shadow(0 0 12px ${theme.color})` }}
       >
+
         <circle cx="100" cy="100" r="86" fill="none" stroke={theme.color} strokeWidth="1.2" />
         <circle
           cx="100"
