@@ -552,6 +552,54 @@ export type Database = {
         }
         Relationships: []
       }
+      shard_gifts: {
+        Row: {
+          accent: string
+          created_at: string
+          from_profile: string
+          id: string
+          note: string | null
+          price: number
+          responded_at: string | null
+          shard_key: string
+          shard_name: string
+          slot: string
+          status: string
+          tier: string
+          to_profile: string
+        }
+        Insert: {
+          accent?: string
+          created_at?: string
+          from_profile: string
+          id?: string
+          note?: string | null
+          price?: number
+          responded_at?: string | null
+          shard_key: string
+          shard_name: string
+          slot?: string
+          status?: string
+          tier?: string
+          to_profile: string
+        }
+        Update: {
+          accent?: string
+          created_at?: string
+          from_profile?: string
+          id?: string
+          note?: string | null
+          price?: number
+          responded_at?: string | null
+          shard_key?: string
+          shard_name?: string
+          slot?: string
+          status?: string
+          tier?: string
+          to_profile?: string
+        }
+        Relationships: []
+      }
       shop_featured_slots: {
         Row: {
           active: boolean

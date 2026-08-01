@@ -449,7 +449,55 @@ export async function dissolveAll(key: string): Promise<number> {
   return value;
 }
 
+/**
+ * Retira 1 fragmento do inventário para enviar de presente. Devolve o
+ * fragmento removido (ou null se não houver).
+ */
+export function takeShardForGift(key: string, toName: string): Shard | null {
+  const idx = state.shards.findIndex((s) => s.key === key);
+  if (idx < 0) return null;
+  const shard = state.shards[idx];
+  state.shards = state.shards.filter((_, i) => i !== idx);
+  pushLog({
+    at: Date.now(),
+    tone: "reroll",
+    label: `Enviado: ${shard.name}`,
+    detail: `Fragmento enviado de presente para ${toName}.`,
+  });
+  return shard;
+}
+
+/** Devolve um fragmento ao inventário (presente recusado / cancelado). */
+export function restoreShard(shard: Omit<Shard, "id" | "at">, detail: string) {
+  const full = makeShard(shard as Candidate);
+  state.shards = [full, ...state.shards].slice(0, 120);
+  pushLog({
+    at: full.at,
+    tone: "drop",
+    label: full.name,
+    detail,
+  });
+}
+
+/** Guarda um fragmento recebido de presente. */
+export function receiveGiftedShard(
+  shard: Omit<Shard, "id" | "at">,
+  fromName: string,
+): Shard {
+  const full = makeShard(shard as Candidate);
+  state.shards = [full, ...state.shards].slice(0, 120);
+  state.lifetime += 1;
+  pushLog({
+    at: full.at,
+    tone: "drop",
+    label: `Presente: ${full.name}`,
+    detail: `Fragmento recebido de ${fromName}.`,
+  });
+  return full;
+}
+
 /** Limpa fragmentos de cosméticos que o perfil já possui (comprou na loja). */
+
 export function pruneOwnedShards() {
   const owned = ownedKeys();
   const before = state.shards.length;

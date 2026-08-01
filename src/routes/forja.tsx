@@ -14,6 +14,8 @@ import {
   Gem,
   Flame,
   ChevronRight,
+  LayoutGrid,
+  Rows3,
 } from "lucide-react";
 import {
   useHunt,
@@ -32,9 +34,13 @@ import {
 } from "@/lib/relic-hunt";
 import { ShardIcon } from "@/components/hunt/ShardDropToast";
 import { ShardArt } from "@/components/hunt/ShardArt";
+import { ShardCard, ShardTile } from "@/components/hunt/ShardCard";
+import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
+import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
 
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
 import { useWallet } from "@/lib/wallet-store";
+import { useCurrentProfile } from "@/lib/profile";
 import { toast } from "sonner";
 
 const SEEN_KEY = "airi.forja.tutorial.v2";
@@ -62,15 +68,21 @@ export const Route = createFileRoute("/forja")({
 });
 
 type Filter = "todos" | "prontos" | "progresso";
+type View = "grade" | "prateleira";
+
+const VIEW_KEY = "airi.forja.view.v1";
 
 function ForjaPage() {
   const hunt = useHunt();
   const wallet = useWallet();
+  const profile = useCurrentProfile();
   const [forging, setForging] = useState<ShardStack | null>(null);
   const [done, setDone] = useState(false);
   const [help, setHelp] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("todos");
+  const [view, setView] = useState<View>("grade");
+  const [gifting, setGifting] = useState<ShardStack | null>(null);
 
   useEffect(() => {
     pruneOwnedShards();
@@ -78,6 +90,8 @@ function ForjaPage() {
 
   useEffect(() => {
     try {
+      const v = localStorage.getItem(VIEW_KEY);
+      if (v === "grade" || v === "prateleira") setView(v);
       if (!localStorage.getItem(SEEN_KEY)) {
         setHelp(true);
         localStorage.setItem(SEEN_KEY, "1");
@@ -86,6 +100,15 @@ function ForjaPage() {
       /* ignore */
     }
   }, []);
+
+  function pickView(v: View) {
+    setView(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* ignore */
+    }
+  }
 
   const stacks = shardStacks(hunt);
   const readyStacks = stacks.filter((s) => s.ready);
@@ -101,6 +124,41 @@ function ForjaPage() {
           : stacks,
     [stacks, filter],
   );
+
+  // Prateleiras estilo Spotify: faixas horizontais por contexto.
+  const shelves = useMemo(() => {
+    const rows: {
+      id: string;
+      title: string;
+      hint: string;
+      items: ShardStack[];
+    }[] = [];
+    const prontos = visible.filter((s) => s.ready);
+    const quase = visible.filter((s) => !s.ready && s.missing === 1);
+    const resto = visible.filter((s) => !s.ready && s.missing > 1);
+    if (prontos.length)
+      rows.push({
+        id: "prontos",
+        title: "Prontos para forjar",
+        hint: `${SHARDS_PER_FORGE} fragmentos completos — só falta pagar ${FORGE_ARLYS_COST} ✦.`,
+        items: prontos,
+      });
+    if (quase.length)
+      rows.push({
+        id: "quase",
+        title: "Falta 1 fragmento",
+        hint: "Uma revisão de sorte (ou um presente) fecha o conjunto.",
+        items: quase,
+      });
+    if (resto.length)
+      rows.push({
+        id: "colecao",
+        title: "Coleção em progresso",
+        hint: "Fragmentos guardados dos bundles ativos.",
+        items: resto,
+      });
+    return rows;
+  }, [visible]);
 
   async function forge(stack: ShardStack) {
     if (forging) return;
@@ -310,10 +368,39 @@ function ForjaPage() {
           <h2 className="flex items-center gap-2 text-sm font-bold tracking-tight">
             <Gem className="h-4 w-4 text-muted-foreground" /> Inventário de fragmentos
           </h2>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
-            <Shuffle className="h-3 w-3" />
-            {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] text-muted-foreground">
+              <Shuffle className="h-3 w-3" />
+              {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
+            </span>
+            <div
+              role="group"
+              aria-label="Modo de visualização"
+              className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1"
+            >
+              {(
+                [
+                  ["grade", "Grade", LayoutGrid],
+                  ["prateleira", "Prateleira", Rows3],
+                ] as [View, string, typeof LayoutGrid][]
+              ).map(([id, label, Icon]) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={view === id}
+                  onClick={() => pickView(id)}
+                  className={`tap-target inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition ${
+                    view === id
+                      ? "bg-primary/22 text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {stacks.length > 0 && (
@@ -364,181 +451,56 @@ function ForjaPage() {
           <p className="mt-4 rounded-3xl border border-white/10 bg-surface/50 p-6 text-center text-[13px] text-muted-foreground">
             Nenhum fragmento neste filtro.
           </p>
-        ) : (
+        ) : view === "grade" ? (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {visible.map((st) => {
-              const tier = TIER_META[st.tier];
-              const affordable = wallet.crystals >= FORGE_ARLYS_COST;
-              const disabled = busy === st.key || forging !== null;
-              const pct = Math.min(100, (st.count / SHARDS_PER_FORGE) * 100);
-              return (
-                <div
-                  key={st.key}
-                  className={`group relative overflow-hidden rounded-3xl border p-4 transition ${
-                    st.ready ? "forge-breathe" : ""
-                  }`}
-                  style={
-                    {
-                      borderColor: st.ready ? `${tier.color}80` : `${tier.color}2e`,
-                      background: st.ready
-                        ? `radial-gradient(120% 100% at 80% 0%, ${tier.color}22, transparent 62%), linear-gradient(155deg, rgba(24,14,40,0.9), rgba(12,7,22,0.94))`
-                        : "linear-gradient(155deg, rgba(22,13,36,0.85), rgba(12,7,22,0.9))",
-                      boxShadow: st.ready ? undefined : `0 0 48px -32px ${tier.color}`,
-                      "--forge-glow": tier.color,
-                    } as React.CSSProperties
-                  }
-                >
-                  {st.ready && (
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-18deg] opacity-25 forge-sheen"
-                      style={{
-                        background: `linear-gradient(90deg, transparent, ${tier.color}, transparent)`,
-                      }}
-                    />
-                  )}
-
-                  <div className="relative flex items-start gap-3">
-                    <span
-                      className="relative grid h-16 w-16 shrink-0 place-items-center rounded-2xl border"
-                      style={{
-                        borderColor: `${tier.color}33`,
-                        background: `radial-gradient(circle at 50% 40%, ${tier.color}26, transparent 70%)`,
-                      }}
-                    >
-                      <ShardArt
-                        cosmeticKey={st.key}
-                        accent={st.accent}
-                        tierColor={tier.color}
-                        size={50}
-                        complete={st.ready}
-                      />
-
-                      {st.count > SHARDS_PER_FORGE && (
-                        <span
-                          className="absolute -bottom-1.5 -right-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
-                          style={{ background: tier.color, color: "#170c26" }}
-                        >
-                          ×{st.count}
-                        </span>
-                      )}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <span
-                        className="inline-flex rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em]"
-                        style={{
-                          color: tier.color,
-                          background: `${tier.color}1a`,
-                          border: `1px solid ${tier.color}33`,
-                        }}
-                      >
-                        {tier.label}
-                      </span>
-                      <p className="mt-1.5 truncate text-[16px] font-bold tracking-tight">
-                        {st.name}
-                      </p>
-                      <p className="truncate text-[11px] text-muted-foreground">
-                        {SLOT_LABEL[st.slot] ?? st.slot}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* progresso */}
-                  <div className="relative mt-4">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-foreground/80">
-                        {Math.min(st.count, SHARDS_PER_FORGE)}/{SHARDS_PER_FORGE} fragmentos
-                      </span>
-                      <span
-                        className="font-semibold"
-                        style={{ color: st.ready ? tier.color : undefined }}
-                      >
-                        {st.ready
-                          ? `Pronto · ${FORGE_ARLYS_COST} ✦`
-                          : `Faltam ${st.missing}`}
-                      </span>
-                    </div>
-                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/8">
-                      <div
-                        className="h-full rounded-full transition-[width] duration-500"
-                        style={{
-                          width: `${pct}%`,
-                          background: `linear-gradient(90deg, ${tier.color}88, ${tier.color})`,
-                        }}
-                      />
-                    </div>
-                    <div className="mt-2 flex gap-1.5">
-                      {Array.from({ length: SHARDS_PER_FORGE }).map((_, i) => (
-                        <span
-                          key={i}
-                          className="grid h-6 flex-1 place-items-center rounded-lg border"
-                          style={{
-                            borderColor:
-                              i < st.count ? tier.color : "rgba(255,255,255,0.12)",
-                            background: i < st.count ? `${tier.color}20` : "transparent",
-                          }}
-                        >
-                          {i < st.count && (
-                            <Check className="h-3.5 w-3.5" style={{ color: tier.color }} />
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={disabled || !st.ready}
-                    onClick={() => void forge(st)}
-                    className="tap-target mt-4 flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold transition disabled:opacity-40"
-                    style={{
-                      background:
-                        st.ready && affordable
-                          ? `linear-gradient(120deg, ${tier.color}, ${tier.color}aa)`
-                          : "rgba(255,255,255,0.06)",
-                      color: st.ready && affordable ? "#170c26" : undefined,
-                    }}
-                  >
-                    <Hammer className="h-4 w-4" />
-                    {!st.ready
-                      ? `Faltam ${st.missing} fragmento(s)`
-                      : affordable
-                        ? `Forjar por ${FORGE_ARLYS_COST} ✦`
-                        : `Faltam ${FORGE_ARLYS_COST - wallet.crystals} ✦`}
-                  </button>
-
-                  <div className="mt-2 flex gap-2">
-                    <button
-                      type="button"
-                      disabled={disabled || left <= 0}
-                      title={
-                        left > 0
-                          ? `Trocar 1 fragmento por outro cosmético (${left} restantes)`
-                          : "Sem trocas nesta semana"
-                      }
-                      onClick={() => void swap(st)}
-                      className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-2xl border border-white/12 bg-white/6 px-3 py-2.5 text-[12px] font-semibold text-muted-foreground transition hover:text-foreground disabled:opacity-30"
-                    >
-                      <Shuffle className="h-3.5 w-3.5" /> Trocar
-                      <span className="text-[10px] opacity-70">({left})</span>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={disabled}
-                      title={`Dissolver 1 fragmento por ${st.dissolveValue} ✦`}
-                      onClick={() => void dissolve(st)}
-                      className="tap-target flex flex-1 items-center justify-center gap-1.5 rounded-2xl border border-white/12 bg-white/6 px-3 py-2.5 text-[12px] font-semibold text-muted-foreground transition hover:text-foreground disabled:opacity-30"
-                    >
-                      <Recycle className="h-3.5 w-3.5" /> Dissolver
-                      <span className="text-[10px] opacity-70">+{st.dissolveValue} ✦</span>
-                    </button>
-                  </div>
+            {visible.map((st) => (
+              <ShardCard
+                key={st.key}
+                stack={st}
+                crystals={wallet.crystals}
+                disabled={busy === st.key || forging !== null}
+                rerollsLeft={left}
+                canGift={Boolean(profile?.id)}
+                onForge={(s) => void forge(s)}
+                onSwap={(s) => void swap(s)}
+                onDissolve={(s) => void dissolve(s)}
+                onGift={(s) => setGifting(s)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-3 space-y-6">
+            {shelves.map((shelf) => (
+              <div key={shelf.id}>
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                  <h3 className="min-w-0 truncate text-[13px] font-bold tracking-tight">
+                    {shelf.title}
+                  </h3>
+                  <span className="shrink-0 text-[11px] text-muted-foreground">
+                    {shelf.items.length}
+                  </span>
                 </div>
-              );
-            })}
+                <p className="text-[11.5px] text-muted-foreground">{shelf.hint}</p>
+                <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {shelf.items.map((st) => (
+                    <ShardTile
+                      key={st.key}
+                      stack={st}
+                      crystals={wallet.crystals}
+                      disabled={busy === st.key || forging !== null}
+                      canGift={Boolean(profile?.id)}
+                      onForge={(s) => void forge(s)}
+                      onGift={(s) => setGifting(s)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>
+
+      <ShardGiftsPanel myId={profile?.id} />
 
       {/* ---- Histórico ---- */}
       <section className="mt-6 rounded-3xl border border-white/10 bg-surface/50 p-5">
@@ -596,6 +558,14 @@ function ForjaPage() {
       </section>
 
       {help && <HelpModal onClose={() => setHelp(false)} />}
+
+      {gifting && profile?.id && (
+        <ShardGiftDialog
+          stack={gifting}
+          myId={profile.id}
+          onClose={() => setGifting(null)}
+        />
+      )}
 
       {forging && (
         <ForgeOverlay
