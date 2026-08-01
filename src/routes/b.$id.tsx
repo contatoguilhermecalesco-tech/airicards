@@ -45,9 +45,9 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
       "Bundle mítico com aura da névoa, coroa da névoa, santuário espiritual, pétalas espectrais, véu espectral, Lobo Espectral da Névoa e itens de streak, selo, título, vitória e o Altar da Névoa. Confira na loja airi.",
   },
   "bundle.piscina_infinita": {
-    title: "airi — Praia Infinita",
+    title: "airi — Curtindo o Verão",
     description:
-      "Bundle épico de verão com aura da maré, coroa de conchas, véu da praia, mesa da praia, fogueira da praia, selo da maré e splash da maré. Confira na loja airi.",
+      "Bundle épico de verão com aura do verão, coroa do verão, véu do verão, mesa do verão infinito, brasa do verão, selo do verão e o splash Verão Infinito. Confira na loja airi.",
   },
 };
 

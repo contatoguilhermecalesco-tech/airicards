@@ -61,7 +61,7 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
   // Corte das Marionetes — carmim e porcelana
   corte_marionetes: { ring: "#d9445f", secondary: "#f8e8ec", kind: "dual", speed: "slow" },
 
-  // Praia Infinita — água turquesa e areia dourada
+  // Curtindo o Verão — água turquesa e ouro do pôr do sol
   piscina_infinita: { ring: "#22d3ee", secondary: "#fbbf24", kind: "dual", speed: "normal" },
 };
 

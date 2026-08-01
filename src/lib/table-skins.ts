@@ -126,8 +126,8 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
   "table:mesa_piscina": {
     id: "mesa_piscina",
     key: "table:mesa_piscina",
-    name: "Mesa da Praia Infinita",
-    tagline: "Areia dourada, ondas turquesa e peixes bobos de óculos surfando entre as cartas.",
+    name: "Mesa do Verão Infinito",
+    tagline: "Piscina infinita no pôr do sol, drinks gelados e peixinhos de óculos curtindo o verão entre as cartas.",
     ambient: piscinaAmbient,
     frame: piscinaTableFrame,
     crest: piscinaCrest,
