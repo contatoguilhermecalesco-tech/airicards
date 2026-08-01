@@ -1122,7 +1122,7 @@
   animation: relic-idle 2.6s ease-in-out infinite;
 }
 
-/* ---- Forja de Fragmentos ------------------------------------------- */
+/* ---- Forja de Relíquias ------------------------------------------- */
 @keyframes forge-spark {
   0%   { transform: translate3d(0, 0, 0) scale(0.6); opacity: 0; }
   15%  { opacity: var(--spark-opacity, 0.75); }
