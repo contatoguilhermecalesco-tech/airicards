@@ -235,7 +235,7 @@ function SmallAction({
   );
 }
 
-/** Card compacto usado nas prateleiras horizontais. */
+/** Card compacto usado na visão em grade. */
 export function ShardTile({
   stack: st,
   crystals,
@@ -250,7 +250,7 @@ export function ShardTile({
 
   return (
     <div
-      className="relative w-[172px] shrink-0 snap-start overflow-hidden rounded-2xl border p-3 transition"
+      className="relative w-full overflow-hidden rounded-2xl border p-3 transition"
       style={{
         borderColor: st.ready ? `${tier.color}70` : `${tier.color}26`,
         background: st.ready
@@ -258,6 +258,7 @@ export function ShardTile({
           : "linear-gradient(160deg, rgba(22,13,36,0.85), rgba(12,7,22,0.92))",
       }}
     >
+
       <span
         className="relative mx-auto grid h-[104px] w-full place-items-center rounded-xl border"
         style={{
@@ -323,6 +324,111 @@ export function ShardTile({
           <Gift className="h-3.5 w-3.5" />
         </button>
       </div>
+    </div>
+  );
+}
+
+/** Linha compacta usada na visão em lista (igual à biblioteca). */
+export function ShardRow({
+  stack: st,
+  crystals,
+  disabled,
+  canGift,
+  onForge,
+  onGift,
+}: Omit<CommonProps, "rerollsLeft" | "onSwap" | "onDissolve">) {
+  const tier = TIER_META[st.tier];
+  const affordable = crystals >= FORGE_ARLYS_COST;
+  const pct = Math.min(100, (st.count / SHARDS_PER_FORGE) * 100);
+
+  return (
+    <div
+      className="flex items-center gap-3 rounded-2xl border px-3 py-2.5"
+      style={{
+        borderColor: st.ready ? `${tier.color}55` : "rgba(255,255,255,0.08)",
+        background: st.ready ? `${tier.color}0f` : "rgba(255,255,255,0.03)",
+      }}
+    >
+      <span
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border"
+        style={{
+          borderColor: `${tier.color}26`,
+          background: `radial-gradient(circle at 50% 40%, ${tier.color}20, transparent 72%)`,
+        }}
+      >
+        <ShardArt
+          cosmeticKey={st.key}
+          accent={st.accent}
+          tierColor={tier.color}
+          size={34}
+          complete={st.ready}
+        />
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2">
+          <span className="truncate text-[14px] font-semibold tracking-tight">
+            {st.name}
+          </span>
+          <span
+            className="shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em]"
+            style={{ color: tier.color, background: `${tier.color}1a` }}
+          >
+            {tier.label}
+          </span>
+        </span>
+        <span className="mt-1 flex items-center gap-2">
+          <span className="h-1 w-24 overflow-hidden rounded-full bg-white/8">
+            <span
+              className="block h-full rounded-full"
+              style={{
+                width: `${pct}%`,
+                background: `linear-gradient(90deg, ${tier.color}88, ${tier.color})`,
+              }}
+            />
+          </span>
+          <span className="truncate text-[11px] text-muted-foreground">
+            {Math.min(st.count, SHARDS_PER_FORGE)}/{SHARDS_PER_FORGE} ·{" "}
+            {SLOT_LABEL[st.slot] ?? st.slot}
+          </span>
+        </span>
+      </span>
+
+      <button
+        type="button"
+        disabled={disabled || !st.ready}
+        onClick={() => onForge(st)}
+        className="tap-target hidden shrink-0 items-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-bold transition disabled:opacity-40 sm:inline-flex"
+        style={{
+          background:
+            st.ready && affordable
+              ? `linear-gradient(120deg, ${tier.color}, ${tier.color}aa)`
+              : "rgba(255,255,255,0.06)",
+          color: st.ready && affordable ? "#170c26" : undefined,
+        }}
+      >
+        <Hammer className="h-3.5 w-3.5" />
+        {st.ready ? "Forjar" : `Faltam ${st.missing}`}
+      </button>
+      <button
+        type="button"
+        disabled={disabled || !st.ready}
+        onClick={() => onForge(st)}
+        aria-label={`Forjar ${st.name}`}
+        className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/6 disabled:opacity-30 sm:hidden"
+      >
+        <Hammer className="h-3.5 w-3.5" />
+      </button>
+      <button
+        type="button"
+        disabled={disabled || !canGift}
+        onClick={() => onGift(st)}
+        aria-label={`Presentear fragmento de ${st.name}`}
+        title="Enviar de presente"
+        className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/6 text-muted-foreground transition hover:text-foreground disabled:opacity-30"
+      >
+        <Gift className="h-3.5 w-3.5" />
+      </button>
     </div>
   );
 }

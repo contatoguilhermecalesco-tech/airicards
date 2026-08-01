@@ -181,68 +181,63 @@ export async function acceptShardGift(gift: ShardGift): Promise<boolean> {
   return true;
 }
 
-/** Recusa o presente — o fragmento fica registrado como devolvido. */
-export async function declineShardGift(gift: ShardGift): Promise<boolean> {
-  const { error } = await (supabase as any)
-    .from("shard_gifts")
-    .update({ status: "declined", responded_at: new Date().toISOString() })
-    .eq("id", gift.id)
-    .eq("status", "pending");
-  if (error) return false;
-  await fetchShardGifts();
-  return true;
-}
+// ---- Recebimento automático ------------------------------------------------
+// O fragmento sai do inventário de quem envia na hora e entra no inventário de
+// quem recebe assim que o app dessa pessoa vê o presente. Sem recusa.
+const CLAIM_KEY = "airi.shardGifts.claimed.v1";
 
-// ---- Devolução de presentes recusados --------------------------------------
-// Quando o outro perfil recusa, o fragmento volta para quem enviou. Só o
-// cliente do remetente consegue mexer no inventário dele, então marcamos
-// localmente os presentes já devolvidos para não duplicar.
-const RECLAIM_KEY = "airi.shardGifts.reclaimed.v1";
-
-function reclaimedIds(): Set<string> {
+function claimedIds(): Set<string> {
   try {
-    const raw = localStorage.getItem(RECLAIM_KEY);
+    const raw = localStorage.getItem(CLAIM_KEY);
     return new Set<string>(raw ? (JSON.parse(raw) as string[]) : []);
   } catch {
     return new Set<string>();
   }
 }
 
-function markReclaimed(ids: Set<string>) {
+function markClaimed(ids: Set<string>) {
   try {
-    localStorage.setItem(RECLAIM_KEY, JSON.stringify([...ids].slice(-100)));
+    localStorage.setItem(CLAIM_KEY, JSON.stringify([...ids].slice(-200)));
   } catch {
     /* noop */
   }
 }
 
-/** Devolve ao inventário os fragmentos de presentes recusados. */
-export function reclaimDeclinedShardGifts(myId: string | undefined): number {
-  if (!myId || typeof window === "undefined") return 0;
-  const done = reclaimedIds();
-  let n = 0;
-  for (const g of state.gifts) {
-    if (g.fromProfile !== myId || g.status !== "declined" || done.has(g.id)) continue;
-    restoreShard(
-      {
-        key: g.shardKey,
-        name: g.shardName,
-        slot: g.slot,
-        price: g.price,
-        accent: g.accent,
-        tier: g.tier,
-      },
-      `${partnerOf(myId).name} recusou o presente — fragmento devolvido.`,
+/** Guarda automaticamente todos os fragmentos recebidos. */
+export function useAutoClaimShardGifts(
+  myId: string | undefined,
+  onClaim?: (gift: ShardGift) => void,
+) {
+  const { gifts } = useGifts();
+  useEffect(() => {
+    if (!myId || typeof window === "undefined") return;
+    const done = claimedIds();
+    const pending = gifts.filter(
+      (g) => g.toProfile === myId && g.status === "pending" && !done.has(g.id),
     );
-    done.add(g.id);
-    n += 1;
-  }
-  if (n > 0) markReclaimed(done);
-  return n;
+    if (pending.length === 0) return;
+    for (const g of pending) done.add(g.id);
+    markClaimed(done);
+    void (async () => {
+      for (const g of pending) {
+        const ok = await acceptShardGift(g);
+        if (ok) onClaim?.(g);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myId, gifts]);
 }
 
-/** Histórico curto de trocas (aceitos/recusados) entre os dois perfis. */
+/** Fragmentos que eu recebi (já guardados no inventário). */
+export function useReceivedShardGifts(myId: string | undefined, limit = 8): ShardGift[] {
+  const { gifts } = useGifts();
+  if (!myId) return [];
+  return gifts.filter((g) => g.toProfile === myId && g.status === "accepted").slice(0, limit);
+}
+
+/** Histórico curto de trocas entre os dois perfis. */
 export function useShardGiftHistory(limit = 8): ShardGift[] {
   const { gifts } = useGifts();
   return gifts.filter((g) => g.status !== "pending").slice(0, limit);
 }
+

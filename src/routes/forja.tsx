@@ -15,6 +15,7 @@ import {
   Flame,
   ChevronRight,
   LayoutGrid,
+  List as ListIcon,
   Rows3,
 } from "lucide-react";
 import {
@@ -28,20 +29,18 @@ import {
   SHARDS_PER_FORGE,
   FORGE_ARLYS_COST,
   REROLL_WEEKLY_LIMIT,
-  TIER_META,
-  SLOT_LABEL,
   type ShardStack,
 } from "@/lib/relic-hunt";
-import { ShardIcon } from "@/components/hunt/ShardDropToast";
-import { ShardArt } from "@/components/hunt/ShardArt";
-import { ShardCard, ShardTile } from "@/components/hunt/ShardCard";
+import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
 import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
 import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
+import { useAutoClaimShardGifts } from "@/lib/shard-gifts";
 
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
 import { useWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { toast } from "sonner";
+
 
 const SEEN_KEY = "airi.forja.tutorial.v2";
 
@@ -68,9 +67,15 @@ export const Route = createFileRoute("/forja")({
 });
 
 type Filter = "todos" | "prontos" | "progresso";
-type View = "grade" | "prateleira";
+type View = "grade" | "lista" | "detalhado";
 
-const VIEW_KEY = "airi.forja.view.v1";
+const VIEW_KEY = "airi.forja.view.v2";
+const VIEWS: [View, string, typeof LayoutGrid][] = [
+  ["grade", "Grade", LayoutGrid],
+  ["lista", "Lista", ListIcon],
+  ["detalhado", "Detalhado", Rows3],
+];
+
 
 function ForjaPage() {
   const hunt = useHunt();
@@ -83,6 +88,11 @@ function ForjaPage() {
   const [filter, setFilter] = useState<Filter>("todos");
   const [view, setView] = useState<View>("grade");
   const [gifting, setGifting] = useState<ShardStack | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  useAutoClaimShardGifts(profile?.id, (g) =>
+    toast.success(`Fragmento recebido: ${g.shardName}`),
+  );
 
   useEffect(() => {
     pruneOwnedShards();
@@ -91,7 +101,7 @@ function ForjaPage() {
   useEffect(() => {
     try {
       const v = localStorage.getItem(VIEW_KEY);
-      if (v === "grade" || v === "prateleira") setView(v);
+      if (v === "grade" || v === "lista" || v === "detalhado") setView(v);
       if (!localStorage.getItem(SEEN_KEY)) {
         setHelp(true);
         localStorage.setItem(SEEN_KEY, "1");
@@ -100,6 +110,7 @@ function ForjaPage() {
       /* ignore */
     }
   }, []);
+
 
   function pickView(v: View) {
     setView(v);
@@ -125,40 +136,16 @@ function ForjaPage() {
     [stacks, filter],
   );
 
-  // Prateleiras estilo Spotify: faixas horizontais por contexto.
-  const shelves = useMemo(() => {
-    const rows: {
-      id: string;
-      title: string;
-      hint: string;
-      items: ShardStack[];
-    }[] = [];
-    const prontos = visible.filter((s) => s.ready);
-    const quase = visible.filter((s) => !s.ready && s.missing === 1);
-    const resto = visible.filter((s) => !s.ready && s.missing > 1);
-    if (prontos.length)
-      rows.push({
-        id: "prontos",
-        title: "Prontos para forjar",
-        hint: `${SHARDS_PER_FORGE} fragmentos completos — só falta pagar ${FORGE_ARLYS_COST} ✦.`,
-        items: prontos,
-      });
-    if (quase.length)
-      rows.push({
-        id: "quase",
-        title: "Falta 1 fragmento",
-        hint: "Uma revisão de sorte (ou um presente) fecha o conjunto.",
-        items: quase,
-      });
-    if (resto.length)
-      rows.push({
-        id: "colecao",
-        title: "Coleção em progresso",
-        hint: "Fragmentos guardados dos bundles ativos.",
-        items: resto,
-      });
-    return rows;
-  }, [visible]);
+  // Ordena: prontos primeiro, depois quem está mais perto de completar.
+  const sorted = useMemo(
+    () =>
+      [...visible].sort(
+        (a, b) => Number(b.ready) - Number(a.ready) || a.missing - b.missing,
+      ),
+    [visible],
+  );
+
+
 
   async function forge(stack: ShardStack) {
     if (forging) return;
@@ -373,34 +360,39 @@ function ForjaPage() {
               <Shuffle className="h-3 w-3" />
               {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
             </span>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="tap-target inline-flex h-9 items-center gap-1.5 rounded-[14px] border border-white/10 bg-white/[0.03] px-3 text-[12.5px] font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.06]"
+            >
+              <History className="h-3.5 w-3.5" strokeWidth={2.4} />
+              Histórico
+            </button>
             <div
               role="group"
               aria-label="Modo de visualização"
-              className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1"
+              className="flex items-center gap-0.5 rounded-[14px] border border-white/10 bg-white/[0.03] p-1 backdrop-blur-md"
             >
-              {(
-                [
-                  ["grade", "Grade", LayoutGrid],
-                  ["prateleira", "Prateleira", Rows3],
-                ] as [View, string, typeof LayoutGrid][]
-              ).map(([id, label, Icon]) => (
+              {VIEWS.map(([id, label, Icon]) => (
                 <button
                   key={id}
                   type="button"
                   aria-pressed={view === id}
+                  aria-label={label}
+                  title={label}
                   onClick={() => pickView(id)}
-                  className={`tap-target inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition ${
+                  className={`grid h-8 w-8 place-items-center rounded-[10px] transition ${
                     view === id
-                      ? "bg-primary/22 text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                      : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
+                  <Icon className="h-4 w-4" strokeWidth={2.25} />
                 </button>
               ))}
             </div>
           </div>
+
         </div>
 
         {stacks.length > 0 && (
@@ -451,9 +443,9 @@ function ForjaPage() {
           <p className="mt-4 rounded-3xl border border-white/10 bg-surface/50 p-6 text-center text-[13px] text-muted-foreground">
             Nenhum fragmento neste filtro.
           </p>
-        ) : view === "grade" ? (
+        ) : view === "detalhado" ? (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {visible.map((st) => (
+            {sorted.map((st) => (
               <ShardCard
                 key={st.key}
                 stack={st}
@@ -468,94 +460,45 @@ function ForjaPage() {
               />
             ))}
           </div>
+        ) : view === "grade" ? (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {sorted.map((st) => (
+              <ShardTile
+                key={st.key}
+                stack={st}
+                crystals={wallet.crystals}
+                disabled={busy === st.key || forging !== null}
+                canGift={Boolean(profile?.id)}
+                onForge={(s) => void forge(s)}
+                onGift={(s) => setGifting(s)}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="mt-3 space-y-6">
-            {shelves.map((shelf) => (
-              <div key={shelf.id}>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                  <h3 className="min-w-0 truncate text-[13px] font-bold tracking-tight">
-                    {shelf.title}
-                  </h3>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {shelf.items.length}
-                  </span>
-                </div>
-                <p className="text-[11.5px] text-muted-foreground">{shelf.hint}</p>
-                <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {shelf.items.map((st) => (
-                    <ShardTile
-                      key={st.key}
-                      stack={st}
-                      crystals={wallet.crystals}
-                      disabled={busy === st.key || forging !== null}
-                      canGift={Boolean(profile?.id)}
-                      onForge={(s) => void forge(s)}
-                      onGift={(s) => setGifting(s)}
-                    />
-                  ))}
-                </div>
-              </div>
+          <div className="mt-3 space-y-2">
+            {sorted.map((st) => (
+              <ShardRow
+                key={st.key}
+                stack={st}
+                crystals={wallet.crystals}
+                disabled={busy === st.key || forging !== null}
+                canGift={Boolean(profile?.id)}
+                onForge={(s) => void forge(s)}
+                onGift={(s) => setGifting(s)}
+              />
             ))}
           </div>
         )}
       </section>
 
-      <ShardGiftsPanel myId={profile?.id} />
+      {historyOpen && (
+        <HistoryModal
+          log={hunt.log}
+          myId={profile?.id}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
 
-      {/* ---- Histórico ---- */}
-      <section className="mt-6 rounded-3xl border border-white/10 bg-surface/50 p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold tracking-tight">
-          <History className="h-4 w-4 text-muted-foreground" /> Histórico da forja
-        </h2>
-        {hunt.log.length === 0 ? (
-          <p className="mt-3 text-[13px] text-muted-foreground">Nada por aqui ainda.</p>
-        ) : (
-          <ul className="mt-3 divide-y divide-white/6">
-            {hunt.log.map((e, i) => {
-              const Icon =
-                e.tone === "forge"
-                  ? Hammer
-                  : e.tone === "dissolve"
-                    ? Coins
-                    : e.tone === "reroll"
-                      ? Shuffle
-                      : Sparkles;
-              const accent =
-                e.tone === "forge"
-                  ? "#fbbf24"
-                  : e.tone === "dissolve"
-                    ? "#7dd3fc"
-                    : e.tone === "reroll"
-                      ? "#34d399"
-                      : "#d8b4fe";
-              return (
-                <li key={`${e.at}-${i}`} className="flex items-center gap-3 py-3">
-                  <span
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
-                    style={{ background: `${accent}1f`, border: `1px solid ${accent}33` }}
-                  >
-                    <Icon className="h-4 w-4" style={{ color: accent }} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-semibold">
-                      {e.label}
-                    </span>
-                    <span className="block truncate text-[11px] text-muted-foreground">
-                      {e.detail}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {new Date(e.at).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    })}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
 
       {help && <HelpModal onClose={() => setHelp(false)} />}
 
@@ -735,6 +678,136 @@ function StatBox({
       <p className="mt-1.5 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
         {label}
       </p>
+    </div>
+  );
+}
+
+type ForgeLog = ReturnType<typeof useHunt>["log"];
+
+function HistoryModal({
+  log,
+  myId,
+  onClose,
+}: {
+  log: ForgeLog;
+  myId: string | undefined;
+  onClose: () => void;
+}) {
+  const [tab, setTab] = useState<"forja" | "trocas">("forja");
+  return (
+    <div
+      className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Histórico da forja"
+    >
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+      />
+      <div
+        className="relative max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-white/12 p-5 sm:rounded-3xl sm:p-6"
+        style={{
+          background:
+            "radial-gradient(110% 70% at 50% 0%, rgba(167,139,250,0.16), transparent 62%), linear-gradient(165deg, rgba(24,14,40,0.98), rgba(11,6,20,0.99))",
+        }}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-primary">
+              Registro
+            </p>
+            <h2 className="mt-1 text-xl font-bold tracking-tight">Histórico</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="tap-target grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/12 bg-white/6 text-muted-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="mt-4 flex gap-1.5 rounded-2xl border border-white/8 bg-white/4 p-1">
+          {(
+            [
+              ["forja", "Forja"],
+              ["trocas", "Trocas"],
+            ] as ["forja" | "trocas", string][]
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className={`tap-target flex-1 rounded-xl px-3 py-2 text-[12.5px] font-semibold transition ${
+                tab === id
+                  ? "bg-primary/22 text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4">
+          {tab === "trocas" ? (
+            <ShardGiftsPanel myId={myId} />
+          ) : log.length === 0 ? (
+            <p className="text-[13px] text-muted-foreground">Nada por aqui ainda.</p>
+          ) : (
+            <ul className="divide-y divide-white/6">
+              {log.map((e, i) => {
+                const Icon =
+                  e.tone === "forge"
+                    ? Hammer
+                    : e.tone === "dissolve"
+                      ? Coins
+                      : e.tone === "reroll"
+                        ? Shuffle
+                        : Sparkles;
+                const accent =
+                  e.tone === "forge"
+                    ? "#fbbf24"
+                    : e.tone === "dissolve"
+                      ? "#7dd3fc"
+                      : e.tone === "reroll"
+                        ? "#34d399"
+                        : "#d8b4fe";
+                return (
+                  <li key={`${e.at}-${i}`} className="flex items-center gap-3 py-3">
+                    <span
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
+                      style={{
+                        background: `${accent}1f`,
+                        border: `1px solid ${accent}33`,
+                      }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: accent }} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-semibold">
+                        {e.label}
+                      </span>
+                      <span className="block truncate text-[11px] text-muted-foreground">
+                        {e.detail}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[11px] text-muted-foreground">
+                      {new Date(e.at).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                      })}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
