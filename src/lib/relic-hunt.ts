@@ -127,6 +127,12 @@ function weekKey(d = new Date()): string {
   ).padStart(2, "0")}`;
 }
 
+function dayKey(d = new Date()): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
+}
+
 const EMPTY: HuntState = {
   shards: [],
   forged: 0,
@@ -134,8 +140,10 @@ const EMPTY: HuntState = {
   rerolls: { week: weekKey(), used: 0 },
   variants: {},
   dissolveWeek: { week: weekKey(), arlys: 0 },
+  dropDay: { day: dayKey(), count: 0, lastAt: 0 },
   log: [],
 };
+
 
 
 function tierFor(price: number): ShardTier {
