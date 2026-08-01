@@ -477,35 +477,6 @@ function ForjaPage() {
   );
 }
 
-function Sep() {
-  return (
-    <ChevronRight aria-hidden className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
-  );
-}
-
-function Step({ n, label, done }: { n: number; label: string; done?: boolean }) {
-  return (
-    <span
-      className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold"
-      style={{
-        borderColor: done ? "rgba(251,191,36,0.35)" : "rgba(255,255,255,0.1)",
-        background: done ? "rgba(251,191,36,0.12)" : "rgba(255,255,255,0.05)",
-        color: done ? "#fcd34d" : undefined,
-      }}
-    >
-      <span
-        className="grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold"
-        style={{
-          background: done ? "rgba(251,191,36,0.28)" : "color-mix(in oklab, var(--primary) 28%, transparent)",
-          color: done ? "#fde68a" : "var(--primary)",
-        }}
-      >
-        {n}
-      </span>
-      {label}
-    </span>
-  );
-}
 
 function HelpModal({ onClose }: { onClose: () => void }) {
   return (
@@ -598,39 +569,30 @@ function HelpItem({
   );
 }
 
-function StatBox({
+function VaultStat({
   label,
   value,
-  accent,
   icon: Icon,
+  highlight,
 }: {
   label: string;
   value: number;
-  accent: string;
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  highlight?: boolean;
 }) {
+  const color = highlight ? "#f0e6d2" : "#c8aa6e";
   return (
     <div
-      className="rounded-2xl border p-3"
-      style={{
-        borderColor: `${accent}2e`,
-        background: `linear-gradient(160deg, ${accent}14, rgba(255,255,255,0.03))`,
-      }}
+      className="flex items-center gap-2.5 px-3 py-2.5"
+      style={{ background: "rgba(6,9,15,0.92)" }}
     >
-      <div className="flex items-center gap-2">
-        <span
-          className="grid h-7 w-7 place-items-center rounded-lg"
-          style={{ background: `${accent}20` }}
-        >
-          <Icon className="h-4 w-4" style={{ color: accent }} />
-        </span>
-        <span className="text-lg font-bold tabular-nums" style={{ color: accent }}>
+      <Icon className="h-4 w-4 shrink-0" style={{ color }} />
+      <div className="min-w-0">
+        <p className="text-[15px] font-bold tabular-nums" style={{ color }}>
           {value}
-        </span>
+        </p>
+        <p className="loot-label truncate text-muted-foreground">{label}</p>
       </div>
-      <p className="mt-1.5 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-        {label}
-      </p>
     </div>
   );
 }
