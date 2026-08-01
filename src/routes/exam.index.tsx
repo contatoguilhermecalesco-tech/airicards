@@ -36,9 +36,9 @@ import {
   hasCompletedExamThisMonth,
   getResultForMonth,
 } from "@/lib/exam-store";
-import type { ExamDifficulty } from "@/lib/exam.functions";
+import { ExamResultView, LEVEL_COLOR, LEVEL_LABEL } from "@/components/exam/ExamResultView";
 
-export const Route = createFileRoute("/exam")({
+export const Route = createFileRoute("/exam/")({
   head: () => ({
     meta: [
       { title: "Prova de nível · airi" },
@@ -56,24 +56,6 @@ export const Route = createFileRoute("/exam")({
   }),
   component: ExamPage,
 });
-
-const LEVEL_LABEL: Record<ExamDifficulty, string> = {
-  A1: "Iniciante",
-  A2: "Básico",
-  B1: "Intermediário",
-  B2: "Intermediário avançado",
-  C1: "Avançado",
-  C2: "Proficiente",
-};
-
-const LEVEL_COLOR: Record<ExamDifficulty, string> = {
-  A1: "from-slate-400/30 to-slate-500/10",
-  A2: "from-sky-400/30 to-sky-500/10",
-  B1: "from-emerald-400/30 to-emerald-500/10",
-  B2: "from-amber-400/30 to-amber-500/10",
-  C1: "from-fuchsia-400/30 to-fuchsia-500/10",
-  C2: "from-primary/40 to-primary/10",
-};
 
 function ExamPage() {
   const profile = useCurrentProfile();
@@ -145,7 +127,7 @@ function ExamPage() {
 
   if (showResult && currentResult) {
     return (
-      <ResultView
+      <ExamResultView
         result={currentResult}
         onClose={() => {
           setShowResult(false);
@@ -436,169 +418,6 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
             Próxima <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
           </button>
         )}
-      </div>
-    </main>
-  );
-}
-
-function ResultView({
-  result,
-  onClose,
-}: {
-  result: NonNullable<ReturnType<typeof getResultForMonth>>;
-  onClose: () => void;
-}) {
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const questions = result.questions ?? [];
-
-  return (
-    <main className="mx-auto max-w-2xl px-5 py-10">
-      <header className="mb-8 text-center">
-        <div className={`mx-auto grid h-20 w-20 place-items-center rounded-3xl bg-gradient-to-br ${LEVEL_COLOR[result.level]} ring-1 ring-white/10`}>
-          <Trophy className="h-8 w-8" strokeWidth={2.25} />
-        </div>
-        <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Prova de {monthLabel(result.monthKey)}
-        </p>
-        <h1 className="mt-2 text-6xl font-semibold tracking-tight tabular-nums">
-          {result.level}
-        </h1>
-        <p className="mt-1 text-lg text-muted-foreground">{LEVEL_LABEL[result.level]}</p>
-        <p className="mt-3 text-sm text-muted-foreground tabular-nums">
-          {result.score} de {result.total} corretas · {result.percent}%
-        </p>
-      </header>
-
-      {/* Breakdown por dificuldade */}
-      <section className="mb-6">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Por dificuldade
-        </h2>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-          {(["A1", "A2", "B1", "B2", "C1", "C2"] as ExamDifficulty[]).map((d) => {
-            const b = result.breakdown[d];
-            if (!b) return null;
-            const pct = Math.round((b.correct / b.total) * 100);
-            return (
-              <div key={d} className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">{d}</span>
-                  <span className="text-xs tabular-nums text-muted-foreground">
-                    {b.correct}/{b.total}
-                  </span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Breakdown por skill */}
-      <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Por habilidade
-        </h2>
-        <div className="space-y-2">
-          {Object.entries(result.skills).map(([skill, s]) => {
-            const pct = Math.round((s.correct / s.total) * 100);
-            return (
-              <div
-                key={skill}
-                className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.025] p-3"
-              >
-                <span className="w-32 text-xs font-medium capitalize text-foreground">
-                  {skill.replace("-", " ")}
-                </span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
-                </div>
-                <span className="w-14 text-right text-xs tabular-nums text-muted-foreground">
-                  {s.correct}/{s.total}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {questions.length > 0 && (
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={() => setReviewOpen((v) => !v)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary transition hover:opacity-80"
-          >
-            {reviewOpen ? "Ocultar" : "Revisar"} respostas
-            <ChevronRight
-              className={`h-4 w-4 transition-transform ${reviewOpen ? "rotate-90" : ""}`}
-              strokeWidth={2.25}
-            />
-          </button>
-          {reviewOpen && (
-            <div className="mt-4 space-y-3">
-              {questions.map((q, i) => {
-                const ans = result.answers?.[q.id];
-                const ok = ans === q.answer;
-                return (
-                  <div
-                    key={q.id}
-                    className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4"
-                  >
-                    <div className="flex items-start gap-2">
-                      {ok ? (
-                        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" strokeWidth={2.25} />
-                      ) : (
-                        <XCircle className="h-5 w-5 shrink-0 text-red-400" strokeWidth={2.25} />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                          {i + 1}. {q.skill} · {q.difficulty}
-                        </p>
-                        <p className="mt-1 text-sm text-foreground">{q.prompt}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          Correta: <span className="text-emerald-300">{q.options[q.answer]}</span>
-                          {!ok && ans !== undefined && ans !== null && (
-                            <>
-                              {" · "}
-                              Sua: <span className="text-red-300">{q.options[ans]}</span>
-                            </>
-                          )}
-                        </p>
-                        {q.explanation && (
-                          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                            {q.explanation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-foreground py-3 text-sm font-semibold text-background transition hover:brightness-95"
-        >
-          Voltar ao início
-        </button>
-        <Link
-          to="/study"
-          className="inline-flex items-center justify-center rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-foreground transition hover:bg-white/5"
-        >
-          Estudar
-        </Link>
       </div>
     </main>
   );
