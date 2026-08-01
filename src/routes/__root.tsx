@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, Map as MapIcon, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -48,6 +48,7 @@ const GiftReceivedOverlay = lazy(() =>
   import("../components/GiftReceivedOverlay").then((m) => ({ default: m.GiftReceivedOverlay })),
 );
 import { useSocialSync } from "../lib/social-store";
+import { useJourneySync } from "../lib/journey-store";
 import { startActivityBridge } from "../lib/activity-bridge";
 import { loadWallet, useWallet } from "../lib/wallet-store";
 
@@ -233,6 +234,14 @@ function RankPill() {
 }
 
 const MORE_ITEMS = [
+  {
+    to: "/jornada",
+    label: "Jornada Compartilhada",
+    description: "O mapa do casal — progresso somado",
+    icon: MapIcon,
+    color: "#38bdf8",
+    matcher: (p: string) => p.startsWith("/jornada"),
+  },
   {
     to: "/perfil",
     label: "Meu perfil",
@@ -773,6 +782,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const profile = useCurrentProfile();
   useSocialSync();
+  useJourneySync();
   useEffect(() => {
     startActivityBridge();
   }, []);

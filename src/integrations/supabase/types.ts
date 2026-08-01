@@ -350,6 +350,33 @@ export type Database = {
         }
         Relationships: []
       }
+      journey_shared: {
+        Row: {
+          claimed: Json
+          contributions: Json
+          created_at: string
+          id: string
+          updated_at: string
+          xp: number
+        }
+        Insert: {
+          claimed?: Json
+          contributions?: Json
+          created_at?: string
+          id: string
+          updated_at?: string
+          xp?: number
+        }
+        Update: {
+          claimed?: Json
+          contributions?: Json
+          created_at?: string
+          id?: string
+          updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       notification_reads: {
         Row: {
           notification_id: string
@@ -733,6 +760,8 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      journey_add_progress: { Args: { _amount: number }; Returns: Json }
+      journey_claim_stop: { Args: { _stop_id: string }; Returns: Json }
       link_profile: {
         Args: { _pin: string; _profile_id: string }
         Returns: Json

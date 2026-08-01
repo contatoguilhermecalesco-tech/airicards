@@ -18,6 +18,7 @@ import { Route as RankRouteImport } from './routes/rank'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as JornadaRouteImport } from './routes/jornada'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -95,6 +96,11 @@ const NovidadesRoute = NovidadesRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JornadaRoute = JornadaRouteImport.update({
+  id: '/jornada',
+  path: '/jornada',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnemiesRoute = EnemiesRouteImport.update({
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/jornada': typeof JornadaRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
@@ -316,6 +323,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/jornada': typeof JornadaRoute
   '/marketplace': typeof MarketplaceRoute
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
@@ -355,6 +363,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/jornada': typeof JornadaRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
@@ -401,6 +410,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/jornada'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
@@ -445,6 +455,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/jornada'
     | '/marketplace'
     | '/perfil'
     | '/rank'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/jornada'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
@@ -528,6 +540,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
+  JornadaRoute: typeof JornadaRoute
   MarketplaceRoute: typeof MarketplaceRoute
   NovidadesRoute: typeof NovidadesRouteWithChildren
   PerfilRoute: typeof PerfilRoute
@@ -619,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jornada': {
+      id: '/jornada'
+      path: '/jornada'
+      fullPath: '/jornada'
+      preLoaderRoute: typeof JornadaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enemies': {
@@ -941,6 +961,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
+  JornadaRoute: JornadaRoute,
   MarketplaceRoute: MarketplaceRoute,
   NovidadesRoute: NovidadesRouteWithChildren,
   PerfilRoute: PerfilRoute,
@@ -971,13 +992,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
