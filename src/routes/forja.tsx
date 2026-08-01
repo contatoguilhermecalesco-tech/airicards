@@ -330,7 +330,7 @@ function ForjaPage() {
                 Forja
               </p>
               <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-                Forja de Fragmentos
+                Forja de Relíquias
               </h1>
               <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted-foreground">
                 {SHARDS_PER_FORGE} fragmentos iguais + {FORGE_ARLYS_COST} ✦ = cosmético
