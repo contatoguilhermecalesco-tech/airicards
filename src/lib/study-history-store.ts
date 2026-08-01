@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
+import { trackJourneyStudySession } from "@/lib/journey-store";
 
 export type StudySubject = "reading" | "listening" | "speaking";
 
@@ -171,6 +172,8 @@ export function addStudyEntry(
   buckets = { ...buckets, [subject]: [entry, ...buckets[subject]] };
   emit();
   scheduleSave();
+  // Jornada Compartilhada: qualquer sessão de estudo move o barco do casal.
+  trackJourneyStudySession();
   return entry;
 }
 
