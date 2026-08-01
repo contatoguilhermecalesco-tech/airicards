@@ -68,13 +68,13 @@ const SEEN_KEY = "airi.forja.tutorial.v2";
 export const Route = createFileRoute("/forja")({
   head: () => ({
     meta: [
-      { title: "Forja de Fragmentos | airi" },
+      { title: "Forja de Relíquias | airi" },
       {
         name: "description",
         content:
           "Junte 3 fragmentos do mesmo cosmético nas suas revisões no airi e forje o item por 150 Arlys ✦. Troque ou dissolva fragmentos que não quiser.",
       },
-      { property: "og:title", content: "Forja de Fragmentos | airi" },
+      { property: "og:title", content: "Forja de Relíquias | airi" },
       {
         property: "og:description",
         content:
