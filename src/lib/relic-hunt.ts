@@ -80,6 +80,12 @@ export const DISSOLVE_WEEKLY_CAP = 300;
 /** Chance de forja crítica (variante áurea) e de variante platina. */
 export const CRIT_FORGE_CHANCE = 0.14;
 export const PLATINA_FORGE_CHANCE = 0.04;
+/** Máximo de fragmentos que podem cair por dia. */
+export const DROP_DAILY_CAP = 3;
+/** Intervalo mínimo entre dois fragmentos (min). */
+export const DROP_COOLDOWN_MIN = 12;
+/** Chance base de drop por acerto. */
+export const DROP_BASE_CHANCE = 0.045;
 
 export const VARIANT_META: Record<ForgeVariant, { label: string; color: string }> = {
   aurea: { label: "Áurea", color: "#f3c969" },
