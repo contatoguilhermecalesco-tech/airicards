@@ -15,7 +15,7 @@ export type StreakFlameTheme = {
   key: string;
   name: string;
   /** Ícone base do medalhão. */
-  glyph: "ember" | "eclipse" | "rune";
+  glyph: "ember" | "eclipse" | "rune" | "marionette";
   /** Cor principal (CSS color). */
   color: string;
   /** Cor secundária para gradientes/brilho. */
@@ -24,6 +24,8 @@ export type StreakFlameTheme = {
   ring: string;
   /** Halo do card. */
   halo: string;
+  /** Arte dedicada (usada pelos glyphs baseados em ilustração). */
+  art?: string;
 };
 
 export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
@@ -53,6 +55,26 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
     accent: "#8e1b2b",
     ring: "border-sky-300/30 bg-gradient-to-b from-sky-400/18 to-[#2a0410]/60 text-sky-50",
     halo: "radial-gradient(closest-side, rgba(143,199,245,0.34), rgba(142,27,43,0.22) 55%, transparent 72%)",
+  },
+  chama_vigilia: {
+    key: "chama_vigilia",
+    name: "Chama da Vigília",
+    glyph: "rune",
+    color: "#bfe4ff",
+    accent: "#0b1a3a",
+    ring: "border-sky-200/30 bg-gradient-to-b from-sky-300/18 to-[#050a1c]/70 text-sky-50",
+    halo: "radial-gradient(closest-side, rgba(191,228,255,0.32), transparent 72%)",
+    art: COSMETIC_ART.chama_vigilia,
+  },
+  chama_marionete: {
+    key: "chama_marionete",
+    name: "Chama da Marionete",
+    glyph: "marionette",
+    color: "#ff4d63",
+    accent: "#f5e7dd",
+    ring: "border-rose-200/30 bg-gradient-to-b from-rose-700/30 to-[#10040a]/80 text-rose-50",
+    halo: "radial-gradient(closest-side, rgba(255,77,99,0.36), rgba(245,231,221,0.14) 52%, transparent 74%)",
+    art: COSMETIC_ART.chama_marionete,
   },
 };
 
