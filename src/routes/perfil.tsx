@@ -54,7 +54,7 @@ import { CompanionRender } from "@/components/CompanionRender";
 
 import { SakuraPetals } from "@/components/SakuraPetals";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
-import { AvatarCrown, NameplateTopCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { AvatarCrown, NameplateTopCrown, getCrownArt, getCrownAccent } from "@/components/profile/AvatarCrown";
 import { tableSkinByKey } from "@/lib/table-skins";
 import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
@@ -438,6 +438,7 @@ function PerfilPage() {
   // Curated art for each equipped slot (bundle-specific PNGs override the generic icon).
   const nameplateArt = getEquippedArt(wallet.equipped.nameplate);
   const crownArt = getCrownArt(wallet.equipped.nameplate);
+  const crownAccent = getCrownAccent(wallet.equipped.nameplate);
   const decorationArt = getEquippedArt(wallet.equipped.decoration);
   const badgeArt = getEquippedArt(wallet.equipped.badge);
   const effectArt = getEquippedArt(wallet.equipped.effect);
@@ -549,7 +550,7 @@ function PerfilPage() {
             aria-hidden
             className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full opacity-60 will-change-transform"
             style={{
-              background: `radial-gradient(circle, ${decorationPalette.ring}55, transparent 65%)`,
+              background: `radial-gradient(circle, ${avatarRing}55, transparent 65%)`,
               filter: "blur(24px)",
               transform: `translate3d(0, ${scrollY * -0.08}px, 0)`,
             }}
@@ -653,7 +654,7 @@ function PerfilPage() {
             style={{
               padding: 6,
               background: "#232428",
-              boxShadow: `0 12px 30px -8px ${decorationPalette.ring}55`,
+              boxShadow: `0 12px 30px -8px ${avatarRing}55`,
             }}
           >
             {/* Aura art (decoration) — glow around avatar (screen blend keeps face visible) */}
@@ -668,7 +669,7 @@ function PerfilPage() {
             )}
             <DiscordAvatar
               size={112}
-              ring={decorationPalette.ring}
+              ring={avatarRing}
               showDecoration={showDecoration}
               initial={initial}
               avatarUrl={wallet.avatarUrl || undefined}
