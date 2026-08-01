@@ -621,8 +621,8 @@ function Step({ n, label, done }: { n: number; label: string; done?: boolean }) 
       <span
         className="grid h-5 w-5 place-items-center rounded-full text-[10px] font-bold"
         style={{
-          background: done ? "rgba(251,191,36,0.28)" : "hsl(var(--primary) / 0.25)",
-          color: done ? "#fde68a" : "hsl(var(--primary))",
+          background: done ? "rgba(251,191,36,0.28)" : "color-mix(in oklab, var(--primary) 28%, transparent)",
+          color: done ? "#fde68a" : "var(--primary)",
         }}
       >
         {n}
