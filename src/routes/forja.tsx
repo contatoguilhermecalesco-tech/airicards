@@ -33,8 +33,6 @@ import {
   SLOT_LABEL,
   type ShardStack,
 } from "@/lib/relic-hunt";
-import { ShardIcon } from "@/components/hunt/ShardDropToast";
-import { ShardArt } from "@/components/hunt/ShardArt";
 import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
 import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
 import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
