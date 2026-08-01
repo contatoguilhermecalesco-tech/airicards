@@ -258,12 +258,12 @@ const MORE_ITEMS = [
     matcher: (p: string) => p.startsWith("/enemies"),
   },
   {
-    to: "/relicario",
-    label: "Relicário",
-    description: "Caça aos Luminhos e recompensas aleatórias",
+    to: "/forja",
+    label: "Forja",
+    description: "Fragmentos de cosméticos e forja com Arlys",
     icon: Sparkles,
     color: "#d8b4fe",
-    matcher: (p: string) => p.startsWith("/relicario"),
+    matcher: (p: string) => p.startsWith("/forja"),
   },
   {
     to: "/rank",

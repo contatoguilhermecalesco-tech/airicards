@@ -14,11 +14,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
-import { Route as RelicarioRouteImport } from './routes/relicario'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as ForjaRouteImport } from './routes/forja'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -78,11 +78,6 @@ const ReviewRoute = ReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RelicarioRoute = RelicarioRouteImport.update({
-  id: '/relicario',
-  path: '/relicario',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RankRoute = RankRouteImport.update({
   id: '/rank',
   path: '/rank',
@@ -101,6 +96,11 @@ const NovidadesRoute = NovidadesRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForjaRoute = ForjaRouteImport.update({
+  id: '/forja',
+  path: '/forja',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnemiesRoute = EnemiesRouteImport.update({
@@ -278,11 +278,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
-  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -323,10 +323,10 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
-  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -363,11 +363,11 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
+  '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
-  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -410,11 +410,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/forja'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
     | '/rank'
-    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -455,10 +455,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/forja'
     | '/marketplace'
     | '/perfil'
     | '/rank'
-    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -494,11 +494,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
+    | '/forja'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
     | '/rank'
-    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -540,11 +540,11 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
+  ForjaRoute: typeof ForjaRoute
   MarketplaceRoute: typeof MarketplaceRoute
   NovidadesRoute: typeof NovidadesRouteWithChildren
   PerfilRoute: typeof PerfilRoute
   RankRoute: typeof RankRoute
-  RelicarioRoute: typeof RelicarioRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   ShopRoute: typeof ShopRoute
@@ -606,13 +606,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/relicario': {
-      id: '/relicario'
-      path: '/relicario'
-      fullPath: '/relicario'
-      preLoaderRoute: typeof RelicarioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/rank': {
       id: '/rank'
       path: '/rank'
@@ -639,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forja': {
+      id: '/forja'
+      path: '/forja'
+      fullPath: '/forja'
+      preLoaderRoute: typeof ForjaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/enemies': {
@@ -961,11 +961,11 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
+  ForjaRoute: ForjaRoute,
   MarketplaceRoute: MarketplaceRoute,
   NovidadesRoute: NovidadesRouteWithChildren,
   PerfilRoute: PerfilRoute,
   RankRoute: RankRoute,
-  RelicarioRoute: RelicarioRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   ShopRoute: ShopRoute,
