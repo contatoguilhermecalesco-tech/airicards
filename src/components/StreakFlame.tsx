@@ -70,8 +70,9 @@ export function StreakFlame({
         </>
       )}
 
-      {theme?.glyph === "marionette" && isActive && theme.art ? (
-        <MarionetteFlame theme={theme} intensity={intensity} />
+      {theme?.glyph === "marionette" && theme.art ? (
+        <MarionetteFlame theme={theme} intensity={intensity} state={state} streak={streak} />
+
       ) : theme?.glyph === "rune" && isActive && theme.art ? (
         <span aria-hidden className="relative grid h-[26px] w-[26px] place-items-center">
           <img
