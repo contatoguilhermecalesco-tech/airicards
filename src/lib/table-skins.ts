@@ -19,6 +19,12 @@ import marioneteTableFrame from "@/assets/shop/marionete/table-frame.png";
 import marioneteCrest from "@/assets/shop/marionete/table-cardback.png";
 import marionetePetals from "@/assets/shop/marionete/petals-overlay.png";
 
+import piscinaAmbient from "@/assets/shop/piscina/table-ambient.jpg";
+import piscinaTableFrame from "@/assets/shop/piscina/table-frame.png";
+import piscinaCrest from "@/assets/shop/piscina/table-cardback.png";
+
+
+
 
 
 export type TableSkin = {
