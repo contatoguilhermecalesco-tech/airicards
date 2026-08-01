@@ -29,8 +29,6 @@ import {
   SHARDS_PER_FORGE,
   FORGE_ARLYS_COST,
   REROLL_WEEKLY_LIMIT,
-  TIER_META,
-  SLOT_LABEL,
   type ShardStack,
 } from "@/lib/relic-hunt";
 import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
