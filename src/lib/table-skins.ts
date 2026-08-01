@@ -123,7 +123,21 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     miss: "#7a1329",
     vfx: "puppet",
   },
+  "table:mesa_piscina": {
+    id: "mesa_piscina",
+    key: "table:mesa_piscina",
+    name: "Mesa da Piscina Infinita",
+    tagline: "Azulejos azul-piscina, boias douradas e peixes bobos nadando entre as cartas.",
+    ambient: piscinaAmbient,
+    frame: piscinaTableFrame,
+    crest: piscinaCrest,
+    accent: "#22d3ee",
+    glow: "rgba(34, 211, 238, 0.38)",
+    hit: "#fde047",
+    miss: "#f43f5e",
+  },
 };
+
 
 
 export function tableSkinFromEquipped(
