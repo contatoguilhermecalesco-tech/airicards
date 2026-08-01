@@ -28,7 +28,6 @@ import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useExamState, getMonthKey, hasCompletedExamThisMonth, monthLabel } from "@/lib/exam-store";
 import { useAppSettings } from "@/lib/app-settings";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
-import { JourneyCompact } from "@/components/home/JourneyCompact";
 
 
 
@@ -412,7 +411,6 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <JourneyCompact />
 
       {/* Atalhos — pills discretas estilo iOS */}
       <section

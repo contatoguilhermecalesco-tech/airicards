@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
 import { awardLp, getRank, isDecayEligible, LP } from "@/lib/rank-store";
 import { trackReview, trackEnemyDefeated } from "@/lib/daily-challenges";
-import { trackJourneyReview, trackJourneyEnemyDefeated } from "@/lib/journey-store";
 
 export const ENEMY_THRESHOLD = 3;
 
@@ -690,7 +689,6 @@ export function reviewCard(id: string, grade: Grade) {
   // Desafios diários: contabiliza revisão e acerto.
   trackReview(isCorrect);
   // Jornada Compartilhada: progresso do casal (soma dos dois perfis).
-  trackJourneyReview(isCorrect);
 
   // Detecta viradas de rank sobre a carta:
   const nextCard = state.cards.find((c) => c.id === id);
@@ -699,7 +697,6 @@ export function reviewCard(id: string, grade: Grade) {
     if (wasEnemyBefore && isDefeated(nextCard)) {
       awardLp(LP.enemyDefeated, "enemy.defeated");
       trackEnemyDefeated();
-      trackJourneyEnemyDefeated();
     }
     // Virou inimigo agora (era não-inimigo, passou o threshold de lapses).
     if (wasBelowEnemyBefore && isEnemy(nextCard) && !isDefeated(nextCard)) {

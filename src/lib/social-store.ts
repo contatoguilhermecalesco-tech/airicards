@@ -4,7 +4,6 @@ import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PROFILES } from "@/lib/profile";
 import { trackDuelWin } from "@/lib/daily-challenges";
-import { trackJourneyDuelWin } from "@/lib/journey-store";
 
 export type ProfileId = "guilherme" | "arlayne";
 
@@ -372,7 +371,6 @@ export async function submitDuelResult(
   // Provação "Duelista": conta assim que o usuário envia seu resultado,
   // vencendo ou perdendo — desafio do primeiro bundle é leve.
   trackDuelWin();
-  trackJourneyDuelWin();
 
 
   const { data: allResults } = await (supabase as any)
