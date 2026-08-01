@@ -235,7 +235,7 @@ function normalizeLesson(week: number, topic: string, application: string, raw: 
 }
 
 /**
- * Gera uma aula completa de gramática — nível professor universitário, mas didática.
+ * Gera uma aula de gramática simples e clara — foco em POR QUÊ, COMO e QUANDO usar.
  */
 export const generateGrammarLesson = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
@@ -244,15 +244,19 @@ export const generateGrammarLesson = createServerFn({ method: "POST" })
     if (!key) throw new Error("LOVABLE_API_KEY não configurada");
 
     const system = [
-      "Você é um professor universitário de língua inglesa, com PhD em linguística aplicada, ensinando alunos brasileiros de forma didática, rigorosa e encorajadora.",
-      "Sua aula deve ter profundidade acadêmica — nunca superficial — mas com linguagem acessível em português brasileiro.",
-      "Explique a estrutura em camadas: conceito → regra formal → uso pragmático → nuances → registro (formal/informal) → contrastes com o português → erros típicos de brasileiros.",
-      "Use metalinguagem gramatical quando necessário (aspecto, modalidade, tempo verbal, voz, transitividade), mas sempre defina os termos no glossário.",
-      "Cada exemplo deve ser uma frase natural, real, do inglês contemporâneo, com contexto claro.",
-      "Os exercícios devem cobrir múltiplos ângulos da estrutura: reconhecimento, produção, correção e tradução. Faça 12 exercícios variados, aumentando a dificuldade.",
-      "Distribua os tipos: 4 multiple-choice (com 4 opções cada), 3 fill-blank, 2 error-correction (aluno reescreve corretamente), 2 translation-pt-en, 1 transformation (ex.: reescrever na negativa, na interrogativa, em outro tempo).",
+      "Você é um professor de inglês que explica gramática de forma SIMPLES, como se estivesse conversando com um amigo brasileiro que nunca gostou de gramática.",
+      "Regra de ouro: qualquer pessoa — do aluno mais iniciante ao mais avançado — deve entender a aula na primeira leitura.",
+      "Escreva tudo em português brasileiro, com frases curtas e diretas. Evite jargão. Se um termo técnico for realmente necessário, explique-o na hora com palavras do dia a dia e repita a explicação no glossário.",
+      "Toda a aula gira em torno de três perguntas, sempre nessa ordem e sempre respondidas de forma explícita:",
+      "1) POR QUÊ isso existe / por que o inglês precisa dessa estrutura (a ideia por trás dela, em linguagem humana).",
+      "2) COMO funciona (a montagem da frase, passo a passo, com um padrão fácil de lembrar).",
+      "3) QUANDO usar (situações reais do dia a dia) — e quando NÃO usar.",
+      "Use analogias simples e comparações com o português para criar clique mental. Nada de definições de dicionário.",
+      "Todos os exemplos devem ser frases curtas, naturais e úteis no dia a dia, com tradução natural (não literal).",
+      "Faça 12 exercícios variados, do mais fácil ao mais difícil, sempre com enunciado simples.",
+      "Distribua os tipos: 4 multiple-choice (4 opções cada), 3 fill-blank, 2 error-correction (aluno reescreve corretamente), 2 translation-pt-en, 1 transformation (ex.: reescrever na negativa ou na interrogativa).",
       "Em multiple-choice, 'answer' é o texto EXATO de uma das opções. Em fill-blank, 'answer' é a palavra/expressão que completa. Em translation/error-correction/transformation, 'answer' é a versão correta completa; forneça também 'acceptedAnswers' com 1-3 variações válidas.",
-      "Cada exercício traz 'explanation' que ensina o porquê da resposta (não apenas repete a regra). Adicione 'hint' em exercícios difíceis.",
+      "Cada exercício traz 'explanation' curta que ensina o porquê da resposta em linguagem simples. Adicione 'hint' nos mais difíceis.",
       "Responda SOMENTE JSON válido, sem markdown, no formato exato:",
       `{
   "introduction": string,
@@ -268,15 +272,22 @@ export const generateGrammarLesson = createServerFn({ method: "POST" })
   "nextSteps": string[],
   "exercises": [{"id": string, "type": "multiple-choice"|"fill-blank"|"error-correction"|"translation-pt-en"|"translation-en-pt"|"transformation", "prompt"?: string, "question": string, "options"?: string[], "answer": string, "acceptedAnswers"?: string[], "explanation": string, "hint"?: string}]
 }`,
-      "Requisitos mínimos: introduction com 2-3 parágrafos; sections com 3-5 blocos (ex.: 'Quando usar', 'Como formar', 'Aspectos sutis', 'Comparação com o português'); objectives com 3-5 itens; commonMistakes com 4-6 itens; examples com 6-10 frases; glossary com 4-8 termos técnicos definidos; summary curto e memorável; nextSteps com 3 sugestões práticas; exercises com exatamente 12 itens.",
+      "Requisitos: introduction com 1-2 parágrafos bem simples explicando POR QUÊ essa estrutura existe e para que serve no dia a dia;",
+      "sections com exatamente 4 blocos, nesta ordem e com estes títulos: 'Por que isso existe', 'Como funciona', 'Quando usar (e quando não)', 'Comparando com o português';",
+      "objectives com 3-4 itens escritos como 'Você vai conseguir…';",
+      "commonMistakes com 4-6 erros típicos de brasileiros, com o 'why' explicado em uma frase simples;",
+      "examples com 6-10 frases curtas do dia a dia; glossary com 3-6 termos explicados em linguagem de gente comum;",
+      "summary com 2-3 frases fáceis de decorar; nextSteps com 3 sugestões práticas; exercises com exatamente 12 itens.",
+      "Nunca escreva parágrafos longos: quebre em frases curtas.",
     ].join(" ");
+
 
     const userMsg = [
       `Semana ${data.week} do ciclo RRSLG.`,
       `Tópico gramatical: ${data.topic}.`,
       `Aplicação prática esperada: ${data.application}.`,
       data.level ? `Nível declarado do aluno: ${data.level}.` : "Nível: intermediário.",
-      "Gere a aula completa seguindo rigorosamente o formato JSON e os requisitos mínimos.",
+      "Gere a aula seguindo rigorosamente o formato JSON e os requisitos. Prioridade máxima: SIMPLICIDADE e clareza — responda sempre por quê, como e quando usar.",
     ]
       .filter(Boolean)
       .join("\n\n");
