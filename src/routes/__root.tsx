@@ -259,7 +259,7 @@ const MORE_ITEMS = [
   },
   {
     to: "/forja",
-    label: "Forja"as string,
+    label: "Forja",
     description: "Fragmentos de cosméticos e forja com Arlys",
     icon: Sparkles,
     color: "#d8b4fe",
