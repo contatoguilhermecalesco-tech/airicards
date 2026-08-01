@@ -78,7 +78,7 @@ export const STREAK_FLAME_THEMES: Record<string, StreakFlameTheme> = {
   },
   chama_piscina: {
     key: "chama_piscina",
-    name: "Brasa do Verão",
+    name: "Chama Tropical",
     glyph: "rune",
     color: "#fbbf24",
     accent: "#06b6d4",
@@ -146,7 +146,7 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
   },
   selo_piscina: {
     key: "selo_piscina",
-    name: "Selo do Verão",
+    name: "Selo Solar",
     color: "#fbbf24",
     accent: "#0891b2",
     missLabel: "QUEIMOU",
@@ -242,9 +242,9 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
   },
   ascensao_piscina: {
     key: "ascensao_piscina",
-    name: "Verão Infinito",
+    name: "Splash de Verão",
     headline: "VITÓRIA",
-    subline: "A festa toda brinda a sua vitória",
+    subline: "A piscina inteira comemora seu mergulho",
     color: "#22d3ee",
     accent: "#f59e0b",
     art: COSMETIC_ART.ascensao_piscina,
