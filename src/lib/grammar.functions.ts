@@ -287,7 +287,7 @@ export const generateGrammarLesson = createServerFn({ method: "POST" })
       `Tópico gramatical: ${data.topic}.`,
       `Aplicação prática esperada: ${data.application}.`,
       data.level ? `Nível declarado do aluno: ${data.level}.` : "Nível: intermediário.",
-      "Gere a aula completa seguindo rigorosamente o formato JSON e os requisitos mínimos.",
+      "Gere a aula seguindo rigorosamente o formato JSON e os requisitos. Prioridade máxima: SIMPLICIDADE e clareza — responda sempre por quê, como e quando usar.",
     ]
       .filter(Boolean)
       .join("\n\n");
