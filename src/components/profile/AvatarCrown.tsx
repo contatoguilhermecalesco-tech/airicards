@@ -63,6 +63,9 @@ export const CROWN_ART_BY_KEY: Record<string, CrownArt> = {
     art: piscinaCrown,
     glow: "rgba(34, 211, 238, 0.24)",
     ring: piscinaRing,
+    // O anel da piscina tem o vão interno mais largo que os outros bundles,
+    // então usa uma escala menor para abraçar o avatar da mesma forma.
+    ringScale: 1.6,
   },
 };
 
