@@ -343,9 +343,9 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
           Cancelar
         </button>
         <div className="flex items-center gap-2 text-xs font-semibold tabular-nums text-muted-foreground">
-          <span>{current.currentIndex + 1}</span>
+          <span>{index + 1}</span>
           <span className="text-muted-foreground/50">/</span>
-          <span>{current.questions.length}</span>
+          <span>{total}</span>
         </div>
       </div>
 
@@ -353,7 +353,7 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
       <div className="mb-8 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
         <div
           className="h-full rounded-full bg-gradient-to-r from-primary/70 to-primary transition-[width] duration-500"
-          style={{ width: `${((current.currentIndex + 1) / current.questions.length) * 100}%` }}
+          style={{ width: `${((index + 1) / total) * 100}%` }}
         />
       </div>
 
@@ -410,20 +410,19 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
       <div className="mt-8 flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => goToIndex(current.currentIndex - 1)}
-          disabled={current.currentIndex === 0}
+          onClick={() => goToIndex(index - 1)}
+          disabled={index === 0}
           className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-2.5 text-sm text-foreground transition hover:bg-white/[0.05] disabled:opacity-40"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={2.25} /> Anterior
         </button>
         <p className="text-[11px] text-muted-foreground tabular-nums">
-          {totalAnswered}/{current.questions.length} respondidas
+          {totalAnswered}/{total} respondidas
         </p>
         {isLast ? (
           <button
             type="button"
             onClick={onFinish}
-            disabled={totalAnswered < current.questions.length}
             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:brightness-95 disabled:opacity-40"
           >
             Finalizar
@@ -431,8 +430,7 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
         ) : (
           <button
             type="button"
-            onClick={() => goToIndex(current.currentIndex + 1)}
-            disabled={selected === undefined || selected === null}
+            onClick={() => goToIndex(index + 1)}
             className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background transition hover:brightness-95 disabled:opacity-40"
           >
             Próxima <ArrowRight className="h-4 w-4" strokeWidth={2.25} />
