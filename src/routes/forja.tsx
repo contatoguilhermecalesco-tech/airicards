@@ -636,15 +636,25 @@ function FusionModal({
   onClose: () => void;
   onDone: (name: string) => void;
 }) {
-  const tiers = useMemo(() => {
+  const tierCounts = useMemo(() => {
     const counts = new Map<ShardTier, number>();
     for (const s of stacks) counts.set(s.tier, (counts.get(s.tier) ?? 0) + 1);
-    return (["mitico", "epico", "raro", "comum"] as ShardTier[]).filter(
-      (t) => (counts.get(t) ?? 0) > 0,
-    );
+    return counts;
   }, [stacks]);
 
-  const [tier, setTier] = useState<ShardTier | null>(tiers[0] ?? null);
+  const tiers = useMemo(
+    () =>
+      (["mitico", "epico", "raro", "comum"] as ShardTier[]).filter(
+        (t) => (tierCounts.get(t) ?? 0) > 0,
+      ),
+    [tierCounts],
+  );
+
+  const [tier, setTier] = useState<ShardTier | null>(
+    // Abre já na raridade que dá pra fundir, evitando parecer que a fusão está travada.
+    tiers.find((t) => (tierCounts.get(t) ?? 0) >= FUSION_INPUT) ?? tiers[0] ?? null,
+  );
+
   const [picked, setPicked] = useState<string[]>([]);
   const [targets, setTargets] = useState<FusionTarget[]>([]);
   const [target, setTarget] = useState<string | null>(null);
