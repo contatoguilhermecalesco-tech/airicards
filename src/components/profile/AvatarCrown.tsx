@@ -50,7 +50,6 @@ export const CROWN_ART_BY_KEY: Record<
     art: piscinaCrown,
     glow: "rgba(34, 211, 238, 0.24)",
     ring: piscinaFrame,
-    ringScale: 1.34,
   },
 };
 
