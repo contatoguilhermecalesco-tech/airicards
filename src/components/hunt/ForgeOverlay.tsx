@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
 import { TIER_META, SLOT_LABEL, type ShardStack } from "@/lib/relic-hunt";
-import { ShardIcon } from "@/components/hunt/ShardDropToast";
+import { ShardArt } from "@/components/hunt/ShardArt";
 
 export function ForgeOverlay({
   stack,
