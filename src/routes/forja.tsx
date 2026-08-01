@@ -92,6 +92,11 @@ function ForjaPage() {
   const [filter, setFilter] = useState<Filter>("todos");
   const [view, setView] = useState<View>("grade");
   const [gifting, setGifting] = useState<ShardStack | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  useAutoClaimShardGifts(profile?.id, (g) =>
+    toast.success(`Fragmento recebido: ${g.shardName}`),
+  );
 
   useEffect(() => {
     pruneOwnedShards();
@@ -100,7 +105,7 @@ function ForjaPage() {
   useEffect(() => {
     try {
       const v = localStorage.getItem(VIEW_KEY);
-      if (v === "grade" || v === "prateleira") setView(v);
+      if (v === "grade" || v === "lista" || v === "detalhado") setView(v);
       if (!localStorage.getItem(SEEN_KEY)) {
         setHelp(true);
         localStorage.setItem(SEEN_KEY, "1");
@@ -109,6 +114,7 @@ function ForjaPage() {
       /* ignore */
     }
   }, []);
+
 
   function pickView(v: View) {
     setView(v);
