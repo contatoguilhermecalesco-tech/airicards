@@ -365,7 +365,10 @@ function ForjaPage() {
 
 
         {stacks.length > 0 && (
-          <div className="mt-3 flex gap-1.5 rounded-2xl border border-white/8 bg-white/4 p-1">
+          <div
+            className="mt-3 flex border-b"
+            style={{ borderColor: "rgba(200,170,110,0.25)" }}
+          >
             {(
               [
                 ["todos", `Todos ${stacks.length}`],
@@ -377,17 +380,24 @@ function ForjaPage() {
                 key={id}
                 type="button"
                 onClick={() => setFilter(id)}
-                className={`tap-target flex-1 rounded-xl px-3 py-2 text-[12px] font-semibold transition ${
+                className="tap-target flex-1 px-3 py-2.5 loot-label transition"
+                style={
                   filter === id
-                    ? "bg-primary/22 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                    ? {
+                        color: "#f0e6d2",
+                        borderBottom: "2px solid #c8aa6e",
+                        background:
+                          "linear-gradient(180deg, transparent, rgba(200,170,110,0.12))",
+                      }
+                    : { color: "rgba(240,230,210,0.5)", borderBottom: "2px solid transparent" }
+                }
               >
                 {label}
               </button>
             ))}
           </div>
         )}
+
 
         {stacks.length === 0 ? (
           <div className="mt-3 overflow-hidden rounded-3xl border border-dashed border-white/14 bg-surface/50 p-8 text-center">
