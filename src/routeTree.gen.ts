@@ -31,6 +31,7 @@ import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
 import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
+import { Route as ExamHistoricoRouteImport } from './routes/exam.historico'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
 import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
@@ -161,6 +162,11 @@ const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   path: '/library/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamHistoricoRoute = ExamHistoricoRouteImport.update({
+  id: '/exam/historico',
+  path: '/exam/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BIdRoute = BIdRouteImport.update({
   id: '/b/$id',
   path: '/b/$id',
@@ -276,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil_/$id': typeof PerfilIdRoute
@@ -402,6 +411,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil/$id'
@@ -443,6 +453,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil/$id'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil_/$id'
@@ -526,6 +538,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
   BIdRoute: typeof BIdRoute
+  ExamHistoricoRoute: typeof ExamHistoricoRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   PerfilIdRoute: typeof PerfilIdRoute
   ExamIndexRoute: typeof ExamIndexRoute
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       path: '/library/$deckId'
       fullPath: '/library/$deckId'
       preLoaderRoute: typeof LibraryDeckIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam/historico': {
+      id: '/exam/historico'
+      path: '/exam/historico'
+      fullPath: '/exam/historico'
+      preLoaderRoute: typeof ExamHistoricoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/b/$id': {
@@ -931,6 +951,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
   BIdRoute: BIdRoute,
+  ExamHistoricoRoute: ExamHistoricoRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   PerfilIdRoute: PerfilIdRoute,
   ExamIndexRoute: ExamIndexRoute,
