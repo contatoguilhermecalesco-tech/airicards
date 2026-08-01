@@ -15,6 +15,7 @@ import {
   Flame,
   ChevronRight,
   LayoutGrid,
+  List as ListIcon,
   Rows3,
 } from "lucide-react";
 import {
@@ -34,14 +35,16 @@ import {
 } from "@/lib/relic-hunt";
 import { ShardIcon } from "@/components/hunt/ShardDropToast";
 import { ShardArt } from "@/components/hunt/ShardArt";
-import { ShardCard, ShardTile } from "@/components/hunt/ShardCard";
+import { ShardCard, ShardTile, ShardRow } from "@/components/hunt/ShardCard";
 import { ShardGiftDialog } from "@/components/hunt/ShardGiftDialog";
 import { ShardGiftsPanel } from "@/components/hunt/ShardGiftsPanel";
+import { useAutoClaimShardGifts } from "@/lib/shard-gifts";
 
 import { ForgeOverlay } from "@/components/hunt/ForgeOverlay";
 import { useWallet } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { toast } from "sonner";
+
 
 const SEEN_KEY = "airi.forja.tutorial.v2";
 
