@@ -60,7 +60,11 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
 
   // Corte das Marionetes — carmim e porcelana
   corte_marionetes: { ring: "#d9445f", secondary: "#f8e8ec", kind: "dual", speed: "slow" },
+
+  // Piscina Infinita — água turquesa e dourado solar
+  piscina_infinita: { ring: "#22d3ee", secondary: "#fbbf24", kind: "dual", speed: "normal" },
 };
+
 
 export const AURA_RING: Record<string, string> = Object.fromEntries(
   Object.entries(AURA_PROFILES).map(([k, v]) => [k, v.ring]),

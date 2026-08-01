@@ -166,7 +166,9 @@ export const ACCENTS: Record<string, string> = {
   lavender: "from-indigo-400/20 to-violet-500/10 text-indigo-200 border-indigo-400/30",
   crimson: "from-rose-400/20 to-red-600/10 text-rose-200 border-rose-400/30",
   azure: "from-sky-400/20 to-blue-600/10 text-sky-200 border-sky-400/30",
+  cyan: "from-cyan-400/20 to-teal-500/10 text-cyan-200 border-cyan-400/30",
 };
+
 
 /* ---------------------- Cosmetic slots & profile preview ---------------------- */
 
@@ -222,7 +224,13 @@ const DISCORD_PALETTE: Record<
     ring: "#60a5fa",
     tag: "Espírito",
   },
+  cyan: {
+    gradient: "linear-gradient(135deg,#a5f3fc 0%,#22d3ee 42%,#164e63 100%)",
+    ring: "#22d3ee",
+    tag: "Piscina",
+  },
 };
+
 
 export function visualFor(item: ShopItem): CosmeticVisual {
   const slotRaw = String(item.payload.slot ?? "cosmetic").toLowerCase();
@@ -520,7 +528,15 @@ const POWERUP_PALETTE: Record<
     spark: "#d1fae5",
     tag: "Verdejante",
   },
+  cyan: {
+    base: "radial-gradient(120% 100% at 20% 15%, #22d3ee 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #155e75 0%, transparent 60%), linear-gradient(160deg,#083344 0%,#022c36 100%)",
+    halo: "rgba(34,211,238,0.55)",
+    ring: "#67e8f9",
+    spark: "#cffafe",
+    tag: "Oceano",
+  },
 };
+
 
 export function powerupPalette(accent: string) {
   return POWERUP_PALETTE[accent] ?? POWERUP_PALETTE.violet;
@@ -693,7 +709,15 @@ const COLLECTION_PALETTE: Record<
     spark: "#d1fae5",
     tag: "Verdejante",
   },
+  cyan: {
+    base: "radial-gradient(120% 100% at 20% 15%, #22d3ee 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #155e75 0%, transparent 60%), linear-gradient(160deg,#083344 0%,#022c36 100%)",
+    edge: "#67e8f9",
+    glow: "rgba(34,211,238,0.5)",
+    spark: "#cffafe",
+    tag: "Piscina",
+  },
 };
+
 
 export function collectionPalette(key: string) {
   return COLLECTION_PALETTE[key] ?? COLLECTION_PALETTE.violet;

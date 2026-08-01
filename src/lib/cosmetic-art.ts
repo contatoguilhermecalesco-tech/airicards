@@ -16,6 +16,11 @@ import ascensaoMarionete from "@/assets/shop/marionete/ascensao.png";
 import olhoVigilia from "@/assets/shop/princesa/selo.png";
 import ascensaoVigilia from "@/assets/shop/princesa/ascensao.png";
 
+import chamaPiscina from "@/assets/shop/piscina/chama.png";
+import seloPiscina from "@/assets/shop/piscina/selo.png";
+import ascensaoPiscina from "@/assets/shop/piscina/ascensao.png";
+
+
 export const COSMETIC_ART: Record<string, string> = {
   brasa_carmesim: brasaCarmesim,
   selo_eclipse: seloEclipse,
@@ -32,7 +37,12 @@ export const COSMETIC_ART: Record<string, string> = {
   ascensao_marionete: ascensaoMarionete,
   olho_vigilia: olhoVigilia,
   ascensao_vigilia: ascensaoVigilia,
+
+  chama_piscina: chamaPiscina,
+  selo_piscina: seloPiscina,
+  ascensao_piscina: ascensaoPiscina,
 };
+
 
 function normalize(value: unknown): string | null {
   if (typeof value !== "string" || !value) return null;

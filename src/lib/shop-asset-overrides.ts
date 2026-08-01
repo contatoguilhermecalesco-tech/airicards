@@ -67,6 +67,20 @@ import marioneteChama from "@/assets/shop/marionete/chama.png";
 import marioneteSelo from "@/assets/shop/marionete/selo.png";
 import marioneteAscensao from "@/assets/shop/marionete/ascensao.png";
 
+import piscinaSplash from "@/assets/shop/piscina/splash-hero.jpg";
+import piscinaAura from "@/assets/shop/piscina/aura.png";
+import piscinaFrame from "@/assets/shop/piscina/frame.png";
+import piscinaCardframe from "@/assets/shop/piscina/cardframe.png";
+import piscinaTableAmbient from "@/assets/shop/piscina/table-ambient.jpg";
+import piscinaTableFrame from "@/assets/shop/piscina/table-frame.png";
+import piscinaTableBack from "@/assets/shop/piscina/table-cardback.png";
+import piscinaChama from "@/assets/shop/piscina/chama.png";
+import piscinaSelo from "@/assets/shop/piscina/selo.png";
+import piscinaAscensao from "@/assets/shop/piscina/ascensao.png";
+
+
+
+
 
 
 
@@ -147,7 +161,18 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.streak_flame.chama_marionete": { art: marioneteChama },
   "cosmetic.enemy_seal.selo_marionete": { art: marioneteSelo },
   "cosmetic.victory_splash.ascensao_marionete": { art: marioneteAscensao },
+
+  // Master bundle — Piscina Infinita (Épico)
+  "bundle.piscina_infinita": { splash: piscinaSplash, art: piscinaAura },
+  "cosmetic.aura.piscina_infinita": { art: piscinaAura },
+  "cosmetic.frame.coroa_piscina": { art: piscinaFrame },
+  "cosmetic.veil.veu_piscina": { art: piscinaCardframe },
+  "cosmetic.table.mesa_piscina": { art: piscinaTableAmbient },
+  "cosmetic.streak_flame.chama_piscina": { art: piscinaChama },
+  "cosmetic.enemy_seal.selo_piscina": { art: piscinaSelo },
+  "cosmetic.victory_splash.ascensao_piscina": { art: piscinaAscensao },
 };
+
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
   return SHOP_ASSET_OVERRIDES[itemId];
@@ -215,7 +240,16 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "streak_flame:chama_marionete": marioneteChama,
   "enemy_seal:selo_marionete": marioneteSelo,
   "victory_splash:ascensao_marionete": marioneteAscensao,
+
+  "decoration:piscina_infinita": piscinaAura,
+  "nameplate:coroa_piscina": piscinaFrame,
+  "veil:veu_piscina": piscinaCardframe,
+  "table:mesa_piscina": piscinaTableAmbient,
+  "streak_flame:chama_piscina": piscinaChama,
+  "enemy_seal:selo_piscina": piscinaSelo,
+  "victory_splash:ascensao_piscina": piscinaAscensao,
 };
+
 
 
 export function getEquippedArt(walletKey: string | undefined | null): string | undefined {

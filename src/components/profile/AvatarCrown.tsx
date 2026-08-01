@@ -8,6 +8,9 @@ import espiritoCrown from "@/assets/shop/espirito/crown.png";
 import espiritoFrame from "@/assets/shop/espirito/frame.png";
 import princesaCrown from "@/assets/shop/princesa/crown.png";
 import princesaFrame from "@/assets/shop/princesa/frame.png";
+import piscinaCrown from "@/assets/shop/piscina/crown.png";
+import piscinaFrame from "@/assets/shop/piscina/frame.png";
+
 
 
 /**
@@ -43,7 +46,13 @@ export const CROWN_ART_BY_KEY: Record<
     glow: "rgba(147, 197, 253, 0.24)",
     ring: princesaFrame,
   },
+  "nameplate:coroa_piscina": {
+    art: piscinaCrown,
+    glow: "rgba(34, 211, 238, 0.24)",
+    ring: piscinaFrame,
+  },
 };
+
 
 export function getCrownArt(walletKey: string | undefined | null) {
   if (!walletKey) return undefined;
