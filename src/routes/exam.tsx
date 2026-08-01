@@ -118,12 +118,30 @@ function ExamPage() {
 
   if (state.current) {
     return (
-      <ExamRunner
-        onFinish={() => setConfirmFinish(true)}
-        onCancel={() => cancelExam()}
-      />
+      <>
+        <ExamRunner
+          onFinish={() => setConfirmFinish(true)}
+          onCancel={() => cancelExam()}
+        />
+        <AlertDialog open={confirmFinish} onOpenChange={setConfirmFinish}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Finalizar prova?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ao finalizar, o resultado é calculado e a prova deste mês é fechada.
+                Você só poderá refazer no próximo mês.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Continuar respondendo</AlertDialogCancel>
+              <AlertDialogAction onClick={handleFinish}>Finalizar</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
   }
+
 
   if (showResult && currentResult) {
     return (
