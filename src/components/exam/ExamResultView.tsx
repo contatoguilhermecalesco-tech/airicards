@@ -48,7 +48,9 @@ function FeedbackList({
   if (items.length === 0) return null;
   return (
     <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-      <div className={`mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] ${tone}`}>
+      <div
+        className={`mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] ${tone}`}
+      >
         {icon}
         {title}
       </div>
@@ -301,10 +303,16 @@ export function ExamResultView({
                 const ans = result.answers?.[q.id];
                 const ok = ans === q.answer;
                 return (
-                  <div key={q.id} className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4">
+                  <div
+                    key={q.id}
+                    className="rounded-2xl border border-white/[0.06] bg-white/[0.025] p-4"
+                  >
                     <div className="flex items-start gap-2">
                       {ok ? (
-                        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" strokeWidth={2.25} />
+                        <CheckCircle2
+                          className="h-5 w-5 shrink-0 text-emerald-400"
+                          strokeWidth={2.25}
+                        />
                       ) : (
                         <XCircle className="h-5 w-5 shrink-0 text-red-400" strokeWidth={2.25} />
                       )}

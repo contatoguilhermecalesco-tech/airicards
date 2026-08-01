@@ -101,17 +101,14 @@ function ExamPage() {
   if (state.current) {
     return (
       <>
-        <ExamRunner
-          onFinish={() => setConfirmFinish(true)}
-          onCancel={() => cancelExam()}
-        />
+        <ExamRunner onFinish={() => setConfirmFinish(true)} onCancel={() => cancelExam()} />
         <AlertDialog open={confirmFinish} onOpenChange={setConfirmFinish}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Finalizar prova?</AlertDialogTitle>
               <AlertDialogDescription>
-                Ao finalizar, o resultado é calculado e a prova deste mês é fechada.
-                Você só poderá refazer no próximo mês.
+                Ao finalizar, o resultado é calculado e a prova deste mês é fechada. Você só poderá
+                refazer no próximo mês.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -123,7 +120,6 @@ function ExamPage() {
       </>
     );
   }
-
 
   if (showResult && currentResult) {
     return (
@@ -175,7 +171,6 @@ function ExamPage() {
         Histórico de provas <ChevronRight className="h-4 w-4" strokeWidth={2.25} />
       </Link>
 
-
       <header className="mb-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
           Prova mensal · {monthLabel(monthKey)}
@@ -184,16 +179,18 @@ function ExamPage() {
           Descubra seu nível de inglês
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-          Uma prova completa com <strong className="text-foreground">25 questões</strong>{" "}
-          geradas por IA — vocabulário, gramática, leitura e escuta — para diagnosticar
-          seu nível CEFR de A1 a C2. Feita uma vez por mês, com questões sempre novas.
+          Uma prova completa com <strong className="text-foreground">25 questões</strong> geradas
+          por IA — vocabulário, gramática, leitura e escuta — para diagnosticar seu nível CEFR de A1
+          a C2. Feita uma vez por mês, com questões sempre novas.
         </p>
       </header>
 
       {alreadyDone && currentResult && (
         <section className="mb-6 overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.025] p-6">
           <div className="flex items-center gap-3">
-            <div className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${LEVEL_COLOR[currentResult.level]} ring-1 ring-white/10`}>
+            <div
+              className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${LEVEL_COLOR[currentResult.level]} ring-1 ring-white/10`}
+            >
               <Trophy className="h-5 w-5" strokeWidth={2.25} />
             </div>
             <div>
@@ -221,10 +218,22 @@ function ExamPage() {
       <section className="glass-panel rounded-3xl border p-6 sm:p-8">
         <h2 className="text-lg font-semibold">Como funciona</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-          <li className="flex gap-2"><span className="text-primary">•</span> 25 questões de múltipla escolha, com dificuldade progressiva (A1 → C2).</li>
-          <li className="flex gap-2"><span className="text-primary">•</span> Cada questão avalia uma habilidade: gramática, vocabulário, leitura, escuta, phrasal verbs, collocations e uso.</li>
-          <li className="flex gap-2"><span className="text-primary">•</span> No fim, a IA calcula seu nível CEFR e mostra os pontos fortes e a melhorar.</li>
-          <li className="flex gap-2"><span className="text-primary">•</span> Disponível uma vez por mês — todo dia 1° uma nova prova é liberada.</li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span> 25 questões de múltipla escolha, com dificuldade
+            progressiva (A1 → C2).
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span> Cada questão avalia uma habilidade: gramática,
+            vocabulário, leitura, escuta, phrasal verbs, collocations e uso.
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span> No fim, a IA calcula seu nível CEFR e mostra os
+            pontos fortes e a melhorar.
+          </li>
+          <li className="flex gap-2">
+            <span className="text-primary">•</span> Disponível uma vez por mês — todo dia 1° uma
+            nova prova é liberada.
+          </li>
         </ul>
 
         {error && (
@@ -264,8 +273,8 @@ function ExamPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Finalizar prova?</AlertDialogTitle>
             <AlertDialogDescription>
-              Ao finalizar, o resultado é calculado e a prova deste mês é fechada.
-              Você só poderá refazer no próximo mês.
+              Ao finalizar, o resultado é calculado e a prova deste mês é fechada. Você só poderá
+              refazer no próximo mês.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -317,7 +326,6 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
       </main>
     );
   }
-
 
   return (
     <main className="mx-auto max-w-2xl px-5 py-8">

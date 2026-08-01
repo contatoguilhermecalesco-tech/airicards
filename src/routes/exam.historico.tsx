@@ -32,7 +32,13 @@ function ExamHistoryPage() {
 
   const selected = history.find((r) => r.id === openId);
   if (selected) {
-    return <ExamResultView result={selected} onClose={() => setOpenId(null)} closeLabel="Voltar ao histórico" />;
+    return (
+      <ExamResultView
+        result={selected}
+        onClose={() => setOpenId(null)}
+        closeLabel="Voltar ao histórico"
+      />
+    );
   }
 
   const sorted = [...history].sort((a, b) => b.completedAt - a.completedAt);
@@ -48,8 +54,12 @@ function ExamHistoryPage() {
       </button>
 
       <header className="mb-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Histórico</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Suas provas mensais</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+          Histórico
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          Suas provas mensais
+        </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
           Cada prova guarda a nota, o nível CEFR estimado e as considerações da IA sobre o seu
           desempenho.
@@ -99,7 +109,10 @@ function ExamHistoryPage() {
                     )}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={2.25} />
+                <ChevronRight
+                  className="h-4 w-4 shrink-0 text-muted-foreground"
+                  strokeWidth={2.25}
+                />
               </button>
             </li>
           ))}
