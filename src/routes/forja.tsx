@@ -559,6 +559,14 @@ function ForjaPage() {
 
       {help && <HelpModal onClose={() => setHelp(false)} />}
 
+      {gifting && profile?.id && (
+        <ShardGiftDialog
+          stack={gifting}
+          myId={profile.id}
+          onClose={() => setGifting(null)}
+        />
+      )}
+
       {forging && (
         <ForgeOverlay
           stack={forging}
