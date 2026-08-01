@@ -709,7 +709,15 @@ const COLLECTION_PALETTE: Record<
     spark: "#d1fae5",
     tag: "Verdejante",
   },
+  cyan: {
+    base: "radial-gradient(120% 100% at 20% 15%, #22d3ee 0%, transparent 55%), radial-gradient(120% 100% at 90% 90%, #155e75 0%, transparent 60%), linear-gradient(160deg,#083344 0%,#022c36 100%)",
+    edge: "#67e8f9",
+    glow: "rgba(34,211,238,0.5)",
+    spark: "#cffafe",
+    tag: "Piscina",
+  },
 };
+
 
 export function collectionPalette(key: string) {
   return COLLECTION_PALETTE[key] ?? COLLECTION_PALETTE.violet;
