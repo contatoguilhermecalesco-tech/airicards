@@ -18,7 +18,6 @@ import { Route as RankRouteImport } from './routes/rank'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
-import { Route as ExamRouteImport } from './routes/exam'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -27,10 +26,12 @@ import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as NovidadesIndexRouteImport } from './routes/novidades.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as ExamIndexRouteImport } from './routes/exam.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
 import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
 import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
+import { Route as ExamHistoricoRouteImport } from './routes/exam.historico'
 import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
 import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
@@ -96,11 +97,6 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
   path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExamRoute = ExamRouteImport.update({
-  id: '/exam',
-  path: '/exam',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EnemiesRoute = EnemiesRouteImport.update({
   id: '/enemies',
   path: '/enemies',
@@ -141,6 +137,11 @@ const LibraryIndexRoute = LibraryIndexRouteImport.update({
   path: '/library/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExamIndexRoute = ExamIndexRouteImport.update({
+  id: '/exam/',
+  path: '/exam/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialStatsRoute = SocialStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
@@ -159,6 +160,11 @@ const NovidadesIdRoute = NovidadesIdRouteImport.update({
 const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
   id: '/library/$deckId',
   path: '/library/$deckId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamHistoricoRoute = ExamHistoricoRouteImport.update({
+  id: '/exam/historico',
+  path: '/exam/historico',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BIdRoute = BIdRouteImport.update({
@@ -266,7 +272,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
-  '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
@@ -277,10 +282,12 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/exam/': typeof ExamIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
@@ -309,7 +316,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
-  '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
@@ -318,10 +324,12 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/exam': typeof ExamIndexRoute
   '/library': typeof LibraryIndexRoute
   '/novidades': typeof NovidadesIndexRoute
   '/social': typeof SocialIndexRoute
@@ -347,7 +355,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
-  '/exam': typeof ExamRoute
   '/marketplace': typeof MarketplaceRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
@@ -358,10 +365,12 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
   '/b/$id': typeof BIdRoute
+  '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil_/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/exam/': typeof ExamIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
@@ -392,7 +401,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
-    | '/exam'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
@@ -403,10 +411,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil/$id'
     | '/social/stats'
+    | '/exam/'
     | '/library/'
     | '/novidades/'
     | '/social/'
@@ -435,7 +445,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
-    | '/exam'
     | '/marketplace'
     | '/perfil'
     | '/rank'
@@ -444,10 +453,12 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil/$id'
     | '/social/stats'
+    | '/exam'
     | '/library'
     | '/novidades'
     | '/social'
@@ -472,7 +483,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/duel'
     | '/enemies'
-    | '/exam'
     | '/marketplace'
     | '/novidades'
     | '/perfil'
@@ -483,10 +493,12 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/social'
     | '/b/$id'
+    | '/exam/historico'
     | '/library/$deckId'
     | '/novidades/$id'
     | '/perfil_/$id'
     | '/social/stats'
+    | '/exam/'
     | '/library/'
     | '/novidades/'
     | '/social/'
@@ -516,7 +528,6 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
-  ExamRoute: typeof ExamRoute
   MarketplaceRoute: typeof MarketplaceRoute
   NovidadesRoute: typeof NovidadesRouteWithChildren
   PerfilRoute: typeof PerfilRoute
@@ -527,8 +538,10 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
   BIdRoute: typeof BIdRoute
+  ExamHistoricoRoute: typeof ExamHistoricoRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   PerfilIdRoute: typeof PerfilIdRoute
+  ExamIndexRoute: typeof ExamIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
@@ -608,13 +621,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/exam': {
-      id: '/exam'
-      path: '/exam'
-      fullPath: '/exam'
-      preLoaderRoute: typeof ExamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/enemies': {
       id: '/enemies'
       path: '/enemies'
@@ -671,6 +677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exam/': {
+      id: '/exam/'
+      path: '/exam'
+      fullPath: '/exam/'
+      preLoaderRoute: typeof ExamIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/social/stats': {
       id: '/social/stats'
       path: '/stats'
@@ -697,6 +710,13 @@ declare module '@tanstack/react-router' {
       path: '/library/$deckId'
       fullPath: '/library/$deckId'
       preLoaderRoute: typeof LibraryDeckIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam/historico': {
+      id: '/exam/historico'
+      path: '/exam/historico'
+      fullPath: '/exam/historico'
+      preLoaderRoute: typeof ExamHistoricoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/b/$id': {
@@ -921,7 +941,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
-  ExamRoute: ExamRoute,
   MarketplaceRoute: MarketplaceRoute,
   NovidadesRoute: NovidadesRouteWithChildren,
   PerfilRoute: PerfilRoute,
@@ -932,8 +951,10 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
   BIdRoute: BIdRoute,
+  ExamHistoricoRoute: ExamHistoricoRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   PerfilIdRoute: PerfilIdRoute,
+  ExamIndexRoute: ExamIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,

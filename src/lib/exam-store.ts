@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
 import { awardLp, LP } from "@/lib/rank-store";
 import type { ExamDifficulty, ExamQuestion } from "@/lib/exam.functions";
+import type { ExamFeedback } from "@/lib/exam-feedback.server";
 
 export type ExamAnswer = {
   questionId: string;
@@ -34,6 +35,10 @@ export type ExamResult = {
   answers: Record<string, number | null>;
   /** Trecho curto de cada questão, usado para evitar repetição futura. */
   fingerprints: string[];
+  /** Considerações da IA sobre a prova (gerado após a finalização). */
+  feedback?: ExamFeedback;
+  /** Mensagem de erro caso a análise da IA falhe. */
+  feedbackError?: string;
 };
 
 export type ExamState = {
@@ -288,6 +293,29 @@ export function getAvoidList(): string[] {
     if (list.length > 300) break;
   }
   return list;
+}
+
+/** Guarda (ou limpa) as considerações da IA de uma prova do histórico. */
+export function setExamFeedback(
+  resultId: string,
+  patch: { feedback?: ExamFeedback; feedbackError?: string },
+) {
+  const idx = state.history.findIndex((r) => r.id === resultId);
+  if (idx < 0) return;
+  const history = [...state.history];
+  const prev = history[idx]!;
+  history[idx] = {
+    ...prev,
+    feedback: patch.feedback ?? (patch.feedbackError ? undefined : prev.feedback),
+    feedbackError: patch.feedbackError,
+  };
+  state = { ...state, history };
+  emit();
+  scheduleSave();
+}
+
+export function getResultById(id: string): ExamResult | undefined {
+  return state.history.find((r) => r.id === id);
 }
 
 export function resetExamsForProfile() {
