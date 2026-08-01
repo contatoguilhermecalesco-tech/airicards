@@ -161,7 +161,18 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.streak_flame.chama_marionete": { art: marioneteChama },
   "cosmetic.enemy_seal.selo_marionete": { art: marioneteSelo },
   "cosmetic.victory_splash.ascensao_marionete": { art: marioneteAscensao },
+
+  // Master bundle — Piscina Infinita (Épico)
+  "bundle.piscina_infinita": { splash: piscinaSplash, art: piscinaAura },
+  "cosmetic.aura.piscina_infinita": { art: piscinaAura },
+  "cosmetic.frame.coroa_piscina": { art: piscinaFrame },
+  "cosmetic.veil.veu_piscina": { art: piscinaCardframe },
+  "cosmetic.table.mesa_piscina": { art: piscinaTableAmbient },
+  "cosmetic.streak_flame.chama_piscina": { art: piscinaChama },
+  "cosmetic.enemy_seal.selo_piscina": { art: piscinaSelo },
+  "cosmetic.victory_splash.ascensao_piscina": { art: piscinaAscensao },
 };
+
 
 export function getShopAssetOverride(itemId: string): ShopAssetOverride | undefined {
   return SHOP_ASSET_OVERRIDES[itemId];
