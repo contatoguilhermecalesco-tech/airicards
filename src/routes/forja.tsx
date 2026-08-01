@@ -447,9 +447,9 @@ function ForjaPage() {
           <p className="mt-4 rounded-3xl border border-white/10 bg-surface/50 p-6 text-center text-[13px] text-muted-foreground">
             Nenhum fragmento neste filtro.
           </p>
-        ) : view === "grade" ? (
+        ) : view === "detalhado" ? (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {visible.map((st) => (
+            {sorted.map((st) => (
               <ShardCard
                 key={st.key}
                 stack={st}
@@ -464,94 +464,45 @@ function ForjaPage() {
               />
             ))}
           </div>
+        ) : view === "grade" ? (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {sorted.map((st) => (
+              <ShardTile
+                key={st.key}
+                stack={st}
+                crystals={wallet.crystals}
+                disabled={busy === st.key || forging !== null}
+                canGift={Boolean(profile?.id)}
+                onForge={(s) => void forge(s)}
+                onGift={(s) => setGifting(s)}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="mt-3 space-y-6">
-            {shelves.map((shelf) => (
-              <div key={shelf.id}>
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                  <h3 className="min-w-0 truncate text-[13px] font-bold tracking-tight">
-                    {shelf.title}
-                  </h3>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {shelf.items.length}
-                  </span>
-                </div>
-                <p className="text-[11.5px] text-muted-foreground">{shelf.hint}</p>
-                <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {shelf.items.map((st) => (
-                    <ShardTile
-                      key={st.key}
-                      stack={st}
-                      crystals={wallet.crystals}
-                      disabled={busy === st.key || forging !== null}
-                      canGift={Boolean(profile?.id)}
-                      onForge={(s) => void forge(s)}
-                      onGift={(s) => setGifting(s)}
-                    />
-                  ))}
-                </div>
-              </div>
+          <div className="mt-3 space-y-2">
+            {sorted.map((st) => (
+              <ShardRow
+                key={st.key}
+                stack={st}
+                crystals={wallet.crystals}
+                disabled={busy === st.key || forging !== null}
+                canGift={Boolean(profile?.id)}
+                onForge={(s) => void forge(s)}
+                onGift={(s) => setGifting(s)}
+              />
             ))}
           </div>
         )}
       </section>
 
-      <ShardGiftsPanel myId={profile?.id} />
+      {historyOpen && (
+        <HistoryModal
+          log={hunt.log}
+          myId={profile?.id}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
 
-      {/* ---- Histórico ---- */}
-      <section className="mt-6 rounded-3xl border border-white/10 bg-surface/50 p-5">
-        <h2 className="flex items-center gap-2 text-sm font-bold tracking-tight">
-          <History className="h-4 w-4 text-muted-foreground" /> Histórico da forja
-        </h2>
-        {hunt.log.length === 0 ? (
-          <p className="mt-3 text-[13px] text-muted-foreground">Nada por aqui ainda.</p>
-        ) : (
-          <ul className="mt-3 divide-y divide-white/6">
-            {hunt.log.map((e, i) => {
-              const Icon =
-                e.tone === "forge"
-                  ? Hammer
-                  : e.tone === "dissolve"
-                    ? Coins
-                    : e.tone === "reroll"
-                      ? Shuffle
-                      : Sparkles;
-              const accent =
-                e.tone === "forge"
-                  ? "#fbbf24"
-                  : e.tone === "dissolve"
-                    ? "#7dd3fc"
-                    : e.tone === "reroll"
-                      ? "#34d399"
-                      : "#d8b4fe";
-              return (
-                <li key={`${e.at}-${i}`} className="flex items-center gap-3 py-3">
-                  <span
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-xl"
-                    style={{ background: `${accent}1f`, border: `1px solid ${accent}33` }}
-                  >
-                    <Icon className="h-4 w-4" style={{ color: accent }} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-semibold">
-                      {e.label}
-                    </span>
-                    <span className="block truncate text-[11px] text-muted-foreground">
-                      {e.detail}
-                    </span>
-                  </span>
-                  <span className="shrink-0 text-[11px] text-muted-foreground">
-                    {new Date(e.at).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    })}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
 
       {help && <HelpModal onClose={() => setHelp(false)} />}
 
