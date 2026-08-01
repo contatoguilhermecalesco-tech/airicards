@@ -70,8 +70,9 @@ export function StreakFlame({
         </>
       )}
 
-      {theme?.glyph === "marionette" && isActive && theme.art ? (
-        <MarionetteFlame theme={theme} intensity={intensity} />
+      {theme?.glyph === "marionette" && theme.art ? (
+        <MarionetteFlame theme={theme} intensity={intensity} state={state} streak={streak} />
+
       ) : theme?.glyph === "rune" && isActive && theme.art ? (
         <span aria-hidden className="relative grid h-[26px] w-[26px] place-items-center">
           <img
@@ -119,67 +120,149 @@ export function StreakFlame({
 }
 
 /* ---------------- Chama da Marionete ---------------- */
-// Chama de porcelana suspensa por fios: balança como marionete, respira com a
-// streak e derruba pétalas brancas. Quanto maior a sequência, mais viva.
+// A marionete reage ao estado da streak:
+//  • empty/ashes → cinza, pendurada e sem forças (fios bambos)
+//  • risk        → tremor nervoso, fios se rompendo, piscadas
+//  • alive       → balanço vivo, pétalas, brasas e coroa de fios em streaks altas
 function MarionetteFlame({
   theme,
   intensity,
+  state,
+  streak,
 }: {
   theme: StreakFlameTheme;
   intensity: number;
+  state: FlameState;
+  streak: number;
 }) {
-  const swayMs = 3400 - intensity * 900;
+  const dead = state === "ashes" || state === "empty";
+  const risk = state === "risk";
+  const alive = state === "alive";
+
+  // Tiers de intensidade só valem para a chama viva.
+  const tier = !alive ? 0 : streak >= 30 ? 3 : streak >= 14 ? 2 : streak >= 5 ? 1 : 0;
+
+  const color = dead ? "#8d93a1" : theme.color;
+  const accent = dead ? "#b9bec9" : theme.accent;
+
+  // Quanto maior a streak, mais rápido e amplo o balanço.
+  const swayMs = dead ? 5200 : risk ? 900 : 3400 - intensity * 1400;
+  const breathMs = dead ? 4200 : risk ? 1100 : 2400 - intensity * 800;
+
+  const swayAnim = dead
+    ? "motion-safe:animate-[puppetSlump_var(--sway)_ease-in-out_infinite]"
+    : risk
+      ? "motion-safe:animate-[maskShiver_var(--sway)_ease-in-out_infinite]"
+      : "motion-safe:animate-[puppetSway_var(--sway)_ease-in-out_infinite]";
+
+  const breathAnim = dead
+    ? "motion-safe:animate-[puppetSlumpBreath_var(--breath)_ease-in-out_infinite]"
+    : risk
+      ? "motion-safe:animate-[maskShiverBreath_var(--breath)_ease-in-out_infinite]"
+      : "motion-safe:animate-[puppetBreath_var(--breath)_ease-in-out_infinite]";
+
+  const threadAnim = dead
+    ? "motion-safe:animate-[threadSlack_4200ms_ease-in-out_infinite]"
+    : risk
+      ? "motion-safe:animate-[threadSnap_1600ms_ease-in-out_infinite]"
+      : "motion-safe:animate-[threadPull_2200ms_ease-in-out_infinite]";
+
+  const petals = tier >= 3 ? [16, 40, 62, 84] : tier >= 2 ? [22, 62, 82] : tier >= 1 ? [30, 70] : [];
+  const glow = dead ? 2 : risk ? 4 : 5 + intensity * 9;
 
   return (
     <span aria-hidden className="relative grid h-full w-full place-items-center">
+      {/* coroa de fios girando (só em streak lendária) */}
+      {tier >= 3 && (
+        <span
+          className="pointer-events-none absolute h-9 w-9 rounded-full border border-dashed motion-safe:animate-[threadCrown_9000ms_linear_infinite]"
+          style={{ borderColor: `${accent}55` }}
+        />
+      )}
+
       {/* fios de comando */}
       {[30, 50, 70].map((left, i) => (
         <span
           key={left}
-          className="pointer-events-none absolute top-0 h-3.5 w-px motion-safe:animate-[threadPull_2200ms_ease-in-out_infinite]"
+          className={`pointer-events-none absolute top-0 w-px ${threadAnim}`}
           style={{
             left: `${left}%`,
-            background: `linear-gradient(to bottom, ${theme.accent}cc, transparent)`,
-            animationDelay: `${i * 320}ms`,
+            height: dead ? "9px" : "14px",
+            background: `linear-gradient(to bottom, ${accent}${dead ? "66" : "cc"}, transparent)`,
+            animationDelay: `${i * (risk ? 180 : 320)}ms`,
           }}
         />
       ))}
 
-      {/* pulsos de porcelana */}
-      <span
-        className="pointer-events-none absolute h-7 w-7 rounded-full border motion-safe:animate-[porcelainRing_2800ms_ease-out_infinite]"
-        style={{ borderColor: `${theme.color}66` }}
-      />
+      {/* pulsos de porcelana — mais rápidos conforme a streak sobe */}
+      {!dead && (
+        <span
+          className="pointer-events-none absolute h-7 w-7 rounded-full border motion-safe:animate-[porcelainRing_var(--ring)_ease-out_infinite]"
+          style={{
+            borderColor: `${color}${risk ? "44" : "66"}`,
+            ["--ring" as string]: `${risk ? 1400 : 2800 - intensity * 900}ms`,
+          }}
+        />
+      )}
 
-      {/* pétalas caindo */}
-      {[22, 62, 82].map((left, i) => (
+      {/* flare pulsante de streak alta */}
+      {tier >= 2 && (
+        <span
+          className="pointer-events-none absolute h-8 w-8 rounded-full motion-safe:animate-[marionetteFlare_1800ms_ease-in-out_infinite]"
+          style={{ background: `radial-gradient(closest-side, ${color}55, transparent 70%)` }}
+        />
+      )}
+
+      {/* pétalas caindo (quantidade cresce com a streak) */}
+      {petals.map((left, i) => (
         <span
           key={`p-${left}`}
-          className="pointer-events-none absolute top-1 h-[3px] w-[5px] rounded-full motion-safe:animate-[petalFall_3200ms_linear_infinite]"
+          className="pointer-events-none absolute top-1 h-[3px] w-[5px] rounded-full motion-safe:animate-[petalFall_var(--fall)_linear_infinite]"
           style={{
             left: `${left}%`,
-            background: theme.accent,
-            opacity: 0.7,
-            animationDelay: `${i * 900}ms`,
+            background: accent,
+            opacity: 0.55 + intensity * 0.35,
+            animationDelay: `${i * 700}ms`,
+            ["--fall" as string]: `${3200 - intensity * 900}ms`,
           }}
         />
       ))}
+
+      {/* cinzas caindo quando a chama morre */}
+      {dead &&
+        [34, 66].map((left, i) => (
+          <span
+            key={`a-${left}`}
+            className="pointer-events-none absolute top-2 h-[2px] w-[2px] rounded-full motion-safe:animate-[petalFall_5200ms_linear_infinite]"
+            style={{
+              left: `${left}%`,
+              background: "#9aa1ad",
+              opacity: 0.35,
+              animationDelay: `${i * 1800}ms`,
+            }}
+          />
+        ))}
 
       {/* chama-máscara */}
       <span
-        className="relative grid h-[28px] w-[28px] origin-top place-items-center motion-safe:animate-[puppetSway_var(--sway)_ease-in-out_infinite]"
+        className={`relative grid h-[28px] w-[28px] origin-top place-items-center ${swayAnim}`}
         style={{ ["--sway" as string]: `${swayMs}ms` }}
       >
         <img
           src={theme.art}
           alt=""
           draggable={false}
-          className="h-[27px] w-[27px] object-contain motion-safe:animate-[puppetBreath_2400ms_ease-in-out_infinite]"
+          className={`h-[27px] w-[27px] object-contain ${breathAnim}`}
           style={{
-            filter: `drop-shadow(0 0 ${5 + intensity * 7}px ${theme.color}cc) drop-shadow(0 0 2px ${theme.accent}aa)`,
+            ["--breath" as string]: `${breathMs}ms`,
+            opacity: dead ? 0.55 : 1,
+            filter: dead
+              ? "grayscale(1) brightness(0.6)"
+              : `drop-shadow(0 0 ${glow}px ${color}cc) drop-shadow(0 0 2px ${accent}aa)`,
           }}
         />
       </span>
     </span>
   );
 }
+
