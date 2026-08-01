@@ -918,14 +918,31 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           </HelpItem>
           <HelpItem n={3} title={`${SHARDS_PER_FORGE} iguais + ${FORGE_ARLYS_COST} ✦`}>
             Junte {SHARDS_PER_FORGE} fragmentos do mesmo cosmético e pague{" "}
-            {FORGE_ARLYS_COST} Arlys ✦ para forjá-lo. O item fica permanente na sua conta.
+            {FORGE_ARLYS_COST} Arlys ✦ para forjá-lo. Antes de confirmar você prova o item
+            no provador, vendo como ele fica equipado.
           </HelpItem>
-          <HelpItem n={4} title="Não gostou? Troque ou dissolva">
+          <HelpItem n={4} title="Forja crítica">
+            Toda forja tem {Math.round(CRIT_FORGE_CHANCE * 100)}% de chance de sair na
+            variante Áurea e {Math.round(PLATINA_FORGE_CHANCE * 100)}% de sair Platina —
+            versões especiais do mesmo cosmético.
+          </HelpItem>
+          <HelpItem n={5} title={`Fusão: ${FUSION_INPUT} diferentes → 1 escolhido`}>
+            Sobrou fragmento de item que você não quer? Funda {FUSION_INPUT} fragmentos de
+            cosméticos diferentes da mesma raridade e receba 1 fragmento do cosmético que
+            você escolher.
+          </HelpItem>
+          <HelpItem n={6} title="Bancada limitada e brilho">
+            A bancada guarda até {SHARD_CAP} fragmentos — cheia, nada novo cai. Fragmentos
+            parados mais de 2 semanas perdem brilho e valem menos ao dissolver, e o saque
+            por dissolução tem teto de {DISSOLVE_WEEKLY_CAP} ✦ por semana.
+          </HelpItem>
+          <HelpItem n={7} title="Não gostou? Troque ou dissolva">
             Trocar transforma o fragmento em outro cosmético — você tem{" "}
             {REROLL_WEEKLY_LIMIT} trocas por semana. Dissolver devolve Arlys ✦ conforme a
             raridade (20 a 60 ✦).
           </HelpItem>
         </ul>
+
 
         <button
           type="button"
