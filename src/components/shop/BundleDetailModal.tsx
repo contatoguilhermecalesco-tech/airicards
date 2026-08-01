@@ -13,6 +13,7 @@ import {
 } from "@/components/shop/shop-visuals";
 import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { getShopAssetOverride } from "@/lib/shop-asset-overrides";
+import { getRingScaleForArt, DEFAULT_RING_SCALE } from "@/components/profile/AvatarCrown";
 
 export function BundleDetailModal({
   bundle,
@@ -549,7 +550,11 @@ function BundlePreview({
                 src={frameArt}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute left-1/2 top-[45%] z-10 h-[168%] w-[168%] max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10 max-w-none -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-[0_6px_20px_rgba(192,132,252,0.45)]"
+                style={{
+                  width: `${(168 * getRingScaleForArt(frameArt)) / DEFAULT_RING_SCALE}%`,
+                  height: `${(168 * getRingScaleForArt(frameArt)) / DEFAULT_RING_SCALE}%`,
+                }}
               />
             )}
             {/* Companion */}
@@ -562,7 +567,7 @@ function BundlePreview({
               />
             )}
           </div>
-          <p className="mt-3 text-sm font-bold text-white">Guilherme</p>
+          <p className="mt-10 text-sm font-bold text-white">Guilherme</p>
           <p className="text-[11px] text-white/60">
             <span className="text-white/80">guilherme</span>
             <span className="text-white/40">.airi.com.br</span>
