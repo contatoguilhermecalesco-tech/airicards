@@ -227,7 +227,7 @@ const DISCORD_PALETTE: Record<
   cyan: {
     gradient: "linear-gradient(135deg,#a5f3fc 0%,#22d3ee 42%,#164e63 100%)",
     ring: "#22d3ee",
-    tag: "Piscina",
+    tag: "Praia",
   },
 };
 
@@ -714,7 +714,7 @@ const COLLECTION_PALETTE: Record<
     edge: "#67e8f9",
     glow: "rgba(34,211,238,0.5)",
     spark: "#cffafe",
-    tag: "Piscina",
+    tag: "Praia",
   },
 };
 
