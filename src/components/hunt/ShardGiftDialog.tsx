@@ -115,9 +115,9 @@ export function ShardGiftDialog({
         />
 
         <p className="mt-3 text-[11.5px] leading-relaxed text-muted-foreground">
-          Sai 1 fragmento do seu inventário agora. Se {partner.name} recusar, ele volta
-          para você.
+          O fragmento sai do seu inventário agora e passa a ser de {partner.name}.
         </p>
+
 
         <button
           type="button"
