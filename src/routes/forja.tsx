@@ -218,136 +218,89 @@ function ForjaPage() {
         </button>
       </div>
 
-      {/* ---- Câmara da forja ---- */}
+      {/* ---- Cofre de espólios ---- */}
       <section
-        className="relative overflow-hidden rounded-[28px] border border-white/10"
+        className="loot-clip relative overflow-hidden border"
         style={{
+          borderColor: "rgba(200,170,110,0.34)",
           background:
-            "radial-gradient(90% 120% at 50% 118%, rgba(251,146,60,0.24), transparent 62%), radial-gradient(110% 90% at 12% -10%, rgba(167,139,250,0.26), transparent 58%), linear-gradient(165deg, rgba(26,15,44,0.94), rgba(10,6,19,0.97))",
+            "radial-gradient(120% 100% at 50% -20%, rgba(200,170,110,0.16), transparent 62%), linear-gradient(170deg, rgba(12,17,26,0.96), rgba(4,6,11,0.98))",
         }}
       >
-        {/* brasas subindo */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <span
-              key={i}
-              className="forge-spark absolute bottom-0 rounded-full"
-              style={
-                {
-                  left: `${6 + i * 6.7}%`,
-                  height: i % 3 === 0 ? 3 : 2,
-                  width: i % 3 === 0 ? 3 : 2,
-                  background: i % 2 ? "#fbbf24" : "#d8b4fe",
-                  filter: "blur(0.4px)",
-                  "--spark-delay": `${(i * 0.63).toFixed(2)}s`,
-                  "--spark-duration": `${6 + (i % 5)}s`,
-                  "--spark-drift": `${(i % 2 ? 1 : -1) * (10 + i * 2)}px`,
-                  "--spark-opacity": i % 3 === 0 ? 0.8 : 0.5,
-                } as React.CSSProperties
-              }
-            />
-          ))}
-        </div>
-        {/* raios lentos */}
-        <div
+        <span aria-hidden className="loot-hexgrid absolute inset-0 opacity-60" />
+        <span
           aria-hidden
-          className="relic-rays pointer-events-none absolute inset-0 opacity-30"
+          className="absolute inset-x-0 top-0 h-[2px]"
           style={{
             background:
-              "repeating-conic-gradient(from 0deg at 50% 108%, rgba(251,191,36,0.14) 0deg 2deg, transparent 2deg 15deg)",
-            maskImage: "radial-gradient(closest-side at 50% 108%, black, transparent 72%)",
-            WebkitMaskImage:
-              "radial-gradient(closest-side at 50% 108%, black, transparent 72%)",
+              "linear-gradient(90deg, transparent, rgba(200,170,110,0.9), transparent)",
           }}
         />
 
-        <div className="relative p-6 sm:p-8">
-          <div className="flex items-start gap-4">
+        <div className="relative p-5 sm:p-6">
+          <div className="flex items-start gap-3.5">
             <span
-              className="forge-anvil grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/12 sm:h-16 sm:w-16"
+              className="loot-clip-sm grid h-12 w-12 shrink-0 place-items-center border sm:h-14 sm:w-14"
               style={{
-                background:
-                  "linear-gradient(150deg, rgba(251,191,36,0.28), rgba(167,139,250,0.18))",
-                boxShadow: "0 0 46px -16px #fbbf24",
+                borderColor: "rgba(200,170,110,0.55)",
+                background: "rgba(200,170,110,0.12)",
               }}
             >
-              <Hammer className="h-7 w-7 text-amber-200 sm:h-8 sm:w-8" />
+              <Hammer className="h-6 w-6" style={{ color: "#f0e6d2" }} />
             </span>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-primary">
-                Modo colecionável
+              <p className="loot-label" style={{ color: "#c8aa6e" }}>
+                Cofre de espólios
               </p>
-              <h1 className="mt-1.5 text-2xl font-bold tracking-tight sm:text-4xl">
+              <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
                 Forja de Fragmentos
               </h1>
-              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Revise cartas, colete fragmentos dos bundles ativos e transforme{" "}
-                <strong className="text-foreground">
-                  {SHARDS_PER_FORGE} iguais + {FORGE_ARLYS_COST} ✦
-                </strong>{" "}
-                em um cosmético permanente.
+              <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted-foreground">
+                {SHARDS_PER_FORGE} fragmentos iguais + {FORGE_ARLYS_COST} ✦ = cosmético
+                permanente.
               </p>
             </div>
           </div>
 
-          {/* trilha */}
-          <div className="mt-6 flex flex-wrap items-center gap-1.5">
-            <Step n={1} label="Revise cartas" />
-            <Sep />
-            <Step n={2} label={`Junte ${SHARDS_PER_FORGE} iguais`} />
-            <Sep />
-            <Step n={3} label={`Pague ${FORGE_ARLYS_COST} ✦`} />
-            <Sep />
-            <Step n={4} label="Permanente" done />
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-            <StatBox
-              label="Fragmentos"
-              value={hunt.shards.length}
-              accent="#d8b4fe"
-              icon={Gem}
-            />
-            <StatBox label="Prontos" value={ready} accent="#34d399" icon={Hammer} />
-            <StatBox label="Forjados" value={hunt.forged} accent="#fbbf24" icon={Flame} />
-            <StatBox
-              label="Arlys ✦"
-              value={wallet.crystals}
-              accent="#7dd3fc"
-              icon={Sparkles}
-            />
+          <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden border sm:grid-cols-4"
+            style={{ borderColor: "rgba(200,170,110,0.22)", background: "rgba(200,170,110,0.18)" }}
+          >
+            <VaultStat label="Fragmentos" value={hunt.shards.length} icon={Gem} />
+            <VaultStat label="Prontos" value={ready} icon={Hammer} highlight={ready > 0} />
+            <VaultStat label="Forjados" value={hunt.forged} icon={Flame} />
+            <VaultStat label="Arlys ✦" value={wallet.crystals} icon={Sparkles} />
           </div>
 
           {ready > 0 && (
             <button
               type="button"
               onClick={() => setFilter("prontos")}
-              className="tap-target mt-5 flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition hover:bg-white/6"
+              className="tap-target loot-clip-sm mt-3 flex w-full items-center gap-3 border px-4 py-3 text-left transition hover:brightness-110"
               style={{
-                borderColor: "rgba(52,211,153,0.4)",
-                background: "rgba(52,211,153,0.10)",
+                borderColor: "rgba(200,170,110,0.6)",
+                background:
+                  "linear-gradient(90deg, rgba(200,170,110,0.20), rgba(200,170,110,0.05))",
               }}
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-emerald-400/20">
-                <Hammer className="h-4 w-4 text-emerald-300" />
-              </span>
+              <Hammer className="h-4 w-4 shrink-0" style={{ color: "#f0e6d2" }} />
               <span className="min-w-0 flex-1">
-                <span className="block text-[13px] font-bold text-emerald-200">
-                  {ready} cosmético{ready > 1 ? "s" : ""} pronto
-                  {ready > 1 ? "s" : ""} para forjar
+                <span className="block loot-label" style={{ color: "#f0e6d2" }}>
+                  {ready} conjunto{ready > 1 ? "s" : ""} pronto{ready > 1 ? "s" : ""} para
+                  forjar
                 </span>
-                <span className="block truncate text-[11px] text-muted-foreground">
+                <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">
                   {readyStacks
                     .slice(0, 2)
                     .map((s) => s.name)
                     .join(" · ")}
                 </span>
               </span>
-              <ChevronRight className="h-4 w-4 shrink-0 text-emerald-300" />
+              <ChevronRight className="h-4 w-4 shrink-0" style={{ color: "#c8aa6e" }} />
             </button>
           )}
         </div>
       </section>
+
 
       {/* ---- Inventário ---- */}
       <section className="mt-6">
