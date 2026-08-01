@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as RelicarioRouteImport } from './routes/relicario'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
@@ -75,6 +76,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RelicarioRoute = RelicarioRouteImport.update({
+  id: '/relicario',
+  path: '/relicario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RankRoute = RankRouteImport.update({
@@ -276,6 +282,7 @@ export interface FileRoutesByFullPath {
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
+  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -319,6 +326,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRoute
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
+  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -359,6 +367,7 @@ export interface FileRoutesById {
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
+  '/relicario': typeof RelicarioRoute
   '/review': typeof ReviewRoute
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
@@ -405,6 +414,7 @@ export interface FileRouteTypes {
     | '/novidades'
     | '/perfil'
     | '/rank'
+    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -448,6 +458,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/perfil'
     | '/rank'
+    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -487,6 +498,7 @@ export interface FileRouteTypes {
     | '/novidades'
     | '/perfil'
     | '/rank'
+    | '/relicario'
     | '/review'
     | '/settings'
     | '/shop'
@@ -532,6 +544,7 @@ export interface RootRouteChildren {
   NovidadesRoute: typeof NovidadesRouteWithChildren
   PerfilRoute: typeof PerfilRoute
   RankRoute: typeof RankRoute
+  RelicarioRoute: typeof RelicarioRoute
   ReviewRoute: typeof ReviewRoute
   SettingsRoute: typeof SettingsRoute
   ShopRoute: typeof ShopRoute
@@ -591,6 +604,13 @@ declare module '@tanstack/react-router' {
       path: '/review'
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relicario': {
+      id: '/relicario'
+      path: '/relicario'
+      fullPath: '/relicario'
+      preLoaderRoute: typeof RelicarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rank': {
@@ -945,6 +965,7 @@ const rootRouteChildren: RootRouteChildren = {
   NovidadesRoute: NovidadesRouteWithChildren,
   PerfilRoute: PerfilRoute,
   RankRoute: RankRoute,
+  RelicarioRoute: RelicarioRoute,
   ReviewRoute: ReviewRoute,
   SettingsRoute: SettingsRoute,
   ShopRoute: ShopRoute,
@@ -971,13 +992,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
