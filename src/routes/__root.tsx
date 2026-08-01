@@ -258,6 +258,14 @@ const MORE_ITEMS = [
     matcher: (p: string) => p.startsWith("/enemies"),
   },
   {
+    to: "/relicario",
+    label: "Relicário",
+    description: "Caça aos Luminhos e recompensas aleatórias",
+    icon: Sparkles,
+    color: "#d8b4fe",
+    matcher: (p: string) => p.startsWith("/relicario"),
+  },
+  {
     to: "/rank",
     label: "Rank",
     description: "Seu elo e progressão",
