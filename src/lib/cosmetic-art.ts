@@ -17,8 +17,6 @@ import olhoVigilia from "@/assets/shop/princesa/selo.png";
 import ascensaoVigilia from "@/assets/shop/princesa/ascensao.png";
 
 import chamaPiscina from "@/assets/shop/piscina/chama.png";
-import seloPiscina from "@/assets/shop/piscina/selo.png";
-import ascensaoPiscina from "@/assets/shop/piscina/ascensao.png";
 
 
 export const COSMETIC_ART: Record<string, string> = {
@@ -39,8 +37,6 @@ export const COSMETIC_ART: Record<string, string> = {
   ascensao_vigilia: ascensaoVigilia,
 
   chama_piscina: chamaPiscina,
-  selo_piscina: seloPiscina,
-  ascensao_piscina: ascensaoPiscina,
 };
 
 
