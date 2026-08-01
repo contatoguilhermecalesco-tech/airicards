@@ -1125,3 +1125,37 @@
 @utility forge-anvil {
   animation: forge-anvil 5s ease-in-out infinite;
 }
+
+/* ---- Cofre de espólios (linguagem hextech / inventário) ---- */
+@utility loot-clip {
+  clip-path: polygon(
+    13px 0,
+    100% 0,
+    100% calc(100% - 13px),
+    calc(100% - 13px) 100%,
+    0 100%,
+    0 13px
+  );
+}
+@utility loot-clip-sm {
+  clip-path: polygon(
+    9px 0,
+    100% 0,
+    100% calc(100% - 9px),
+    calc(100% - 9px) 100%,
+    0 100%,
+    0 9px
+  );
+}
+@utility loot-hexgrid {
+  background-image:
+    repeating-linear-gradient(60deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 38px);
+}
+@utility loot-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
