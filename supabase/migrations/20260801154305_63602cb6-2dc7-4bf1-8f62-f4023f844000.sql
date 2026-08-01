@@ -1,0 +1,8 @@
+UPDATE public.shop_items SET name='Praia Infinita', description='Um verão infinito na praia do airi: areia dourada, ondas turquesa, guarda-sóis listrados, boias douradas na arrebentação, peixes bobos de óculos e coco gelado. Luxo com humor.' WHERE id='bundle.piscina_infinita';
+UPDATE public.shop_items SET name='Aura da Maré', description='Anel de água turquesa com areia dourada, conchas e peixes bobos de óculos girando ao redor do avatar.' WHERE id='cosmetic.aura.piscina_infinita';
+UPDATE public.shop_items SET name='Coroa de Conchas', description='Coroa dourada de conchas, estrelas-do-mar e corais com ondas turquesa — a joia da praia infinita.' WHERE id='cosmetic.frame.coroa_piscina';
+UPDATE public.shop_items SET name='Véu da Praia', description='Verso das cartas com medalhão de concha dourada, ondas turquesa e peixinhos de óculos sobre areia.' WHERE id='cosmetic.veil.veu_piscina';
+UPDATE public.shop_items SET name='Mesa da Praia Infinita', description='Mesa de revisão numa praia ao pôr do sol: areia dourada, ondas turquesa, guarda-sóis e luzinhas.' WHERE id='cosmetic.table.mesa_piscina';
+UPDATE public.shop_items SET name='Fogueira da Praia', description='Chama de streak com chapéu de palha, óculos escuros e água de coco na mão.' WHERE id='cosmetic.streak_flame.chama_piscina';
+UPDATE public.shop_items SET name='Selo da Maré', description='Selo redondo com sol de óculos escuros surfando uma onda, concha e estrela-do-mar.' WHERE id='cosmetic.enemy_seal.selo_piscina';
+UPDATE public.shop_items SET name='Splash da Maré', description='Ao vencer, uma explosão de mar e areia com peixes bobos saltando entre boias douradas.' WHERE id='cosmetic.victory_splash.ascensao_piscina';
