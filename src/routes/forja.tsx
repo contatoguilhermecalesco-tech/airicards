@@ -404,7 +404,14 @@ function ForjaPage() {
                         background: `radial-gradient(circle at 50% 40%, ${tier.color}26, transparent 70%)`,
                       }}
                     >
-                      <ShardIcon accent={st.accent} tier={tier.color} size={50} />
+                      <ShardArt
+                        cosmeticKey={st.key}
+                        accent={st.accent}
+                        tierColor={tier.color}
+                        size={50}
+                        complete={st.ready}
+                      />
+
                       {st.count > SHARDS_PER_FORGE && (
                         <span
                           className="absolute -bottom-1.5 -right-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
