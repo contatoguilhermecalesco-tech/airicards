@@ -94,6 +94,8 @@ export type EnemySealTheme = {
   missLabel: string;
   /** Texto curto estampado ao derrotar. */
   hitLabel: string;
+  /** Arte dedicada do sigilo (opcional). */
+  art?: string;
 };
 
 export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
@@ -112,6 +114,24 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
     accent: "#8e1b2b",
     missLabel: "SELO SANGRADO",
     hitLabel: "GELO ROMPIDO",
+  },
+  olho_vigilia: {
+    key: "olho_vigilia",
+    name: "Olho da Vigília",
+    color: "#bfe4ff",
+    accent: "#050a1c",
+    missLabel: "VIGIADO",
+    hitLabel: "GELO PARTIDO",
+    art: COSMETIC_ART.olho_vigilia,
+  },
+  selo_marionete: {
+    key: "selo_marionete",
+    name: "Selo da Marionete",
+    color: "#ff4d63",
+    accent: "#10040a",
+    missLabel: "AMARRADO",
+    hitLabel: "FIOS CORTADOS",
+    art: COSMETIC_ART.selo_marionete,
   },
 };
 
@@ -180,6 +200,24 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     color: "#8fc7f5",
     accent: "#0a1430",
     art: COSMETIC_ART.ascensao_espiritual,
+  },
+  ascensao_vigilia: {
+    key: "ascensao_vigilia",
+    name: "Ascensão da Vigília",
+    headline: "VITÓRIA",
+    subline: "O rito de gelo coroa sua vigília",
+    color: "#bfe4ff",
+    accent: "#050a1c",
+    art: COSMETIC_ART.ascensao_vigilia,
+  },
+  ascensao_marionete: {
+    key: "ascensao_marionete",
+    name: "Ascensão da Marionete",
+    headline: "VITÓRIA",
+    subline: "A corte aplaude — os fios agora são seus",
+    color: "#ff4d63",
+    accent: "#10040a",
+    art: COSMETIC_ART.ascensao_marionete,
   },
 };
 
