@@ -43,6 +43,8 @@ export type TableSkin = {
   hit: string;
   /** Cor do feedback de erro. */
   miss: string;
+  /** Assinatura de VFX da mesa. `puppet` usa o teatro de marionetes. */
+  vfx?: "default" | "puppet";
 };
 
 export const DEFAULT_TABLE_SKIN: TableSkin = {
@@ -113,6 +115,7 @@ export const TABLE_SKINS: Record<string, TableSkin> = {
     glow: "rgba(185, 28, 60, 0.45)",
     hit: "#ff8aa0",
     miss: "#7a1329",
+    vfx: "puppet",
   },
 };
 

@@ -1,4 +1,5 @@
 import type { TableSkin } from "@/lib/table-skins";
+import { PuppetImpact } from "./PuppetTableFX";
 
 /**
  * VFX cinematográfico de impacto da Mesa de Revisão.
@@ -29,11 +30,17 @@ export function TableSkinImpact({
   skin,
   tone,
   seed,
+  contained = false,
 }: {
   skin: TableSkin;
   tone: "hit" | "miss";
   seed: number;
+  /** Prévia da loja: fica dentro da caixa em vez de cobrir a tela. */
+  contained?: boolean;
 }) {
+  // Mesas com assinatura própria trocam o VFX inteiro.
+  if (skin.vfx === "puppet") return <PuppetImpact skin={skin} tone={tone} seed={seed} contained={contained} />;
+
   const color = tone === "hit" ? skin.hit : skin.miss;
   const accent = tone === "hit" ? skin.accent : skin.miss;
 
@@ -41,7 +48,7 @@ export function TableSkinImpact({
     <div
       key={seed}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-30 overflow-hidden"
+      className={`pointer-events-none inset-0 overflow-hidden ${contained ? "absolute z-20" : "fixed z-30"}`}
     >
       {/* Clarão radial */}
       <div
