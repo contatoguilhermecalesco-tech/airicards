@@ -33,7 +33,7 @@ import { RankEmblem } from "@/components/RankBadge";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { formatPresence } from "@/lib/presence";
 import { getEquippedArt } from "@/lib/shop-asset-overrides";
-import { AvatarCrown, NameplateTopCrown, getCrownArt } from "@/components/profile/AvatarCrown";
+import { AvatarCrown, NameplateTopCrown, getCrownArt, getCrownAccent } from "@/components/profile/AvatarCrown";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";
@@ -128,6 +128,8 @@ function PerfilViewer() {
   // Artes curadas dos cosméticos equipados (mesmas usadas no /perfil próprio).
   const nameplateArt = getEquippedArt(equipped.nameplate);
   const crownArt = getCrownArt(equipped.nameplate);
+  // Anel/blur do avatar sempre na cor da coroa equipada.
+  const avatarRing = getCrownAccent(equipped.nameplate) ?? decorationPalette.ring;
   const decorationArt = getEquippedArt(equipped.decoration);
   const badgeArt = getEquippedArt(equipped.badge);
   const effectArt = getEquippedArt(equipped.effect);
@@ -230,7 +232,7 @@ function PerfilViewer() {
                   <span
                     className="cosmetic-ring-spin absolute inset-0 rounded-full"
                     style={{
-                      background: `conic-gradient(from 0deg, ${decorationPalette.ring}, transparent 35%, ${decorationPalette.ring} 65%, transparent 100%)`,
+                      background: `conic-gradient(from 0deg, ${avatarRing}, transparent 35%, ${avatarRing} 65%, transparent 100%)`,
                     }}
                   />
                   <span className="absolute inset-[3px] rounded-full" style={{ background: "#1e1f22" }} />
@@ -244,7 +246,7 @@ function PerfilViewer() {
                   backgroundImage: snapshot?.wallet.avatarUrl ? undefined : profile.gradient,
                   background: snapshot?.wallet.avatarUrl ? "#000" : undefined,
                   fontSize: 34,
-                  boxShadow: showDecoration ? `0 0 14px ${decorationPalette.ring}55` : "none",
+                  boxShadow: showDecoration ? `0 0 14px ${avatarRing}55` : "none",
                 }}
               >
                 {snapshot?.wallet.avatarUrl ? (

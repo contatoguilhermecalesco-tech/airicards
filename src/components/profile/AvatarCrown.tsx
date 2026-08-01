@@ -17,36 +17,49 @@ import piscinaRing from "@/assets/shop/piscina/ring.png";
  * Coroas: arte apoiada no topo do avatar + círculo ornamentado em volta do
  * perfil (a moldura completa do bundle).
  */
-export const CROWN_ART_BY_KEY: Record<
-  string,
-  { art: string; glow: string; ring?: string; ringScale?: number }
-> = {
+export type CrownArt = {
+  art: string;
+  /** halo suave (rgba) usado atrás da coroa/anel */
+  glow: string;
+  /** cor sólida do bundle — usada no anel/blur dentro do perfil */
+  accent: string;
+  ring?: string;
+  ringScale?: number;
+};
+
+export const CROWN_ART_BY_KEY: Record<string, CrownArt> = {
   "nameplate:coroa_guardia": {
+    accent: "#c4a0ff",
     art: florescerCrown,
     glow: "rgba(196, 160, 255, 0.22)",
     ring: florescerFrame,
   },
   "nameplate:coroa_soberano": {
+    accent: "#8b5cf6",
     art: monarcaCrown,
     glow: "rgba(139, 92, 246, 0.22)",
     ring: monarcaFrame,
   },
   "nameplate:coroa_crepusculo": {
+    accent: "#e0435f",
     art: eclipseCrown,
     glow: "rgba(224, 67, 95, 0.22)",
     ring: eclipseFrame,
   },
   "nameplate:coroa_nevoa": {
+    accent: "#8fc7f5",
     art: espiritoCrown,
     glow: "rgba(143, 199, 245, 0.22)",
     ring: espiritoFrame,
   },
   "nameplate:coroa_espinho_prata": {
+    accent: "#93c5fd",
     art: princesaCrown,
     glow: "rgba(147, 197, 253, 0.24)",
     ring: princesaFrame,
   },
   "nameplate:coroa_piscina": {
+    accent: "#22d3ee",
     art: piscinaCrown,
     glow: "rgba(34, 211, 238, 0.24)",
     ring: piscinaRing,
@@ -57,6 +70,15 @@ export const CROWN_ART_BY_KEY: Record<
 export function getCrownArt(walletKey: string | undefined | null) {
   if (!walletKey) return undefined;
   return CROWN_ART_BY_KEY[walletKey];
+}
+
+/**
+ * Cor sólida do bundle da coroa equipada. Universal: qualquer lugar que
+ * desenha o anel/blur em volta do avatar deve preferir esta cor, para que o
+ * brilho dentro do perfil combine sempre com a coroa.
+ */
+export function getCrownAccent(walletKey: string | undefined | null): string | undefined {
+  return getCrownArt(walletKey)?.accent;
 }
 
 /**
@@ -103,7 +125,7 @@ export function AvatarCrown({
   crown,
   size = 112,
 }: {
-  crown: { art: string; glow: string; ring?: string; ringScale?: number };
+  crown: CrownArt;
   size?: number;
 }) {
   const width = size * 0.98;
