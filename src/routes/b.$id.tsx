@@ -47,7 +47,7 @@ const BUNDLE_META: Record<string, { title: string; description: string }> = {
   "bundle.piscina_infinita": {
     title: "airi — Piscina Infinita",
     description:
-      "Bundle épico de verão com aura azul-piscina, coroa dourada de piscina, véu com boia e peixe bôbo, mesa da piscina, chama tropical, selo solar e splash de verão. Confira na loja airi.",
+      "Bundle épico de verão com aura azul-piscina, coroa dourada de piscina, mesa da piscina infinita e chama tropical. Confira na loja airi.",
   },
 };
 

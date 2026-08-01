@@ -9,7 +9,7 @@ import espiritoFrame from "@/assets/shop/espirito/frame.png";
 import princesaCrown from "@/assets/shop/princesa/crown.png";
 import princesaFrame from "@/assets/shop/princesa/frame.png";
 import piscinaCrown from "@/assets/shop/piscina/crown.png";
-import piscinaFrame from "@/assets/shop/piscina/frame.png";
+import piscinaRing from "@/assets/shop/piscina/ring.png";
 
 
 
@@ -49,7 +49,7 @@ export const CROWN_ART_BY_KEY: Record<
   "nameplate:coroa_piscina": {
     art: piscinaCrown,
     glow: "rgba(34, 211, 238, 0.24)",
-    ring: piscinaFrame,
+    ring: piscinaRing,
   },
 };
 

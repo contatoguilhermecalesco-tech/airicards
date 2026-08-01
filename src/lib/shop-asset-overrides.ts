@@ -70,13 +70,10 @@ import marioneteAscensao from "@/assets/shop/marionete/ascensao.png";
 import piscinaSplash from "@/assets/shop/piscina/splash-hero.jpg";
 import piscinaAura from "@/assets/shop/piscina/aura.png";
 import piscinaFrame from "@/assets/shop/piscina/frame.png";
-import piscinaCardframe from "@/assets/shop/piscina/cardframe.png";
 import piscinaTableAmbient from "@/assets/shop/piscina/table-ambient.jpg";
 import piscinaTableFrame from "@/assets/shop/piscina/table-frame.png";
 import piscinaTableBack from "@/assets/shop/piscina/table-cardback.png";
 import piscinaChama from "@/assets/shop/piscina/chama.png";
-import piscinaSelo from "@/assets/shop/piscina/selo.png";
-import piscinaAscensao from "@/assets/shop/piscina/ascensao.png";
 
 
 
@@ -166,11 +163,8 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "bundle.piscina_infinita": { splash: piscinaSplash, art: piscinaAura },
   "cosmetic.aura.piscina_infinita": { art: piscinaAura },
   "cosmetic.frame.coroa_piscina": { art: piscinaFrame },
-  "cosmetic.veil.veu_piscina": { art: piscinaCardframe },
   "cosmetic.table.mesa_piscina": { art: piscinaTableAmbient },
   "cosmetic.streak_flame.chama_piscina": { art: piscinaChama },
-  "cosmetic.enemy_seal.selo_piscina": { art: piscinaSelo },
-  "cosmetic.victory_splash.ascensao_piscina": { art: piscinaAscensao },
 };
 
 
@@ -243,11 +237,8 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
 
   "decoration:piscina_infinita": piscinaAura,
   "nameplate:coroa_piscina": piscinaFrame,
-  "veil:veu_piscina": piscinaCardframe,
   "table:mesa_piscina": piscinaTableAmbient,
   "streak_flame:chama_piscina": piscinaChama,
-  "enemy_seal:selo_piscina": piscinaSelo,
-  "victory_splash:ascensao_piscina": piscinaAscensao,
 };
 
 

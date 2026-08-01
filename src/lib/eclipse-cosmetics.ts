@@ -144,15 +144,6 @@ export const ENEMY_SEAL_THEMES: Record<string, EnemySealTheme> = {
     hitLabel: "FIOS CORTADOS",
     art: COSMETIC_ART.selo_marionete,
   },
-  selo_piscina: {
-    key: "selo_piscina",
-    name: "Selo Solar",
-    color: "#fbbf24",
-    accent: "#0891b2",
-    missLabel: "QUEIMOU",
-    hitLabel: "MERGULHOU",
-    art: COSMETIC_ART.selo_piscina,
-  },
 };
 
 
@@ -239,15 +230,6 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     color: "#ff4d63",
     accent: "#10040a",
     art: COSMETIC_ART.ascensao_marionete,
-  },
-  ascensao_piscina: {
-    key: "ascensao_piscina",
-    name: "Splash de Verão",
-    headline: "VITÓRIA",
-    subline: "A piscina inteira comemora seu mergulho",
-    color: "#22d3ee",
-    accent: "#f59e0b",
-    art: COSMETIC_ART.ascensao_piscina,
   },
 };
 
