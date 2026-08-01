@@ -240,7 +240,17 @@ export const VICTORY_SPLASH_THEMES: Record<string, VictorySplashTheme> = {
     accent: "#10040a",
     art: COSMETIC_ART.ascensao_marionete,
   },
+  ascensao_piscina: {
+    key: "ascensao_piscina",
+    name: "Splash de Verão",
+    headline: "VITÓRIA",
+    subline: "A piscina infinita aplaude seu mergulho",
+    color: "#22d3ee",
+    accent: "#f59e0b",
+    art: COSMETIC_ART.ascensao_piscina,
+  },
 };
+
 
 export function victorySplashFromEquipped(equipped: EquippedMap): VictorySplashTheme | null {
   const k = keyFrom(equipped.victory_splash);
