@@ -567,22 +567,27 @@ function VaultStat({
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   highlight?: boolean;
 }) {
-  const color = highlight ? "#f0e6d2" : "#c8aa6e";
   return (
     <div
-      className="flex items-center gap-2.5 px-3 py-2.5"
-      style={{ background: "rgba(6,9,15,0.92)" }}
+      className={`flex items-center gap-2.5 rounded-2xl border px-3 py-2.5 ${
+        highlight
+          ? "border-primary/30 bg-primary/12"
+          : "border-white/8 bg-white/[0.04]"
+      }`}
     >
-      <Icon className="h-4 w-4 shrink-0" style={{ color }} />
+      <Icon className={`h-4 w-4 shrink-0 ${highlight ? "text-primary" : "text-muted-foreground"}`} />
       <div className="min-w-0">
-        <p className="text-[15px] font-bold tabular-nums" style={{ color }}>
+        <p className={`text-[15px] font-bold tabular-nums ${highlight ? "text-primary" : "text-foreground"}`}>
           {value}
         </p>
-        <p className="loot-label truncate text-muted-foreground">{label}</p>
+        <p className="truncate text-[10.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+          {label}
+        </p>
       </div>
     </div>
   );
 }
+
 
 type ForgeLog = ReturnType<typeof useHunt>["log"];
 
