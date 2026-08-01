@@ -53,8 +53,11 @@ export type HuntState = {
   variants: Record<string, ForgeVariant>;
   /** Arlys já sacados por dissolução nesta semana (teto anti-inflação). */
   dissolveWeek: { week: string; arlys: number };
+  /** Controle de drops do dia (teto diário + intervalo entre quedas). */
+  dropDay: { day: string; count: number; lastAt: number };
   log: ForgeLogEntry[];
 };
+
 
 const META_KEY = "relicHunt";
 
