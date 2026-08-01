@@ -224,7 +224,13 @@ const DISCORD_PALETTE: Record<
     ring: "#60a5fa",
     tag: "Espírito",
   },
+  cyan: {
+    gradient: "linear-gradient(135deg,#a5f3fc 0%,#22d3ee 42%,#164e63 100%)",
+    ring: "#22d3ee",
+    tag: "Piscina",
+  },
 };
+
 
 export function visualFor(item: ShopItem): CosmeticVisual {
   const slotRaw = String(item.payload.slot ?? "cosmetic").toLowerCase();
