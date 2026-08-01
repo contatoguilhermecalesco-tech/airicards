@@ -1,5 +1,5 @@
-// Cartões do inventário da Forja no estilo "cofre de espólios": moldura hextech
-// com cantos chanfrados, faixa de raridade, contador de pilha e ações douradas.
+// Cartões do inventário da Forja na linguagem visual do airi: vidro escuro,
+// cantos arredondados, acento roxo suave e detalhes por raridade.
 import { Hammer, Recycle, Shuffle, Gift } from "lucide-react";
 import { ShardArt } from "@/components/hunt/ShardArt";
 import {
@@ -9,9 +9,6 @@ import {
   SLOT_LABEL,
   type ShardStack,
 } from "@/lib/relic-hunt";
-
-const GOLD = "#c8aa6e";
-const GOLD_SOFT = "#f0e6d2";
 
 export type ShardActions = {
   onForge: (s: ShardStack) => void;
@@ -28,8 +25,8 @@ type CommonProps = ShardActions & {
   canGift: boolean;
 };
 
-/** Painel de arte com moldura chanfrada, faixa de raridade e contador de pilha. */
-function LootArt({
+/** Painel de arte: vidro arredondado, halo da raridade e contador de pilha. */
+function ShardPanel({
   st,
   color,
   height,
@@ -40,16 +37,16 @@ function LootArt({
   height: number;
   artSize: number;
 }) {
+  const pct = Math.min(100, (st.count / SHARDS_PER_FORGE) * 100);
   return (
     <span
-      className="loot-clip relative block w-full overflow-hidden border"
+      className="relative block w-full overflow-hidden rounded-2xl border"
       style={{
         height,
-        borderColor: st.ready ? `${color}88` : "rgba(255,255,255,0.10)",
-        background: `radial-gradient(90% 80% at 50% 12%, ${color}26, transparent 70%), linear-gradient(180deg, rgba(9,13,20,0.92), rgba(4,6,10,0.96))`,
+        borderColor: st.ready ? `${color}55` : "rgba(255,255,255,0.08)",
+        background: `radial-gradient(90% 80% at 50% 10%, ${color}22, transparent 72%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))`,
       }}
     >
-      <span aria-hidden className="loot-hexgrid absolute inset-0 opacity-50" />
       <span className="relative grid h-full w-full place-items-center">
         <ShardArt
           cosmeticKey={st.key}
@@ -61,41 +58,38 @@ function LootArt({
       </span>
 
       {/* contador de pilha */}
-      <span
-        className="absolute left-0 top-0 px-2 py-[3px] loot-label"
-        style={{ background: "rgba(3,5,9,0.82)", color: GOLD_SOFT }}
-      >
+      <span className="absolute left-2 top-2 rounded-full border border-white/12 bg-black/45 px-2 py-[2px] text-[10.5px] font-semibold tabular-nums text-foreground/85 backdrop-blur-md">
         {Math.min(st.count, SHARDS_PER_FORGE)}/{SHARDS_PER_FORGE}
+        {st.count > SHARDS_PER_FORGE && (
+          <span style={{ color }}> ·{st.count}</span>
+        )}
       </span>
-      {st.count > SHARDS_PER_FORGE && (
-        <span
-          className="absolute right-0 top-0 px-2 py-[3px] text-[11px] font-bold tabular-nums"
-          style={{ background: "rgba(3,5,9,0.82)", color: GOLD }}
-        >
-          ×{st.count}
-        </span>
-      )}
 
-      {/* faixa de raridade */}
-      <span
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-[3px]"
-        style={{ background: `linear-gradient(90deg, ${color}33, ${color}, ${color}33)` }}
-      />
       {st.ready && (
         <span
-          className="absolute inset-x-0 bottom-[3px] py-1 text-center loot-label"
-          style={{ background: `${color}d9`, color: "#0a0c12" }}
+          className="absolute right-2 top-2 rounded-full px-2 py-[2px] text-[10px] font-bold uppercase tracking-[0.08em]"
+          style={{ background: `${color}e6`, color: "#0b0710" }}
         >
           Pronto
         </span>
       )}
+
+      {/* progresso da pilha */}
+      <span aria-hidden className="absolute inset-x-0 bottom-0 h-[3px] bg-white/8">
+        <span
+          className="block h-full rounded-r-full transition-[width] duration-500"
+          style={{
+            width: `${pct}%`,
+            background: `linear-gradient(90deg, ${color}66, ${color})`,
+          }}
+        />
+      </span>
     </span>
   );
 }
 
-/** Botão de ação com a linguagem dourada do cofre. */
-function LootButton({
+/** Botão de ação no estilo iOS do app. */
+function ShardButton({
   label,
   icon: Icon,
   primary,
@@ -118,14 +112,11 @@ function LootButton({
       disabled={disabled}
       title={title}
       onClick={onClick}
-      className={`tap-target loot-clip-sm flex min-w-0 items-center justify-center gap-1.5 border px-3 py-2 loot-label transition disabled:opacity-35 ${className}`}
-      style={{
-        borderColor: primary ? GOLD : "rgba(200,170,110,0.35)",
-        color: primary ? "#0a0c12" : GOLD_SOFT,
-        background: primary
-          ? `linear-gradient(180deg, ${GOLD_SOFT}, ${GOLD})`
-          : "rgba(200,170,110,0.10)",
-      }}
+      className={`tap-target flex min-w-0 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[12px] font-semibold transition active:scale-[0.98] disabled:opacity-40 ${
+        primary
+          ? "bg-primary text-primary-foreground shadow-[0_8px_20px_-10px_hsl(var(--primary)/0.9)] hover:brightness-110"
+          : "border border-white/10 bg-white/6 text-foreground/85 hover:bg-white/10"
+      } ${className}`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" />
       <span className="truncate">{label}</span>
@@ -136,15 +127,44 @@ function LootButton({
 function TierTag({ color, label }: { color: string; label: string }) {
   return (
     <span
-      className="inline-flex loot-label px-1.5 py-[2px]"
-      style={{ color, border: `1px solid ${color}55`, background: `${color}16` }}
+      className="inline-flex shrink-0 items-center rounded-full px-2 py-[2px] text-[10px] font-semibold uppercase tracking-[0.06em]"
+      style={{ color, border: `1px solid ${color}44`, background: `${color}14` }}
     >
       {label}
     </span>
   );
 }
 
-/** Card completo (visão Detalhado) — painel de espólio com todas as ações. */
+function IconButton({
+  icon: Icon,
+  label,
+  disabled,
+  title,
+  onClick,
+  className = "",
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  disabled?: boolean;
+  title?: string;
+  onClick: () => void;
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={label}
+      title={title ?? label}
+      className={`tap-target grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/6 text-foreground/70 transition hover:bg-white/10 hover:text-foreground disabled:opacity-35 ${className}`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+    </button>
+  );
+}
+
+/** Card completo (visão Detalhado). */
 export function ShardCard({
   stack: st,
   crystals,
@@ -161,14 +181,10 @@ export function ShardCard({
 
   return (
     <div
-      className="loot-clip relative border p-3"
-      style={{
-        borderColor: st.ready ? `${tier.color}66` : "rgba(200,170,110,0.20)",
-        background:
-          "linear-gradient(170deg, rgba(14,19,28,0.95), rgba(5,7,12,0.97))",
-      }}
+      className="relative rounded-3xl border bg-surface/60 p-3 backdrop-blur-xl transition hover:border-white/16"
+      style={{ borderColor: st.ready ? `${tier.color}44` : "rgba(255,255,255,0.09)" }}
     >
-      <LootArt st={st} color={tier.color} height={150} artSize={92} />
+      <ShardPanel st={st} color={tier.color} height={150} artSize={92} />
 
       <div className="mt-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
@@ -184,12 +200,12 @@ export function ShardCard({
         <span className="text-muted-foreground">
           {st.ready ? "Conjunto completo" : `Faltam ${st.missing} fragmento(s)`}
         </span>
-        <span className="font-bold tabular-nums" style={{ color: GOLD }}>
+        <span className="font-semibold tabular-nums text-primary">
           {FORGE_ARLYS_COST} ✦
         </span>
       </div>
 
-      <LootButton
+      <ShardButton
         className="mt-3 w-full"
         icon={Hammer}
         primary={st.ready && affordable}
@@ -205,7 +221,7 @@ export function ShardCard({
       />
 
       <div className="mt-2 grid grid-cols-3 gap-1.5">
-        <LootButton
+        <ShardButton
           icon={Shuffle}
           label={`Trocar ${left}`}
           disabled={disabled || left <= 0}
@@ -216,14 +232,14 @@ export function ShardCard({
           }
           onClick={() => onSwap(st)}
         />
-        <LootButton
+        <ShardButton
           icon={Gift}
           label="Enviar"
           disabled={disabled || !canGift}
           title={canGift ? "Enviar 1 fragmento" : "Entre com seu perfil para presentear"}
           onClick={() => onGift(st)}
         />
-        <LootButton
+        <ShardButton
           icon={Recycle}
           label={`+${st.dissolveValue}`}
           disabled={disabled}
@@ -235,7 +251,7 @@ export function ShardCard({
   );
 }
 
-/** Tile do cofre (visão Grade). */
+/** Tile (visão Grade). */
 export function ShardTile({
   stack: st,
   crystals,
@@ -249,24 +265,21 @@ export function ShardTile({
 
   return (
     <div
-      className="loot-clip relative border p-2.5"
-      style={{
-        borderColor: st.ready ? `${tier.color}66` : "rgba(200,170,110,0.18)",
-        background: "linear-gradient(170deg, rgba(14,19,28,0.94), rgba(5,7,12,0.97))",
-      }}
+      className="relative rounded-3xl border bg-surface/60 p-2.5 backdrop-blur-xl transition hover:border-white/16"
+      style={{ borderColor: st.ready ? `${tier.color}40` : "rgba(255,255,255,0.09)" }}
     >
-      <LootArt st={st} color={tier.color} height={122} artSize={80} />
+      <ShardPanel st={st} color={tier.color} height={122} artSize={80} />
 
       <p className="mt-2 truncate text-[12.5px] font-bold tracking-tight">{st.name}</p>
       <p
-        className="truncate loot-label mt-0.5"
+        className="mt-0.5 truncate text-[10.5px] font-semibold uppercase tracking-[0.06em]"
         style={{ color: tier.color, opacity: 0.85 }}
       >
         {tier.label}
       </p>
 
       <div className="mt-2 flex gap-1.5">
-        <LootButton
+        <ShardButton
           className="flex-1"
           icon={Hammer}
           primary={st.ready && affordable}
@@ -274,27 +287,19 @@ export function ShardTile({
           label={st.ready ? "Forjar" : `Faltam ${st.missing}`}
           onClick={() => onForge(st)}
         />
-        <button
-          type="button"
+        <IconButton
+          icon={Gift}
+          label={`Presentear fragmento de ${st.name}`}
+          title="Enviar de presente"
           disabled={disabled || !canGift}
           onClick={() => onGift(st)}
-          aria-label={`Presentear fragmento de ${st.name}`}
-          title="Enviar de presente"
-          className="tap-target loot-clip-sm grid h-9 w-9 shrink-0 place-items-center border disabled:opacity-30"
-          style={{
-            borderColor: "rgba(200,170,110,0.35)",
-            background: "rgba(200,170,110,0.10)",
-            color: GOLD_SOFT,
-          }}
-        >
-          <Gift className="h-3.5 w-3.5" />
-        </button>
+        />
       </div>
     </div>
   );
 }
 
-/** Linha do cofre (visão Lista). */
+/** Linha (visão Lista). */
 export function ShardRow({
   stack: st,
   crystals,
@@ -309,17 +314,14 @@ export function ShardRow({
 
   return (
     <div
-      className="loot-clip-sm flex items-center gap-3 border px-3 py-2.5"
-      style={{
-        borderColor: st.ready ? `${tier.color}55` : "rgba(200,170,110,0.16)",
-        background: "linear-gradient(180deg, rgba(13,18,27,0.9), rgba(5,7,12,0.94))",
-      }}
+      className="flex items-center gap-3 rounded-2xl border bg-surface/55 px-3 py-2.5 backdrop-blur-xl transition hover:border-white/16"
+      style={{ borderColor: st.ready ? `${tier.color}3d` : "rgba(255,255,255,0.08)" }}
     >
       <span
-        className="loot-clip-sm relative grid h-12 w-12 shrink-0 place-items-center border"
+        className="relative grid h-12 w-12 shrink-0 place-items-center rounded-2xl border"
         style={{
-          borderColor: `${tier.color}44`,
-          background: `radial-gradient(circle at 50% 40%, ${tier.color}22, transparent 72%)`,
+          borderColor: `${tier.color}33`,
+          background: `radial-gradient(circle at 50% 40%, ${tier.color}1f, transparent 74%)`,
         }}
       >
         <ShardArt
@@ -328,11 +330,6 @@ export function ShardRow({
           tierColor={tier.color}
           size={36}
           complete={st.ready}
-        />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-[2px]"
-          style={{ background: tier.color }}
         />
       </span>
 
@@ -343,13 +340,13 @@ export function ShardRow({
           </span>
           <TierTag color={tier.color} label={tier.label} />
         </span>
-        <span className="mt-1 flex items-center gap-2">
-          <span className="h-[3px] w-24 overflow-hidden bg-white/10">
+        <span className="mt-1.5 flex items-center gap-2">
+          <span className="h-[3px] w-24 overflow-hidden rounded-full bg-white/10">
             <span
-              className="block h-full"
+              className="block h-full rounded-full"
               style={{
                 width: `${pct}%`,
-                background: `linear-gradient(90deg, ${tier.color}88, ${tier.color})`,
+                background: `linear-gradient(90deg, ${tier.color}77, ${tier.color})`,
               }}
             />
           </span>
@@ -360,7 +357,7 @@ export function ShardRow({
         </span>
       </span>
 
-      <LootButton
+      <ShardButton
         className="hidden shrink-0 sm:flex"
         icon={Hammer}
         primary={st.ready && affordable}
@@ -368,34 +365,20 @@ export function ShardRow({
         label={st.ready ? "Forjar" : `Faltam ${st.missing}`}
         onClick={() => onForge(st)}
       />
-      <button
-        type="button"
+      <IconButton
+        icon={Hammer}
+        label={`Forjar ${st.name}`}
         disabled={disabled || !st.ready}
         onClick={() => onForge(st)}
-        aria-label={`Forjar ${st.name}`}
-        className="tap-target loot-clip-sm grid h-9 w-9 shrink-0 place-items-center border disabled:opacity-30 sm:hidden"
-        style={{
-          borderColor: "rgba(200,170,110,0.35)",
-          background: "rgba(200,170,110,0.10)",
-          color: GOLD_SOFT,
-        }}
-      >
-        <Hammer className="h-3.5 w-3.5" />
-      </button>
-      <button
-        type="button"
+        className="sm:hidden"
+      />
+      <IconButton
+        icon={Gift}
+        label={`Presentear fragmento de ${st.name}`}
+        title="Enviar de presente"
         disabled={disabled || !canGift}
         onClick={() => onGift(st)}
-        aria-label={`Presentear fragmento de ${st.name}`}
-        title="Enviar de presente"
-        className="tap-target loot-clip-sm grid h-9 w-9 shrink-0 place-items-center border text-muted-foreground transition hover:text-foreground disabled:opacity-30"
-        style={{
-          borderColor: "rgba(200,170,110,0.25)",
-          background: "rgba(200,170,110,0.07)",
-        }}
-      >
-        <Gift className="h-3.5 w-3.5" />
-      </button>
+      />
     </div>
   );
 }
