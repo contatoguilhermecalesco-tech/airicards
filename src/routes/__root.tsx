@@ -25,6 +25,7 @@ import { auraRingFromEquipped, auraProfileFromEquipped } from "../lib/aura";
 import { AuraRing } from "../components/AuraRing";
 import { getEquippedArt } from "../lib/shop-asset-overrides";
 import { SyncIndicator } from "../components/SyncIndicator";
+import { Toaster } from "@/components/ui/sonner";
 import "@/lib/presence";
 
 // Overlays só aparecem sob eventos raros (subiu de rank, streak milestone,
