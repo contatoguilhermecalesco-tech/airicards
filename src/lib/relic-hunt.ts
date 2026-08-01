@@ -85,9 +85,9 @@ const EMPTY: HuntState = {
 };
 
 function tierFor(price: number): ShardTier {
-  if (price >= 800) return "mitico";
-  if (price >= 400) return "epico";
-  if (price >= 150) return "raro";
+  if (price >= 500) return "mitico";
+  if (price >= 320) return "epico";
+  if (price >= 180) return "raro";
   return "comum";
 }
 
@@ -106,7 +106,7 @@ function normalize(raw: Partial<HuntState> | undefined): HuntState {
         slot: String(s.slot ?? "effect"),
         price: Math.max(0, Math.floor(s.price ?? 0)),
         accent: String(s.accent ?? "#d8b4fe"),
-        tier: s.tier ?? tierFor(s.price ?? 0),
+        tier: s.price ? tierFor(s.price) : (s.tier ?? "comum"),
         at: Number(s.at ?? Date.now()),
       }))
       .slice(0, 120),
@@ -517,8 +517,8 @@ function pushLog(entry: ForgeLogEntry) {
 
 export const TIER_META: Record<ShardTier, { label: string; color: string }> = {
   comum: { label: "Comum", color: "#cbd5e1" },
-  raro: { label: "Raro", color: "#7dd3fc" },
-  epico: { label: "Épico", color: "#c4b5fd" },
+  raro: { label: "Raro", color: "#af95df" },
+  epico: { label: "Épico", color: "#d1a8ff" },
   mitico: { label: "Mítico", color: "#fbbf24" },
 };
 
