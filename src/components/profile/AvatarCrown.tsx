@@ -19,7 +19,7 @@ import piscinaFrame from "@/assets/shop/piscina/frame.png";
  */
 export const CROWN_ART_BY_KEY: Record<
   string,
-  { art: string; glow: string; ring?: string }
+  { art: string; glow: string; ring?: string; ringScale?: number }
 > = {
   "nameplate:coroa_guardia": {
     art: florescerCrown,
@@ -50,6 +50,7 @@ export const CROWN_ART_BY_KEY: Record<
     art: piscinaCrown,
     glow: "rgba(34, 211, 238, 0.24)",
     ring: piscinaFrame,
+    ringScale: 1.34,
   },
 };
 
@@ -66,12 +67,14 @@ export function AvatarRing({
   art,
   glow,
   size = 112,
+  scale = 1.78,
 }: {
   art: string;
   glow: string;
   size?: number;
+  scale?: number;
 }) {
-  const width = size * 1.78;
+  const width = size * scale;
   return (
     <div
       aria-hidden
@@ -101,14 +104,21 @@ export function AvatarCrown({
   crown,
   size = 112,
 }: {
-  crown: { art: string; glow: string; ring?: string };
+  crown: { art: string; glow: string; ring?: string; ringScale?: number };
   size?: number;
 }) {
   const width = size * 0.98;
   // Molduras circulares já trazem o brasão no topo — nesse caso o círculo
   // sozinho é o visual correto (estilo League of Legends).
   if (crown.ring) {
-    return <AvatarRing art={crown.ring} glow={crown.glow} size={size} />;
+    return (
+      <AvatarRing
+        art={crown.ring}
+        glow={crown.glow}
+        size={size}
+        scale={crown.ringScale ?? 1.78}
+      />
+    );
   }
   return (
     <div
