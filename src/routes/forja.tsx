@@ -66,15 +66,21 @@ export const Route = createFileRoute("/forja")({
 });
 
 type Filter = "todos" | "prontos" | "progresso";
+type View = "grade" | "prateleira";
+
+const VIEW_KEY = "airi.forja.view.v1";
 
 function ForjaPage() {
   const hunt = useHunt();
   const wallet = useWallet();
+  const profile = useCurrentProfile();
   const [forging, setForging] = useState<ShardStack | null>(null);
   const [done, setDone] = useState(false);
   const [help, setHelp] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("todos");
+  const [view, setView] = useState<View>("grade");
+  const [gifting, setGifting] = useState<ShardStack | null>(null);
 
   useEffect(() => {
     pruneOwnedShards();
@@ -82,6 +88,8 @@ function ForjaPage() {
 
   useEffect(() => {
     try {
+      const v = localStorage.getItem(VIEW_KEY);
+      if (v === "grade" || v === "prateleira") setView(v);
       if (!localStorage.getItem(SEEN_KEY)) {
         setHelp(true);
         localStorage.setItem(SEEN_KEY, "1");
@@ -90,6 +98,15 @@ function ForjaPage() {
       /* ignore */
     }
   }, []);
+
+  function pickView(v: View) {
+    setView(v);
+    try {
+      localStorage.setItem(VIEW_KEY, v);
+    } catch {
+      /* ignore */
+    }
+  }
 
   const stacks = shardStacks(hunt);
   const readyStacks = stacks.filter((s) => s.ready);
@@ -105,6 +122,41 @@ function ForjaPage() {
           : stacks,
     [stacks, filter],
   );
+
+  // Prateleiras estilo Spotify: faixas horizontais por contexto.
+  const shelves = useMemo(() => {
+    const rows: {
+      id: string;
+      title: string;
+      hint: string;
+      items: ShardStack[];
+    }[] = [];
+    const prontos = visible.filter((s) => s.ready);
+    const quase = visible.filter((s) => !s.ready && s.missing === 1);
+    const resto = visible.filter((s) => !s.ready && s.missing > 1);
+    if (prontos.length)
+      rows.push({
+        id: "prontos",
+        title: "Prontos para forjar",
+        hint: `${SHARDS_PER_FORGE} fragmentos completos — só falta pagar ${FORGE_ARLYS_COST} ✦.`,
+        items: prontos,
+      });
+    if (quase.length)
+      rows.push({
+        id: "quase",
+        title: "Falta 1 fragmento",
+        hint: "Uma revisão de sorte (ou um presente) fecha o conjunto.",
+        items: quase,
+      });
+    if (resto.length)
+      rows.push({
+        id: "colecao",
+        title: "Coleção em progresso",
+        hint: "Fragmentos guardados dos bundles ativos.",
+        items: resto,
+      });
+    return rows;
+  }, [visible]);
 
   async function forge(stack: ShardStack) {
     if (forging) return;
