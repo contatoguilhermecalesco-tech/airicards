@@ -498,7 +498,9 @@ function TableStage({ walletKey }: { walletKey: string }) {
         {flash && (
           <>
             <TableSkinFlash skin={skin} tone={flash} />
-            <TableSkinImpact skin={skin} tone={flash} seed={seed} contained />
+            <div className="pointer-events-none absolute inset-0 overflow-hidden"><div className="absolute left-1/2 top-1/2 h-screen w-screen -translate-x-1/2 -translate-y-1/2 scale-[0.34]">
+              <TableSkinImpact skin={skin} tone={flash} seed={seed} />
+            </div></div>
           </>
         )}
       </div>
