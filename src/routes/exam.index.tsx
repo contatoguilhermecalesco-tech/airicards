@@ -168,6 +168,14 @@ function ExamPage() {
         <ArrowLeft className="h-4 w-4" strokeWidth={2.25} /> Voltar
       </button>
 
+      <Link
+        to="/exam/historico"
+        className="mb-6 ml-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition hover:opacity-80"
+      >
+        Histórico de provas <ChevronRight className="h-4 w-4" strokeWidth={2.25} />
+      </Link>
+
+
       <header className="mb-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
           Prova mensal · {monthLabel(monthKey)}
