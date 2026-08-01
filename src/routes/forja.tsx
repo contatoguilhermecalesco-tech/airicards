@@ -759,21 +759,27 @@ function FusionModal({
           ) : (
             <>
               <div className="flex gap-1.5 overflow-x-auto rounded-full border border-white/10 bg-white/[0.04] p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {tiers.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setTier(t)}
-                    className={`tap-target flex-1 whitespace-nowrap rounded-full px-3 py-2 text-[12.5px] font-semibold transition ${
-                      tier === t
-                        ? "bg-primary/18 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={tier === t ? { color: TIER_META[t].color } : undefined}
-                  >
-                    {TIER_META[t].label}
-                  </button>
-                ))}
+                {tiers.map((t) => {
+                  const n = tierCounts.get(t) ?? 0;
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTier(t)}
+                      className={`tap-target flex-1 whitespace-nowrap rounded-full px-3 py-2 text-[12.5px] font-semibold transition ${
+                        tier === t
+                          ? "bg-primary/18 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.35)]"
+                          : n >= FUSION_INPUT
+                            ? "text-muted-foreground hover:text-foreground"
+                            : "text-muted-foreground/50"
+                      }`}
+                      style={tier === t ? { color: TIER_META[t].color } : undefined}
+                    >
+                      {TIER_META[t].label} · {n}/{FUSION_INPUT}
+                    </button>
+                  );
+                })}
+
               </div>
 
               <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
