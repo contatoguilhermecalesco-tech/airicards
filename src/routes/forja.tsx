@@ -140,40 +140,16 @@ function ForjaPage() {
     [stacks, filter],
   );
 
-  // Prateleiras estilo Spotify: faixas horizontais por contexto.
-  const shelves = useMemo(() => {
-    const rows: {
-      id: string;
-      title: string;
-      hint: string;
-      items: ShardStack[];
-    }[] = [];
-    const prontos = visible.filter((s) => s.ready);
-    const quase = visible.filter((s) => !s.ready && s.missing === 1);
-    const resto = visible.filter((s) => !s.ready && s.missing > 1);
-    if (prontos.length)
-      rows.push({
-        id: "prontos",
-        title: "Prontos para forjar",
-        hint: `${SHARDS_PER_FORGE} fragmentos completos — só falta pagar ${FORGE_ARLYS_COST} ✦.`,
-        items: prontos,
-      });
-    if (quase.length)
-      rows.push({
-        id: "quase",
-        title: "Falta 1 fragmento",
-        hint: "Uma revisão de sorte (ou um presente) fecha o conjunto.",
-        items: quase,
-      });
-    if (resto.length)
-      rows.push({
-        id: "colecao",
-        title: "Coleção em progresso",
-        hint: "Fragmentos guardados dos bundles ativos.",
-        items: resto,
-      });
-    return rows;
-  }, [visible]);
+  // Ordena: prontos primeiro, depois quem está mais perto de completar.
+  const sorted = useMemo(
+    () =>
+      [...visible].sort(
+        (a, b) => Number(b.ready) - Number(a.ready) || a.missing - b.missing,
+      ),
+    [visible],
+  );
+
+
 
   async function forge(stack: ShardStack) {
     if (forging) return;
