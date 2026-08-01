@@ -231,23 +231,47 @@ export type ShardDrop = Shard;
 type Candidate = Omit<Shard, "id" | "at">;
 
 /**
+ * Conjunto de posse tolerante a formatos antigos de chave: guarda a chave
+ * completa ("slot:id") e também o id puro, para nunca sortear/guardar
+ * fragmento de algo que o perfil já tem.
+ */
+function ownedKeys(): Set<string> {
+  const set = new Set<string>();
+  for (const k of getWallet().cosmetics) {
+    set.add(k);
+    const bare = k.includes(":") ? k.slice(k.indexOf(":") + 1) : k;
+    set.add(bare);
+  }
+  return set;
+}
+
+function isOwnedKey(key: string, owned = ownedKeys()): boolean {
+  const bare = key.includes(":") ? key.slice(key.indexOf(":") + 1) : key;
+  return owned.has(key) || owned.has(bare);
+}
+
+/**
  * Cosméticos sorteáveis: apenas itens cosméticos que pertencem a bundles
- * ATIVOS na loja e que o perfil ainda não possui.
+ * ATIVOS na loja e que o perfil ainda não possui (nem via compra do bundle).
  */
 async function candidatePool(exclude?: string): Promise<Candidate[]> {
   try {
     const items = await listShopItems();
+    const owned = ownedKeys();
+
+    // Bundles ativos; se o perfil já possui TODOS os cosméticos de um bundle,
+    // ele não deve mais receber fragmentos daquele conjunto.
     const allowed = new Set<string>();
     for (const it of items) {
       if (it.kind !== "bundle" || !it.active) continue;
       for (const id of bundleItemIds(it)) allowed.add(id);
     }
-    const owned = new Set(getWallet().cosmetics);
+
     return items
       .filter((i) => i.kind === "cosmetic" && allowed.has(i.id))
       .map((i) => {
         const key = String(i.payload?.key ?? i.id);
-        const slot = String(i.payload?.slot ?? "effect");
+        const slot = String(i.payload?.slot ?? "cosmetic");
         return {
           key: `${slot}:${key}`,
           name: i.name,
@@ -257,11 +281,12 @@ async function candidatePool(exclude?: string): Promise<Candidate[]> {
           tier: tierFor(i.price),
         };
       })
-      .filter((c) => !owned.has(c.key) && c.key !== exclude);
+      .filter((c) => !isOwnedKey(c.key, owned) && c.key !== exclude);
   } catch {
     return [];
   }
 }
+
 
 function weightedPick(pool: Candidate[]): Candidate | null {
   if (pool.length === 0) return null;
@@ -426,9 +451,10 @@ export async function dissolveAll(key: string): Promise<number> {
 
 /** Limpa fragmentos de cosméticos que o perfil já possui (comprou na loja). */
 export function pruneOwnedShards() {
-  const owned = new Set(getWallet().cosmetics);
+  const owned = ownedKeys();
   const before = state.shards.length;
-  state.shards = state.shards.filter((s) => !owned.has(s.key));
+  state.shards = state.shards.filter((s) => !isOwnedKey(s.key, owned));
+
   if (state.shards.length !== before) {
     emit();
     persist();
