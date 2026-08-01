@@ -364,34 +364,39 @@ function ForjaPage() {
               <Shuffle className="h-3 w-3" />
               {left}/{REROLL_WEEKLY_LIMIT} trocas nesta semana
             </span>
+            <button
+              type="button"
+              onClick={() => setHistoryOpen(true)}
+              className="tap-target inline-flex h-9 items-center gap-1.5 rounded-[14px] border border-white/10 bg-white/[0.03] px-3 text-[12.5px] font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.06]"
+            >
+              <History className="h-3.5 w-3.5" strokeWidth={2.4} />
+              Histórico
+            </button>
             <div
               role="group"
               aria-label="Modo de visualização"
-              className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1"
+              className="flex items-center gap-0.5 rounded-[14px] border border-white/10 bg-white/[0.03] p-1 backdrop-blur-md"
             >
-              {(
-                [
-                  ["grade", "Grade", LayoutGrid],
-                  ["prateleira", "Prateleira", Rows3],
-                ] as [View, string, typeof LayoutGrid][]
-              ).map(([id, label, Icon]) => (
+              {VIEWS.map(([id, label, Icon]) => (
                 <button
                   key={id}
                   type="button"
                   aria-pressed={view === id}
+                  aria-label={label}
+                  title={label}
                   onClick={() => pickView(id)}
-                  className={`tap-target inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition ${
+                  className={`grid h-8 w-8 place-items-center rounded-[10px] transition ${
                     view === id
-                      ? "bg-primary/22 text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                      : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
+                  <Icon className="h-4 w-4" strokeWidth={2.25} />
                 </button>
               ))}
             </div>
           </div>
+
         </div>
 
         {stacks.length > 0 && (
