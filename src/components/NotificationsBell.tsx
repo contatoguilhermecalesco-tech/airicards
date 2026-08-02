@@ -7,151 +7,30 @@ import {
   Inbox,
   Settings2,
   Moon,
+  ArrowUpRight,
 } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { resolveNotificationIcon } from "@/lib/notification-icons";
 
 import {
   initNotifications,
   markAllAsRead,
   markAsRead,
   useNotifications,
+  type Notification,
 } from "@/lib/notifications-store";
 import { subscribeProfile } from "@/lib/profile";
 import { isQuietNow, useNotificationPrefs } from "@/lib/notification-prefs";
 import { playChime, vibratePulse } from "@/lib/notification-sound";
+import { NotificationRow, inferKind } from "@/lib/notification-ui";
 
-function timeAgo(iso: string) {
-  const t = new Date(iso).getTime();
-  const diff = Math.max(0, Date.now() - t);
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "agora";
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} h`;
-  const d = Math.floor(h / 24);
-  if (d < 7) return `${d} d`;
-  return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-}
-
-const ESSENTIAL_PATTERN = /essenc|import|urg|alerta|critico|crítico/i;
-function isEssentialTag(name?: string | null) {
-  if (!name) return false;
-  return ESSENTIAL_PATTERN.test(name);
-}
-
-type Notif = ReturnType<typeof useNotifications>["notifications"][number];
-type Tag = ReturnType<typeof useNotifications>["tags"][number];
-
-function Row({
-  n,
-  tag,
-  isRead,
-  onClick,
-}: {
-  n: Notif;
-  tag: Tag | null;
-  isRead: boolean;
-  onClick: () => void;
-}) {
-  const accent = tag?.color ?? "hsl(var(--primary))";
-  const Icon = resolveNotificationIcon(n.icon, tag?.name, n.title);
-  return (
-    <button
-      onClick={onClick}
-      className={`group relative flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors duration-150 hover:bg-white/[0.04] active:bg-white/[0.06] ${
-        isRead ? "opacity-70" : "opacity-100"
-      }`}
-    >
-      <div className="relative mt-0.5 shrink-0">
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-2xl border"
-          style={{
-            background: `color-mix(in oklab, ${accent} 14%, transparent)`,
-            borderColor: `color-mix(in oklab, ${accent} 30%, transparent)`,
-            boxShadow: isRead ? "none" : `0 0 14px -4px ${accent}`,
-          }}
-        >
-          <Icon
-            className="h-[18px] w-[18px]"
-            strokeWidth={2.2}
-            style={{ color: accent }}
-          />
-        </div>
-        {!isRead && (
-          <span
-            className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-[oklch(0.19_0.02_290)]"
-            style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
-            aria-hidden
-          />
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className={`truncate text-[14px] font-semibold tracking-tight ${isRead ? "text-foreground/80" : "text-foreground"}`}>
-            {n.title}
-          </p>
-          <span className="shrink-0 text-[11px] font-medium tabular-nums text-foreground/50">
-            {timeAgo(n.created_at)}
-          </span>
-        </div>
-        <p className="mt-0.5 line-clamp-2 text-[12.5px] leading-relaxed text-foreground/70">
-          {n.body}
-        </p>
-        <div className="mt-1.5 flex flex-wrap items-center gap-2">
-          {tag && (
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                className="h-1.5 w-1.5 rounded-full"
-                style={{ background: tag.color }}
-                aria-hidden
-              />
-              <span
-                className="text-[10.5px] font-semibold uppercase tracking-[0.08em]"
-                style={{ color: tag.color }}
-              >
-                {tag.name}
-              </span>
-            </span>
-          )}
-          {n.action_route && (
-            <span
-              className="ml-auto inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/15 px-2 py-0.5 text-[10.5px] font-semibold text-primary"
-              aria-hidden
-            >
-              {n.action_label?.trim() || "Abrir"}
-              <ChevronRight className="h-3 w-3" strokeWidth={2.5} />
-            </span>
-          )}
-        </div>
-      </div>
-    </button>
-  );
+function isSocial(n: Notification) {
+  const k = inferKind(n);
+  return k === "social" || k === "gift" || k === "duel";
 }
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
-  const handleClick = (n: Notif) => {
-    void markAsRead(n.id);
-    if (n.action_route) {
-      setOpen(false);
-      const route = n.action_route;
-      const qIdx = route.indexOf("?");
-      if (qIdx >= 0) {
-        const pathname = route.slice(0, qIdx) || "/";
-        const params = new URLSearchParams(route.slice(qIdx + 1));
-        const search: Record<string, string> = {};
-        params.forEach((v, k) => {
-          search[k] = v;
-        });
-        void navigate({ to: pathname as any, search: search as any });
-      } else {
-        void navigate({ to: route as any });
-      }
-    }
-  };
   const ref = useRef<HTMLDivElement>(null);
   const { notifications, tags, readIds } = useNotifications();
   const prefs = useNotificationPrefs();
@@ -182,23 +61,20 @@ export function NotificationsBell() {
 
   const tagMap = useMemo(() => new Map(tags.map((t) => [t.id, t])), [tags]);
 
-  // Apply "essential only" filter — keeps only notifications whose tag looks essential.
   const visible = useMemo(() => {
     if (!prefs.essentialOnly) return notifications;
+    const ESSENTIAL_PATTERN = /essenc|import|urg|alerta|critico|crítico/i;
     return notifications.filter((n) => {
       const tag = n.tag_id ? tagMap.get(n.tag_id) : null;
-      return isEssentialTag(tag?.name);
+      return tag ? ESSENTIAL_PATTERN.test(tag.name) : false;
     });
   }, [notifications, prefs.essentialOnly, tagMap]);
 
-  const unread = useMemo(
-    () => visible.filter((n) => !readIds.has(n.id)).length,
-    [visible, readIds],
-  );
+  const unread = useMemo(() => visible.filter((n) => !readIds.has(n.id)).length, [visible, readIds]);
 
   const { news, older } = useMemo(() => {
-    const news: Notif[] = [];
-    const older: Notif[] = [];
+    const news: Notification[] = [];
+    const older: Notification[] = [];
     for (const n of visible) {
       if (readIds.has(n.id)) older.push(n);
       else news.push(n);
@@ -212,7 +88,7 @@ export function NotificationsBell() {
     const current = new Set(visible.map((n) => n.id));
     const prev = lastIdsRef.current;
     lastIdsRef.current = current;
-    if (!prev) return; // first load — don't chime
+    if (!prev) return;
     let hasNew = false;
     current.forEach((id) => {
       if (!prev.has(id)) hasNew = true;
@@ -224,6 +100,26 @@ export function NotificationsBell() {
   }, [visible, prefs]);
 
   const quiet = isQuietNow(prefs);
+
+  const handleClick = (n: Notification) => {
+    void markAsRead(n.id);
+    setOpen(false);
+    if (n.action_route) {
+      const route = n.action_route;
+      const qIdx = route.indexOf("?");
+      if (qIdx >= 0) {
+        const pathname = route.slice(0, qIdx) || "/";
+        const params = new URLSearchParams(route.slice(qIdx + 1));
+        const search: Record<string, string> = {};
+        params.forEach((v, k) => {
+          search[k] = v;
+        });
+        void navigate({ to: pathname as any, search: search as any });
+      } else {
+        void navigate({ to: route as any });
+      }
+    }
+  };
 
   return (
     <div ref={ref} className="relative">
@@ -247,17 +143,13 @@ export function NotificationsBell() {
       </button>
 
       {open && (
-        <div className="fixed left-1/2 top-[64px] z-50 w-[min(94vw,380px)] -translate-x-1/2 overflow-hidden rounded-[26px] border border-white/[0.08] bg-[oklch(0.19_0.02_290/0.92)] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:translate-x-0">
+        <div className="fixed left-1/2 top-[64px] z-50 w-[min(94vw,420px)] -translate-x-1/2 overflow-hidden rounded-[26px] border border-white/[0.08] bg-[oklch(0.19_0.02_290/0.92)] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.7)] backdrop-blur-2xl sm:absolute sm:left-auto sm:right-0 sm:top-auto sm:mt-2 sm:translate-x-0">
           {/* Header */}
           <div className="flex items-center justify-between px-4 pb-2 pt-3.5">
             <div>
-              <p className="text-[15px] font-semibold tracking-tight text-foreground">
-                Notificações
-              </p>
+              <p className="text-[15px] font-semibold tracking-tight text-foreground">Notificações</p>
               <p className="mt-0.5 text-[11.5px] text-foreground/55">
-                {unread > 0
-                  ? `${unread} nova${unread > 1 ? "s" : ""}`
-                  : "Tudo em dia"}
+                {unread > 0 ? `${unread} nova${unread > 1 ? "s" : ""}` : "Tudo em dia"}
                 {prefs.essentialOnly && " · só essenciais"}
                 {quiet && " · silencioso"}
               </p>
@@ -300,9 +192,7 @@ export function NotificationsBell() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.04]">
                   <Inbox className="h-5 w-5 text-foreground/50" strokeWidth={2} />
                 </div>
-                <p className="mt-1 text-[13px] font-semibold text-foreground/90">
-                  Sua caixa está limpa
-                </p>
+                <p className="mt-1 text-[13px] font-semibold text-foreground/90">Sua caixa está limpa</p>
                 <p className="text-[11.5px] text-foreground/55">
                   {prefs.essentialOnly
                     ? "Nenhuma notificação essencial no momento."
@@ -317,13 +207,14 @@ export function NotificationsBell() {
                       Novas
                     </p>
                     <ul className="space-y-0.5">
-                      {news.map((n) => (
+                      {news.slice(0, 5).map((n) => (
                         <li key={n.id}>
-                          <Row
+                          <NotificationRow
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={false}
                             onClick={() => handleClick(n)}
+                            compact
                           />
                         </li>
                       ))}
@@ -337,13 +228,14 @@ export function NotificationsBell() {
                       Anteriores
                     </p>
                     <ul className="space-y-0.5">
-                      {older.map((n) => (
+                      {older.slice(0, 4).map((n) => (
                         <li key={n.id}>
-                          <Row
+                          <NotificationRow
                             n={n}
                             tag={n.tag_id ? tagMap.get(n.tag_id) ?? null : null}
                             isRead={true}
                             onClick={() => handleClick(n)}
+                            compact
                           />
                         </li>
                       ))}
@@ -355,17 +247,17 @@ export function NotificationsBell() {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-white/[0.06] px-4 py-2.5">
+          <div className="border-t border-white/[0.06] px-3 py-2.5">
             <Link
-              to="/settings"
+              to="/notificacoes"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-between text-[11.5px] font-medium text-foreground/70 transition hover:text-foreground"
+              className="flex items-center justify-between rounded-xl px-2 py-1.5 text-[12px] font-medium text-foreground/70 transition hover:bg-white/[0.04] hover:text-foreground"
             >
               <span className="inline-flex items-center gap-1.5">
-                <Settings2 className="h-3.5 w-3.5" strokeWidth={2.25} />
-                Preferências de notificação
+                <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2.25} />
+                Ver central completa
               </span>
-              <span className="text-foreground/40">›</span>
+              <ChevronRight className="h-4 w-4 text-foreground/40" strokeWidth={2.25} />
             </Link>
           </div>
         </div>
