@@ -896,7 +896,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
       className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Como funciona a Fragmentos de Skins"
+      aria-label="Como funcionam os Fragmentos de Skins"
     >
       <button
         type="button"
