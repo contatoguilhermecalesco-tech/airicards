@@ -68,13 +68,13 @@ const SEEN_KEY = "airi.forja.tutorial.v2";
 export const Route = createFileRoute("/forja")({
   head: () => ({
     meta: [
-      { title: "Forja de Relíquias | airi" },
+      { title: "Forja de Cosméticos | airi" },
       {
         name: "description",
         content:
           "Junte 3 fragmentos do mesmo cosmético nas suas revisões no airi e forje o item por 150 Arlys ✦. Troque ou dissolva fragmentos que não quiser.",
       },
-      { property: "og:title", content: "Forja de Relíquias | airi" },
+      { property: "og:title", content: "Forja de Cosméticos | airi" },
       {
         property: "og:description",
         content:
@@ -330,7 +330,7 @@ function ForjaPage() {
                 Forja
               </p>
               <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
-                Forja de Relíquias
+                Forja de Cosméticos
               </h1>
               <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-muted-foreground">
                 {SHARDS_PER_FORGE} fragmentos iguais + {FORGE_ARLYS_COST} ✦ = cosmético
@@ -896,7 +896,7 @@ function HelpModal({ onClose }: { onClose: () => void }) {
       className="fixed inset-0 z-[96] grid place-items-end sm:place-items-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Como funciona a Forja de Relíquias"
+      aria-label="Como funciona a Forja de Cosméticos"
     >
       <button
         type="button"
