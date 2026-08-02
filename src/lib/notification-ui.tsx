@@ -264,7 +264,7 @@ export function NotificationVisual({
   if (kind === "streak") {
     return (
       <div className="flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
-        <StreakFlame count={7} size={size} />
+        <StreakFlame state="alive" studiedToday={true} theme={null} streak={7} />
       </div>
     );
   }
