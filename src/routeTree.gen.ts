@@ -17,6 +17,7 @@ import { Route as ReviewRouteImport } from './routes/review'
 import { Route as RankRouteImport } from './routes/rank'
 import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as ForjaRouteImport } from './routes/forja'
 import { Route as EnemiesRouteImport } from './routes/enemies'
@@ -91,6 +92,11 @@ const PerfilRoute = PerfilRouteImport.update({
 const NovidadesRoute = NovidadesRouteImport.update({
   id: '/novidades',
   path: '/novidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
@@ -325,6 +332,7 @@ export interface FileRoutesByTo {
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
   '/review': typeof ReviewRoute
@@ -365,6 +373,7 @@ export interface FileRoutesById {
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notificacoes': typeof NotificacoesRoute
   '/novidades': typeof NovidadesRouteWithChildren
   '/perfil': typeof PerfilRoute
   '/rank': typeof RankRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/forja'
     | '/marketplace'
+    | '/notificacoes'
     | '/novidades'
     | '/perfil'
     | '/rank'
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/forja'
     | '/marketplace'
+    | '/notificacoes'
     | '/perfil'
     | '/rank'
     | '/review'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/enemies'
     | '/forja'
     | '/marketplace'
+    | '/notificacoes'
     | '/novidades'
     | '/perfil'
     | '/rank'
@@ -542,6 +554,7 @@ export interface RootRouteChildren {
   EnemiesRoute: typeof EnemiesRoute
   ForjaRoute: typeof ForjaRoute
   MarketplaceRoute: typeof MarketplaceRoute
+  NotificacoesRoute: typeof NotificacoesRoute
   NovidadesRoute: typeof NovidadesRouteWithChildren
   PerfilRoute: typeof PerfilRoute
   RankRoute: typeof RankRoute
@@ -625,6 +638,13 @@ declare module '@tanstack/react-router' {
       path: '/novidades'
       fullPath: '/novidades'
       preLoaderRoute: typeof NovidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -963,6 +983,7 @@ const rootRouteChildren: RootRouteChildren = {
   EnemiesRoute: EnemiesRoute,
   ForjaRoute: ForjaRoute,
   MarketplaceRoute: MarketplaceRoute,
+  NotificacoesRoute: NotificacoesRoute,
   NovidadesRoute: NovidadesRouteWithChildren,
   PerfilRoute: PerfilRoute,
   RankRoute: RankRoute,
