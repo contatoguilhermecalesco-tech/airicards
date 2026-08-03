@@ -388,7 +388,7 @@ export function awardLp(delta: number, reason: string, multiplier = 1): {
   promoWon: boolean;
   promoLost: boolean;
 } {
-  const finalDelta = delta > 0 ? Math.round(delta * multiplier) : delta;
+  const finalDelta = Math.round(delta * multiplier);
   const before = state;
   let next: RankState = {
     ...state,
