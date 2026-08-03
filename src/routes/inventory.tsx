@@ -30,7 +30,8 @@ function InventoryPage() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px]"
         style={{
           background:
-            "radial-gradient(55% 55% at 50% 0%, rgba(34,211,238,0.15), transparent 65%), radial-gradient(45% 55% at 92% 6%, rgba(167,139,250,0.1), transparent 70%)",
+            "radial-gradient(55% 55% at 50% 0%, rgba(167,139,250,0.15), transparent 65%), radial-gradient(45% 55% at 92% 6%, rgba(167,139,250,0.1), transparent 70%)",
+
         }}
       />
 
@@ -51,7 +52,7 @@ function InventoryPage() {
               Gerencie seus itens consumíveis e bônus ativos.
             </p>
           </div>
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 shadow-[0_0_20px_-5px_rgba(34,211,238,0.4)]">
+          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-primary/30 bg-primary/10 text-primary shadow-[0_0_20px_-5px_rgba(167,139,250,0.4)]">
             <Package className="h-6 w-6" strokeWidth={2.25} />
           </div>
         </div>
@@ -61,7 +62,7 @@ function InventoryPage() {
         {/* Seção de Power-ups */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 px-1">
-            <Zap className="h-4 w-4 text-cyan-400" strokeWidth={2.5} />
+            <Zap className="h-4 w-4 text-primary" strokeWidth={2.5} />
             <h2 className="text-[13px] font-bold uppercase tracking-[0.15em] text-foreground/90">
               Power-ups
             </h2>
@@ -84,7 +85,7 @@ function InventoryPage() {
           
           <div className="grid grid-cols-1 gap-3">
             <HelpItem 
-              icon={<Zap className="h-4 w-4 text-cyan-400" />}
+              icon={<Zap className="h-4 w-4 text-primary" />}
               title="Ativação"
               desc="Clique em um item para ativá-lo. Ele será consumido do seu estoque."
             />
