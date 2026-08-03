@@ -1,4 +1,20 @@
-function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
+import { useState } from "react";
+import { Zap, Shield, Sparkles } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useWallet, activatePowerup, consumePowerup } from "@/lib/wallet-store";
+import { toast } from "sonner";
+
+export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
+
   const items = Object.entries(wallet.powerups).filter(([_, count]) => count > 0);
   const activeId = wallet.activePowerup;
   
