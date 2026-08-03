@@ -121,17 +121,11 @@ function Review() {
     if (active) {
       if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
         setSessionMultiplier(2);
+        setActivePowerupLabel("LP em Dobro");
       } else {
         setSessionMultiplier(1);
+        setActivePowerupLabel("Power-up");
       }
-      const { powerupName } = import.meta.env.SSR 
-        ? { powerupName: (id: string) => id } 
-        : require("@/lib/wallet-store"); 
-      // Note: We need a direct way to get the name if we can't import easily
-      const name = active === "lp_multiplier_2x" ? "Dobrador de LP" : 
-                   active === "powerup:double_lp" ? "LP em Dobro" : 
-                   "Power-up";
-      setActivePowerupLabel(name);
     } else {
       setSessionMultiplier(1);
       setActivePowerupLabel(null);
@@ -503,8 +497,8 @@ function Review() {
                     if (ok) {
                       if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
                         setSessionMultiplier(2);
-                        setActivePowerupLabel("2X LP");
-                        toast.success("LP em dobro ativado para esta sessão!", {
+                        setActivePowerupLabel("LP em Dobro");
+                        toast.success("LP em dobro ativado!", {
                           icon: "🔥",
                           description: "Seus ganhos de LP serão multiplicados por 2.",
                         });
