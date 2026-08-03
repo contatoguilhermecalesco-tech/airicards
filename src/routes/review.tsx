@@ -118,9 +118,14 @@ function Review() {
 
   useEffect(() => {
     const active = wallet.activePowerup;
-    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
-      setSessionMultiplier(2);
-      setActivePowerupLabel("2X LP");
+    if (active) {
+      if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
+        setSessionMultiplier(2);
+        setActivePowerupLabel("LP em Dobro");
+      } else {
+        setSessionMultiplier(1);
+        setActivePowerupLabel("Power-up");
+      }
     } else {
       setSessionMultiplier(1);
       setActivePowerupLabel(null);
@@ -492,8 +497,8 @@ function Review() {
                     if (ok) {
                       if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
                         setSessionMultiplier(2);
-                        setActivePowerupLabel("2X LP");
-                        toast.success("LP em dobro ativado para esta sessão!", {
+                        setActivePowerupLabel("LP em Dobro");
+                        toast.success("LP em dobro ativado!", {
                           icon: "🔥",
                           description: "Seus ganhos de LP serão multiplicados por 2.",
                         });
