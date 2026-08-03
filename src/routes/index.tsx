@@ -746,7 +746,14 @@ function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
 
 
   return (
-    <>
+    <section className="animate-fade-in space-y-3">
+      <div className="flex items-center gap-2 px-1">
+        <Layers className="h-3.5 w-3.5 text-primary/70" strokeWidth={2.5} />
+        <h2 className="text-[12px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">
+          Seu Inventário
+        </h2>
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         {items.length === 0 && (
           <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2 text-muted-foreground/50">
@@ -779,7 +786,9 @@ function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
                 ) : (
                   <Shield className="h-3 w-3" />
                 )}
-              </div>
+      </div>
+    </section>
+
               <div className="text-left">
                 <p className="text-[11px] font-bold leading-none">{label}</p>
                 {!isActive && <p className="mt-0.5 text-[9px] opacity-60">{count} em estoque</p>}
