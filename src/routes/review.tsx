@@ -118,9 +118,20 @@ function Review() {
 
   useEffect(() => {
     const active = wallet.activePowerup;
-    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
-      setSessionMultiplier(2);
-      setActivePowerupLabel("2X LP");
+    if (active) {
+      if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
+        setSessionMultiplier(2);
+      } else {
+        setSessionMultiplier(1);
+      }
+      const { powerupName } = import.meta.env.SSR 
+        ? { powerupName: (id: string) => id } 
+        : require("@/lib/wallet-store"); 
+      // Note: We need a direct way to get the name if we can't import easily
+      const name = active === "lp_multiplier_2x" ? "Dobrador de LP" : 
+                   active === "powerup:double_lp" ? "LP em Dobro" : 
+                   "Power-up";
+      setActivePowerupLabel(name);
     } else {
       setSessionMultiplier(1);
       setActivePowerupLabel(null);
