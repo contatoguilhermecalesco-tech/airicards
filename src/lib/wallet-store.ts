@@ -28,6 +28,7 @@ export type WalletState = {
   cosmetics: string[];
   equipped: EquippedMap;
   powerups: Record<string, number>;
+  activePowerup: string | null;
   bio: string;
   avatarUrl: string;
   loaded: boolean;
@@ -39,6 +40,7 @@ const empty = (id = ""): WalletState => ({
   cosmetics: [],
   equipped: {},
   powerups: {},
+  activePowerup: null,
   bio: "",
   avatarUrl: "",
   loaded: false,
@@ -80,6 +82,7 @@ type WalletRow = {
     cosmetics?: string[];
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
+    activePowerup?: string | null;
     bio?: string;
     avatarUrl?: string;
   } | null;
@@ -114,6 +117,7 @@ function normalize(row: WalletRow, profileId: string): WalletState {
         ? repairEquipped(inv.equipped, cosmetics)
         : {},
     powerups: inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {},
+    activePowerup: typeof inv.activePowerup === "string" ? inv.activePowerup : null,
     bio: typeof inv.bio === "string" ? inv.bio : "",
     avatarUrl: typeof inv.avatarUrl === "string" ? inv.avatarUrl : "",
     loaded: true,
@@ -173,6 +177,7 @@ async function persist() {
         cosmetics: state.cosmetics,
         equipped: state.equipped,
         powerups: state.powerups,
+        activePowerup: state.activePowerup,
         bio: state.bio,
         avatarUrl: state.avatarUrl,
       },
@@ -295,11 +300,29 @@ export async function consumePowerup(effect: string): Promise<boolean> {
   const cur = state.powerups[effect] ?? 0;
   if (cur <= 0) return false;
   const next = { ...state.powerups, [effect]: cur - 1 };
-  if (next[effect] <= 0) delete next[effect];
+  if (next[effect] <= 0) {
+    delete next[effect];
+    if (state.activePowerup === effect) state.activePowerup = null;
+  }
   state.powerups = next;
   emit();
   await persist();
   return true;
+}
+
+export async function activatePowerup(effect: string) {
+  if (!currentProfileId) return;
+  if (!state.powerups[effect]) return;
+  state.activePowerup = effect;
+  emit();
+  await persist();
+}
+
+export async function deactivatePowerup() {
+  if (!currentProfileId) return;
+  state.activePowerup = null;
+  emit();
+  await persist();
 }
 
 // ---- earning events (UI toast) ----

@@ -24,6 +24,7 @@ function normalizeWallet(row: {
     cosmetics?: string[];
     equipped?: EquippedMap;
     powerups?: Record<string, number>;
+    activePowerup?: string | null;
     bio?: string;
     avatarUrl?: string;
   } | null;
@@ -35,6 +36,7 @@ function normalizeWallet(row: {
     cosmetics: Array.isArray(inv.cosmetics) ? inv.cosmetics : [],
     equipped: (inv.equipped && typeof inv.equipped === "object" ? inv.equipped : {}) as Partial<Record<CosmeticSlot, string>>,
     powerups: (inv.powerups && typeof inv.powerups === "object" ? inv.powerups : {}) as Record<string, number>,
+    activePowerup: typeof inv.activePowerup === "string" ? inv.activePowerup : null,
     bio: typeof inv.bio === "string" ? inv.bio : "",
     avatarUrl: typeof inv.avatarUrl === "string" ? inv.avatarUrl : "",
     loaded: true,
