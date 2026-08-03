@@ -508,6 +508,12 @@ function Review() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
+          {activePowerup === "powerup:double_lp" && (
+            <div className="absolute left-1/2 top-4 -translate-x-1/2 flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-[10px] font-bold text-orange-300 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
+              <Zap className="h-3 w-3 fill-orange-300" />
+              2X LP ATIVO
+            </div>
+          )}
           {isEnemyRun ? (
             <Link
               to="/enemies"
