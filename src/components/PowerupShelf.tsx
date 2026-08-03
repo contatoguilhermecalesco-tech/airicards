@@ -28,13 +28,8 @@ export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> 
   const [activating, setActivating] = useState<string | null>(null);
 
   return (
-    <section className="animate-fade-in space-y-3">
-      <div className="flex items-center gap-2 px-1">
-        <Zap className="h-3.5 w-3.5 text-primary/70" strokeWidth={2.5} />
-        <h2 className="text-[12px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">
-          Seu Inventário
-        </h2>
-      </div>
+    <section className="animate-fade-in space-y-5">
+
 
       <div className="flex flex-wrap items-center gap-2">
         {items.length === 0 && (

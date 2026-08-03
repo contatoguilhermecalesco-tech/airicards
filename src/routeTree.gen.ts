@@ -19,6 +19,7 @@ import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as NotificacoesRouteImport } from './routes/notificacoes'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as InventoryRouteImport } from './routes/inventory'
 import { Route as ForjaRouteImport } from './routes/forja'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as DuelRouteImport } from './routes/duel'
@@ -102,6 +103,11 @@ const NotificacoesRoute = NotificacoesRouteImport.update({
 const MarketplaceRoute = MarketplaceRouteImport.update({
   id: '/marketplace',
   path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForjaRoute = ForjaRouteImport.update({
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
+  '/inventory': typeof InventoryRoute
   '/marketplace': typeof MarketplaceRoute
   '/notificacoes': typeof NotificacoesRoute
   '/novidades': typeof NovidadesRouteWithChildren
@@ -331,6 +338,7 @@ export interface FileRoutesByTo {
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
+  '/inventory': typeof InventoryRoute
   '/marketplace': typeof MarketplaceRoute
   '/notificacoes': typeof NotificacoesRoute
   '/perfil': typeof PerfilRoute
@@ -372,6 +380,7 @@ export interface FileRoutesById {
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
+  '/inventory': typeof InventoryRoute
   '/marketplace': typeof MarketplaceRoute
   '/notificacoes': typeof NotificacoesRoute
   '/novidades': typeof NovidadesRouteWithChildren
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/duel'
     | '/enemies'
     | '/forja'
+    | '/inventory'
     | '/marketplace'
     | '/notificacoes'
     | '/novidades'
@@ -466,6 +476,7 @@ export interface FileRouteTypes {
     | '/duel'
     | '/enemies'
     | '/forja'
+    | '/inventory'
     | '/marketplace'
     | '/notificacoes'
     | '/perfil'
@@ -506,6 +517,7 @@ export interface FileRouteTypes {
     | '/duel'
     | '/enemies'
     | '/forja'
+    | '/inventory'
     | '/marketplace'
     | '/notificacoes'
     | '/novidades'
@@ -553,6 +565,7 @@ export interface RootRouteChildren {
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
   ForjaRoute: typeof ForjaRoute
+  InventoryRoute: typeof InventoryRoute
   MarketplaceRoute: typeof MarketplaceRoute
   NotificacoesRoute: typeof NotificacoesRoute
   NovidadesRoute: typeof NovidadesRouteWithChildren
@@ -652,6 +665,13 @@ declare module '@tanstack/react-router' {
       path: '/marketplace'
       fullPath: '/marketplace'
       preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forja': {
@@ -982,6 +1002,7 @@ const rootRouteChildren: RootRouteChildren = {
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
   ForjaRoute: ForjaRoute,
+  InventoryRoute: InventoryRoute,
   MarketplaceRoute: MarketplaceRoute,
   NotificacoesRoute: NotificacoesRoute,
   NovidadesRoute: NovidadesRouteWithChildren,
@@ -1013,3 +1034,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
