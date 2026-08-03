@@ -731,26 +731,32 @@ function Home() {
 }
 
 function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
-  const owned = Object.entries(wallet.powerups).filter(([_, count]) => count > 0);
+  const items = Object.entries(wallet.powerups).filter(([_, count]) => count > 0);
+  const activeId = wallet.activePowerup;
+  
+  // Garantir que o power-up ativo apareça na lista mesmo se o estoque for 0
+  const allIds = new Set(items.map(([id]) => id));
+  if (activeId && !allIds.has(activeId)) {
+    items.push([activeId, 0]);
+  }
+
   const [busy, setBusy] = useState<string | null>(null);
   const [activating, setActivating] = useState<string | null>(null);
 
-  // Mantemos o modal fixo na home para que o usuário possa visualizar seu inventário 
-  // e entender que ali é o lugar de gestão, mesmo se não tiver itens.
-  // if (owned.length === 0 && !wallet.activePowerup) return null;
 
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        {owned.length === 0 && !wallet.activePowerup && (
+        {items.length === 0 && (
           <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2 text-muted-foreground/50">
             <Zap className="h-3.5 w-3.5 opacity-30" />
             <span className="text-[11px] font-medium tracking-tight">Inventário de Power-ups vazio</span>
           </div>
         )}
-        {owned.map(([id, count]) => {
+        {items.map(([id, count]) => {
           const isActive = wallet.activePowerup === id;
+
           const label = id === "lp_multiplier_2x" || id === "powerup:double_lp" ? "LP em Dobro" : "Power-up";
           
           return (
