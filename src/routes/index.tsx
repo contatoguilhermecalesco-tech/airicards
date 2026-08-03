@@ -735,11 +735,20 @@ function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [activating, setActivating] = useState<string | null>(null);
 
-  if (owned.length === 0 && !wallet.activePowerup) return null;
+  // Mantemos o modal fixo na home para que o usuário possa visualizar seu inventário 
+  // e entender que ali é o lugar de gestão, mesmo se não tiver itens.
+  // if (owned.length === 0 && !wallet.activePowerup) return null;
+
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
+        {owned.length === 0 && !wallet.activePowerup && (
+          <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2 text-muted-foreground/50">
+            <Zap className="h-3.5 w-3.5 opacity-30" />
+            <span className="text-[11px] font-medium tracking-tight">Inventário de Power-ups vazio</span>
+          </div>
+        )}
         {owned.map(([id, count]) => {
           const isActive = wallet.activePowerup === id;
           const label = id === "lp_multiplier_2x" || id === "powerup:double_lp" ? "LP em Dobro" : "Power-up";
@@ -774,6 +783,7 @@ function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
           );
         })}
       </div>
+
 
       <AlertDialog open={!!activating} onOpenChange={(open) => !open && setActivating(null)}>
         <AlertDialogContent className="max-w-[360px] border-white/10 bg-black/60 backdrop-blur-2xl">
