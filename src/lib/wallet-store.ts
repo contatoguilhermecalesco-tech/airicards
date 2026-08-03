@@ -329,18 +329,20 @@ export async function deactivatePowerup() {
 }
 
 export function powerupName(id: string): string {
-  if (id === "lp_multiplier_2x") return "Dobrador de LP";
-  if (id === "powerup:double_lp") return "LP em Dobro";
-  if (id === "powerup:shield") return "Escudo de Streak";
-  if (id === "powerup:extra_life") return "Vida Extra";
+  if (id === "lp_multiplier_2x" || id === "powerup:double_lp") return "LP em Dobro";
+  if (id === "powerup:shield" || id === "shield") return "Escudo de Streak";
+  if (id === "powerup:extra_life" || id === "extra_life") return "Vida Extra";
+  if (id === "powerup:reset_revisions" || id === "reset_revisions") return "Reset de Revisões";
+  if (id === "powerup:double_arlys" || id === "double_arlys") return "Arlys em Dobro";
   return "Power-up Especial";
 }
 
 export function powerupDesc(id: string): string {
-  if (id === "lp_multiplier_2x") return "Dobra todos os ganhos de LP na sua próxima sessão de revisão.";
-  if (id === "powerup:double_lp") return "Multiplica por 2 a quantidade de LP recebida em cada acerto.";
-  if (id === "powerup:shield") return "Protege sua sequência de dias caso você esqueça de revisar.";
-  if (id === "powerup:extra_life") return "Permite errar uma carta sem perder o multiplicador de combo.";
+  if (id === "lp_multiplier_2x" || id === "powerup:double_lp") return "Multiplica por 2 a quantidade de LP recebida em cada acerto.";
+  if (id === "powerup:shield" || id === "shield") return "Protege sua sequência de dias caso você esqueça de revisar.";
+  if (id === "powerup:extra_life" || id === "extra_life") return "Permite errar uma carta sem perder o multiplicador de combo.";
+  if (id === "powerup:reset_revisions" || id === "reset_revisions") return "Zera o contador de revisões diárias para você continuar estudando.";
+  if (id === "powerup:double_arlys" || id === "double_arlys") return "Dobra todos os ganhos de Arlys ✦ durante a próxima sessão.";
   return "Um item consumível que concede benefícios temporários durante o estudo.";
 }
 
