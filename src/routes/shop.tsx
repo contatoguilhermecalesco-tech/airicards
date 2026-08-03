@@ -868,9 +868,9 @@ function UnifiedCard({
             badge={puBadge}
           />
           {owned && (
-            <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+            <span className="absolute right-3 bottom-3 inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2.5 py-1 text-[10px] font-semibold text-emerald-200 backdrop-blur">
               <Check className="h-3 w-3" strokeWidth={2.75} />
-              Adquirido
+              Em estoque
             </span>
           )}
           {stack > 0 && !owned && (
@@ -1071,7 +1071,9 @@ function UnifiedCard({
             <button
               onClick={onBuy}
               disabled={busy || owned || (!isMineDeck && item.kind !== "bundle" && !canAfford)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-95 disabled:opacity-40"
+              className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition hover:opacity-95 disabled:opacity-40 ${
+                item.kind === 'powerup' && owned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-primary text-primary-foreground'
+              }`}
             >
               {busy ? (
                 <>
@@ -1081,7 +1083,7 @@ function UnifiedCard({
               ) : owned ? (
                 <>
                   <Check className="h-3.5 w-3.5" strokeWidth={2.75} />
-                  Adquirido
+                  {item.kind === 'powerup' ? 'Adquirido' : 'Adquirido'}
                 </>
               ) : isMineDeck ? (
                 "Importar"
