@@ -480,67 +480,13 @@ function Review() {
       )}
 
       <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
-        {/* Power-ups Selector */}
-        {!focusMode && !index && !showBack && !finished && Object.keys(wallet.powerups).length > 0 && (
-          <div className="mb-6 flex animate-in fade-in slide-in-from-top-4 duration-500 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              <Zap className="h-3 w-3" />
-              Power-ups Disponíveis
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {Object.entries(wallet.powerups).map(([id, qty]) => (
-                <button
-                  key={id}
-                  onClick={async () => {
-                    if (activePowerupLabel === id) return;
-                    const ok = await consumePowerup(id);
-                    if (ok) {
-                      if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
-                        setSessionMultiplier(2);
-                        setActivePowerupLabel("LP em Dobro");
-                        toast.success("LP em dobro ativado!", {
-                          icon: "🔥",
-                          description: "Seus ganhos de LP serão multiplicados por 2.",
-                        });
-                      }
-                    }
-                  }}
-                  disabled={!!activePowerupLabel}
-                  className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
-                    activePowerupLabel === id
-                      ? "border-primary bg-primary/20 scale-105"
-                      : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
-                  }`}
-                >
-                  <div className="flex flex-col items-start">
-                    <span className="text-[11px] font-bold text-foreground">
-                      {(id === "powerup:double_lp" || id === "lp_multiplier_2x") ? "LP em Dobro" : "Power-up"}
-                    </span>
-                    <span className="text-[9px] font-medium text-muted-foreground">
-                      {activePowerupLabel ? "Ativado" : `${qty} disponível(eis)`}
-                    </span>
-                  </div>
-                  {activePowerupLabel && (
-                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
-                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-            {activePowerupLabel && (
-              <div className="text-[10px] font-medium text-primary/80 animate-pulse">
-                Sessão fortalecida · Bônus ativo até o fim da revisão
-              </div>
-            )}
-          </div>
-        )}
+
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
           {activePowerupLabel && (
-            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[11px] font-bold text-emerald-300 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
-              <Zap className="h-3.5 w-3.5 fill-emerald-300" strokeWidth={2.5} />
+            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-[11px] font-bold text-primary shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
+              <Zap className="h-3.5 w-3.5 fill-primary" strokeWidth={2.5} />
               <span className="uppercase tracking-[0.16em]">{activePowerupLabel} ATIVO</span>
             </div>
           )}
