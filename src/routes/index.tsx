@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen, Shield, Zap } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,7 @@ import {
   isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
-import { useWallet } from "@/lib/wallet-store";
+import { useWallet, activatePowerup, deactivatePowerup } from "@/lib/wallet-store";
 import { streakFlameFromEquipped } from "@/lib/eclipse-cosmetics";
 import { StreakFlame, streakHalo } from "@/components/StreakFlame";
 import { useCurrentProfile } from "@/lib/profile";
@@ -216,6 +216,9 @@ function Home() {
           {salute}
           {name ? `, ${name}` : ""}
         </h1>
+        <div className="mt-4">
+          <PowerupShelf wallet={wallet} />
+        </div>
       </header>
 
 
@@ -722,6 +725,69 @@ function Home() {
         </section>
       )}
     </main>
+  );
+}
+
+function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
+  const owned = Object.entries(wallet.powerups).filter(([_, count]) => count > 0);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  if (owned.length === 0 && !wallet.activePowerup) return null;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {owned.map(([id, count]) => {
+        const isActive = wallet.activePowerup === id;
+        const label = id === "lp_multiplier_2x" ? "Dobrador de LP" : id;
+        
+        return (
+          <button
+            key={id}
+            disabled={busy !== null}
+            onClick={async () => {
+              setBusy(id);
+              if (isActive) {
+                await deactivatePowerup();
+              } else {
+                await activatePowerup(id);
+              }
+              setBusy(null);
+            }}
+            className={`group relative flex items-center gap-2 rounded-xl border px-3 py-1.5 transition-all active:scale-95 ${
+              isActive 
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]" 
+                : "border-white/10 bg-white/[0.03] text-muted-foreground hover:border-white/20 hover:bg-white/[0.06]"
+            }`}
+          >
+            <div className={`grid h-5 w-5 place-items-center rounded-lg ${isActive ? "bg-emerald-500/20" : "bg-white/10"}`}>
+              {id === "lp_multiplier_2x" ? (
+                <Zap className={`h-3 w-3 ${isActive ? "text-emerald-300" : "text-white/60"}`} />
+              ) : (
+                <Shield className="h-3 w-3" />
+              )}
+            </div>
+            <div className="text-left">
+              <p className="text-[11px] font-bold leading-none">{label}</p>
+              {!isActive && <p className="mt-0.5 text-[9px] opacity-60">{count}x em estoque</p>}
+              {isActive && <p className="mt-0.5 text-[9px] font-bold text-emerald-400">ATIVO</p>}
+            </div>
+          </button>
+        );
+      })}
+      
+      {wallet.activePowerup && !owned.some(([id]) => id === wallet.activePowerup) && (
+        <button
+          onClick={() => deactivatePowerup()}
+          className="group relative flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-emerald-300"
+        >
+          <Zap className="h-3 w-3" />
+          <div className="text-left">
+            <p className="text-[11px] font-bold leading-none">Power-up Ativo</p>
+            <p className="mt-0.5 text-[9px] font-bold text-emerald-400">REVISAR AGORA</p>
+          </div>
+        </button>
+      )}
+    </div>
   );
 }
 
