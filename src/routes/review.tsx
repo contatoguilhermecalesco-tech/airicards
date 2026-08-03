@@ -14,11 +14,14 @@ import {
 } from "@/lib/flashcards-store";
 import { matchAnswer } from "@/lib/answer-match";
 import { toast } from "sonner";
+import { awardLp, LP } from "@/lib/rank-store";
 import {
   useWallet,
   consumePowerup,
   grantPowerup,
 } from "@/lib/wallet-store";
+import {
+  enemyTier,
   TIER_META,
   useCombo,
   resetCombo,
@@ -29,7 +32,6 @@ import {
   onComboReached,
   getComboCount,
 } from "@/lib/enemy-system";
-import { useWallet } from "@/lib/wallet-store";
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinImpact } from "@/components/review/TableSkinImpact";
