@@ -394,7 +394,7 @@ export function awardLp(delta: number, reason: string, multiplier = 1): {
     ...state,
     history: [{ at: Date.now(), delta: finalDelta, reason }, ...state.history].slice(0, 60),
     totalEarned: finalDelta > 0 ? state.totalEarned + finalDelta : state.totalEarned,
-    totalLost: finalDelta < 0 ? state.totalLost + -finalDelta : state.totalLost,
+    totalLost: finalDelta < 0 ? state.totalLost + Math.abs(finalDelta) : state.totalLost,
   };
 
   let promoted = false;

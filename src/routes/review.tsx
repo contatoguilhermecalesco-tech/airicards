@@ -258,7 +258,7 @@ function Review() {
       if (isEnemyRun) breakCombo();
       
       // Penalidade de LP por erro na tradução (padrão do sistema)
-      awardLp(LP.reviewWrong, `Erro: ${current.front}`);
+      awardLp(LP.reviewWrong, `Erro: ${current.front}`, sessionMultiplier);
     }
   }
 
@@ -275,7 +275,7 @@ function Review() {
     const willBecomeEnemy =
       !wasEnemy && (current.lapses ?? 0) + 1 >= ENEMY_THRESHOLD;
     
-    awardLp(LP.reviewWrong, `Pulei/Errei: ${current.front}`);
+    awardLp(LP.reviewWrong, `Pulei/Errei: ${current.front}`, sessionMultiplier);
     reviewCard(current.id, "again");
     setReviewed((n) => n + 1);
     setHitFlash(true);
