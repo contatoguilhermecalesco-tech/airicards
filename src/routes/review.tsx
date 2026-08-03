@@ -301,7 +301,8 @@ function Review() {
     
     // Ganhos de LP baseados na dificuldade escolhida
     const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
-    awardLp(lpGain, `Revisão: ${current.front}`, sessionMultiplier);
+    const reason = g === "easy" ? "review.easy" : g === "good" ? "review.good" : "review.hard";
+    awardLp(lpGain, reason, sessionMultiplier);
     
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
