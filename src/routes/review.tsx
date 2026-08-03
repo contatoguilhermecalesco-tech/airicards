@@ -293,8 +293,9 @@ function Review() {
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
-    const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
     
+    // Ganhos de LP baseados na dificuldade escolhida
+    const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
     awardLp(lpGain, `Revisão: ${current.front}`, sessionMultiplier);
     
     reviewCard(current.id, g);
