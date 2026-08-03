@@ -19,6 +19,7 @@ import {
   useWallet,
   consumePowerup,
   grantPowerup,
+  deactivatePowerup,
 } from "@/lib/wallet-store";
 import {
   enemyTier,
@@ -113,15 +114,16 @@ function Review() {
   const [runStreak, setRunStreak] = useState(0);
   // Power-ups ativos na sessão
   const [sessionMultiplier, setSessionMultiplier] = useState(1);
-  const [activePowerup, setActivePowerup] = useState<string | null>(null);
+  const [activePowerupLabel, setActivePowerupLabel] = useState<string | null>(null);
 
   useEffect(() => {
-    if (wallet.activePowerup === "lp_multiplier_2x") {
+    const active = wallet.activePowerup;
+    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
       setSessionMultiplier(2);
-      setActivePowerup("2X LP");
+      setActivePowerupLabel("2X LP");
     } else {
       setSessionMultiplier(1);
-      setActivePowerup(null);
+      setActivePowerupLabel(null);
     }
   }, [wallet.activePowerup]);
 
@@ -330,6 +332,18 @@ function Review() {
       }, 900);
       return;
     }
+    if (finished || reviewed + 1 >= queue.length) {
+      if (wallet.activePowerup) {
+        const name = (wallet.activePowerup === "lp_multiplier_2x" || wallet.activePowerup === "powerup:double_lp") 
+          ? "LP em Dobro" 
+          : "Power-up";
+        toast.info(`${name} finalizado!`, {
+          description: "O bônus foi aplicado a todas as cartas desta sessão.",
+          icon: <Check className="h-4 w-4 text-emerald-400" />,
+        });
+        void deactivatePowerup();
+      }
+    }
     setIndex((i) => i + 1);
   }
 
@@ -473,12 +487,12 @@ function Review() {
                 <button
                   key={id}
                   onClick={async () => {
-                    if (activePowerup === id) return;
+                    if (activePowerupLabel === id) return;
                     const ok = await consumePowerup(id);
                     if (ok) {
-                      setActivePowerup(id);
-                      if (id === "powerup:double_lp") {
+                      if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
                         setSessionMultiplier(2);
+                        setActivePowerupLabel("2X LP");
                         toast.success("LP em dobro ativado para esta sessão!", {
                           icon: "🔥",
                           description: "Seus ganhos de LP serão multiplicados por 2.",
@@ -486,22 +500,22 @@ function Review() {
                       }
                     }
                   }}
-                  disabled={!!activePowerup}
+                  disabled={!!activePowerupLabel}
                   className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
-                    activePowerup === id
+                    activePowerupLabel === id
                       ? "border-primary bg-primary/20 scale-105"
                       : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
                   }`}
                 >
                   <div className="flex flex-col items-start">
                     <span className="text-[11px] font-bold text-foreground">
-                      {id === "powerup:double_lp" ? "LP em Dobro" : "Power-up"}
+                      {(id === "powerup:double_lp" || id === "lp_multiplier_2x") ? "LP em Dobro" : "Power-up"}
                     </span>
                     <span className="text-[9px] font-medium text-muted-foreground">
-                      {activePowerup === id ? "Ativado" : `${qty} disponível(eis)`}
+                      {activePowerupLabel ? "Ativado" : `${qty} disponível(eis)`}
                     </span>
                   </div>
-                  {activePowerup === id && (
+                  {activePowerupLabel && (
                     <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
                       <Check className="h-2.5 w-2.5" strokeWidth={3} />
                     </div>
@@ -509,7 +523,7 @@ function Review() {
                 </button>
               ))}
             </div>
-            {activePowerup && (
+            {activePowerupLabel && (
               <div className="text-[10px] font-medium text-primary/80 animate-pulse">
                 Sessão fortalecida · Bônus ativo até o fim da revisão
               </div>
@@ -519,10 +533,10 @@ function Review() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          {activePowerup === "powerup:double_lp" && (
-            <div className="absolute left-1/2 top-4 -translate-x-1/2 flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-[10px] font-bold text-orange-300 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
-              <Zap className="h-3 w-3 fill-orange-300" />
-              2X LP ATIVO
+          {activePowerupLabel && (
+            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[11px] font-bold text-emerald-300 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
+              <Zap className="h-3.5 w-3.5 fill-emerald-300" strokeWidth={2.5} />
+              <span className="uppercase tracking-[0.16em]">{activePowerupLabel} ATIVO</span>
             </div>
           )}
           {isEnemyRun ? (
