@@ -13,8 +13,12 @@ import {
   registerHomeSession,
 } from "@/lib/flashcards-store";
 import { matchAnswer } from "@/lib/answer-match";
+import { toast } from "sonner";
 import {
-  enemyTier,
+  useWallet,
+  consumePowerup,
+  grantPowerup,
+} from "@/lib/wallet-store";
   TIER_META,
   useCombo,
   resetCombo,
@@ -105,6 +109,10 @@ function Review() {
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
+  // Power-ups ativos na sessão
+  const [sessionMultiplier, setSessionMultiplier] = useState(1);
+  const [activePowerup, setActivePowerup] = useState<string | null>(null);
+
   // Caça aos Fragmentos — drop aleatório ao acertar.
   const [luminho, setLuminho] = useState<(ShardDrop & { uid: number }) | null>(null);
   const luminhoIdRef = useRef(0);
@@ -283,6 +291,10 @@ function Review() {
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
+    const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
+    
+    awardLp(lpGain, `Revisão: ${current.front}`, sessionMultiplier);
+    
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
     if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
@@ -430,6 +442,62 @@ function Review() {
       )}
 
       <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
+        {/* Power-ups Selector */}
+        {!focusMode && !index && !showBack && !finished && Object.keys(wallet.powerups).length > 0 && (
+          <div className="mb-6 flex animate-in fade-in slide-in-from-top-4 duration-500 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              <Zap className="h-3 w-3" />
+              Power-ups Disponíveis
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {Object.entries(wallet.powerups).map(([id, qty]) => (
+                <button
+                  key={id}
+                  onClick={async () => {
+                    if (activePowerup === id) return;
+                    const ok = await consumePowerup(id);
+                    if (ok) {
+                      setActivePowerup(id);
+                      if (id === "powerup:double_lp") {
+                        setSessionMultiplier(2);
+                        toast.success("LP em dobro ativado para esta sessão!", {
+                          icon: "🔥",
+                          description: "Seus ganhos de LP serão multiplicados por 2.",
+                        });
+                      }
+                    }
+                  }}
+                  disabled={!!activePowerup}
+                  className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
+                    activePowerup === id
+                      ? "border-primary bg-primary/20 scale-105"
+                      : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
+                  }`}
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="text-[11px] font-bold text-foreground">
+                      {id === "powerup:double_lp" ? "LP em Dobro" : "Power-up"}
+                    </span>
+                    <span className="text-[9px] font-medium text-muted-foreground">
+                      {activePowerup === id ? "Ativado" : `${qty} disponível(eis)`}
+                    </span>
+                  </div>
+                  {activePowerup === id && (
+                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
+                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            {activePowerup && (
+              <div className="text-[10px] font-medium text-primary/80 animate-pulse">
+                Sessão fortalecida · Bônus ativo até o fim da revisão
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Top bar */}
         <div className="flex items-center justify-between">
           {isEnemyRun ? (
