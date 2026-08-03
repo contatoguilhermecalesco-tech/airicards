@@ -87,6 +87,7 @@ function GlassHighlight() {
 }
 
 function Home() {
+  const wallet = useWallet();
   const profile = useCurrentProfile();
   const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
