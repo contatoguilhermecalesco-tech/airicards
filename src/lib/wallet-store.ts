@@ -331,8 +331,19 @@ export async function deactivatePowerup() {
 export function powerupName(id: string): string {
   if (id === "lp_multiplier_2x") return "Dobrador de LP";
   if (id === "powerup:double_lp") return "LP em Dobro";
+  if (id === "powerup:shield") return "Escudo de Streak";
+  if (id === "powerup:extra_life") return "Vida Extra";
   return "Power-up Especial";
 }
+
+export function powerupDesc(id: string): string {
+  if (id === "lp_multiplier_2x") return "Dobra todos os ganhos de LP na sua próxima sessão de revisão.";
+  if (id === "powerup:double_lp") return "Multiplica por 2 a quantidade de LP recebida em cada acerto.";
+  if (id === "powerup:shield") return "Protege sua sequência de dias caso você esqueça de revisar.";
+  if (id === "powerup:extra_life") return "Permite errar uma carta sem perder o multiplicador de combo.";
+  return "Um item consumível que concede benefícios temporários durante o estudo.";
+}
+
 
 // ---- earning events (UI toast) ----
 export type EarnEvent = { amount: number; reason: string; at: number };
