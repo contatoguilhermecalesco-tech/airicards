@@ -480,24 +480,6 @@ function Review() {
       )}
 
       <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
-        {/* Power-ups Selector */}
-        {!focusMode && !index && !showBack && !finished && Object.keys(wallet.powerups).length > 0 && (
-          <div className="mb-6 flex animate-in fade-in slide-in-from-top-4 duration-500 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              <Zap className="h-3 w-3" />
-              Power-ups Disponíveis
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {Object.entries(wallet.powerups).map(([id, qty]) => (
-                <button
-                  key={id}
-                  onClick={async () => {
-                    if (activePowerupLabel === id) return;
-                    const ok = await consumePowerup(id);
-                    if (ok) {
-                      if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
-                        setSessionMultiplier(2);
-                        setActivePowerupLabel("LP em Dobro");
                         toast.success("LP em dobro ativado!", {
                           icon: "🔥",
                           description: "Seus ganhos de LP serão multiplicados por 2.",
