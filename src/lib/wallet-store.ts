@@ -313,6 +313,7 @@ export async function consumePowerup(effect: string): Promise<boolean> {
 export async function activatePowerup(effect: string) {
   if (!currentProfileId) return;
   if (!state.powerups[effect]) return;
+  // O usuário não pode desequipar o power-up depois de ativado (decisão de design do airi).
   state.activePowerup = effect;
   emit();
   await persist();
@@ -320,9 +321,17 @@ export async function activatePowerup(effect: string) {
 
 export async function deactivatePowerup() {
   if (!currentProfileId) return;
+  // Apenas limpa localmente caso seja necessário, mas a persistência
+  // deve ser controlada. O usuário final não tem botão de desequipar.
   state.activePowerup = null;
   emit();
   await persist();
+}
+
+export function powerupName(id: string): string {
+  if (id === "lp_multiplier_2x") return "Dobrador de LP";
+  if (id === "powerup:double_lp") return "LP em Dobro";
+  return "Power-up Especial";
 }
 
 // ---- earning events (UI toast) ----

@@ -113,15 +113,16 @@ function Review() {
   const [runStreak, setRunStreak] = useState(0);
   // Power-ups ativos na sessão
   const [sessionMultiplier, setSessionMultiplier] = useState(1);
-  const [activePowerup, setActivePowerup] = useState<string | null>(null);
+  const [activePowerupLabel, setActivePowerupLabel] = useState<string | null>(null);
 
   useEffect(() => {
-    if (wallet.activePowerup === "lp_multiplier_2x") {
+    const active = wallet.activePowerup;
+    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
       setSessionMultiplier(2);
-      setActivePowerup("2X LP");
+      setActivePowerupLabel("2X LP");
     } else {
       setSessionMultiplier(1);
-      setActivePowerup(null);
+      setActivePowerupLabel(null);
     }
   }, [wallet.activePowerup]);
 
@@ -330,6 +331,18 @@ function Review() {
       }, 900);
       return;
     }
+    if (finished || reviewed + 1 >= queue.length) {
+      if (wallet.activePowerup) {
+        const name = (wallet.activePowerup === "lp_multiplier_2x" || wallet.activePowerup === "powerup:double_lp") 
+          ? "LP em Dobro" 
+          : "Power-up";
+        toast.info(`${name} finalizado!`, {
+          description: "O bônus foi aplicado a todas as cartas desta sessão.",
+          icon: <Check className="h-4 w-4 text-emerald-400" />,
+        });
+        void deactivatePowerup();
+      }
+    }
     setIndex((i) => i + 1);
   }
 
@@ -519,10 +532,10 @@ function Review() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          {activePowerup === "powerup:double_lp" && (
-            <div className="absolute left-1/2 top-4 -translate-x-1/2 flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-[10px] font-bold text-orange-300 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
-              <Zap className="h-3 w-3 fill-orange-300" />
-              2X LP ATIVO
+          {activePowerupLabel && (
+            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[11px] font-bold text-emerald-300 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
+              <Zap className="h-3.5 w-3.5 fill-emerald-300" strokeWidth={2.5} />
+              <span className="uppercase tracking-[0.16em]">{activePowerupLabel} ATIVO</span>
             </div>
           )}
           {isEnemyRun ? (
