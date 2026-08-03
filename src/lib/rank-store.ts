@@ -405,7 +405,7 @@ export function awardLp(delta: number, reason: string, multiplier = 1): {
 
   if (isElite(next.tier)) {
     // Elite: LP livre, sem promo/rebaixamento entre master/gm/challenger é automático por faixa.
-    const newLp = Math.max(0, next.lp + delta);
+    const newLp = Math.max(0, next.lp + finalDelta);
     const newTier = eliteTierForLp(newLp);
     if (newTier !== next.tier) {
       // troca visual de faixa elite
