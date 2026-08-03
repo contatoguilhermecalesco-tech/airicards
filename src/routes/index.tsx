@@ -220,9 +220,8 @@ function Home() {
           {salute}
           {name ? `, ${name}` : ""}
         </h1>
-        <div className="mt-4">
-          <PowerupShelf wallet={wallet} />
-        </div>
+        {/* PowerupShelf removido da home conforme pedido */}
+
       </header>
 
 
@@ -426,6 +425,12 @@ function Home() {
       >
 
         <QuickPill
+          to="/inventory"
+          label="Inventário"
+          icon={<Zap className="h-3.5 w-3.5" strokeWidth={2.25} />}
+          accent="text-cyan-200"
+        />
+        <QuickPill
           to="/social"
           label="Duelo"
           icon={<Swords className="h-3.5 w-3.5" strokeWidth={2.25} />}
@@ -451,6 +456,7 @@ function Home() {
           icon={<ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.25} />}
           accent="text-amber-200"
         />
+
       </section>
 
       {/* Streak — sequência de dias */}
