@@ -20,7 +20,8 @@ import {
   isDefeated,
   type Streak,
 } from "@/lib/flashcards-store";
-import { useWallet, activatePowerup, deactivatePowerup } from "@/lib/wallet-store";
+import { useWallet, activatePowerup, deactivatePowerup, consumePowerup } from "@/lib/wallet-store";
+import { toast } from "sonner";
 import { streakFlameFromEquipped } from "@/lib/eclipse-cosmetics";
 import { StreakFlame, streakHalo } from "@/components/StreakFlame";
 import { useCurrentProfile } from "@/lib/profile";

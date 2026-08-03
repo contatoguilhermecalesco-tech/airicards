@@ -19,6 +19,7 @@ import {
   useWallet,
   consumePowerup,
   grantPowerup,
+  deactivatePowerup,
 } from "@/lib/wallet-store";
 import {
   enemyTier,
@@ -486,12 +487,12 @@ function Review() {
                 <button
                   key={id}
                   onClick={async () => {
-                    if (activePowerup === id) return;
+                    if (activePowerupLabel === id) return;
                     const ok = await consumePowerup(id);
                     if (ok) {
-                      setActivePowerup(id);
-                      if (id === "powerup:double_lp") {
+                      if (id === "powerup:double_lp" || id === "lp_multiplier_2x") {
                         setSessionMultiplier(2);
+                        setActivePowerupLabel("2X LP");
                         toast.success("LP em dobro ativado para esta sessão!", {
                           icon: "🔥",
                           description: "Seus ganhos de LP serão multiplicados por 2.",
@@ -499,22 +500,22 @@ function Review() {
                       }
                     }
                   }}
-                  disabled={!!activePowerup}
+                  disabled={!!activePowerupLabel}
                   className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
-                    activePowerup === id
+                    activePowerupLabel === id
                       ? "border-primary bg-primary/20 scale-105"
                       : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
                   }`}
                 >
                   <div className="flex flex-col items-start">
                     <span className="text-[11px] font-bold text-foreground">
-                      {id === "powerup:double_lp" ? "LP em Dobro" : "Power-up"}
+                      {(id === "powerup:double_lp" || id === "lp_multiplier_2x") ? "LP em Dobro" : "Power-up"}
                     </span>
                     <span className="text-[9px] font-medium text-muted-foreground">
-                      {activePowerup === id ? "Ativado" : `${qty} disponível(eis)`}
+                      {activePowerupLabel ? "Ativado" : `${qty} disponível(eis)`}
                     </span>
                   </div>
-                  {activePowerup === id && (
+                  {activePowerupLabel && (
                     <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
                       <Check className="h-2.5 w-2.5" strokeWidth={3} />
                     </div>
@@ -522,7 +523,7 @@ function Review() {
                 </button>
               ))}
             </div>
-            {activePowerup && (
+            {activePowerupLabel && (
               <div className="text-[10px] font-medium text-primary/80 animate-pulse">
                 Sessão fortalecida · Bônus ativo até o fim da revisão
               </div>
