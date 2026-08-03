@@ -380,7 +380,7 @@ function updatePeak(next: RankState): RankState {
 }
 
 /** Concede/retira LP e recalcula tier/divisão. Retorna evento resultante. */
-export function awardLp(delta: number, reason: string): {
+export function awardLp(delta: number, reason: string, multiplier = 1): {
   state: RankState;
   promoted: boolean;
   demoted: boolean;
@@ -388,12 +388,13 @@ export function awardLp(delta: number, reason: string): {
   promoWon: boolean;
   promoLost: boolean;
 } {
+  const finalDelta = delta > 0 ? Math.round(delta * multiplier) : delta;
   const before = state;
   let next: RankState = {
     ...state,
-    history: [{ at: Date.now(), delta, reason }, ...state.history].slice(0, 60),
-    totalEarned: delta > 0 ? state.totalEarned + delta : state.totalEarned,
-    totalLost: delta < 0 ? state.totalLost + -delta : state.totalLost,
+    history: [{ at: Date.now(), delta: finalDelta, reason }, ...state.history].slice(0, 60),
+    totalEarned: finalDelta > 0 ? state.totalEarned + finalDelta : state.totalEarned,
+    totalLost: finalDelta < 0 ? state.totalLost + -finalDelta : state.totalLost,
   };
 
   let promoted = false;
@@ -404,7 +405,7 @@ export function awardLp(delta: number, reason: string): {
 
   if (isElite(next.tier)) {
     // Elite: LP livre, sem promo/rebaixamento entre master/gm/challenger é automático por faixa.
-    const newLp = Math.max(0, next.lp + delta);
+    const newLp = Math.max(0, next.lp + finalDelta);
     const newTier = eliteTierForLp(newLp);
     if (newTier !== next.tier) {
       // troca visual de faixa elite
@@ -498,6 +499,7 @@ export const LP = {
   reviewGood: 2,
   reviewHard: 1,
   reviewWrong: -4,
+  lpMultiplier: 1, // Multiplicador base de LP (afetado por power-ups)
   enemyDefeated: 8,
   enemyEvolved: -12,
   streakDay: (days: number) => Math.min(12, Math.max(2, days * 2)),

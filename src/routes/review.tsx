@@ -13,6 +13,13 @@ import {
   registerHomeSession,
 } from "@/lib/flashcards-store";
 import { matchAnswer } from "@/lib/answer-match";
+import { toast } from "sonner";
+import { awardLp, LP } from "@/lib/rank-store";
+import {
+  useWallet,
+  consumePowerup,
+  grantPowerup,
+} from "@/lib/wallet-store";
 import {
   enemyTier,
   TIER_META,
@@ -25,7 +32,6 @@ import {
   onComboReached,
   getComboCount,
 } from "@/lib/enemy-system";
-import { useWallet } from "@/lib/wallet-store";
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinImpact } from "@/components/review/TableSkinImpact";
@@ -105,6 +111,10 @@ function Review() {
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
+  // Power-ups ativos na sessão
+  const [sessionMultiplier, setSessionMultiplier] = useState(1);
+  const [activePowerup, setActivePowerup] = useState<string | null>(null);
+
   // Caça aos Fragmentos — drop aleatório ao acertar.
   const [luminho, setLuminho] = useState<(ShardDrop & { uid: number }) | null>(null);
   const luminhoIdRef = useRef(0);
@@ -246,6 +256,9 @@ function Review() {
       setRunStreak(0);
       pulseSkin("miss");
       if (isEnemyRun) breakCombo();
+      
+      // Penalidade de LP por erro na tradução (padrão do sistema)
+      awardLp(LP.reviewWrong, `Erro: ${current.front}`);
     }
   }
 
@@ -261,6 +274,8 @@ function Review() {
     const wasEnemy = isEnemy(current);
     const willBecomeEnemy =
       !wasEnemy && (current.lapses ?? 0) + 1 >= ENEMY_THRESHOLD;
+    
+    awardLp(LP.reviewWrong, `Pulei/Errei: ${current.front}`);
     reviewCard(current.id, "again");
     setReviewed((n) => n + 1);
     setHitFlash(true);
@@ -283,6 +298,11 @@ function Review() {
     const willDefeat =
       wasEnemy && (current.successes ?? 0) + 1 > (current.lapses ?? 0);
     const dmg = g === "easy" ? 2 : g === "good" ? 1 : 1;
+    
+    // Ganhos de LP baseados na dificuldade escolhida
+    const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
+    awardLp(lpGain, `Revisão: ${current.front}`, sessionMultiplier);
+    
     reviewCard(current.id, g);
     setReviewed((n) => n + 1);
     if (wasEnemy) spawnDmg(`-${dmg} HP`, "damage");
@@ -430,8 +450,70 @@ function Review() {
       )}
 
       <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
+        {/* Power-ups Selector */}
+        {!focusMode && !index && !showBack && !finished && Object.keys(wallet.powerups).length > 0 && (
+          <div className="mb-6 flex animate-in fade-in slide-in-from-top-4 duration-500 flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              <Zap className="h-3 w-3" />
+              Power-ups Disponíveis
+            </div>
+            <div className="flex flex-wrap justify-center gap-2">
+              {Object.entries(wallet.powerups).map(([id, qty]) => (
+                <button
+                  key={id}
+                  onClick={async () => {
+                    if (activePowerup === id) return;
+                    const ok = await consumePowerup(id);
+                    if (ok) {
+                      setActivePowerup(id);
+                      if (id === "powerup:double_lp") {
+                        setSessionMultiplier(2);
+                        toast.success("LP em dobro ativado para esta sessão!", {
+                          icon: "🔥",
+                          description: "Seus ganhos de LP serão multiplicados por 2.",
+                        });
+                      }
+                    }
+                  }}
+                  disabled={!!activePowerup}
+                  className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
+                    activePowerup === id
+                      ? "border-primary bg-primary/20 scale-105"
+                      : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
+                  }`}
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="text-[11px] font-bold text-foreground">
+                      {id === "powerup:double_lp" ? "LP em Dobro" : "Power-up"}
+                    </span>
+                    <span className="text-[9px] font-medium text-muted-foreground">
+                      {activePowerup === id ? "Ativado" : `${qty} disponível(eis)`}
+                    </span>
+                  </div>
+                  {activePowerup === id && (
+                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
+                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            {activePowerup && (
+              <div className="text-[10px] font-medium text-primary/80 animate-pulse">
+                Sessão fortalecida · Bônus ativo até o fim da revisão
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Top bar */}
         <div className="flex items-center justify-between">
+          {activePowerup === "powerup:double_lp" && (
+            <div className="absolute left-1/2 top-4 -translate-x-1/2 flex items-center gap-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-[10px] font-bold text-orange-300 animate-in fade-in zoom-in duration-300 backdrop-blur-md">
+              <Zap className="h-3 w-3 fill-orange-300" />
+              2X LP ATIVO
+            </div>
+          )}
           {isEnemyRun ? (
             <Link
               to="/enemies"
