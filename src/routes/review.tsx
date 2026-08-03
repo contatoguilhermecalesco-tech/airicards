@@ -115,6 +115,16 @@ function Review() {
   const [sessionMultiplier, setSessionMultiplier] = useState(1);
   const [activePowerup, setActivePowerup] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (wallet.activePowerup === "lp_multiplier_2x") {
+      setSessionMultiplier(2);
+      setActivePowerup("2X LP");
+    } else {
+      setSessionMultiplier(1);
+      setActivePowerup(null);
+    }
+  }, [wallet.activePowerup]);
+
   // Caça aos Fragmentos — drop aleatório ao acertar.
   const [luminho, setLuminho] = useState<(ShardDrop & { uid: number }) | null>(null);
   const luminhoIdRef = useRef(0);
