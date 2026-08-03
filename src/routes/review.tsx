@@ -485,8 +485,8 @@ function Review() {
         {/* Top bar */}
         <div className="flex items-center justify-between">
           {activePowerupLabel && (
-            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-[11px] font-bold text-emerald-300 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
-              <Zap className="h-3.5 w-3.5 fill-emerald-300" strokeWidth={2.5} />
+            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-[11px] font-bold text-primary shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
+              <Zap className="h-3.5 w-3.5 fill-primary" strokeWidth={2.5} />
               <span className="uppercase tracking-[0.16em]">{activePowerupLabel} ATIVO</span>
             </div>
           )}
