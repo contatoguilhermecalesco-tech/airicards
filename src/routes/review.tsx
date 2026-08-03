@@ -480,43 +480,7 @@ function Review() {
       )}
 
       <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
-                        toast.success("LP em dobro ativado!", {
-                          icon: "🔥",
-                          description: "Seus ganhos de LP serão multiplicados por 2.",
-                        });
-                      }
-                    }
-                  }}
-                  disabled={!!activePowerupLabel}
-                  className={`group relative flex items-center gap-2 rounded-xl border px-3 py-2 transition-all ${
-                    activePowerupLabel === id
-                      ? "border-primary bg-primary/20 scale-105"
-                      : "border-white/10 bg-white/5 hover:border-white/20 active:scale-95 disabled:opacity-50"
-                  }`}
-                >
-                  <div className="flex flex-col items-start">
-                    <span className="text-[11px] font-bold text-foreground">
-                      {(id === "powerup:double_lp" || id === "lp_multiplier_2x") ? "LP em Dobro" : "Power-up"}
-                    </span>
-                    <span className="text-[9px] font-medium text-muted-foreground">
-                      {activePowerupLabel ? "Ativado" : `${qty} disponível(eis)`}
-                    </span>
-                  </div>
-                  {activePowerupLabel && (
-                    <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-lg">
-                      <Check className="h-2.5 w-2.5" strokeWidth={3} />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-            {activePowerupLabel && (
-              <div className="text-[10px] font-medium text-primary/80 animate-pulse">
-                Sessão fortalecida · Bônus ativo até o fim da revisão
-              </div>
-            )}
-          </div>
-        )}
+
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
