@@ -25,6 +25,7 @@ export function BundleDetailModal({
   splashUrl,
   artUrl,
   onPreview,
+  onBuyItem,
 }: {
   bundle: ShopItem;
   wallet: number;
@@ -36,6 +37,7 @@ export function BundleDetailModal({
   artUrl?: string | null;
   /** Abre o provador (prévia contextual) — sem item, prova o bundle inteiro. */
   onPreview?: (item?: ShopItem) => void;
+  onBuyItem?: (item: ShopItem) => void;
 }) {
   const [contents, setContents] = useState<ShopItem[] | null>(null);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
@@ -231,6 +233,9 @@ export function BundleDetailModal({
                     active={enabled[c.id] ?? true}
                     onToggle={() => toggleItem(c.id)}
                     onPreview={onPreview ? () => onPreview(c) : undefined}
+                    onBuyItem={onBuyItem}
+                    wallet={wallet}
+                    busy={busy}
                   />
                 ))}
               </ul>
@@ -338,16 +343,24 @@ function BundleItemRow({
   active,
   onToggle,
   onPreview,
+  busy,
+  wallet,
+  onBuyItem,
 }: {
   item: ShopItem;
   owned: boolean;
   active: boolean;
   onToggle: () => void;
   onPreview?: () => void;
+  busy?: boolean;
+  wallet?: number;
+  onBuyItem?: (item: ShopItem) => void;
 }) {
   const rarity = RARITY_META[rarityOfItem(item)];
   const Icon = ICONS[item.icon] ?? Sparkles;
   const override = getShopAssetOverride(item.id);
+  const canAfford = wallet !== undefined ? wallet >= item.price : true;
+
   return (
     <li
       className={`relative flex items-center gap-3 overflow-hidden rounded-2xl border ${rarity.border} bg-white/[0.02] p-2.5 transition ${active ? "opacity-100" : "opacity-55"}`}
@@ -395,23 +408,42 @@ function BundleItemRow({
           )}
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-pressed={active}
-        aria-label={active ? "Ocultar do preview" : "Mostrar no preview"}
-        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
-          active
-            ? "border-violet-300/50 bg-gradient-to-r from-violet-500 to-fuchsia-500"
-            : "border-white/15 bg-white/10"
-        }`}
-      >
+
+      <div className="flex items-center gap-2">
+        {!owned && onBuyItem && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onBuyItem(item);
+            }}
+            disabled={busy || !canAfford}
+            className="flex h-8 items-center gap-1 rounded-lg bg-white/10 px-2.5 text-[11px] font-bold text-white transition hover:bg-white/20 disabled:opacity-40"
+          >
+            {busy ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <>Comprar</>
+            )}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-pressed={active}
+          aria-label={active ? "Ocultar do preview" : "Mostrar no preview"}
+          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border transition ${
+            active
+              ? "border-violet-300/50 bg-gradient-to-r from-violet-500 to-fuchsia-500"
+              : "border-white/15 bg-white/10"
+          }`}
+        >
         <span
           className={`inline-block h-4 w-4 rounded-full bg-white shadow-md transition-transform ${
             active ? "translate-x-6" : "translate-x-1"
           }`}
         />
       </button>
+      </div>
     </li>
   );
 }

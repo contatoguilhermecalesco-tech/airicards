@@ -746,6 +746,10 @@ function ShopPage() {
           onPreview={(it) => setTryOn({ root: bundleOpen, focusId: it?.id ?? null })}
           splashUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.splash_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.splash}
           artUrl={featuredSlots.find((s) => s.item_id === bundleOpen.id)?.art_url ?? BUNDLE_ASSET_OVERRIDES[bundleOpen.id]?.art}
+          onBuyItem={async (it) => {
+            const u = unified.find((x) => x.id === it.id);
+            if (u) await handleBuyUnified(u);
+          }}
         />
       )}
 
