@@ -426,7 +426,7 @@ function Home() {
 
         <QuickPill
           to="/inventory"
-          label="Inventário"
+          label="Power-ups"
           icon={<Zap className="h-3.5 w-3.5" strokeWidth={2.25} />}
           accent="text-cyan-200"
         />

@@ -32,7 +32,7 @@ export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> 
         {items.length === 0 && (
           <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2 text-muted-foreground/50">
             <Sparkles className="h-3.5 w-3.5 opacity-30" />
-            <span className="text-[11px] font-medium tracking-tight">Inventário de Power-ups vazio</span>
+            <span className="text-[11px] font-medium tracking-tight">Lista de Power-ups vazia</span>
           </div>
         )}
         {items.map(([id, count]) => {
