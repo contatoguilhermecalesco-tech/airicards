@@ -442,6 +442,7 @@ function BundleItemRow({
           }`}
         />
       </button>
+      </div>
     </li>
   );
 }
