@@ -114,21 +114,19 @@ function Review() {
   const [runStreak, setRunStreak] = useState(0);
   // Power-ups ativos na sessão
   const [sessionMultiplier, setSessionMultiplier] = useState(1);
-  const [activePowerupLabel, setActivePowerupLabel] = useState<string | null>(null);
+  const wallet = useWallet();
+  const activePowerupLabel = useMemo(() => {
+    const id = wallet.activePowerup;
+    if (!id) return null;
+    return powerupName(id);
+  }, [wallet.activePowerup]);
 
   useEffect(() => {
     const active = wallet.activePowerup;
-    if (active) {
-      if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
-        setSessionMultiplier(2);
-        setActivePowerupLabel("LP em Dobro");
-      } else {
-        setSessionMultiplier(1);
-        setActivePowerupLabel("Power-up");
-      }
+    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
+      setSessionMultiplier(2);
     } else {
       setSessionMultiplier(1);
-      setActivePowerupLabel(null);
     }
   }, [wallet.activePowerup]);
 
@@ -339,9 +337,7 @@ function Review() {
     }
     if (finished || reviewed + 1 >= queue.length) {
       if (wallet.activePowerup) {
-        const name = (wallet.activePowerup === "lp_multiplier_2x" || wallet.activePowerup === "powerup:double_lp") 
-          ? "LP em Dobro" 
-          : "Power-up";
+        const name = powerupName(wallet.activePowerup);
         toast.info(`${name} finalizado!`, {
           description: "O bônus foi aplicado a todas as cartas desta sessão.",
           icon: <Check className="h-4 w-4 text-emerald-400" />,

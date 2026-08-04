@@ -334,7 +334,7 @@ export function powerupName(id: string): string {
   if (id === "powerup:extra_life" || id === "extra_life") return "Vida Extra";
   if (id === "powerup:reset_revisions" || id === "reset_revisions") return "Reset de Revisões";
   if (id === "powerup:double_arlys" || id === "double_arlys") return "Arlys em Dobro";
-  return "Power-up Especial";
+  return "Power-up";
 }
 
 export function powerupDesc(id: string): string {
