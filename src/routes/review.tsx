@@ -20,6 +20,7 @@ import {
   consumePowerup,
   grantPowerup,
   deactivatePowerup,
+  powerupName,
 } from "@/lib/wallet-store";
 import {
   enemyTier,
@@ -105,7 +106,6 @@ function Review() {
   const comboMult = comboMultiplier(combo.count);
 
   // Mesa de revisão equipada (skin da sessão)
-  const wallet = useWallet();
   const skin = tableSkinFromEquipped(wallet.equipped);
   const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
