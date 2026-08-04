@@ -124,7 +124,7 @@ function Review() {
 
   useEffect(() => {
     const active = wallet.activePowerup;
-    if (active === "lp_multiplier_2x" || active === "powerup:double_lp") {
+    if (active === "lp_multiplier_2x" || active === "powerup:double_lp" || active === "double_lp") {
       setSessionMultiplier(2);
     } else {
       setSessionMultiplier(1);
