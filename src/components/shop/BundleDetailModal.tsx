@@ -25,6 +25,7 @@ export function BundleDetailModal({
   splashUrl,
   artUrl,
   onPreview,
+  onBuyItem,
 }: {
   bundle: ShopItem;
   wallet: number;
