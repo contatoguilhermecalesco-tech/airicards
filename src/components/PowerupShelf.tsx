@@ -54,7 +54,7 @@ export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> 
               }`}
             >
               <div className={`grid h-5 w-5 place-items-center rounded-lg ${isActive ? "bg-primary/20" : "bg-white/10"}`}>
-                {(id === "lp_multiplier_2x" || id === "powerup:double_lp") ? (
+                {(id === "lp_multiplier_2x" || id === "powerup:double_lp" || id === "double_lp") ? (
                   <Zap className={`h-3 w-3 ${isActive ? "text-primary" : "text-white/60"}`} />
                 ) : (
                   <Shield className={`h-3 w-3 ${isActive ? "text-primary" : "text-white/60"}`} />
