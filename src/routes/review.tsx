@@ -115,11 +115,12 @@ function Review() {
   const [runStreak, setRunStreak] = useState(0);
 
   // Power-ups ativos na sessão
+  const [sessionMultiplier, setSessionMultiplier] = useState(1);
   const activePowerupLabel = useMemo(() => {
     const id = wallet.activePowerup;
     if (!id) return null;
     return powerupName(id);
-  }, [wallet.activePowerup]);
+  }, [wallet.activePowerup, wallet.loaded]); // Adicionado wallet.loaded para garantir atualização após load
 
   useEffect(() => {
     const active = wallet.activePowerup;
@@ -407,6 +408,13 @@ function Review() {
           : ""
       }`}
     >
+      {/* Indicador de Power-up Ativo — Notificação suspensa no canto superior */}
+      {activePowerupLabel && (
+        <div className="fixed right-5 top-5 z-[100] flex items-center gap-2.5 rounded-2xl border border-primary/40 bg-primary/10 px-4 py-2.5 text-[10px] font-bold text-primary shadow-[0_8px_32px_-8px_rgba(167,139,250,0.5)] backdrop-blur-2xl animate-in fade-in slide-in-from-right-4 duration-500">
+          <Zap className="h-3.5 w-3.5 fill-primary" strokeWidth={2.5} />
+          <span className="uppercase tracking-[0.2em]">{activePowerupLabel} ATIVO</span>
+        </div>
+      )}
 
 
       {/* Mesa de revisão equipada — ambiente temático */}
@@ -480,12 +488,6 @@ function Review() {
 
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          {activePowerupLabel && (
-            <div className="fixed right-6 top-6 z-[60] flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-[11px] font-bold text-primary shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-right-4 duration-500">
-              <Zap className="h-3.5 w-3.5 fill-primary" strokeWidth={2.5} />
-              <span className="uppercase tracking-[0.16em]">{activePowerupLabel} ATIVO</span>
-            </div>
-          )}
           {isEnemyRun ? (
             <Link
               to="/enemies"
