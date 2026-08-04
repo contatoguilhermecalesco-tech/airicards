@@ -106,15 +106,16 @@ function Review() {
   const comboMult = comboMultiplier(combo.count);
 
   // Mesa de revisão equipada (skin da sessão)
+  const wallet = useWallet();
   const skin = tableSkinFromEquipped(wallet.equipped);
   const enemySeal = enemySealFromEquipped(wallet.equipped);
   const skinned = !isDefaultTableSkin(skin);
   const [skinFlash, setSkinFlash] = useState<"hit" | "miss" | null>(null);
   const [impactSeed, setImpactSeed] = useState(0);
   const [runStreak, setRunStreak] = useState(0);
+
   // Power-ups ativos na sessão
   const [sessionMultiplier, setSessionMultiplier] = useState(1);
-  const wallet = useWallet();
   const activePowerupLabel = useMemo(() => {
     const id = wallet.activePowerup;
     if (!id) return null;
