@@ -115,7 +115,6 @@ function Review() {
   const [runStreak, setRunStreak] = useState(0);
 
   // Power-ups ativos na sessão
-  const [sessionMultiplier, setSessionMultiplier] = useState(1);
   const activePowerupLabel = useMemo(() => {
     const id = wallet.activePowerup;
     if (!id) return null;
