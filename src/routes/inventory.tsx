@@ -46,7 +46,7 @@ function InventoryPage() {
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-[32px] font-semibold tracking-tight text-foreground">
-              Inventário
+              Power-ups
             </h1>
             <p className="text-[14px] text-muted-foreground">
               Gerencie seus itens consumíveis e bônus ativos.
