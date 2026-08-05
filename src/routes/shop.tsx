@@ -109,6 +109,7 @@ type UnifiedItem = {
   raw: ShopItem | PublishedDeckRow;
   bundleItems?: string[]; // for future bundle payloads
   owner?: string; // decks
+  isBundled?: boolean; // Se pertence a algum bundle e deve ser omitido da listagem geral
 };
 
 const CATEGORIES: { id: Category; label: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }[] = [
@@ -201,7 +202,10 @@ function ShopPage() {
     (items ?? []).forEach((it) => {
       const kind = (it.kind as UnifiedItem["kind"]) ?? "pack";
       if (it.active === false) return; // bundles ocultos vêm só para o filtro acima
-      if (kind !== "bundle" && bundledIds.has(it.id)) return;
+      // IMPORTANTE: Removemos a trava que impedia itens de bundles de aparecerem na lista 'unified'
+      // para que handleBuyUnified encontre o item ao ser chamado pelo BundleDetailModal.
+      // A filtragem visual da 'Vitrine' continuará escondendo-os se o usuário preferir,
+      // mas eles precisam existir no mapeamento.
       list.push({
         id: it.id,
         kind,
@@ -216,6 +220,7 @@ function ShopPage() {
         bundleItems: Array.isArray((it.payload as { items?: unknown })?.items)
           ? ((it.payload as { items: string[] }).items ?? [])
           : undefined,
+        isBundled: bundledIds.has(it.id),
       });
     });
     (decks ?? [])
@@ -243,6 +248,10 @@ function ShopPage() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     let list = unified.filter((u) => {
+      // Itens que pertencem a bundles não aparecem soltos na loja, a menos que
+      // o usuário esteja filtrando especificamente por essa categoria ou pesquisando.
+      if (!needle && category === "all" && u.isBundled) return false;
+
       if (category !== "all" && u.kind !== category) return false;
       // Raridade só se aplica a cosméticos e bundles.
       if (
@@ -405,7 +414,7 @@ function ShopPage() {
   async function handleBuyUnified(u: UnifiedItem) {
     if (!profile || busy) return;
     // Bundles show a detail modal first — never buy silently.
-    if (u.kind === "bundle") {
+    if (u.kind === "bundle" && !u.isBundled) {
       setBundleOpen(u.raw as ShopItem);
       return;
     }
