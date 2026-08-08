@@ -68,7 +68,7 @@ const BUNDLE_ASSET_OVERRIDES = SHOP_ASSET_OVERRIDES;
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (search: Record<string, unknown>) => ({
-    b: typeof search.b === "string" ? search.b : undefined,
+    b: typeof search.b === "string" ? search.b : undefined as string | undefined,
   }),
   head: () => ({
     meta: [
@@ -180,7 +180,7 @@ function ShopPage() {
     const target = items.find((it) => it.id === search.b && it.kind === "bundle");
     if (target) setBundleOpen(target);
     // Clear the query param so refresh/close doesn't re-open.
-    router.navigate({ to: "/shop", search: {}, replace: true });
+    router.navigate({ to: "/shop", search: (prev: any) => ({ ...prev, b: undefined }), replace: true });
   }, [search.b, items, router]);
 
   const handlePreview = (u: UnifiedItem) => setPreview(u);
@@ -435,8 +435,11 @@ function ShopPage() {
     }
     const r = await buyShopItem(profile.id, u.raw as ShopItem);
     setBusy(null);
-    if (r.ok) celebrate(u, r.message);
-    else
+    if (r.ok) {
+      celebrate(u, r.message);
+      // Recarregar carteira para atualizar visualmente
+      void loadWallet(profile.id);
+    } else {
       toast(
         "err",
         r.reason === "insufficient"
@@ -445,6 +448,40 @@ function ShopPage() {
             ? "Você já tem este item."
             : "Não foi possível comprar.",
       );
+    }
+  }
+
+  async function handleBuyItemFromBundle(item: ShopItem) {
+    if (!profile || busy) return;
+    setBusy(item.id);
+    const r = await buyShopItem(profile.id, item);
+    setBusy(null);
+    if (r.ok) {
+      const u: UnifiedItem = {
+        id: item.id,
+        kind: (item.kind as UnifiedItem["kind"]) ?? "cosmetic",
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        accent: item.accent,
+        icon: item.icon,
+        rarity: rarityOfItem(item),
+        createdAt: 0,
+        raw: item,
+        isBundled: true,
+      };
+      celebrate(u, r.message);
+      void loadWallet(profile.id);
+    } else {
+      toast(
+        "err",
+        r.reason === "insufficient"
+          ? "Arlys insuficientes."
+          : r.reason === "already_owned"
+            ? "Você já tem este item."
+            : "Não foi possível comprar.",
+      );
+    }
   }
 
   async function confirmBuyBundle(item: ShopItem) {
@@ -456,6 +493,7 @@ function ShopPage() {
       const u = unified.find((x) => x.id === item.id);
       if (u) celebrate(u, r.message);
       setBundleOpen(null);
+      void loadWallet(profile.id);
     } else {
       toast(
         "err",
