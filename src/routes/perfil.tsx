@@ -905,6 +905,7 @@ function PerfilPage() {
           </div>
           <Link
             to="/shop"
+            search={{}}
             className="hidden shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-foreground/90 transition hover:bg-white/[0.08] sm:inline-flex"
           >
             <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />

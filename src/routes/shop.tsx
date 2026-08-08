@@ -68,7 +68,7 @@ const BUNDLE_ASSET_OVERRIDES = SHOP_ASSET_OVERRIDES;
 
 export const Route = createFileRoute("/shop")({
   validateSearch: (search: Record<string, unknown>) => ({
-    b: typeof search.b === "string" ? search.b : undefined,
+    b: typeof search.b === "string" ? search.b : undefined as string | undefined,
   }),
   head: () => ({
     meta: [
@@ -180,7 +180,7 @@ function ShopPage() {
     const target = items.find((it) => it.id === search.b && it.kind === "bundle");
     if (target) setBundleOpen(target);
     // Clear the query param so refresh/close doesn't re-open.
-    router.navigate({ to: "/shop", search: {}, replace: true });
+    router.navigate({ to: "/shop", search: (prev) => ({ ...prev, b: undefined }), replace: true });
   }, [search.b, items, router]);
 
   const handlePreview = (u: UnifiedItem) => setPreview(u);
