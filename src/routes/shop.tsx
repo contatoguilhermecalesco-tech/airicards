@@ -493,6 +493,7 @@ function ShopPage() {
       const u = unified.find((x) => x.id === item.id);
       if (u) celebrate(u, r.message);
       setBundleOpen(null);
+      void loadWallet(profile.id);
     } else {
       toast(
         "err",
