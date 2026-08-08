@@ -246,6 +246,12 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "nameplate:coroa_piscina": piscinaFrame,
   "table:mesa_piscina": piscinaTableAmbient,
   "streak_flame:chama_piscina": piscinaChama,
+
+  "decoration:catedral_sombras": monarcaAura,
+  "nameplate:coroa_gothica": monarcaFrame,
+  "effect:vitral_noturno": monarcaBackground,
+  "streak_flame:chama_eterea": monarcaOverlay,
+  "enemy_seal:selo_gothico": monarcaCardframe,
 };
 
 
