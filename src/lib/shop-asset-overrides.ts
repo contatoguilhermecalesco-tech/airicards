@@ -165,6 +165,13 @@ export const SHOP_ASSET_OVERRIDES: Record<string, ShopAssetOverride> = {
   "cosmetic.frame.coroa_piscina": { art: piscinaFrame },
   "cosmetic.table.mesa_piscina": { art: piscinaTableAmbient },
   "cosmetic.streak_flame.chama_piscina": { art: piscinaChama },
+  // Master bundle — Catedral de Sombras (Mítico)
+  "bundle.catedral_sombras": { splash: monarcaSplash, art: monarcaAura },
+  "cosmetic.aura.catedral_sombras": { art: monarcaAura },
+  "cosmetic.frame.coroa_gothica": { art: monarcaFrame },
+  "cosmetic.effect.vitral_noturno": { art: monarcaBackground },
+  "cosmetic.streak_flame.chama_eterea": { art: monarcaOverlay },
+  "cosmetic.enemy_seal.selo_gothico": { art: monarcaCardframe },
 };
 
 
@@ -239,6 +246,12 @@ export const EQUIPPED_ART_BY_KEY: Record<string, string> = {
   "nameplate:coroa_piscina": piscinaFrame,
   "table:mesa_piscina": piscinaTableAmbient,
   "streak_flame:chama_piscina": piscinaChama,
+
+  "decoration:catedral_sombras": monarcaAura,
+  "nameplate:coroa_gothica": monarcaFrame,
+  "effect:vitral_noturno": monarcaBackground,
+  "streak_flame:chama_eterea": monarcaOverlay,
+  "enemy_seal:selo_gothico": monarcaCardframe,
 };
 
 

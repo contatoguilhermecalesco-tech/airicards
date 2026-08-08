@@ -63,6 +63,8 @@ export const AURA_PROFILES: Record<string, AuraProfile> = {
 
   // Piscina Infinita — água azul-piscina e ouro
   piscina_infinita: { ring: "#22d3ee", secondary: "#fbbf24", kind: "dual", speed: "normal" },
+  // Catedral de Sombras — roxo catedral e azul profundo
+  catedral_sombras: { ring: "#af95df", secondary: "#1a1a2e", kind: "sparkle", speed: "slow" },
 };
 
 
