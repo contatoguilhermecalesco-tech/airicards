@@ -414,6 +414,14 @@ function BundleItemRow({
           <button
             onClick={(e) => {
               e.stopPropagation();
+              onBuyItem?.(item);
+            }}
+            disabled={busy || !canAfford}
+            className="rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold text-primary transition hover:bg-primary/20 disabled:opacity-30"
+          >
+            Comprar
+          </button>
+              e.stopPropagation();
               onBuyItem(item);
             }}
             disabled={busy || !canAfford}

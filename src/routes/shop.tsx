@@ -435,8 +435,11 @@ function ShopPage() {
     }
     const r = await buyShopItem(profile.id, u.raw as ShopItem);
     setBusy(null);
-    if (r.ok) celebrate(u, r.message);
-    else
+    if (r.ok) {
+      celebrate(u, r.message);
+      // Recarregar carteira para atualizar visualmente
+      void loadWallet(profile.id);
+    } else {
       toast(
         "err",
         r.reason === "insufficient"
@@ -445,6 +448,40 @@ function ShopPage() {
             ? "Você já tem este item."
             : "Não foi possível comprar.",
       );
+    }
+  }
+
+  async function handleBuyItemFromBundle(item: ShopItem) {
+    if (!profile || busy) return;
+    setBusy(item.id);
+    const r = await buyShopItem(profile.id, item);
+    setBusy(null);
+    if (r.ok) {
+      const u: UnifiedItem = {
+        id: item.id,
+        kind: (item.kind as UnifiedItem["kind"]) ?? "cosmetic",
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        accent: item.accent,
+        icon: item.icon,
+        rarity: rarityOfItem(item),
+        createdAt: 0,
+        raw: item,
+        isBundled: true,
+      };
+      celebrate(u, r.message);
+      void loadWallet(profile.id);
+    } else {
+      toast(
+        "err",
+        r.reason === "insufficient"
+          ? "Arlys insuficientes."
+          : r.reason === "already_owned"
+            ? "Você já tem este item."
+            : "Não foi possível comprar.",
+      );
+    }
   }
 
   async function confirmBuyBundle(item: ShopItem) {

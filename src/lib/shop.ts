@@ -287,6 +287,16 @@ export async function updateBundleChildItem(
   await updateShopItem(item.id, row);
 }
 
+/**
+ * Retorna os itens disponíveis na loja, incluindo os "secretos" que pertencem a bundles
+ * para que possam ser resolvidos por ID durante uma compra individual.
+ */
+export async function getShopMapping(): Promise<Map<string, ShopItem>> {
+  const all = await listAllShopItems();
+  return new Map(all.map((it) => [it.id, it]));
+}
+
+
 
 export async function buyPublishedDeck(
   profileId: string,
