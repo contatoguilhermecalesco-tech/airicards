@@ -180,7 +180,7 @@ function ShopPage() {
     const target = items.find((it) => it.id === search.b && it.kind === "bundle");
     if (target) setBundleOpen(target);
     // Clear the query param so refresh/close doesn't re-open.
-    router.navigate({ to: "/shop", search: (prev) => ({ ...prev, b: undefined }), replace: true });
+    router.navigate({ to: "/shop", search: (prev: any) => ({ ...prev, b: undefined }), replace: true });
   }, [search.b, items, router]);
 
   const handlePreview = (u: UnifiedItem) => setPreview(u);
