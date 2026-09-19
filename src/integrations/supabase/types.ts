@@ -465,6 +465,48 @@ export type Database = {
           },
         ]
       }
+      pokes: {
+        Row: {
+          created_at: string
+          emoji: string
+          from_profile: string
+          id: string
+          seen: boolean
+          to_profile: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string
+          from_profile: string
+          id?: string
+          seen?: boolean
+          to_profile: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          from_profile?: string
+          id?: string
+          seen?: boolean
+          to_profile?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokes_from_profile_fkey"
+            columns: ["from_profile"]
+            isOneToOne: false
+            referencedRelation: "app_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pokes_to_profile_fkey"
+            columns: ["to_profile"]
+            isOneToOne: false
+            referencedRelation: "app_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_data: {
         Row: {
           data: Json
