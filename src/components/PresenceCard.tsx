@@ -98,12 +98,15 @@ export function PresenceCard() {
             · {presence.label}
           </span>
         </div>
-        <Link
-          to="/duel"
-          className="flex items-center gap-1 text-[13px] font-medium text-primary hover:opacity-80"
-        >
-          Duelar <ChevronRight className="h-3 w-3" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <PokeButton targetId={otherId} />
+          <Link
+            to="/duel"
+            className="flex items-center gap-1 text-[13px] font-medium text-primary hover:opacity-80"
+          >
+            Duelar <ChevronRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
 
       {events.length === 0 ? (
