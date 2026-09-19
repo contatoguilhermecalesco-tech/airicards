@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Flame, Trophy, GraduationCap, Swords, Skull, ChevronRight } from "lucide-react";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { PokeButton } from "@/components/PokeButton";
 import { useCurrentProfile } from "@/lib/profile";
 import { useProfileSnapshot } from "@/lib/profile-view";
 import { formatPresence } from "@/lib/presence";
@@ -98,12 +99,15 @@ export function PresenceCard() {
             · {presence.label}
           </span>
         </div>
-        <Link
-          to="/duel"
-          className="flex items-center gap-1 text-[13px] font-medium text-primary hover:opacity-80"
-        >
-          Duelar <ChevronRight className="h-3 w-3" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <PokeButton targetId={otherId} />
+          <Link
+            to="/duel"
+            className="flex items-center gap-1 text-[13px] font-medium text-primary hover:opacity-80"
+          >
+            Duelar <ChevronRight className="h-3 w-3" />
+          </Link>
+        </div>
       </div>
 
       {events.length === 0 ? (

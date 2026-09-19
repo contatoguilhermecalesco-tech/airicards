@@ -37,6 +37,7 @@ import { AvatarCrown, NameplateTopCrown, getCrownArt, getCrownAccent } from "@/c
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";
+import { PokeButton } from "@/components/PokeButton";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
@@ -162,9 +163,7 @@ function PerfilViewer() {
           <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
           Meu perfil
         </Link>
-        <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">
-          Visualização
-        </span>
+        <PokeButton targetId={profile.id as any} />
       </div>
 
       {/* HERO */}
