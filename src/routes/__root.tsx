@@ -48,6 +48,9 @@ const OnboardingTour = lazy(() =>
 const GiftReceivedOverlay = lazy(() =>
   import("../components/GiftReceivedOverlay").then((m) => ({ default: m.GiftReceivedOverlay })),
 );
+const PokeOverlay = lazy(() =>
+  import("../components/PokeOverlay").then((m) => ({ default: m.PokeOverlay })),
+);
 import { useSocialSync } from "../lib/social-store";
 import { startActivityBridge } from "../lib/activity-bridge";
 import { loadWallet, useWallet } from "../lib/wallet-store";
