@@ -162,9 +162,7 @@ function PerfilViewer() {
           <ArrowLeft className="h-4 w-4" strokeWidth={2.5} />
           Meu perfil
         </Link>
-        <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">
-          Visualização
-        </span>
+        <PokeButton targetId={profile.id as any} />
       </div>
 
       {/* HERO */}
