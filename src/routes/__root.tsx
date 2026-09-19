@@ -810,6 +810,7 @@ function RootComponent() {
             <StreakChangeOverlay />
             <OnboardingTour />
             <GiftReceivedOverlay />
+            <PokeOverlay />
           </Suspense>
         </div>
       </ProfileGate>
