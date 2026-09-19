@@ -37,6 +37,7 @@ import { AvatarCrown, NameplateTopCrown, getCrownArt, getCrownAccent } from "@/c
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 import { SakuraPetals } from "@/components/SakuraPetals";
+import { PokeButton } from "@/components/PokeButton";
 
 export const Route = createFileRoute("/perfil_/$id")({
   head: () => ({
