@@ -55,7 +55,7 @@ type Tab = "inbox" | "activity" | "duel";
 
 function SocialPage() {
   const me = useCurrentProfile();
-  const [tab, setTab] = useState<Tab>("inbox");
+  const [tab, setTab] = useState<Tab>("activity");
 
   // Pre-carrega stats para comparação lado a lado.
   useEffect(() => { startSocialStatsSync(); }, []);
@@ -72,51 +72,35 @@ function SocialPage() {
   const duel = useWeeklyDuel();
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
     { id: "activity", label: "Feed", icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />, badge: feed.length || undefined },
+    { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
     { id: "duel", label: "Duelo", icon: <Swords className="h-4 w-4" strokeWidth={2.25} /> },
   ];
 
   return (
-    <div className="mx-auto max-w-3xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-6 sm:pb-10">
+    <div className="mx-auto max-w-xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-8 sm:pb-10">
       {/* Header */}
-      <header className="animate-fade-in mb-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Social
-        </p>
-        <div className="mt-1 flex items-center justify-between gap-3">
-          <h1 className="text-[28px] font-semibold tracking-tight text-foreground">
+      <header className="animate-fade-in mb-5 flex items-center justify-between gap-3 px-1">
+        <div>
+          <h1 className="text-[26px] font-bold tracking-tight text-foreground">Social</h1>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
             Você & {opp.name}
-          </h1>
-          <Link
-            to="/social/stats"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
-          >
-            <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
-            Comparar
-          </Link>
+          </p>
         </div>
-        <p className="mt-1 text-[14px] text-muted-foreground">
-          Presentes, feed e o duelo da semana.
-        </p>
+        <Link
+          to="/social/stats"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
+        >
+          <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
+          Comparar
+        </Link>
       </header>
 
-      {/* Quick strip */}
-      <div className="mb-5 grid grid-cols-3 gap-2">
-        <StatChip label="Presentes" value={pending.length} accent="from-primary/30 to-primary/5" />
-        <StatChip label="Enviados" value={sent.length} accent="from-fuchsia-400/25 to-fuchsia-500/5" />
-        <StatChip
-          label={`Duelo ${score.g}–${score.a}`}
-          value={duel ? (duel.status === "completed" ? "encerrado" : "ativo") : "—"}
-          accent="from-amber-300/25 to-amber-500/5"
-        />
-      </div>
-
-      {/* Tabs */}
+      {/* Tabs — segmento iOS */}
       <div
         role="tablist"
         aria-label="Seções sociais"
-        className="mb-5 flex gap-1 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1"
+        className="mb-6 flex gap-1 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-1"
       >
         {tabs.map((t) => {
           const active = tab === t.id;
@@ -126,16 +110,16 @@ function SocialPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(t.id)}
-              className={`tap-target relative flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-medium transition ${
+              className={`tap-target relative flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[13px] transition ${
                 active
-                  ? "bg-white/10 text-foreground shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary/25 font-semibold text-foreground shadow-sm"
+                  : "font-medium text-muted-foreground hover:text-foreground"
               }`}
             >
               {t.icon}
               <span>{t.label}</span>
               {t.badge ? (
-                <span className="ml-0.5 rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                <span className="ml-0.5 rounded-full bg-primary/25 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                   {t.badge}
                 </span>
               ) : null}
@@ -166,29 +150,39 @@ function SocialPage() {
                 </h2>
               </div>
               <ul className="space-y-2">
-                {sent.map((g) => (
-                  <li
-                    key={g.id}
-                    className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3"
-                  >
-                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.03]">
-                      {g.status === "imported" ? (
-                        <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} />
-                      ) : g.status === "declined" ? (
-                        <XIcon className="h-4 w-4 text-destructive" />
-                      ) : (
-                        <Gift className="h-4 w-4 text-primary" strokeWidth={2.25} />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-medium text-foreground">{g.front}</p>
-                      <p className="truncate text-[12px] text-muted-foreground">{g.back}</p>
-                    </div>
-                    <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      {g.status === "pending" ? "pendente" : g.status === "imported" ? "aceita" : "recusada"}
-                    </span>
-                  </li>
-                ))}
+                {sent.map((g) => {
+                  const pill =
+                    g.status === "imported"
+                      ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                      : g.status === "declined"
+                        ? "border-white/[0.06] bg-white/[0.03] text-muted-foreground"
+                        : "border-primary/30 bg-primary/10 text-primary";
+                  return (
+                    <li
+                      key={g.id}
+                      className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3"
+                    >
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/10">
+                        {g.status === "imported" ? (
+                          <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} />
+                        ) : g.status === "declined" ? (
+                          <XIcon className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Gift className="h-4 w-4 text-primary" strokeWidth={2.25} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-medium text-foreground">{g.front}</p>
+                        <p className="truncate text-[12px] text-muted-foreground">{g.back}</p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${pill}`}
+                      >
+                        {g.status === "pending" ? "pendente" : g.status === "imported" ? "aceita" : "recusada"}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
@@ -200,8 +194,14 @@ function SocialPage() {
       )}
 
       {tab === "activity" && (
-        <div className="animate-fade-in">
-          <UnifiedFeed meId={meId} />
+        <div className="animate-fade-in space-y-5">
+          <DuelMiniCard meId={meId} oppId={oppId} score={score} duel={duel} />
+          <div>
+            <h3 className="mb-3 px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              Recentes
+            </h3>
+            <UnifiedFeed meId={meId} />
+          </div>
         </div>
       )}
 
@@ -209,6 +209,78 @@ function SocialPage() {
         <DuelPanel meId={meId} oppId={oppId} score={score} duel={duel} />
       )}
     </div>
+  );
+}
+
+// Card de duelo compacto fixado no topo do feed.
+function DuelMiniCard({
+  meId,
+  oppId,
+  score,
+  duel,
+}: {
+  meId: ProfileId;
+  oppId: ProfileId;
+  score: { g: number; a: number };
+  duel: ReturnType<typeof useWeeklyDuel>;
+}) {
+  const me = profileMeta(meId);
+  const opp = profileMeta(oppId);
+  const myScore = meId === "guilherme" ? score.g : score.a;
+  const oppScore = meId === "guilherme" ? score.a : score.g;
+  const status =
+    duel && duel.status === "active"
+      ? "Em andamento"
+      : duel && duel.status === "completed"
+        ? "Encerrado"
+        : "Sem rodada";
+
+  return (
+    <Link
+      to="/duel"
+      className="group relative block overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/60 p-5 shadow-[0_16px_40px_-16px_hsl(var(--primary)/0.6)] transition active:scale-[0.99]"
+    >
+      <div className="pointer-events-none absolute -right-6 -top-8 opacity-15">
+        <Swords className="h-24 w-24 text-primary-foreground" strokeWidth={1.5} />
+      </div>
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-foreground/70">
+          Duelo da semana
+        </span>
+        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
+          {status}
+        </span>
+      </div>
+      <div className="relative flex items-center justify-between">
+        <div className="flex flex-col items-center gap-1.5">
+          <ProfileAvatar
+            profileId={me.id}
+            initial={me.initial}
+            gradient={me.gradient}
+            size={52}
+            radius={18}
+            fontScale={0.34}
+            className="ring-2 ring-white/30 shadow-lg"
+          />
+          <p className="text-[11px] font-semibold text-primary-foreground">{me.name}</p>
+          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{myScore}</p>
+        </div>
+        <span className="text-[18px] font-black italic text-primary-foreground/50">VS</span>
+        <div className="flex flex-col items-center gap-1.5">
+          <ProfileAvatar
+            profileId={opp.id}
+            initial={opp.initial}
+            gradient={opp.gradient}
+            size={52}
+            radius={18}
+            fontScale={0.34}
+            className="ring-2 ring-white/30 shadow-lg"
+          />
+          <p className="text-[11px] font-semibold text-primary-foreground">{opp.name}</p>
+          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{oppScore}</p>
+        </div>
+      </div>
+    </Link>
   );
 }
 
