@@ -150,29 +150,39 @@ function SocialPage() {
                 </h2>
               </div>
               <ul className="space-y-2">
-                {sent.map((g) => (
-                  <li
-                    key={g.id}
-                    className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3"
-                  >
-                    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.06] bg-white/[0.03]">
-                      {g.status === "imported" ? (
-                        <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} />
-                      ) : g.status === "declined" ? (
-                        <XIcon className="h-4 w-4 text-destructive" />
-                      ) : (
-                        <Gift className="h-4 w-4 text-primary" strokeWidth={2.25} />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-medium text-foreground">{g.front}</p>
-                      <p className="truncate text-[12px] text-muted-foreground">{g.back}</p>
-                    </div>
-                    <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      {g.status === "pending" ? "pendente" : g.status === "imported" ? "aceita" : "recusada"}
-                    </span>
-                  </li>
-                ))}
+                {sent.map((g) => {
+                  const pill =
+                    g.status === "imported"
+                      ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+                      : g.status === "declined"
+                        ? "border-white/[0.06] bg-white/[0.03] text-muted-foreground"
+                        : "border-primary/30 bg-primary/10 text-primary";
+                  return (
+                    <li
+                      key={g.id}
+                      className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3"
+                    >
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/10">
+                        {g.status === "imported" ? (
+                          <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} />
+                        ) : g.status === "declined" ? (
+                          <XIcon className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Gift className="h-4 w-4 text-primary" strokeWidth={2.25} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-medium text-foreground">{g.front}</p>
+                        <p className="truncate text-[12px] text-muted-foreground">{g.back}</p>
+                      </div>
+                      <span
+                        className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${pill}`}
+                      >
+                        {g.status === "pending" ? "pendente" : g.status === "imported" ? "aceita" : "recusada"}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}
@@ -184,8 +194,14 @@ function SocialPage() {
       )}
 
       {tab === "activity" && (
-        <div className="animate-fade-in">
-          <UnifiedFeed meId={meId} />
+        <div className="animate-fade-in space-y-5">
+          <DuelMiniCard meId={meId} oppId={oppId} score={score} duel={duel} />
+          <div>
+            <h3 className="mb-3 px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+              Recentes
+            </h3>
+            <UnifiedFeed meId={meId} />
+          </div>
         </div>
       )}
 
@@ -193,6 +209,78 @@ function SocialPage() {
         <DuelPanel meId={meId} oppId={oppId} score={score} duel={duel} />
       )}
     </div>
+  );
+}
+
+// Card de duelo compacto fixado no topo do feed.
+function DuelMiniCard({
+  meId,
+  oppId,
+  score,
+  duel,
+}: {
+  meId: ProfileId;
+  oppId: ProfileId;
+  score: { g: number; a: number };
+  duel: ReturnType<typeof useWeeklyDuel>;
+}) {
+  const me = profileMeta(meId);
+  const opp = profileMeta(oppId);
+  const myScore = meId === "guilherme" ? score.g : score.a;
+  const oppScore = meId === "guilherme" ? score.a : score.g;
+  const status =
+    duel && duel.status === "active"
+      ? "Em andamento"
+      : duel && duel.status === "completed"
+        ? "Encerrado"
+        : "Sem rodada";
+
+  return (
+    <Link
+      to="/duel"
+      className="group relative block overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/60 p-5 shadow-[0_16px_40px_-16px_hsl(var(--primary)/0.6)] transition active:scale-[0.99]"
+    >
+      <div className="pointer-events-none absolute -right-6 -top-8 opacity-15">
+        <Swords className="h-24 w-24 text-primary-foreground" strokeWidth={1.5} />
+      </div>
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-foreground/70">
+          Duelo da semana
+        </span>
+        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
+          {status}
+        </span>
+      </div>
+      <div className="relative flex items-center justify-between">
+        <div className="flex flex-col items-center gap-1.5">
+          <ProfileAvatar
+            profileId={me.id}
+            initial={me.initial}
+            gradient={me.gradient}
+            size={52}
+            radius={18}
+            fontScale={0.34}
+            className="ring-2 ring-white/30 shadow-lg"
+          />
+          <p className="text-[11px] font-semibold text-primary-foreground">{me.name}</p>
+          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{myScore}</p>
+        </div>
+        <span className="text-[18px] font-black italic text-primary-foreground/50">VS</span>
+        <div className="flex flex-col items-center gap-1.5">
+          <ProfileAvatar
+            profileId={opp.id}
+            initial={opp.initial}
+            gradient={opp.gradient}
+            size={52}
+            radius={18}
+            fontScale={0.34}
+            className="ring-2 ring-white/30 shadow-lg"
+          />
+          <p className="text-[11px] font-semibold text-primary-foreground">{opp.name}</p>
+          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{oppScore}</p>
+        </div>
+      </div>
+    </Link>
   );
 }
 
