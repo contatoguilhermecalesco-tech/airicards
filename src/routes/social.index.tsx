@@ -55,7 +55,7 @@ type Tab = "inbox" | "activity" | "duel";
 
 function SocialPage() {
   const me = useCurrentProfile();
-  const [tab, setTab] = useState<Tab>("inbox");
+  const [tab, setTab] = useState<Tab>("activity");
 
   // Pre-carrega stats para comparação lado a lado.
   useEffect(() => { startSocialStatsSync(); }, []);
@@ -72,51 +72,35 @@ function SocialPage() {
   const duel = useWeeklyDuel();
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
     { id: "activity", label: "Feed", icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />, badge: feed.length || undefined },
+    { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
     { id: "duel", label: "Duelo", icon: <Swords className="h-4 w-4" strokeWidth={2.25} /> },
   ];
 
   return (
-    <div className="mx-auto max-w-3xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-6 sm:pb-10">
+    <div className="mx-auto max-w-xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-8 sm:pb-10">
       {/* Header */}
-      <header className="animate-fade-in mb-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          Social
-        </p>
-        <div className="mt-1 flex items-center justify-between gap-3">
-          <h1 className="text-[28px] font-semibold tracking-tight text-foreground">
+      <header className="animate-fade-in mb-5 flex items-center justify-between gap-3 px-1">
+        <div>
+          <h1 className="text-[26px] font-bold tracking-tight text-foreground">Social</h1>
+          <p className="mt-0.5 text-[13px] text-muted-foreground">
             Você & {opp.name}
-          </h1>
-          <Link
-            to="/social/stats"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
-          >
-            <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
-            Comparar
-          </Link>
+          </p>
         </div>
-        <p className="mt-1 text-[14px] text-muted-foreground">
-          Presentes, feed e o duelo da semana.
-        </p>
+        <Link
+          to="/social/stats"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
+        >
+          <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
+          Comparar
+        </Link>
       </header>
 
-      {/* Quick strip */}
-      <div className="mb-5 grid grid-cols-3 gap-2">
-        <StatChip label="Presentes" value={pending.length} accent="from-primary/30 to-primary/5" />
-        <StatChip label="Enviados" value={sent.length} accent="from-fuchsia-400/25 to-fuchsia-500/5" />
-        <StatChip
-          label={`Duelo ${score.g}–${score.a}`}
-          value={duel ? (duel.status === "completed" ? "encerrado" : "ativo") : "—"}
-          accent="from-amber-300/25 to-amber-500/5"
-        />
-      </div>
-
-      {/* Tabs */}
+      {/* Tabs — segmento iOS */}
       <div
         role="tablist"
         aria-label="Seções sociais"
-        className="mb-5 flex gap-1 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1"
+        className="mb-6 flex gap-1 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-1"
       >
         {tabs.map((t) => {
           const active = tab === t.id;
@@ -126,16 +110,16 @@ function SocialPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(t.id)}
-              className={`tap-target relative flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[13px] font-medium transition ${
+              className={`tap-target relative flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[13px] transition ${
                 active
-                  ? "bg-white/10 text-foreground shadow-[0_1px_0_rgba(255,255,255,0.08)_inset]"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary/25 font-semibold text-foreground shadow-sm"
+                  : "font-medium text-muted-foreground hover:text-foreground"
               }`}
             >
               {t.icon}
               <span>{t.label}</span>
               {t.badge ? (
-                <span className="ml-0.5 rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                <span className="ml-0.5 rounded-full bg-primary/25 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
                   {t.badge}
                 </span>
               ) : null}
