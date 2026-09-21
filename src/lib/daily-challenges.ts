@@ -8,6 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
 import { earn } from "@/lib/wallet-store";
 import { getRank, TIER_ORDER, subscribeAllRanks } from "@/lib/rank-store";
+import {
+  missionTrackReview,
+  missionTrackEnemyDefeated,
+  missionTrackWriting,
+  missionTrackDuel,
+} from "@/lib/daily-missions";
 
 export type JourneyStepType =
   | "review_n"
