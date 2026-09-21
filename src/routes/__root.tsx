@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Target, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -237,6 +237,14 @@ function RankPill() {
 }
 
 const MORE_ITEMS = [
+  {
+    to: "/desafios",
+    label: "Desafios diários",
+    description: "Missões de hoje por Arlys ✦ e LP",
+    icon: Target,
+    color: "#34d399",
+    matcher: (p: string) => p.startsWith("/desafios"),
+  },
   {
     to: "/perfil",
     label: "Meu perfil",

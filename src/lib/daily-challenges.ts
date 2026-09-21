@@ -8,6 +8,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile, subscribeProfile } from "@/lib/profile";
 import { earn } from "@/lib/wallet-store";
 import { getRank, TIER_ORDER, subscribeAllRanks } from "@/lib/rank-store";
+import {
+  missionTrackReview,
+  missionTrackEnemyDefeated,
+  missionTrackWriting,
+  missionTrackDuel,
+} from "@/lib/daily-missions";
 
 export type JourneyStepType =
   | "review_n"
@@ -216,16 +222,19 @@ function bump(type: JourneyStepType, amount = 1) {
 export function trackReview(correct: boolean) {
   bump("review_n", 1);
   if (correct) bump("correct_n", 1);
+  missionTrackReview(correct);
 }
 export function trackEnemyDefeated() {
   bump("defeat_enemies", 1);
+  missionTrackEnemyDefeated();
 }
-// Desafio de escrita retirado da jornada — mantido como no-op para compatibilidade.
+// Desafio de escrita retirado da jornada — segue alimentando os desafios diários.
 export function trackWritingComplete() {
-  /* no-op */
+  missionTrackWriting();
 }
 export function trackDuelWin() {
   bump("win_duel", 1);
+  missionTrackDuel();
 }
 // Removido: `trackStudyMinutes` não faz mais sentido sem prazo.
 export function trackStudyMinutes(_minutes: number) {

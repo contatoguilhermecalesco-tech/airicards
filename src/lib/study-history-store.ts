@@ -171,6 +171,7 @@ export function addStudyEntry(
   buckets = { ...buckets, [subject]: [entry, ...buckets[subject]] };
   emit();
   scheduleSave();
+  void import("@/lib/daily-missions").then((m) => m.missionTrackStudySession());
   // Jornada Compartilhada: qualquer sessão de estudo move o barco do casal.
   return entry;
 }
