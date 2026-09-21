@@ -238,6 +238,14 @@ function RankPill() {
 
 const MORE_ITEMS = [
   {
+    to: "/desafios",
+    label: "Desafios diários",
+    description: "Missões de hoje por Arlys ✦ e LP",
+    icon: Target,
+    color: "#34d399",
+    matcher: (p: string) => p.startsWith("/desafios"),
+  },
+  {
     to: "/perfil",
     label: "Meu perfil",
     description: "Cosméticos equipados e vitrine",
