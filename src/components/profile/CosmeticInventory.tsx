@@ -105,7 +105,7 @@ export function CosmeticInventory({
   return (
     <>
       {/* ---------- grade compacta de slots ---------- */}
-      <ul className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-profile-panel sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
         {slotOrder.map((slot) => {
           const meta = slotMeta[slot];
           const item = equippedItem[slot];
@@ -118,18 +118,17 @@ export function CosmeticInventory({
               <button
                 type="button"
                 onClick={() => openSlot(slot)}
-                className="group relative flex w-full items-center gap-2.5 overflow-hidden rounded-2xl border border-white/10 p-2.5 text-left transition hover:border-white/20"
-                style={{ background: "#1e1f22" }}
+                className="group relative flex w-full items-center gap-3 overflow-hidden p-3 text-left transition hover:bg-profile-raised sm:min-h-[82px] sm:border-b sm:border-border"
               >
                 {palette && (
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 opacity-25 transition group-hover:opacity-40"
+                    className="pointer-events-none absolute inset-y-0 left-0 w-1 opacity-80 transition group-hover:opacity-100"
                     style={{ background: palette.gradient }}
                   />
                 )}
                 <span
-                  className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/10 bg-black/40"
+                  className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-md border border-border bg-profile-base"
                 >
                   <ItemArt art={art} Icon={Icon} size={34} />
                 </span>

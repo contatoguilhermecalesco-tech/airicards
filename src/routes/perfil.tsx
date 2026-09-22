@@ -60,6 +60,7 @@ import { titleFromEquipped } from "@/lib/eclipse-cosmetics";
 import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -325,17 +326,9 @@ function PerfilPage() {
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
   const [activityOpen, setActivityOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Parallax suave — reagimos ao scroll do window.
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   async function onPickAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -501,7 +494,7 @@ function PerfilPage() {
   const totalEquipped = Object.keys(wallet.equipped).length;
 
   return (
-    <main className="mx-auto max-w-4xl px-[clamp(0.75rem,4vw,1.5rem)] py-6">
+    <main className="profile-page mx-auto max-w-6xl px-[clamp(0.75rem,4vw,1.5rem)] py-6">
       <Link
         to="/"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
@@ -518,15 +511,14 @@ function PerfilPage() {
 
       {/* ============ HERO (parallax + status) ============ */}
       <section
-        className="relative overflow-hidden rounded-3xl border border-black/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
-        style={{ background: "#232428" }}
+        className="relative overflow-hidden rounded-2xl border border-border bg-profile-panel shadow-[0_24px_60px_-32px_var(--profile-shadow)]"
       >
         {/* Banner com parallax suave (translateY em função do scroll) */}
         <div
-          className={`relative h-[190px] w-full overflow-hidden sm:h-[220px] ${
+          className={`relative h-[150px] w-full overflow-hidden sm:h-[184px] ${
             showBanner ? "cosmetic-banner-animated" : ""
           }`}
-          style={{ background: "#1a1b1e" }}
+          style={{ background: "var(--profile-base)" }}
         >
           <div
             aria-hidden
@@ -535,26 +527,7 @@ function PerfilPage() {
               background: showBanner
                 ? heroPalette.gradient
                 : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
-              transform: `translate3d(0, ${scrollY * 0.35}px, 0) scale(${1 + Math.min(scrollY, 300) * 0.0006})`,
-            }}
-          />
-          {/* orbes de profundidade — reagem em direção oposta */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -left-16 -top-10 h-64 w-64 rounded-full opacity-70 will-change-transform"
-            style={{
-              background: `radial-gradient(circle, ${heroPalette.ring}66, transparent 65%)`,
-              filter: "blur(30px)",
-              transform: `translate3d(0, ${scrollY * -0.15}px, 0)`,
-            }}
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -right-16 bottom-0 h-48 w-48 rounded-full opacity-60 will-change-transform"
-            style={{
-              background: `radial-gradient(circle, ${avatarRing}55, transparent 65%)`,
-              filter: "blur(24px)",
-              transform: `translate3d(0, ${scrollY * -0.08}px, 0)`,
+               transform: "scale(1.01)",
             }}
           />
           {showBanner && (
@@ -633,7 +606,7 @@ function PerfilPage() {
           />
 
           {/* Status pill flutuante (top-right) */}
-          <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 backdrop-blur-md">
+           <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-md border border-border bg-profile-base/80 px-2.5 py-1 backdrop-blur-md">
             <span
               className="relative inline-flex h-1.5 w-1.5"
               aria-hidden
@@ -655,7 +628,7 @@ function PerfilPage() {
             }`}
             style={{
               padding: 6,
-              background: "#232428",
+               background: "var(--profile-panel)",
               boxShadow: `0 12px 30px -8px ${avatarRing}55`,
             }}
           >
@@ -755,8 +728,8 @@ function PerfilPage() {
 
 
         {/* Info */}
-        <div className="px-5 pb-5 pt-14 sm:px-6 sm:pb-6 sm:pt-16">
-          <div className="rounded-xl p-4 sm:p-5" style={{ background: "#111214" }}>
+         <div className="px-5 pb-6 pt-14 sm:px-7 sm:pb-7 sm:pt-16">
+           <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[20px] font-bold leading-tight text-white sm:text-[22px]">
                 {profile?.name ?? "…"}
@@ -798,7 +771,7 @@ function PerfilPage() {
               </div>
             )}
 
-            <div className="mt-3 h-px w-full" style={{ background: "#2b2d31" }} />
+            <div className="mt-4 h-px w-full bg-border" />
 
             <div className="mt-3 flex items-center justify-between">
               <p className="text-[11px] font-bold uppercase tracking-wider text-white/80">
@@ -862,7 +835,7 @@ function PerfilPage() {
             <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
               Membro airi
             </p>
-            <div className="mt-1 grid grid-cols-2 gap-2 sm:grid-cols-4">
+             <div className="mt-2 grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-lg border border-border bg-profile-base sm:grid-cols-4 sm:divide-y-0">
               <StatChip
                 label={rank ? TIER_LABEL[rank.tier] : "Sem rank"}
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
@@ -892,8 +865,9 @@ function PerfilPage() {
         </div>
       </section>
 
-      {/* ============ SLOTS ============ */}
-      <section className="mt-6">
+       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+       {/* ============ SLOTS ============ */}
+       <section className="min-w-0">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-[18px] font-semibold tracking-tight text-foreground sm:text-[20px]">
@@ -906,7 +880,7 @@ function PerfilPage() {
           <Link
             to="/shop"
             search={{ b: undefined }}
-            className="hidden shrink-0 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold text-foreground/90 transition hover:bg-white/[0.08] sm:inline-flex"
+            className="hidden shrink-0 items-center gap-1.5 rounded-md border border-border bg-profile-panel px-3 py-1.5 text-[11px] font-semibold text-foreground/90 transition hover:bg-profile-raised sm:inline-flex"
           >
             <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />
             Loja
@@ -929,13 +903,15 @@ function PerfilPage() {
       </section>
 
 
+      <aside className="space-y-3 lg:sticky lg:top-24">
       {/* ============ ACTIVITY TIMELINE (modal) ============ */}
       {profile && (
-        <section className="mt-6">
-          <button
+         <section>
+           <Button
             type="button"
             onClick={() => setActivityOpen(true)}
-            className="group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-left transition hover:bg-white/[0.05]"
+             variant="ghost"
+             className="group h-auto w-full justify-start gap-3 rounded-lg border border-border bg-profile-panel p-4 text-left hover:bg-profile-raised"
           >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
               <Zap className="h-4 w-4" strokeWidth={2.25} />
@@ -952,7 +928,7 @@ function PerfilPage() {
               className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
               strokeWidth={2.5}
             />
-          </button>
+           </Button>
 
           <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
             <DialogContent className="max-w-lg overflow-hidden border-white/10 p-0" style={{ background: "#141317" }}>
@@ -975,11 +951,11 @@ function PerfilPage() {
 
       {/* ============ PARTNER LINK ============ */}
       {partner && (
-        <section className="mt-6">
+         <section>
           <Link
             to="/perfil/$id"
             params={{ id: partner.id }}
-            className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:bg-white/[0.05]"
+             className="group flex items-center gap-3 rounded-lg border border-border bg-profile-panel p-4 transition hover:bg-profile-raised"
           >
             <ProfileAvatar
               profileId={partner.id}
@@ -1011,7 +987,7 @@ function PerfilPage() {
 
 
       {/* ============ HELP FOOTER ============ */}
-      <section className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+       <section className="border-t border-border px-1 pt-4">
         <div className="flex items-start gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
             <UserRound className="h-4 w-4" strokeWidth={2.25} />
@@ -1019,14 +995,13 @@ function PerfilPage() {
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-foreground">Onde meu perfil aparece?</p>
             <p className="mt-1 text-[12px] leading-snug text-muted-foreground">
-              Esta é a sua vitrine airi. Todo cosmético que você compra na loja fica guardado aqui e
-              pode ser equipado nos 6 slots (nameplate, decoração, badge, efeito, véu e
-              companheiro). O banner e a aura acompanham você em previews sociais, no perfil e ao
-              compartilhar conquistas.
+               Seus cosméticos equipados aparecem no perfil, nas interações sociais e ao compartilhar conquistas.
             </p>
           </div>
         </div>
-      </section>
+       </section>
+       </aside>
+       </div>
     </main>
   );
 }

@@ -38,6 +38,9 @@
   --color-ring: var(--ring);
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
+  --color-profile-base: var(--profile-base);
+  --color-profile-panel: var(--profile-panel);
+  --color-profile-raised: var(--profile-raised);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "SF Pro Display",
     "SF Pro Text", "Helvetica Neue", sans-serif;
@@ -91,6 +94,23 @@
   --border: oklch(1 0 0 / 0.065);
   --input: oklch(1 0 0 / 0.085);
   --ring: oklch(0.72 0.11 300 / 0.5);
+
+  /* Perfil social: Discord refinado, sem alterar o restante do app. */
+  --profile-base: oklch(0.177 0.004 265);
+  --profile-panel: oklch(0.226 0.006 265);
+  --profile-raised: oklch(0.273 0.007 265);
+  --profile-shadow: oklch(0 0 0 / 0.72);
+}
+
+.profile-page {
+  font-family: "Manrope", var(--font-sans);
+}
+
+.profile-page h1,
+.profile-page h2,
+.profile-page h3 {
+  font-family: "Sora", var(--font-display);
+  letter-spacing: 0;
 }
 
 .dark {
