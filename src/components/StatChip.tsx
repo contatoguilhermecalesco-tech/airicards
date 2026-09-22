@@ -40,6 +40,7 @@ export function StatChip({
   color,
   accent,
   render,
+  flat = false,
 }: {
   icon?: IconType;
   label: string;
@@ -49,18 +50,20 @@ export function StatChip({
   accent?: boolean;
   /** Optional custom visual (e.g. a RankEmblem SVG) rendered inside the icon tile */
   render?: React.ReactNode;
+  /** Removes the nested-card treatment when used inside a grouped stats strip. */
+  flat?: boolean;
 }) {
   return (
     <div
-      className="group relative flex flex-col gap-1.5 rounded-xl p-2 shadow-lg transition-colors"
+      className={`group relative flex flex-col gap-1.5 p-2.5 transition-colors ${flat ? "rounded-none shadow-none" : "rounded-xl shadow-lg"}`}
       style={{
-        background: "rgba(255,255,255,0.05)",
-        border: `1px solid ${accent ? `${color}44` : "rgba(255,255,255,0.10)"}`,
+        background: flat ? "transparent" : "rgba(255,255,255,0.05)",
+        border: flat ? "none" : `1px solid ${accent ? `${color}44` : "rgba(255,255,255,0.10)"}`,
       }}
     >
       {/* Icon tile — compact, fixed height */}
       <div
-        className="relative flex h-11 w-full items-center justify-center overflow-hidden rounded-lg"
+        className={`relative flex h-11 w-full items-center justify-center overflow-hidden ${flat ? "rounded-md" : "rounded-lg"}`}
         style={{
           background: `linear-gradient(135deg, ${color}2e 0%, ${color}10 100%)`,
           boxShadow: "inset 0 1px 1px rgba(255,255,255,0.10)",
