@@ -841,24 +841,27 @@ function PerfilPage() {
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
                 color={rank ? TIER_COLORS[rank.tier].ring : "#fbbf24"}
                 accent
+                 flat
                 render={
                   rank ? (
                     <RankEmblem tier={rank.tier} division={rank.division} size={44} />
                   ) : null
                 }
               />
-              <StatChip icon={ArlysIcon} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" accent />
+               <StatChip icon={ArlysIcon} label="Arlys ✦" value={wallet.crystals.toString()} color="#a78bfa" accent flat />
               <StatChip
                 icon={Sparkles}
                 label="Cosméticos"
                 value={`${totalEquipped}/${totalOwned}`}
                 color="#38bdf8"
+                 flat
               />
               <StatChip
                 icon={Flame}
                 label="LP"
                 value={rank ? `${rank.lp}` : "—"}
                 color="#f87171"
+                 flat
               />
             </div>
           </div>
