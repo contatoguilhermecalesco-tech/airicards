@@ -509,13 +509,13 @@ function PerfilPage() {
         </div>
       )}
 
-      {/* ============ HERO (parallax + status) ============ */}
+      <div className="grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)]">
+      {/* ============ PROFILE PREVIEW ============ */}
       <section
-        className="relative overflow-hidden rounded-2xl border border-border bg-profile-panel shadow-[0_24px_60px_-32px_var(--profile-shadow)]"
+        className="relative overflow-hidden rounded-lg border border-border bg-profile-panel shadow-[0_24px_60px_-32px_var(--profile-shadow)] lg:sticky lg:top-24"
       >
-        {/* Banner com parallax suave (translateY em função do scroll) */}
         <div
-          className={`relative h-[150px] w-full overflow-hidden sm:h-[184px] ${
+          className={`relative h-[128px] w-full overflow-hidden sm:h-[144px] ${
             showBanner ? "cosmetic-banner-animated" : ""
           }`}
           style={{ background: "var(--profile-base)" }}
@@ -623,7 +623,7 @@ function PerfilPage() {
         {/* Avatar + upload */}
         <div className="relative px-5 sm:px-6">
           <div
-            className={`group absolute -top-[60px] left-5 rounded-full sm:left-6 ${
+             className={`group absolute -top-[52px] left-5 rounded-full sm:left-6 ${
               showDecoration ? "cosmetic-avatar-float" : ""
             }`}
             style={{
@@ -643,7 +643,7 @@ function PerfilPage() {
               />
             )}
             <DiscordAvatar
-              size={112}
+              size={96}
               ring={avatarRing}
               showDecoration={showDecoration}
               initial={initial}
@@ -681,15 +681,15 @@ function PerfilPage() {
             )}
             {/* Coroa (nameplate) — apoiada no topo do avatar */}
             {crownArt ? (
-              <AvatarCrown crown={crownArt} size={112} />
+               <AvatarCrown crown={crownArt} size={96} />
             ) : nameplateArt ? (
-              <NameplateTopCrown art={nameplateArt} size={112} />
+               <NameplateTopCrown art={nameplateArt} size={96} />
             ) : null}
           </div>
 
           {companion && (
-            <div
-              className="pointer-events-none absolute -top-[52px] right-3 z-10 h-[92px] w-[92px] sm:right-5 sm:h-[104px] sm:w-[104px]"
+           <div
+               className="pointer-events-none absolute -top-[44px] right-3 z-10 h-[82px] w-[82px] sm:right-5 sm:h-[92px] sm:w-[92px]"
               aria-hidden
             >
               <div
@@ -728,7 +728,7 @@ function PerfilPage() {
 
 
         {/* Info */}
-         <div className="px-5 pb-6 pt-14 sm:px-7 sm:pb-7 sm:pt-16">
+         <div className="px-5 pb-6 pt-12 sm:px-6 sm:pt-14">
            <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[20px] font-bold leading-tight text-white sm:text-[22px]">
@@ -835,7 +835,7 @@ function PerfilPage() {
             <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-white/80">
               Membro airi
             </p>
-             <div className="mt-2 grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-lg border border-border bg-profile-base sm:grid-cols-4 sm:divide-y-0">
+             <div className="mt-2 grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-md border border-border bg-profile-base">
               <StatChip
                 label={rank ? TIER_LABEL[rank.tier] : "Sem rank"}
                 value={rank && rank.division !== null ? DIVISION_ROMAN[rank.division] : ""}
@@ -868,7 +868,16 @@ function PerfilPage() {
         </div>
       </section>
 
-       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+       <div className="min-w-0">
+       <div className="mb-5 border-b border-border">
+         <div className="flex min-w-0 items-center gap-6 overflow-x-auto">
+           <span className="relative shrink-0 pb-3 text-[13px] font-semibold text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary">
+             Perfil
+           </span>
+           <span className="shrink-0 pb-3 text-[13px] font-semibold text-muted-foreground">Atividade</span>
+           <span className="shrink-0 pb-3 text-[13px] font-semibold text-muted-foreground">Conquistas</span>
+         </div>
+       </div>
        {/* ============ SLOTS ============ */}
        <section className="min-w-0">
         <div className="flex items-end justify-between">
@@ -906,7 +915,7 @@ function PerfilPage() {
       </section>
 
 
-      <aside className="space-y-3 lg:sticky lg:top-24">
+       <aside className="mt-6 grid gap-3 sm:grid-cols-2">
       {/* ============ ACTIVITY TIMELINE (modal) ============ */}
       {profile && (
          <section>
@@ -1004,6 +1013,7 @@ function PerfilPage() {
         </div>
        </section>
        </aside>
+       </div>
        </div>
     </main>
   );
