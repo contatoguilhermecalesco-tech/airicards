@@ -2,7 +2,7 @@
 // Mostra uma grade compacta com os 12 slots (só o que está equipado) e abre
 // um modal estilo "inventário de jogo" para trocar itens por slot.
 import { useMemo, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Search, Sparkles, ShoppingBag, X } from "lucide-react";
+import { Check, ChevronRight, Search, Sparkles, ShoppingBag, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -94,68 +94,38 @@ export function CosmeticInventory({
 
   const activeMeta = slotMeta[activeSlot];
   const activeEquippedKey = equippedKeys[activeSlot];
-  const slotIndex = Math.max(0, slotOrder.indexOf(activeSlot));
-
-  function goSlot(dir: -1 | 1) {
-    const next = (slotIndex + dir + slotOrder.length) % slotOrder.length;
-    setActiveSlot(slotOrder[next]);
-    setQuery("");
-  }
 
   return (
     <>
-      {/* ---------- grade compacta de slots ---------- */}
-      <ul className="mt-4 divide-y divide-border overflow-hidden rounded-lg border border-border bg-profile-panel sm:grid sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-3">
-        {slotOrder.map((slot) => {
-          const meta = slotMeta[slot];
-          const item = equippedItem[slot];
-          const owned = ownedBySlot[slot].length;
-          const art = getEquippedArt(equippedKeys[slot]);
-          const palette = item ? paletteFor(item.accent) : null;
-          const Icon = item ? iconFor(item) : meta.icon;
-          return (
-            <li key={slot}>
-              <button
-                type="button"
-                onClick={() => openSlot(slot)}
-                className="group relative flex w-full items-center gap-3 overflow-hidden p-3 text-left transition hover:bg-profile-raised sm:min-h-[82px] sm:border-b sm:border-border"
+      {/* ---------- acesso único ao inventário ---------- */}
+      <button
+        type="button"
+        onClick={() => openSlot(slotOrder[0])}
+        className="group mt-4 flex w-full items-center gap-4 border-y border-border py-4 text-left transition hover:border-foreground/20"
+      >
+        <span className="flex min-w-0 flex-1 items-center">
+          {slotOrder.slice(0, 4).map((slot, index) => {
+            const item = equippedItem[slot];
+            const Icon = item ? iconFor(item) : slotMeta[slot].icon;
+            const art = getEquippedArt(equippedKeys[slot]);
+            return (
+              <span
+                key={slot}
+                className={`grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border-2 border-profile-panel bg-profile-base ${index > 0 ? "-ml-2" : ""}`}
               >
-                {palette && (
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-y-0 left-0 w-1 opacity-80 transition group-hover:opacity-100"
-                    style={{ background: palette.gradient }}
-                  />
-                )}
-                <span
-                  className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-md border border-border bg-profile-base"
-                >
-                  <ItemArt art={art} Icon={Icon} size={34} />
-                </span>
-                <span className="relative min-w-0 flex-1">
-                  <span className="block truncate text-[10px] font-bold uppercase tracking-wider text-white/50">
-                    {meta.label}
-                  </span>
-                  <span className="mt-0.5 block truncate text-[12.5px] font-semibold text-white">
-                    {item ? item.name : owned > 0 ? "Slot vazio" : "Sem itens"}
-                  </span>
-                  <span className="mt-0.5 block text-[10px] text-white/45">
-                    {owned} {owned === 1 ? "item" : "itens"}
-                  </span>
-                </span>
-                {item && (
-                  <Check className="relative h-4 w-4 shrink-0 text-emerald-300" strokeWidth={2.75} />
-                )}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-
-      <p className="mt-3 text-[11px] text-white/45">
-        {totalEquipped} de {slotOrder.length} slots equipados · {totalOwned} itens no inventário.
-        Toque num slot para trocar.
-      </p>
+                <ItemArt art={art} Icon={Icon} size={28} />
+              </span>
+            );
+          })}
+        </span>
+        <span className="min-w-0 flex-[2]">
+          <span className="block text-[13px] font-semibold text-foreground">Personalizar cosméticos</span>
+          <span className="mt-0.5 block text-[11px] text-muted-foreground">
+            {totalEquipped} equipados · {totalOwned} itens
+          </span>
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-foreground" strokeWidth={2.5} />
+      </button>
 
       {/* ---------- modal de inventário ---------- */}
       <Dialog open={open} onOpenChange={setOpen}>
@@ -170,34 +140,17 @@ export function CosmeticInventory({
               "radial-gradient(120% 80% at 50% -10%, rgba(139,92,246,0.20), transparent 60%), #121016",
           }}
         >
-          {/* ---------- topo com navegação lateral ---------- */}
+          {/* ---------- topo ---------- */}
           <div className="relative shrink-0 px-4 pt-4 pb-3 sm:px-5">
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => goSlot(-1)}
-                aria-label="Slot anterior"
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 transition active:scale-95"
-              >
-                <ChevronLeft className="h-4.5 w-4.5" strokeWidth={2.5} />
-              </button>
-
-              <div className="min-w-0 flex-1 text-center">
+              <div className="min-w-0 flex-1">
                 <p className="text-[9.5px] font-bold uppercase tracking-[0.18em] text-violet-300/70">
-                  Inventário · {slotIndex + 1}/{slotOrder.length}
+                  Inventário
                 </p>
                 <h3 className="mt-0.5 truncate text-[17px] font-semibold leading-tight text-white">
-                  {activeMeta.label}
+                  Meus cosméticos
                 </h3>
               </div>
-
-              <button
-                onClick={() => goSlot(1)}
-                aria-label="Próximo slot"
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.06] text-white/75 transition active:scale-95"
-              >
-                <ChevronRight className="h-4.5 w-4.5" strokeWidth={2.5} />
-              </button>
-
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fechar"
@@ -207,16 +160,29 @@ export function CosmeticInventory({
               </button>
             </div>
 
-            {/* pontinhos de progresso dos slots */}
-            <div className="mt-2.5 flex justify-center gap-1">
-              {slotOrder.map((s, i) => (
-                <span
-                  key={s}
-                  className={`h-1 rounded-full transition-all ${
-                    i === slotIndex ? "w-4 bg-violet-400" : "w-1 bg-white/20"
-                  }`}
-                />
-              ))}
+            <div className="mt-4 flex gap-1 overflow-x-auto border-b border-white/10 pb-px">
+              {slotOrder.map((slot) => {
+                const meta = slotMeta[slot];
+                const Icon = meta.icon;
+                const active = slot === activeSlot;
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => {
+                      setActiveSlot(slot);
+                      setQuery("");
+                    }}
+                    className={`relative flex shrink-0 items-center gap-1.5 px-2.5 pb-2.5 text-[11px] font-semibold transition ${
+                      active ? "text-white after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:bg-violet-400" : "text-white/45 hover:text-white/75"
+                    }`}
+                  >
+                    <Icon className="h-3.5 w-3.5" strokeWidth={2.25} />
+                    {meta.label}
+                    {equippedKeys[slot] && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-label="Equipado" />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
