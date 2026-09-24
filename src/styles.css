@@ -41,6 +41,8 @@
   --color-profile-base: var(--profile-base);
   --color-profile-panel: var(--profile-panel);
   --color-profile-raised: var(--profile-raised);
+  --color-nav-surface: var(--nav-surface);
+  --color-nav-border: var(--nav-border);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "SF Pro Display",
     "SF Pro Text", "Helvetica Neue", sans-serif;
@@ -100,6 +102,9 @@
   --profile-panel: oklch(0.226 0.006 265);
   --profile-raised: oklch(0.273 0.007 265);
   --profile-shadow: oklch(0 0 0 / 0.72);
+
+  --nav-surface: oklch(0.105 0.016 295 / 0.9);
+  --nav-border: oklch(1 0 0 / 0.1);
 }
 
 .profile-page {
@@ -222,6 +227,31 @@
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   border: 1px solid var(--border);
+}
+
+@utility airi-desktop-nav {
+  background: color-mix(in oklab, var(--nav-surface) 84%, transparent);
+  border: 1px solid var(--nav-border);
+  box-shadow: 0 18px 52px -28px oklch(0 0 0 / 0.78), inset 0 1px 0 oklch(1 0 0 / 0.055);
+  backdrop-filter: blur(26px) saturate(135%);
+  -webkit-backdrop-filter: blur(26px) saturate(135%);
+}
+
+@utility airi-mega-menu {
+  background: color-mix(in oklab, var(--popover) 94%, transparent);
+  border: 1px solid var(--nav-border);
+  box-shadow: 0 28px 80px -28px oklch(0 0 0 / 0.9), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+}
+
+@utility airi-mobile-nav {
+  background: color-mix(in oklab, var(--nav-surface) 94%, transparent);
+  border: 1px solid var(--nav-border);
+  border-radius: 1.35rem;
+  box-shadow: 0 18px 48px -20px oklch(0 0 0 / 0.85), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
 }
 
 @utility ios-card {
