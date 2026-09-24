@@ -2,9 +2,10 @@
 // Mostra uma grade compacta com os 12 slots (só o que está equipado) e abre
 // um modal estilo "inventário de jogo" para trocar itens por slot.
 import { useMemo, useState } from "react";
-import { Check, ChevronRight, Search, Sparkles, ShoppingBag, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Search, Sparkles, ShoppingBag, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { ShopItem } from "@/lib/shop";
 import type { CosmeticSlot } from "@/lib/wallet-store";
@@ -86,6 +87,13 @@ export function CosmeticInventory({
     setOpen(true);
   }
 
+  function moveSlot(direction: -1 | 1) {
+    const currentIndex = slotOrder.indexOf(activeSlot);
+    const nextIndex = (currentIndex + direction + slotOrder.length) % slotOrder.length;
+    setActiveSlot(slotOrder[nextIndex]);
+    setQuery("");
+  }
+
   const listed = useMemo(() => {
     const q = query.trim().toLowerCase();
     const arr = ownedBySlot[activeSlot] ?? [];
@@ -160,7 +168,42 @@ export function CosmeticInventory({
               </button>
             </div>
 
-            <div className="mt-4 flex gap-1 overflow-x-auto border-b border-white/10 pb-px">
+            <div className="mt-4 flex items-center justify-between border-b border-white/10 pb-2 sm:hidden">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => moveSlot(-1)}
+                aria-label="Cosmético anterior"
+                title="Cosmético anterior"
+                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-white/75 active:scale-95"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
+              </Button>
+
+              <div className="flex min-w-0 items-center gap-2 px-3 text-white">
+                {(() => {
+                  const ActiveIcon = activeMeta.icon;
+                  return <ActiveIcon className="h-4 w-4 shrink-0 text-violet-300" strokeWidth={2.25} />;
+                })()}
+                <span className="truncate text-[12px] font-semibold">{activeMeta.label}</span>
+                {activeEquippedKey && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-label="Equipado" />}
+              </div>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => moveSlot(1)}
+                aria-label="Próximo cosmético"
+                title="Próximo cosmético"
+                className="h-10 w-10 rounded-full border border-white/10 bg-white/[0.04] text-white/75 active:scale-95"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
+              </Button>
+            </div>
+
+            <div className="mt-4 hidden gap-1 overflow-x-auto border-b border-white/10 pb-px sm:flex">
               {slotOrder.map((slot) => {
                 const meta = slotMeta[slot];
                 const Icon = meta.icon;
