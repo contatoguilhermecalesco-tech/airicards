@@ -785,9 +785,7 @@ function StatChip({
         )}
       </div>
       <p
-        className={`relative mt-1.5 flex items-baseline gap-0.5 text-[22px] font-semibold leading-none tabular-nums ${
-          accent ? "text-primary-foreground" : "text-foreground"
-        }`}
+        className="relative mt-1.5 flex items-baseline gap-0.5 text-[22px] font-semibold leading-none tabular-nums text-foreground"
       >
         {value}
         {suffix && (
