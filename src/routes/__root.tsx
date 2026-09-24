@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Target, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ShoppingBag, UserRound } from "lucide-react";
+import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Target, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ChevronDown, ShoppingBag, UserRound } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
 
 import appCss from "../styles.css?url";
@@ -427,33 +427,38 @@ function TopBar() {
   const { pathname, isMoreActive } = useMoreState();
   const isReview = pathname.startsWith("/review");
   const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
   const unreadNews = useChangelogUnread();
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const close = (event: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(event.target as Node)) setMoreOpen(false);
+    };
+    window.addEventListener("mousedown", close);
+    return () => window.removeEventListener("mousedown", close);
+  }, [moreOpen]);
+
   if (isReview) return null;
 
   const navItems = [
-    { to: "/", label: "Início", active: pathname === "/" },
-    { to: "/library", label: "Biblioteca", active: pathname.startsWith("/library") },
-    { to: "/study", label: "Estudo", active: pathname.startsWith("/study") },
-    { to: "/social", label: "Social", active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
+    { to: "/", label: "Início", icon: Home, active: pathname === "/" },
+    { to: "/library", label: "Biblioteca", icon: Library, active: pathname.startsWith("/library") },
+    { to: "/study", label: "Estudo", icon: GraduationCap, active: pathname.startsWith("/study") },
+    { to: "/social", label: "Social", icon: Users2, active: pathname.startsWith("/social") || pathname.startsWith("/duel") },
   ] as const;
 
   const pillLink = (active: boolean) =>
-    `tap-target relative inline-flex min-w-[92px] items-center justify-center rounded-full px-4 py-1.5 text-center text-[13px] font-semibold tracking-tight transition-all duration-200 lg:min-w-[104px] lg:px-5 lg:text-sm ${
+    `tap-target relative inline-flex items-center justify-center gap-2 rounded-full px-3 py-1.5 text-center text-[13px] font-medium transition-all duration-200 lg:px-4 ${
       active
-        ? "bg-white/10 text-white shadow-[0_1px_0_0_rgba(255,255,255,0.08)_inset]"
-        : "text-white/50 hover:text-white/90"
+        ? "bg-primary/12 text-foreground shadow-[inset_0_1px_0_color-mix(in_oklab,var(--foreground)_8%,transparent)]"
+        : "text-muted-foreground hover:bg-accent/60 hover:text-foreground"
     }`;
 
   return (
     <header className="relative z-40 w-full sm:sticky sm:top-0">
       <div className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-6 sm:pt-4">
-        <nav className="relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.03] px-3 py-2 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.7),0_1px_0_0_rgba(255,255,255,0.05)_inset] backdrop-blur-2xl sm:rounded-full sm:px-4 sm:py-2.5 md:px-6">
-          {/* Brilho interno superior */}
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-x-16 top-0 h-px"
-            style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.35), transparent)" }}
-          />
+        <nav className="airi-desktop-nav relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-3xl px-3 py-2 sm:rounded-full sm:px-4 sm:py-2 md:px-5">
 
           {/* Esquerda: logo */}
           <div className="flex min-w-0 items-center gap-2 justify-self-start">
@@ -462,10 +467,10 @@ function TopBar() {
                 <img
                   src={airiLogo.url}
                   alt=""
-                  className="h-9 w-9 rounded-xl object-contain shadow-[0_8px_20px_-4px_rgba(167,139,250,0.35)]"
+                  className="h-9 w-9 rounded-xl object-contain shadow-glow"
                 />
               </span>
-              <span className="hidden text-[15px] font-semibold lowercase tracking-tight text-white/90 sm:inline">
+              <span className="hidden text-[15px] font-semibold lowercase text-foreground sm:inline">
                 airi
               </span>
               <span className="hidden sm:inline">
@@ -475,26 +480,59 @@ function TopBar() {
           </div>
 
           {/* Centro: nav em pill (desktop) */}
-          <div className="hidden items-center gap-1 justify-self-center rounded-full border border-white/5 bg-white/[0.03] p-1 md:flex">
-            {navItems.map((i) => (
-              <Link key={i.to} to={i.to} className={pillLink(i.active)}>
+          <div className="hidden items-center gap-0.5 justify-self-center md:flex">
+            {navItems.map((i) => {
+              const Icon = i.icon;
+              return <Link key={i.to} to={i.to} className={pillLink(i.active)}>
+                <Icon className="h-4 w-4" strokeWidth={2} />
                 {i.label}
               </Link>
-            ))}
-            <button
-              type="button"
-              onClick={() => setMoreOpen(true)}
-              className={`${pillLink(isMoreActive)} relative`}
-              aria-haspopup="dialog"
-              aria-expanded={moreOpen}
-            >
-              Mais
-              {unreadNews > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
-                  {unreadNews}
-                </span>
+            })}
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((open) => !open)}
+                className={`${pillLink(isMoreActive || moreOpen)} relative`}
+                aria-haspopup="menu"
+                aria-expanded={moreOpen}
+              >
+                Recursos
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${moreOpen ? "rotate-180" : ""}`} />
+                {unreadNews > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground">
+                    {unreadNews}
+                  </span>
+                )}
+              </button>
+              {moreOpen && (
+                <div className="airi-mega-menu absolute left-1/2 top-full mt-3 w-[min(680px,calc(100vw-3rem))] -translate-x-1/2 overflow-hidden rounded-2xl p-3 animate-in fade-in slide-in-from-top-2 duration-200" role="menu">
+                  <div className="grid grid-cols-[1.15fr_0.85fr] gap-3">
+                    <div className="grid grid-cols-2 gap-1">
+                      {MORE_ITEMS.map(({ to, label, description, icon: Icon }) => (
+                        <Link key={to} to={to} onClick={() => setMoreOpen(false)} className="group flex min-w-0 items-start gap-3 rounded-xl p-3 transition-colors hover:bg-accent" role="menuitem">
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-secondary text-muted-foreground transition-colors group-hover:text-primary">
+                            <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block truncate text-[13px] font-medium text-foreground">{label}</span>
+                            <span className="mt-0.5 block line-clamp-2 text-[11px] leading-4 text-muted-foreground">{description}</span>
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="flex flex-col rounded-xl border border-border bg-secondary/55 p-4">
+                      <span className="text-[10px] font-semibold uppercase text-primary">Destaque de hoje</span>
+                      <Target className="mt-5 h-8 w-8 text-primary" strokeWidth={1.75} />
+                      <p className="mt-3 text-sm font-semibold text-foreground">Desafios diários</p>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">Treine inglês, conclua missões e ganhe Arlys ✦ e LP.</p>
+                      <Link to="/desafios" onClick={() => setMoreOpen(false)} className="mt-auto flex items-center justify-between rounded-lg bg-primary/12 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/20">
+                        Abrir desafios <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
+            </div>
           </div>
           {/* Placeholder do centro no mobile (mantém grid consistente) */}
           <div className="md:hidden" aria-hidden />
@@ -510,7 +548,6 @@ function TopBar() {
           </div>
         </nav>
       </div>
-      <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
     </header>
   );
 }
@@ -547,31 +584,21 @@ function BottomBar() {
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 w-full border-t border-white/10 bg-black/70 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2.5 backdrop-blur-3xl sm:hidden"
+        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md sm:hidden"
       >
-        {/* Brilho superior sutil */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-16 top-0 h-px"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.4), transparent)" }}
-        />
-        <ul className="mx-auto flex max-w-md items-center justify-between">
+        <ul className="airi-mobile-nav grid grid-cols-5 items-center px-2">
           {items.map((item) => {
             const Icon = item.icon;
             const active = item.active;
-            const cls = `tap-target group flex flex-col items-center gap-1.5 px-2 py-1 transition-all active:scale-[0.94] duration-150`;
+            const cls = `tap-target group relative flex h-[68px] w-full items-center justify-center transition-all active:scale-[0.94] duration-200`;
             const iconWrap = (
-              <span className="relative flex items-center justify-center">
+              <span className={`relative z-10 grid h-12 w-12 place-items-center rounded-full transition-all duration-300 ${active ? "-translate-y-6 bg-primary text-primary-foreground shadow-glow ring-[7px] ring-background" : "text-muted-foreground group-hover:text-foreground"}`}>
                 <Icon
-                  className={`h-6 w-6 transition-colors ${
-                    active ? "text-primary" : "text-white/40 group-hover:text-white/70"
-                  }`}
+                  className="h-[22px] w-[22px] transition-colors"
                   strokeWidth={active ? 2.4 : 2}
-                  fill={active ? "currentColor" : "none"}
-                  fillOpacity={active ? 0.18 : 0}
                 />
                 {item.badge && item.badge > 0 ? (
-                  <span className="absolute -right-1.5 -top-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9.5px] font-semibold text-primary-foreground ring-2 ring-black/60">
+                  <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[9.5px] font-semibold text-destructive-foreground ring-2 ring-background">
                     {item.badge}
                   </span>
                 ) : null}
@@ -579,9 +606,7 @@ function BottomBar() {
             );
             const label = (
               <span
-                className={`text-[10px] font-bold tracking-tight transition-colors ${
-                  active ? "text-primary" : "text-white/40"
-                }`}
+                className={`pointer-events-none absolute bottom-1.5 text-[9px] font-semibold transition-all ${active ? "translate-y-1 opacity-0" : "text-muted-foreground opacity-100"}`}
               >
                 {item.label}
               </span>
