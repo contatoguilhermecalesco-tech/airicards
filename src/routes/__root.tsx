@@ -627,10 +627,11 @@ function BottomBar() {
                 </li>
               );
             }
+            if (!item.to) return null;
             return (
               <li key={item.key}>
                 <Link
-                  to={item.to!}
+                  to={item.to}
                   className={cls}
                   aria-current={active ? "page" : undefined}
                 >
