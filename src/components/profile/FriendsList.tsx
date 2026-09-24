@@ -21,7 +21,7 @@ export function FriendsList({ friend }: { friend: Profile }) {
   const [open, setOpen] = useState(false);
   const { snapshot, loading } = useProfileSnapshot(friend.id);
   const presence = formatPresence(snapshot?.lastSeenAt);
-  const streakDays = snapshot?.streak?.count ?? 0;
+  const streakDays = snapshot?.streak?.current ?? 0;
 
   return (
     <section className="min-w-0">
