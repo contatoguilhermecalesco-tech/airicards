@@ -984,6 +984,8 @@ function PerfilPage() {
         </div>
        </section>
        </aside>
+       </>
+       )}
        </div>
        </div>
     </main>
