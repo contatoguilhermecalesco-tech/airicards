@@ -94,7 +94,6 @@ export function CosmeticInventory({
 
   const activeMeta = slotMeta[activeSlot];
   const activeEquippedKey = equippedKeys[activeSlot];
-  const slotIndex = Math.max(0, slotOrder.indexOf(activeSlot));
 
   return (
     <>
