@@ -47,7 +47,6 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-sto
 import { RankEmblem } from "@/components/RankBadge";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
-import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
@@ -61,13 +60,6 @@ import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 
 
@@ -326,7 +318,6 @@ function PerfilPage() {
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [activityOpen, setActivityOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -916,49 +907,6 @@ function PerfilPage() {
 
 
        <aside className="mt-6 grid gap-3 sm:grid-cols-2">
-      {/* ============ ACTIVITY TIMELINE (modal) ============ */}
-      {profile && (
-         <section>
-           <Button
-            type="button"
-            onClick={() => setActivityOpen(true)}
-             variant="ghost"
-             className="group h-auto w-full justify-start gap-3 rounded-lg border border-border bg-profile-panel p-4 text-left hover:bg-profile-raised"
-          >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-violet-500/15 text-violet-300">
-              <Zap className="h-4 w-4" strokeWidth={2.25} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-[14px] font-semibold text-foreground">
-                Atividade recente
-              </span>
-              <span className="mt-0.5 block truncate text-[12px] text-muted-foreground">
-                Linha do tempo dos seus últimos passos no airi.
-              </span>
-            </span>
-            <ArrowLeft
-              className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
-              strokeWidth={2.5}
-            />
-           </Button>
-
-          <Dialog open={activityOpen} onOpenChange={setActivityOpen}>
-            <DialogContent className="max-w-lg overflow-hidden border-white/10 p-0" style={{ background: "#141317" }}>
-              <DialogHeader className="border-b border-white/10 px-4 py-3 text-left">
-                <DialogTitle className="text-[15px] font-semibold text-white">
-                  Atividade recente
-                </DialogTitle>
-                <DialogDescription className="text-[11.5px] text-white/50">
-                  Linha do tempo dos seus últimos passos no airi.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="max-h-[65vh] overflow-y-auto p-4">
-                <ProfileActivityFeed profileId={profile.id} />
-              </div>
-            </DialogContent>
-          </Dialog>
-        </section>
-      )}
 
 
       {/* ============ PARTNER LINK ============ */}
