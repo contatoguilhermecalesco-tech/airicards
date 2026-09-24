@@ -47,7 +47,6 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-sto
 import { RankEmblem } from "@/components/RankBadge";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
-import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
