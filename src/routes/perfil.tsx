@@ -60,6 +60,7 @@ import { CosmeticTitle } from "@/components/profile/CosmeticTitle";
 import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModal";
 import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
 import { Button } from "@/components/ui/button";
+import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 
 
 
@@ -318,6 +319,7 @@ function PerfilPage() {
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [tab, setTab] = useState<"perfil" | "atividade">("perfil");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -862,13 +864,34 @@ function PerfilPage() {
        <div className="min-w-0">
        <div className="mb-5 border-b border-border">
          <div className="flex min-w-0 items-center gap-6 overflow-x-auto">
-           <span className="relative shrink-0 pb-3 text-[13px] font-semibold text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary">
-             Perfil
-           </span>
-           <span className="shrink-0 pb-3 text-[13px] font-semibold text-muted-foreground">Atividade</span>
-           <span className="shrink-0 pb-3 text-[13px] font-semibold text-muted-foreground">Conquistas</span>
+           {(["perfil", "atividade"] as const).map((t) => (
+             <button
+               key={t}
+               type="button"
+               onClick={() => setTab(t)}
+               className={`relative shrink-0 pb-3 text-[13px] font-semibold transition ${
+                 tab === t
+                   ? "text-foreground after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-primary"
+                   : "text-muted-foreground hover:text-foreground"
+               }`}
+             >
+               {t === "perfil" ? "Perfil" : "Atividade"}
+             </button>
+           ))}
          </div>
        </div>
+       {tab === "atividade" ? (
+         <section className="min-w-0">
+           <h2 className="text-[18px] font-semibold tracking-tight text-foreground sm:text-[20px]">
+             Atividade recente
+           </h2>
+           <p className="mt-0.5 mb-4 text-[12px] text-muted-foreground">
+             Linha do tempo dos seus últimos passos no airi.
+           </p>
+           {profile ? <ProfileActivityFeed profileId={profile.id} limit={30} /> : null}
+         </section>
+       ) : (
+       <>
        {/* ============ SLOTS ============ */}
        <section className="min-w-0">
         <div className="flex items-end justify-between">
