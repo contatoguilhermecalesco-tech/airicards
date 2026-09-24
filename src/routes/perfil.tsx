@@ -47,7 +47,6 @@ import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS } from "@/lib/rank-sto
 import { RankEmblem } from "@/components/RankBadge";
 import { useStreak } from "@/lib/flashcards-store";
 import { compressAvatarFile } from "@/lib/image-compress";
-import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { companionFromEquipped } from "@/lib/companion-assets";
 import { CompanionRender } from "@/components/CompanionRender";
 
@@ -61,6 +60,7 @@ import { TableSkinPreviewButton } from "@/components/review/TableSkinPreviewModa
 import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
 import { Button } from "@/components/ui/button";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
+import { FriendsList } from "@/components/profile/FriendsList";
 
 
 
@@ -932,40 +932,7 @@ function PerfilPage() {
        <aside className="mt-6 grid gap-3 sm:grid-cols-2">
 
 
-      {/* ============ PARTNER LINK ============ */}
-      {partner && (
-         <section>
-          <Link
-            to="/perfil/$id"
-            params={{ id: partner.id }}
-             className="group flex items-center gap-3 rounded-lg border border-border bg-profile-panel p-4 transition hover:bg-profile-raised"
-          >
-            <ProfileAvatar
-              profileId={partner.id}
-              initial={partner.name.charAt(0).toUpperCase()}
-              gradient={partner.gradient}
-              size={48}
-              fontScale={0.36}
-              ring="rgba(255,255,255,0.15)"
-            />
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-white/50">
-                Perfil do parceiro
-              </p>
-              <p className="mt-0.5 truncate text-[15px] font-semibold text-white">
-                Ver perfil de {partner.name}
-              </p>
-              <p className="mt-0.5 truncate text-[12px] text-white/50">
-                Cosméticos equipados, rank, streak e bio
-              </p>
-            </div>
-            <ArrowLeft
-              className="h-4 w-4 shrink-0 rotate-180 text-white/40 transition group-hover:translate-x-0.5 group-hover:text-white/80"
-              strokeWidth={2.5}
-            />
-          </Link>
-        </section>
-      )}
+      {partner && <FriendsList friend={partner} />}
 
 
 
