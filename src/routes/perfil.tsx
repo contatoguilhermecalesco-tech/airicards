@@ -318,7 +318,6 @@ function PerfilPage() {
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [activityOpen, setActivityOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
