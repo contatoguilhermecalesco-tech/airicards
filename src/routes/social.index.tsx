@@ -1,731 +1,279 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  BarChart3,
+  Check,
+  ChevronRight,
+  Flame,
   Gift,
+  GraduationCap,
+  Heart,
+  Home,
+  MessageCircle,
+  Send,
   Sparkles,
   Swords,
-  Send,
-  Check,
-  X as XIcon,
-  ChevronRight,
-  Info,
-  Users,
-  Target,
-  Zap,
   Trophy,
-  HelpCircle,
-  Flame,
-  BarChart3,
-  GraduationCap,
-  Skull,
+  UserRound,
+  Users,
+  X as XIcon,
 } from "lucide-react";
+import { GiftInbox } from "@/components/GiftInbox";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { Button } from "@/components/ui/button";
 import { useCurrentProfile } from "@/lib/profile";
 import {
-  usePendingGifts,
-  useSentGifts,
-  useActivityFeed,
-  useUnifiedFeed,
-  useReactionsForEvent,
-  toggleReaction,
-  useDuelScore,
-  useWeeklyDuel,
+  addActivityComment,
   otherProfile,
   profileMeta,
-  type ProfileId,
+  toggleReaction,
+  useCommentsForEvent,
+  useDuelScore,
+  usePendingGifts,
+  useReactionsForEvent,
+  useSentGifts,
+  useUnifiedFeed,
+  useWeeklyDuel,
   type ActivityEvent,
+  type ProfileId,
 } from "@/lib/social-store";
-import { startSocialStatsSync } from "@/lib/social-stats";
-import { GiftInbox } from "@/components/GiftInbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/social/")({
   head: () => ({
     meta: [
-      { title: "Social — airi" },
-      { name: "description", content: "Presentes de cartas, atividade da dupla e duelo semanal em um só lugar." },
-      { property: "og:title", content: "Social — airi" },
-      { property: "og:description", content: "Presentes, atividade e duelo semanal." },
+      { title: "Comunidade — airi" },
+      { name: "description", content: "Conquistas, comentários, presentes e duelo semanal da sua dupla no airi." },
+      { property: "og:title", content: "Comunidade — airi" },
+      { property: "og:description", content: "Acompanhe e celebre o progresso da sua dupla." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SocialPage,
 });
 
-type Tab = "inbox" | "activity" | "duel";
+type Section = "feed" | "gifts" | "duel";
 
 function SocialPage() {
   const me = useCurrentProfile();
-  const [tab, setTab] = useState<Tab>("activity");
-
-  // Pre-carrega stats para comparação lado a lado.
-  useEffect(() => { startSocialStatsSync(); }, []);
-
+  const [section, setSection] = useState<Section>("feed");
   if (!me) return null;
-  const meId = me.id as ProfileId;
-  const oppId = otherProfile(meId);
-  const opp = profileMeta(oppId);
 
+  const meId = me.id as ProfileId;
+  const friendId = otherProfile(meId);
+  const friend = profileMeta(friendId);
   const pending = usePendingGifts(meId);
   const sent = useSentGifts(meId);
-  const feed = useActivityFeed(oppId, 8);
   const score = useDuelScore();
   const duel = useWeeklyDuel();
 
-  const tabs: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: "activity", label: "Feed", icon: <Sparkles className="h-4 w-4" strokeWidth={2.25} />, badge: feed.length || undefined },
-    { id: "inbox", label: "Presentes", icon: <Gift className="h-4 w-4" strokeWidth={2.25} />, badge: pending.length || undefined },
-    { id: "duel", label: "Duelo", icon: <Swords className="h-4 w-4" strokeWidth={2.25} /> },
+  const nav = [
+    { id: "feed" as const, label: "Início", icon: Home },
+    { id: "gifts" as const, label: "Presentes", icon: Gift, badge: pending.length },
+    { id: "duel" as const, label: "Duelo", icon: Swords },
   ];
 
   return (
-    <div className="mx-auto max-w-xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-8 sm:pb-10">
-      {/* Header */}
-      <header className="animate-fade-in mb-5 flex items-center justify-between gap-3 px-1">
-        <div>
-          <h1 className="text-[26px] font-bold tracking-tight text-foreground">Social</h1>
-          <p className="mt-0.5 text-[13px] text-muted-foreground">
-            Você & {opp.name}
-          </p>
+    <main className="mx-auto w-full max-w-[1180px] px-3 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
+      <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/60 pb-5">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase text-primary">Comunidade airi</p>
+          <h1 className="truncate text-[26px] font-semibold text-foreground">Social</h1>
         </div>
-        <Link
-          to="/social/stats"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-white/[0.06]"
-        >
-          <BarChart3 className="h-3.5 w-3.5 text-primary" strokeWidth={2.4} />
-          Comparar
-        </Link>
+        <Button asChild variant="ghost" size="sm" className="rounded-full text-muted-foreground">
+          <Link to="/social/stats"><BarChart3 /> Comparar</Link>
+        </Button>
       </header>
 
-      {/* Tabs — segmento iOS */}
-      <div
-        role="tablist"
-        aria-label="Seções sociais"
-        className="mb-6 flex gap-1 rounded-2xl border border-white/[0.06] bg-white/[0.04] p-1"
-      >
-        {tabs.map((t) => {
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(t.id)}
-              className={`tap-target relative flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-[13px] transition ${
-                active
-                  ? "bg-primary/25 font-semibold text-foreground shadow-sm"
-                  : "font-medium text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.icon}
-              <span>{t.label}</span>
-              {t.badge ? (
-                <span className="ml-0.5 rounded-full bg-primary/25 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                  {t.badge}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Panels */}
-      {tab === "inbox" && (
-        <div className="animate-fade-in space-y-6">
-          {pending.length === 0 ? (
-            <EmptyState
-              icon={<Gift className="h-5 w-5 text-primary" strokeWidth={2.25} />}
-              title="Sem presentes por agora"
-              body={`Quando ${opp.name} enviar uma carta pra você, ela aparece aqui.`}
-            />
-          ) : (
-            <GiftInbox />
-          )}
-
-          {sent.length > 0 && (
-            <section>
-              <div className="mb-2 flex items-center gap-2 px-1">
-                <Send className="h-4 w-4 text-muted-foreground" strokeWidth={2.25} />
-                <h2 className="text-[15px] font-semibold tracking-tight text-foreground">
-                  Enviados recentemente
-                </h2>
-              </div>
-              <ul className="space-y-2">
-                {sent.map((g) => {
-                  const pill =
-                    g.status === "imported"
-                      ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                      : g.status === "declined"
-                        ? "border-white/[0.06] bg-white/[0.03] text-muted-foreground"
-                        : "border-primary/30 bg-primary/10 text-primary";
-                  return (
-                    <li
-                      key={g.id}
-                      className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3"
-                    >
-                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary/30 to-primary/10">
-                        {g.status === "imported" ? (
-                          <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} />
-                        ) : g.status === "declined" ? (
-                          <XIcon className="h-4 w-4 text-muted-foreground" />
-                        ) : (
-                          <Gift className="h-4 w-4 text-primary" strokeWidth={2.25} />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[14px] font-medium text-foreground">{g.front}</p>
-                        <p className="truncate text-[12px] text-muted-foreground">{g.back}</p>
-                      </div>
-                      <span
-                        className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${pill}`}
-                      >
-                        {g.status === "pending" ? "pendente" : g.status === "imported" ? "aceita" : "recusada"}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
-
-          <p className="px-1 text-[12px] text-muted-foreground">
-            Dica: abra uma carta na Biblioteca e toque no botão de presente para enviar para {opp.name}.
-          </p>
-        </div>
-      )}
-
-      {tab === "activity" && (
-        <div className="animate-fade-in space-y-5">
-          <DuelMiniCard meId={meId} oppId={oppId} score={score} duel={duel} />
-          <div>
-            <h3 className="mb-3 px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-              Recentes
-            </h3>
-            <UnifiedFeed meId={meId} />
-          </div>
-        </div>
-      )}
-
-      {tab === "duel" && (
-        <DuelPanel meId={meId} oppId={oppId} score={score} duel={duel} />
-      )}
-    </div>
-  );
-}
-
-// Card de duelo compacto fixado no topo do feed.
-function DuelMiniCard({
-  meId,
-  oppId,
-  score,
-  duel,
-}: {
-  meId: ProfileId;
-  oppId: ProfileId;
-  score: { g: number; a: number };
-  duel: ReturnType<typeof useWeeklyDuel>;
-}) {
-  const me = profileMeta(meId);
-  const opp = profileMeta(oppId);
-  const myScore = meId === "guilherme" ? score.g : score.a;
-  const oppScore = meId === "guilherme" ? score.a : score.g;
-  const status =
-    duel && duel.status === "active"
-      ? "Em andamento"
-      : duel && duel.status === "completed"
-        ? "Encerrado"
-        : "Sem rodada";
-
-  return (
-    <Link
-      to="/duel"
-      className="group relative block overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/60 p-5 shadow-[0_16px_40px_-16px_hsl(var(--primary)/0.6)] transition active:scale-[0.99]"
-    >
-      <div className="pointer-events-none absolute -right-6 -top-8 opacity-15">
-        <Swords className="h-24 w-24 text-primary-foreground" strokeWidth={1.5} />
-      </div>
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary-foreground/70">
-          Duelo da semana
-        </span>
-        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
-          {status}
-        </span>
-      </div>
-      <div className="relative flex items-center justify-between">
-        <div className="flex flex-col items-center gap-1.5">
-          <ProfileAvatar
-            profileId={me.id}
-            initial={me.initial}
-            gradient={me.gradient}
-            size={52}
-            radius={18}
-            fontScale={0.34}
-            className="ring-2 ring-white/30 shadow-lg"
-          />
-          <p className="text-[11px] font-semibold text-primary-foreground">{me.name}</p>
-          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{myScore}</p>
-        </div>
-        <span className="text-[18px] font-black italic text-primary-foreground/50">VS</span>
-        <div className="flex flex-col items-center gap-1.5">
-          <ProfileAvatar
-            profileId={opp.id}
-            initial={opp.initial}
-            gradient={opp.gradient}
-            size={52}
-            radius={18}
-            fontScale={0.34}
-            className="ring-2 ring-white/30 shadow-lg"
-          />
-          <p className="text-[11px] font-semibold text-primary-foreground">{opp.name}</p>
-          <p className="text-[20px] font-bold leading-none text-primary-foreground tabular-nums">{oppScore}</p>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-
-function DuelPanel({
-  meId,
-  oppId,
-  score,
-  duel,
-}: {
-  meId: ProfileId;
-  oppId: ProfileId;
-  score: { g: number; a: number };
-  duel: ReturnType<typeof useWeeklyDuel>;
-}) {
-  const [howOpen, setHowOpen] = useState(false);
-  const me = profileMeta(meId);
-  const opp = profileMeta(oppId);
-  const myScore = meId === "guilherme" ? score.g : score.a;
-  const oppScore = meId === "guilherme" ? score.a : score.g;
-  const isLeading = myScore > oppScore;
-  const isTied = myScore === oppScore;
-
-  const status = duel
-    ? duel.status === "completed"
-      ? { label: "Rodada encerrada", tone: "muted" as const }
-      : { label: "Rodada em andamento", tone: "live" as const }
-    : { label: "Sem duelo esta semana", tone: "idle" as const };
-
-  const cta =
-    duel && duel.status === "active"
-      ? "Entrar no duelo"
-      : duel && duel.status === "completed"
-        ? "Ver resultado da rodada"
-        : "Criar duelo desta semana";
-
-  return (
-    <div className="animate-fade-in space-y-5">
-      {/* Arena — hero card */}
-      <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.015] p-5">
-        {/* soft glows */}
-        <div
-          className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-40 blur-3xl"
-          style={{ background: me.gradient }}
-        />
-        <div
-          className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-30 blur-3xl"
-          style={{ background: opp.gradient }}
-        />
-
-        {/* Status pill */}
-        <div className="relative flex items-center justify-between">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1">
-            <span
-              className={`h-1.5 w-1.5 rounded-full ${
-                status.tone === "live"
-                  ? "animate-pulse bg-emerald-400"
-                  : status.tone === "muted"
-                    ? "bg-muted-foreground/60"
-                    : "bg-primary/70"
-              }`}
-            />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              {status.label}
-            </span>
-          </div>
+      <div className="mb-4 grid grid-cols-3 border-b border-border/60 lg:hidden">
+        {nav.map(({ id, label, icon: Icon, badge }) => (
           <button
+            key={id}
             type="button"
-            onClick={() => setHowOpen(true)}
-            className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground"
+            onClick={() => setSection(id)}
+            className={`relative flex h-11 items-center justify-center gap-2 text-[12px] font-medium transition ${section === id ? "text-foreground" : "text-muted-foreground"}`}
           >
-            <HelpCircle className="h-3 w-3" strokeWidth={2.25} />
-            Como funciona
-          </button>
-        </div>
-
-        {/* VS arena */}
-        <div className="relative mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <Fighter profile={me} score={myScore} winning={isLeading} align="left" />
-          <div className="flex flex-col items-center gap-1">
-            <div className="relative grid h-11 w-11 place-items-center rounded-2xl border border-white/[0.1] bg-background/60 backdrop-blur">
-              <Swords className="h-5 w-5 text-primary" strokeWidth={2.4} />
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-              vs
-            </span>
-          </div>
-          <Fighter profile={opp} score={oppScore} winning={!isTied && !isLeading} align="right" />
-        </div>
-
-        {/* Score summary */}
-        <div className="relative mt-5 flex items-center justify-center gap-2 text-[12px] text-muted-foreground">
-          <Trophy className="h-3.5 w-3.5 text-primary/80" strokeWidth={2.25} />
-          <span>
-            Placar geral{" "}
-            <span className="font-semibold tabular-nums text-foreground">
-              {score.g}–{score.a}
-            </span>{" "}
-            <span className="text-muted-foreground/70">· Guilherme vs Arlayne</span>
-          </span>
-        </div>
-
-        {/* CTA */}
-        <Link
-          to="/duel"
-          className="group relative mt-5 flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-primary/80 py-3.5 text-[15px] font-semibold text-primary-foreground shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.7)] transition active:scale-[0.99]"
-        >
-          <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-          <Flame className="h-4 w-4" strokeWidth={2.5} />
-          {cta}
-          <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
-        </Link>
-      </div>
-
-      {/* Quick tips row */}
-      <div className="grid grid-cols-3 gap-2">
-        <MiniTip icon={<Users className="h-3.5 w-3.5" />} label="5 cartas" hint="mesmo baralho" />
-        <MiniTip icon={<Zap className="h-3.5 w-3.5" />} label="Tempo conta" hint="desempate" />
-        <MiniTip icon={<Trophy className="h-3.5 w-3.5" />} label="Semanal" hint="reset toda seg." />
-      </div>
-
-      <HowItWorksDialog open={howOpen} onOpenChange={setHowOpen} />
-    </div>
-  );
-}
-
-function Fighter({
-  profile,
-  score,
-  winning,
-  align,
-}: {
-  profile: { id: string; name: string; initial: string; gradient: string };
-  score: number;
-  winning: boolean;
-  align: "left" | "right";
-}) {
-  return (
-    <div
-      className={`flex flex-col items-center gap-2 ${
-        align === "left" ? "items-start sm:items-center" : "items-end sm:items-center"
-      } sm:items-center`}
-    >
-      <div className="relative">
-        <ProfileAvatar
-          profileId={profile.id}
-          initial={profile.initial}
-          gradient={profile.gradient}
-          size={64}
-          radius={22}
-          fontScale={0.34}
-          className={winning ? "ring-2 ring-primary/60 ring-offset-2 ring-offset-background shadow-lg" : "shadow-lg"}
-        />
-        {winning && (
-          <div className="absolute -right-1 -top-1 grid h-6 w-6 place-items-center rounded-full bg-primary text-primary-foreground shadow">
-            <Trophy className="h-3 w-3" strokeWidth={2.5} />
-          </div>
-        )}
-      </div>
-      <div className="text-center">
-        <p className="text-[13px] font-semibold text-foreground">{profile.name}</p>
-        <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground tabular-nums">
-          {score} {score === 1 ? "vitória" : "vitórias"}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function MiniTip({
-  icon,
-  label,
-  hint,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  hint: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
-      <div className="mx-auto grid h-7 w-7 place-items-center rounded-full bg-primary/10 text-primary">
-        {icon}
-      </div>
-      <p className="mt-1.5 text-[12px] font-semibold text-foreground">{label}</p>
-      <p className="text-[10.5px] text-muted-foreground">{hint}</p>
-    </div>
-  );
-}
-
-function HowItWorksDialog({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] rounded-3xl border-white/[0.08] bg-background/95 backdrop-blur-xl">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[16px]">
-            <Info className="h-4 w-4 text-primary" strokeWidth={2.25} />
-            Como funciona o duelo
-          </DialogTitle>
-        </DialogHeader>
-        <ol className="mt-2 space-y-3">
-          <Step
-            n={1}
-            icon={<Users className="h-3.5 w-3.5" />}
-            title="Um de vocês cria o desafio"
-            body="Quem abrir a sala escolhe um baralho próprio. O sistema sorteia 5 cartas — as mesmas para os dois."
-          />
-          <Step
-            n={2}
-            icon={<Target className="h-3.5 w-3.5" />}
-            title="Cada um joga sozinho"
-            body="Você vira a carta, diz se acertou e segue. Não dá para ver a jogada do outro antes da sua vez."
-          />
-          <Step
-            n={3}
-            icon={<Zap className="h-3.5 w-3.5" />}
-            title="Quem acerta mais, vence"
-            body="Em empate, o menor tempo leva. Vencedor ganha +1 vitória no placar geral."
-          />
-          <Step
-            n={4}
-            icon={<Trophy className="h-3.5 w-3.5" />}
-            title="Prazo de 48h · WO"
-            body="Faltando 24h avisamos por notificação. Se um não jogar no prazo, perde por WO (−1) e o outro vence. Se ninguém jogar, quem criou leva o −1."
-          />
-          <Step
-            n={5}
-            icon={<Trophy className="h-3.5 w-3.5" />}
-            title="Nova rodada toda semana"
-            body="Toda segunda, qualquer um pode criar um novo desafio."
-          />
-        </ol>
-        <p className="mt-3 rounded-xl bg-white/[0.03] px-3 py-2 text-[12px] text-muted-foreground">
-          Dica: baralhos com mais cartas dão mais variedade ao sorteio.
-        </p>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-
-function Step({
-  n,
-  icon,
-  title,
-  body,
-}: {
-  n: number;
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
-  return (
-    <li className="flex gap-3">
-      <div className="flex flex-col items-center gap-1 pt-0.5">
-        <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/15 text-[11px] font-bold text-primary">
-          {n}
-        </div>
-        {n < 5 && <div className="h-full w-px bg-white/[0.06]" />}
-      </div>
-      <div className="flex-1 pb-4">
-        <div className="flex items-center gap-1.5">
-          <span className="text-primary">{icon}</span>
-          <h3 className="text-[14px] font-semibold text-foreground">{title}</h3>
-        </div>
-        <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{body}</p>
-      </div>
-    </li>
-  );
-}
-
-function StatChip({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: number | string;
-  accent: string;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3">
-      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${accent} opacity-70`} />
-      <div className="relative">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          {label}
-        </p>
-        <p className="mt-0.5 text-[18px] font-semibold tabular-nums text-foreground">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function EmptyState({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div className="rounded-3xl border border-white/[0.06] bg-white/[0.02] px-6 py-10 text-center">
-      <div className="mx-auto grid h-11 w-11 place-items-center rounded-2xl border border-white/[0.06] bg-white/[0.03]">
-        {icon}
-      </div>
-      <p className="mt-3 text-[15px] font-semibold text-foreground">{title}</p>
-      <p className="mt-1 text-[13px] text-muted-foreground">{body}</p>
-    </div>
-  );
-}
-
-// ============================================================
-// Feed unificado — eventos dos dois perfis em uma timeline só.
-// ============================================================
-
-const FEED_REACTIONS = ["🔥", "😂", "💀", "🎯", "👏"];
-
-function timeAgo(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const m = Math.round(diff / 60000);
-  if (m < 1) return "agora";
-  if (m < 60) return `${m} min`;
-  const h = Math.round(m / 60);
-  if (h < 24) return `${h}h`;
-  const d = Math.round(h / 24);
-  return `${d}d`;
-}
-
-function iconForKind(kind: ActivityEvent["kind"]) {
-  switch (kind) {
-    case "rank_up":
-      return <Trophy className="h-4 w-4 text-amber-300" strokeWidth={2.25} />;
-    case "streak_milestone":
-      return <Flame className="h-4 w-4 text-orange-400" strokeWidth={2.25} />;
-    case "exam_done":
-      return <GraduationCap className="h-4 w-4 text-primary" strokeWidth={2.25} />;
-    case "duel_won":
-      return <Swords className="h-4 w-4 text-primary" strokeWidth={2.25} />;
-    case "enemy_defeated":
-      return <Skull className="h-4 w-4 text-destructive" strokeWidth={2.25} />;
-    default:
-      return <Sparkles className="h-4 w-4 text-primary" strokeWidth={2.25} />;
-  }
-}
-
-function labelForEvent(e: ActivityEvent, actorName: string): string {
-  const p = e.payload as Record<string, unknown>;
-  switch (e.kind) {
-    case "rank_up":
-      return `${actorName} subiu para ${String(p.toTier ?? "")} ${String(p.toDivision ?? "")}`.trim();
-    case "streak_milestone":
-      return `${actorName} atingiu ${String(p.days ?? "")} dias de sequência`;
-    case "exam_done":
-      return `${actorName} concluiu a prova mensal · ${String(p.level ?? "")}`.trim();
-    case "duel_won":
-      return `${actorName} venceu o duelo da semana${p.byForfeit ? " por WO" : ""}`;
-    case "enemy_defeated":
-      return `${actorName} derrotou uma carta inimiga`;
-  }
-}
-
-function UnifiedFeed({ meId }: { meId: ProfileId }) {
-  const events = useUnifiedFeed(30);
-
-  if (events.length === 0) {
-    return (
-      <EmptyState
-        icon={<Sparkles className="h-5 w-5 text-primary" strokeWidth={2.25} />}
-        title="Nenhuma novidade ainda"
-        body="Conquistas, sequências, provas e duelos aparecem aqui — dos dois perfis, em tempo real."
-      />
-    );
-  }
-
-  return (
-    <ul className="space-y-2">
-      {events.map((e) => (
-        <FeedRow key={e.id} event={e} meId={meId} />
-      ))}
-    </ul>
-  );
-}
-
-function FeedRow({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
-  const actor = profileMeta(event.profileId);
-  const isMe = event.profileId === meId;
-  const actorName = isMe ? "Você" : actor.name;
-  const reactions = useReactionsForEvent(event.id);
-
-  const grouped = FEED_REACTIONS.map((emoji) => {
-    const list = reactions.filter((r) => r.emoji === emoji);
-    const mine = list.some((r) => r.profileId === meId);
-    return { emoji, count: list.length, mine };
-  });
-
-  return (
-    <li
-      className={`rounded-2xl border p-3 transition ${
-        isMe
-          ? "border-primary/20 bg-primary/[0.04]"
-          : "border-white/[0.06] bg-white/[0.03]"
-      }`}
-    >
-      <div className="flex items-center gap-2.5">
-        <ProfileAvatar
-          profileId={event.profileId}
-          initial={actor.initial}
-          gradient={actor.gradient}
-          size={36}
-          fontScale={0.36}
-          className="shadow-sm"
-        />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[13.5px] font-medium text-foreground">
-            {labelForEvent(event, actorName)}
-          </p>
-          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            {iconForKind(event.kind)}
-            <span>{timeAgo(event.createdAt)}</span>
-          </p>
-        </div>
-      </div>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {grouped.map((r) => (
-          <button
-            key={r.emoji}
-            onClick={() => toggleReaction(event.id, meId, r.emoji)}
-            className={`flex items-center gap-1 rounded-full border px-2 py-1 text-[12px] tabular-nums transition ${
-              r.mine
-                ? "border-primary/40 bg-primary/15 text-foreground"
-                : "border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:border-white/[0.12] hover:text-foreground"
-            }`}
-          >
-            <span>{r.emoji}</span>
-            {r.count > 0 && <span className="text-[11px]">{r.count}</span>}
+            <Icon className="h-4 w-4" />{label}
+            {badge ? <span className="min-w-4 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{badge}</span> : null}
+            {section === id ? <span className="absolute inset-x-5 bottom-0 h-0.5 bg-primary" /> : null}
           </button>
         ))}
       </div>
+
+      <div className="lg:grid lg:grid-cols-[176px_minmax(0,1fr)_270px] lg:gap-7">
+        <aside className="hidden border-r border-border/60 pr-5 lg:block">
+          <nav className="sticky top-24 space-y-1">
+            {nav.map(({ id, label, icon: Icon, badge }) => (
+              <Button
+                key={id}
+                type="button"
+                variant="ghost"
+                onClick={() => setSection(id)}
+                className={`w-full justify-start rounded-md ${section === id ? "bg-accent text-foreground" : "text-muted-foreground"}`}
+              >
+                <Icon /> <span className="flex-1 text-left">{label}</span>
+                {badge ? <span className="text-[11px] text-primary">{badge}</span> : null}
+              </Button>
+            ))}
+          </nav>
+        </aside>
+
+        <section className="min-w-0">
+          {section === "feed" ? <Feed meId={meId} /> : null}
+          {section === "gifts" ? <Gifts pending={pending} sent={sent} friendName={friend.name} /> : null}
+          {section === "duel" ? <DuelSection meId={meId} score={score} duel={duel} /> : null}
+        </section>
+
+        <aside className="mt-7 space-y-7 border-t border-border/60 pt-6 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-[15px] font-semibold text-foreground">Amigo</h2>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <Link to="/perfil/$id" params={{ id: friendId }} className="group flex items-center gap-3 border-b border-border/50 pb-4">
+              <div className="relative">
+                <ProfileAvatar profileId={friendId} initial={friend.initial} gradient={friend.gradient} size={42} />
+                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-success" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13px] font-semibold text-foreground">{friend.name}</p>
+                <p className="text-[11px] text-muted-foreground">Parceiro de estudos</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" />
+            </Link>
+          </section>
+          <DuelAside meId={meId} score={score} duel={duel} />
+        </aside>
+      </div>
+    </main>
+  );
+}
+
+function Feed({ meId }: { meId: ProfileId }) {
+  const rawEvents = useUnifiedFeed(30);
+  const [visible, setVisible] = useState(6);
+  const events = useMemo(() => consolidateRankEvents(rawEvents), [rawEvents]);
+
+  if (!events.length) return <Empty icon={Sparkles} title="O feed está tranquilo" body="As próximas conquistas de vocês aparecerão aqui." />;
+
+  return (
+    <div>
+      <div className="mb-4 flex items-end justify-between">
+        <div><h2 className="text-[18px] font-semibold text-foreground">Atividades recentes</h2><p className="text-[12px] text-muted-foreground">O progresso de vocês, sem repetições.</p></div>
+        <span className="text-[11px] text-muted-foreground">{events.length} publicações</span>
+      </div>
+      <ol className="border-t border-border/60">
+        {events.slice(0, visible).map((event) => <FeedPost key={event.id} event={event} meId={meId} />)}
+      </ol>
+      {visible < events.length ? (
+        <Button variant="ghost" onClick={() => setVisible((value) => value + 6)} className="mt-3 w-full text-muted-foreground">Ver mais atividades</Button>
+      ) : null}
+    </div>
+  );
+}
+
+function consolidateRankEvents(events: ActivityEvent[]) {
+  const hidden = new Set<string>();
+  return events.filter((event, index) => {
+    if (hidden.has(event.id)) return false;
+    if (event.kind !== "rank_up") return true;
+    for (let next = index + 1; next < events.length; next += 1) {
+      const candidate = events[next];
+      if (candidate.profileId === event.profileId && candidate.kind === "rank_up") hidden.add(candidate.id);
+    }
+    return true;
+  });
+}
+
+function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
+  const actor = profileMeta(event.profileId);
+  const reactions = useReactionsForEvent(event.id);
+  const comments = useCommentsForEvent(event.id);
+  const [showComments, setShowComments] = useState(false);
+  const [body, setBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const liked = reactions.some((reaction) => reaction.profileId === meId && reaction.emoji === "❤️");
+
+  async function submitComment(eventForm: React.FormEvent) {
+    eventForm.preventDefault();
+    if (!body.trim() || sending) return;
+    setSending(true);
+    const ok = await addActivityComment(event.id, meId, body);
+    setSending(false);
+    if (ok) setBody("");
+  }
+
+  return (
+    <li className="border-b border-border/60 py-5">
+      <div className="flex gap-3">
+        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={40} />
+        <article className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="truncate text-[13px] font-semibold text-foreground">{event.profileId === meId ? "Você" : actor.name}</p>
+            <span className="text-[11px] text-muted-foreground">{timeAgo(event.createdAt)}</span>
+          </div>
+          <div className="mt-2 flex gap-3">
+            <span className="mt-0.5 text-primary">{eventIcon(event.kind)}</span>
+            <div>
+              <p className="text-[15px] font-medium leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{eventDescription(event)}</p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={() => toggleReaction(event.id, meId, "❤️")} className={`rounded-full ${liked ? "text-primary" : "text-muted-foreground"}`}>
+              <Heart className={liked ? "fill-current" : ""} /> {reactions.filter((reaction) => reaction.emoji === "❤️").length || "Curtir"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowComments((value) => !value)} className="rounded-full text-muted-foreground">
+              <MessageCircle /> {comments.length || "Comentar"}
+            </Button>
+          </div>
+          {showComments ? (
+            <div className="mt-3 border-l border-border pl-3">
+              {comments.map((comment) => {
+                const author = profileMeta(comment.profileId);
+                return <div key={comment.id} className="mb-3 flex gap-2"><ProfileAvatar profileId={comment.profileId} initial={author.initial} gradient={author.gradient} size={24} /><div><p className="text-[11px] font-semibold text-foreground">{comment.profileId === meId ? "Você" : author.name}</p><p className="text-[12px] text-muted-foreground">{comment.body}</p></div></div>;
+              })}
+              <form onSubmit={submitComment} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
+                <input value={body} onChange={(e) => setBody(e.target.value)} maxLength={280} placeholder="Escreva um comentário" className="min-w-0 rounded-md border border-border bg-secondary/50 px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+                <Button type="submit" size="icon" disabled={!body.trim() || sending} aria-label="Enviar comentário"><Send /></Button>
+              </form>
+            </div>
+          ) : null}
+        </article>
+      </div>
     </li>
   );
 }
+
+function DuelAside({ meId, score, duel }: { meId: ProfileId; score: { g: number; a: number }; duel: ReturnType<typeof useWeeklyDuel> }) {
+  const friendId = otherProfile(meId);
+  const mine = meId === "guilherme" ? score.g : score.a;
+  const theirs = meId === "guilherme" ? score.a : score.g;
+  return <section><div className="mb-3 flex items-center justify-between"><h2 className="text-[15px] font-semibold text-foreground">Duelo semanal</h2><span className="text-[10px] uppercase text-muted-foreground">{duel?.status === "active" ? "Em andamento" : "Placar"}</span></div><div className="flex items-center justify-between border-y border-border/60 py-4"><DuelAvatar id={meId} score={mine} label="Você" /><span className="text-[11px] font-semibold text-muted-foreground">VS</span><DuelAvatar id={friendId} score={theirs} label={profileMeta(friendId).name} /></div><Button asChild variant="ghost" className="mt-2 w-full justify-between text-muted-foreground"><Link to="/duel">{duel ? "Abrir duelo" : "Criar duelo"}<ChevronRight /></Link></Button></section>;
+}
+
+function DuelAvatar({ id, score, label }: { id: ProfileId; score: number; label: string }) {
+  const profile = profileMeta(id);
+  return <div className="flex items-center gap-2"><ProfileAvatar profileId={id} initial={profile.initial} gradient={profile.gradient} size={34} /><div><p className="text-[11px] text-muted-foreground">{label}</p><p className="text-[16px] font-semibold tabular-nums text-foreground">{score}</p></div></div>;
+}
+
+function DuelSection({ meId, score, duel }: { meId: ProfileId; score: { g: number; a: number }; duel: ReturnType<typeof useWeeklyDuel> }) {
+  const friendId = otherProfile(meId);
+  const mine = meId === "guilherme" ? score.g : score.a;
+  const theirs = meId === "guilherme" ? score.a : score.g;
+  return <div><div className="mb-5"><h2 className="text-[18px] font-semibold text-foreground">Duelo semanal</h2><p className="text-[12px] text-muted-foreground">As mesmas cartas para os dois. A melhor precisão vence.</p></div><div className="border-y border-border/60 py-7"><div className="mx-auto flex max-w-md items-center justify-between"><DuelAvatarLarge id={meId} score={mine} label="Você" /><div className="text-center"><Swords className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">{duel?.status === "active" ? "Ao vivo" : "Semana"}</p></div><DuelAvatarLarge id={friendId} score={theirs} label={profileMeta(friendId).name} /></div></div><Button asChild className="mt-5 w-full"><Link to="/duel">{duel?.status === "active" ? "Continuar duelo" : duel ? "Ver resultado" : "Criar novo duelo"}<ChevronRight /></Link></Button><div className="mt-7 grid grid-cols-3 divide-x divide-border border-y border-border/60 py-4 text-center"><DuelRule value="5" label="cartas" /><DuelRule value="48h" label="prazo" /><DuelRule value="1×" label="por semana" /></div></div>;
+}
+
+function DuelAvatarLarge({ id, score, label }: { id: ProfileId; score: number; label: string }) { const p = profileMeta(id); return <div className="text-center"><ProfileAvatar profileId={id} initial={p.initial} gradient={p.gradient} size={58} className="mx-auto" /><p className="mt-2 text-[12px] font-medium text-foreground">{label}</p><p className="text-[24px] font-semibold tabular-nums text-foreground">{score}</p></div>; }
+function DuelRule({ value, label }: { value: string; label: string }) { return <div><p className="text-[15px] font-semibold text-foreground">{value}</p><p className="text-[10px] uppercase text-muted-foreground">{label}</p></div>; }
+
+function Gifts({ pending, sent, friendName }: { pending: ReturnType<typeof usePendingGifts>; sent: ReturnType<typeof useSentGifts>; friendName: string }) {
+  return <div><div className="mb-5"><h2 className="text-[18px] font-semibold text-foreground">Presentes</h2><p className="text-[12px] text-muted-foreground">Cartas compartilhadas entre você e {friendName}.</p></div>{pending.length ? <GiftInbox /> : <Empty icon={Gift} title="Nenhum presente novo" body={`Quando ${friendName} enviar uma carta, ela aparecerá aqui.`} />}{sent.length ? <section className="mt-7"><h3 className="mb-2 text-[12px] font-semibold uppercase text-muted-foreground">Enviados</h3><ul className="border-t border-border/60">{sent.map((gift) => <li key={gift.id} className="flex items-center gap-3 border-b border-border/60 py-3"><span className="text-muted-foreground">{gift.status === "imported" ? <Check className="h-4 w-4 text-success" /> : gift.status === "declined" ? <XIcon className="h-4 w-4" /> : <Gift className="h-4 w-4 text-primary" />}</span><div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium text-foreground">{gift.front}</p><p className="truncate text-[11px] text-muted-foreground">{gift.back}</p></div><span className="text-[10px] uppercase text-muted-foreground">{gift.status === "pending" ? "Pendente" : gift.status === "imported" ? "Aceita" : "Recusada"}</span></li>)}</ul></section> : null}</div>;
+}
+
+function eventIcon(kind: ActivityEvent["kind"]) { if (kind === "rank_up") return <Trophy className="h-4 w-4" />; if (kind === "streak_milestone") return <Flame className="h-4 w-4" />; if (kind === "exam_done") return <GraduationCap className="h-4 w-4" />; if (kind === "duel_won") return <Swords className="h-4 w-4" />; return <Sparkles className="h-4 w-4" />; }
+function eventTitle(event: ActivityEvent, name: string) { const p = event.payload; if (event.kind === "rank_up") return `${name} chegou ao ${formatRank(p.toTier, p.toDivision)}`; if (event.kind === "streak_milestone") return `${name} completou ${String(p.days ?? "")} dias de sequência`; if (event.kind === "exam_done") return `${name} concluiu a prova mensal`; if (event.kind === "duel_won") return `${name} venceu o duelo da semana`; return `${name} derrotou uma carta inimiga`; }
+function eventDescription(event: ActivityEvent) { if (event.kind === "rank_up") return "Uma nova etapa foi alcançada no airi Rank."; if (event.kind === "streak_milestone") return "Consistência que merece ser celebrada."; if (event.kind === "exam_done") return "Mais uma avaliação concluída no plano de estudos."; if (event.kind === "duel_won") return "Rodada finalizada com a melhor pontuação."; return "Mais um desafio removido da Arena."; }
+function formatRank(tier: unknown, division: unknown) { const tierText = String(tier ?? "").trim(); const divisionText = String(division ?? "").trim(); const normalized = tierText.charAt(0).toUpperCase() + tierText.slice(1).toLowerCase(); return `${normalized}${divisionText ? ` ${divisionText.toUpperCase()}` : ""}`.trim(); }
+function timeAgo(iso: string) { const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000); if (minutes < 1) return "agora"; if (minutes < 60) return `${minutes} min`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours}h`; return `${Math.floor(hours / 24)}d`; }
+function Empty({ icon: Icon, title, body }: { icon: typeof Gift; title: string; body: string }) { return <div className="border-y border-border/60 py-12 text-center"><Icon className="mx-auto h-5 w-5 text-primary" /><p className="mt-3 text-[14px] font-semibold text-foreground">{title}</p><p className="mx-auto mt-1 max-w-xs text-[12px] text-muted-foreground">{body}</p></div>; }
