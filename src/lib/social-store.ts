@@ -98,6 +98,14 @@ export type ActivityReaction = {
   createdAt: string;
 };
 
+export type ActivityComment = {
+  id: string;
+  eventId: string;
+  profileId: ProfileId;
+  body: string;
+  createdAt: string;
+};
+
 // ============================================================
 // Estado in-memory + pub/sub
 // ============================================================
@@ -108,6 +116,7 @@ type State = {
   gifts: CardGift[];
   events: ActivityEvent[];
   reactions: ActivityReaction[];
+  comments: ActivityComment[];
   loaded: boolean;
 };
 
@@ -117,6 +126,7 @@ let state: State = {
   gifts: [],
   events: [],
   reactions: [],
+  comments: [],
   loaded: false,
 };
 
@@ -204,6 +214,15 @@ function mapReaction(row: any): ActivityReaction {
     createdAt: row.created_at,
   };
 }
+function mapComment(row: any): ActivityComment {
+  return {
+    id: row.id,
+    eventId: row.event_id,
+    profileId: row.profile_id,
+    body: row.body,
+    createdAt: row.created_at,
+  };
+}
 
 // ============================================================
 // Bootstrap: fetch inicial + realtime
@@ -214,12 +233,13 @@ let channel: ReturnType<typeof supabase.channel> | null = null;
 
 async function fetchAll() {
   const anySb = supabase as any;
-  const [duels, results, gifts, events, reactions] = await Promise.all([
+  const [duels, results, gifts, events, reactions, comments] = await Promise.all([
     anySb.from("duels").select("*").order("created_at", { ascending: false }).limit(30),
     anySb.from("duel_results").select("*"),
     anySb.from("card_gifts").select("*").order("created_at", { ascending: false }).limit(50),
     anySb.from("activity_events").select("*").order("created_at", { ascending: false }).limit(30),
     anySb.from("activity_reactions").select("*"),
+    anySb.from("activity_comments").select("*").order("created_at", { ascending: true }),
   ]);
   state = {
     duels: (duels.data ?? []).map(mapDuel),
@@ -227,6 +247,7 @@ async function fetchAll() {
     gifts: (gifts.data ?? []).map(mapGift),
     events: (events.data ?? []).map(mapEvent),
     reactions: (reactions.data ?? []).map(mapReaction),
+    comments: (comments.data ?? []).map(mapComment),
     loaded: true,
   };
   emit();
@@ -246,6 +267,7 @@ export function startSocialSync() {
     .on("postgres_changes", { event: "*", schema: "public", table: "card_gifts" }, () => fetchAll())
     .on("postgres_changes", { event: "*", schema: "public", table: "activity_events" }, () => fetchAll())
     .on("postgres_changes", { event: "*", schema: "public", table: "activity_reactions" }, () => fetchAll())
+    .on("postgres_changes", { event: "*", schema: "public", table: "activity_comments" }, () => fetchAll())
     .subscribe();
 
   // Verifica prazos a cada 5 minutos.
@@ -471,6 +493,30 @@ export function useUnifiedFeed(limit = 30): ActivityEvent[] {
 
 export function useReactionsForEvent(eventId: string): ActivityReaction[] {
   return useSocial((s) => s.reactions.filter((r) => r.eventId === eventId));
+}
+
+export function useCommentsForEvent(eventId: string): ActivityComment[] {
+  return useSocial((s) => s.comments.filter((comment) => comment.eventId === eventId));
+}
+
+export async function addActivityComment(
+  eventId: string,
+  profileId: ProfileId,
+  body: string,
+): Promise<boolean> {
+  const cleanBody = body.trim().slice(0, 280);
+  if (!cleanBody) return false;
+  const { error } = await (supabase as any).from("activity_comments").insert({
+    event_id: eventId,
+    profile_id: profileId,
+    body: cleanBody,
+  });
+  if (error) {
+    console.error("addActivityComment", error);
+    return false;
+  }
+  await fetchAll();
+  return true;
 }
 
 /** Timeline consolidada de um perfil (eventos + duelos + presentes). */
