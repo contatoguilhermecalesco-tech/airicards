@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_comments: {
+        Row: {
+          body: string
+          created_at: string
+          event_id: string
+          id: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          event_id: string
+          id?: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_comments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "activity_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_events: {
         Row: {
           created_at: string
