@@ -35,6 +35,7 @@ import { getEquippedArt } from "@/lib/shop-asset-overrides";
 import { profileMeta, type ProfileId } from "@/lib/social-store";
 import { useCurrentProfile } from "@/lib/profile";
 import type { Notification, NotificationTag } from "@/lib/notifications-store";
+import { iconFromKey } from "@/lib/notification-icons";
 
 export type NotifKind =
   | "shard"
@@ -189,6 +190,25 @@ export function NotificationVisual({
 }) {
   const kind = inferKind(n);
   const accent = tag?.color ?? "hsl(var(--primary))";
+  const SelectedIcon = iconFromKey(n.icon);
+
+  // Notifications created by an admin must always honor the chosen icon.
+  // Content inference is only a fallback for older notifications without one.
+  if (SelectedIcon) {
+    return (
+      <div
+        className="flex shrink-0 items-center justify-center rounded-2xl border"
+        style={{
+          width: size,
+          height: size,
+          background: `color-mix(in oklab, ${accent} 14%, transparent)`,
+          borderColor: `color-mix(in oklab, ${accent} 30%, transparent)`,
+        }}
+      >
+        <SelectedIcon className="h-5 w-5" style={{ color: accent }} strokeWidth={2.2} />
+      </div>
+    );
+  }
 
   if (kind === "shard") {
     const cosmeticId = extractCosmeticId(`${n.title} ${n.body} ${n.action_route ?? ""}`);
