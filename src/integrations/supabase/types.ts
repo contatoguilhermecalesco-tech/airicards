@@ -814,6 +814,81 @@ export type Database = {
           },
         ]
       }
+      system_update_reads: {
+        Row: {
+          profile_id: string
+          read_at: string
+          update_id: string
+        }
+        Insert: {
+          profile_id: string
+          read_at?: string
+          update_id: string
+        }
+        Update: {
+          profile_id?: string
+          read_at?: string
+          update_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_update_reads_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "app_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_update_reads_update_id_fkey"
+            columns: ["update_id"]
+            isOneToOne: false
+            referencedRelation: "system_updates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_updates: {
+        Row: {
+          action_label: string | null
+          action_route: string | null
+          affected_area: string | null
+          body: string
+          color: string
+          created_at: string
+          icon: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_route?: string | null
+          affected_area?: string | null
+          body: string
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          status: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_label?: string | null
+          action_route?: string | null
+          affected_area?: string | null
+          body?: string
+          color?: string
+          created_at?: string
+          icon?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
