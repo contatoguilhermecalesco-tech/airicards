@@ -191,6 +191,7 @@ export function NotificationVisual({
   const kind = inferKind(n);
   const accent = tag?.color ?? "hsl(var(--primary))";
   const SelectedIcon = iconFromKey(n.icon);
+  const isSystemTag = Boolean(tag && !/social|presente|duelo/i.test(tag.name));
 
   // Notifications created by an admin must always honor the chosen icon.
   // Content inference is only a fallback for older notifications without one.
@@ -206,6 +207,15 @@ export function NotificationVisual({
         }}
       >
         <SelectedIcon className="h-5 w-5" style={{ color: accent }} strokeWidth={2.2} />
+      </div>
+    );
+  }
+
+  if (isSystemTag) {
+    const FallbackIcon = kind === "event" ? Calendar : kind === "study" ? GraduationCap : Bell;
+    return (
+      <div className="flex shrink-0 items-center justify-center rounded-2xl border" style={{ width: size, height: size, background: `color-mix(in oklab, ${accent} 14%, transparent)`, borderColor: `color-mix(in oklab, ${accent} 30%, transparent)` }}>
+        <FallbackIcon className="h-5 w-5" style={{ color: accent }} strokeWidth={2.2} />
       </div>
     );
   }
