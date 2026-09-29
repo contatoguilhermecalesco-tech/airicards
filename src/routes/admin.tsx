@@ -19,6 +19,7 @@ import {
   Tag as TagIcon,
   Trophy,
   Users,
+  AlertTriangle,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -56,6 +57,8 @@ import { DuelsAdminSection } from "@/components/admin/DuelsAdminSection";
 import { PinAdminSection } from "@/components/admin/PinAdminSection";
 import { TagsSection } from "@/components/admin/TagsSection";
 import { NotificationsSection } from "@/components/admin/NotificationsSection";
+import { SystemUpdatesSection } from "@/components/admin/SystemUpdatesSection";
+import { initSystemUpdates } from "@/lib/system-updates-store";
 import { ChangelogSection } from "@/components/admin/ChangelogSection";
 import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
@@ -67,6 +70,17 @@ import { BundleConceptsSection } from "@/components/admin/BundleConceptsSection"
 import { initBundleConcepts } from "@/lib/bundle-concepts-store";
 
 export const Route = createFileRoute("/admin")({
+  head: () => ({
+    meta: [
+      { title: "Admin — airi" },
+      { name: "description", content: "Painel administrativo do airi." },
+      { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Admin — airi" },
+      { property: "og:description", content: "Painel administrativo do airi." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AdminGate,
 });
 
@@ -100,6 +114,7 @@ type PanelKey =
   | "pin"
   | "tags"
   | "notifications"
+  | "system-updates"
   | "changelog"
   | "backup"
   | "streak"
@@ -127,6 +142,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "pin", label: "PIN", hint: "Redefinir / desvincular perfis", Icon: KeyRound, color: "#94a3b8" },
   { key: "tags", label: "Tags", hint: "Criar tags de notificação", Icon: TagIcon, color: "#60a5fa" },
   { key: "notifications", label: "Notificações", hint: "Enviar avisos e alertas", Icon: BellIcon, color: "#34d399" },
+  { key: "system-updates", label: "Atualizações", hint: "Informar estado dos recursos", Icon: AlertTriangle, color: "#f59e0b", wide: true },
   { key: "changelog", label: "Patch notes", hint: "Publicar / editar novidades", Icon: ScrollText, color: "#c084fc", wide: true },
   { key: "backup", label: "Backup", hint: "Exportar / importar decks (JSON)", Icon: Database, color: "#38bdf8", wide: true },
   { key: "streak", label: "Streak", hint: "Ajustar sequência de dias", Icon: Flame, color: "#fb923c" },
@@ -158,6 +174,7 @@ function AdminPage() {
   useEffect(() => {
     void load();
     void initNotifications();
+    void initSystemUpdates();
     void initChangelog();
     void initBundleConcepts();
   }, []);
@@ -297,6 +314,7 @@ function AdminPage() {
                 {openPanel === "pin" && <PinAdminSection />}
                 {openPanel === "tags" && <TagsSection />}
                 {openPanel === "notifications" && <NotificationsSection />}
+                {openPanel === "system-updates" && <SystemUpdatesSection />}
                 {openPanel === "changelog" && <ChangelogSection />}
                 {openPanel === "backup" && <BackupSection />}
                 {openPanel === "streak" && <StreakAdminSection />}

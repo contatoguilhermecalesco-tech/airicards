@@ -24,6 +24,7 @@ import { Route as ForjaRouteImport } from './routes/forja'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as DesafiosRouteImport } from './routes/desafios'
+import { Route as AtualizacoesRouteImport } from './routes/atualizacoes'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
@@ -129,6 +130,11 @@ const DuelRoute = DuelRouteImport.update({
 const DesafiosRoute = DesafiosRouteImport.update({
   id: '/desafios',
   path: '/desafios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtualizacoesRoute = AtualizacoesRouteImport.update({
+  id: '/atualizacoes',
+  path: '/atualizacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -294,6 +300,7 @@ const StudyListeningHistoryIdRoute = StudyListeningHistoryIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
@@ -385,6 +393,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/atualizacoes'
     | '/desafios'
     | '/duel'
     | '/enemies'
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/atualizacoes'
     | '/desafios'
     | '/duel'
     | '/enemies'
@@ -525,6 +536,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/atualizacoes'
     | '/desafios'
     | '/duel'
     | '/enemies'
@@ -574,6 +586,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AtualizacoesRoute: typeof AtualizacoesRoute
   DesafiosRoute: typeof DesafiosRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
@@ -713,6 +726,13 @@ declare module '@tanstack/react-router' {
       path: '/desafios'
       fullPath: '/desafios'
       preLoaderRoute: typeof DesafiosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atualizacoes': {
+      id: '/atualizacoes'
+      path: '/atualizacoes'
+      fullPath: '/atualizacoes'
+      preLoaderRoute: typeof AtualizacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1019,6 +1039,7 @@ const StudyWritingHistoryRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AtualizacoesRoute: AtualizacoesRoute,
   DesafiosRoute: DesafiosRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
