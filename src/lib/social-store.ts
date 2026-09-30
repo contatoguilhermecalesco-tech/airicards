@@ -503,20 +503,31 @@ export async function addActivityComment(
   eventId: string,
   profileId: ProfileId,
   body: string,
-): Promise<boolean> {
+): Promise<{ ok: true; comment: ActivityComment } | { ok: false; message: string }> {
   const cleanBody = body.trim().slice(0, 280);
-  if (!cleanBody) return false;
-  const { error } = await (supabase as any).from("activity_comments").insert({
-    event_id: eventId,
-    profile_id: profileId,
-    body: cleanBody,
-  });
+  if (!cleanBody) return { ok: false, message: "Escreva um comentário antes de enviar." };
+  const { data, error } = await (supabase as any)
+    .from("activity_comments")
+    .insert({
+      event_id: eventId,
+      profile_id: profileId,
+      body: cleanBody,
+    })
+    .select("*")
+    .single();
   if (error) {
     console.error("addActivityComment", error);
-    return false;
+    return { ok: false, message: "Não foi possível enviar. Tente novamente." };
   }
-  await fetchAll();
-  return true;
+  const comment = mapComment(data);
+  state = {
+    ...state,
+    comments: state.comments.some((item) => item.id === comment.id)
+      ? state.comments
+      : [...state.comments, comment],
+  };
+  emit();
+  return { ok: true, comment };
 }
 
 /** Timeline consolidada de um perfil (eventos + duelos + presentes). */

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
   BarChart3,
   Check,
@@ -198,9 +199,17 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
     eventForm.preventDefault();
     if (!body.trim() || sending) return;
     setSending(true);
-    const ok = await addActivityComment(event.id, meId, body);
-    setSending(false);
-    if (ok) setBody("");
+    try {
+      const result = await addActivityComment(event.id, meId, body);
+      if (result.ok) {
+        setBody("");
+        toast.success("Comentário publicado");
+      } else {
+        toast.error(result.message);
+      }
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -229,13 +238,14 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
           </div>
           {showComments ? (
             <div className="mt-3 border-l border-border pl-3">
+              {comments.length === 0 ? <p className="mb-3 text-[12px] text-muted-foreground">Seja o primeiro a comentar.</p> : null}
               {comments.map((comment) => {
                 const author = profileMeta(comment.profileId);
                 return <div key={comment.id} className="mb-3 flex gap-2"><ProfileAvatar profileId={comment.profileId} initial={author.initial} gradient={author.gradient} size={24} /><div><p className="text-[11px] font-semibold text-foreground">{comment.profileId === meId ? "Você" : author.name}</p><p className="text-[12px] text-muted-foreground">{comment.body}</p></div></div>;
               })}
               <form onSubmit={submitComment} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
                 <input value={body} onChange={(e) => setBody(e.target.value)} maxLength={280} placeholder="Escreva um comentário" className="min-w-0 rounded-md border border-border bg-secondary/50 px-3 text-[12px] text-foreground outline-none focus:border-primary" />
-                <Button type="submit" size="icon" disabled={!body.trim() || sending} aria-label="Enviar comentário"><Send /></Button>
+                <Button type="submit" size="icon" disabled={!body.trim() || sending} aria-label={sending ? "Enviando comentário" : "Enviar comentário"}><Send /></Button>
               </form>
             </div>
           ) : null}
