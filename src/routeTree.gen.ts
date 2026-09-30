@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StreakRouteImport } from './routes/streak'
 import { Route as SocialRouteImport } from './routes/social'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -57,6 +58,11 @@ import { Route as StudySpeakingHistoryIdRouteImport } from './routes/study.speak
 import { Route as StudyReadingHistoryIdRouteImport } from './routes/study.reading.history.$id'
 import { Route as StudyListeningHistoryIdRouteImport } from './routes/study.listening.history.$id'
 
+const StreakRoute = StreakRouteImport.update({
+  id: '/streak',
+  path: '/streak',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialRoute = SocialRouteImport.update({
   id: '/social',
   path: '/social',
@@ -316,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
+  '/streak': typeof StreakRoute
   '/b/$id': typeof BIdRoute
   '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
@@ -363,6 +370,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/streak': typeof StreakRoute
   '/b/$id': typeof BIdRoute
   '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
@@ -409,6 +417,7 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/social': typeof SocialRouteWithChildren
+  '/streak': typeof StreakRoute
   '/b/$id': typeof BIdRoute
   '/exam/historico': typeof ExamHistoricoRoute
   '/library/$deckId': typeof LibraryDeckIdRoute
@@ -460,6 +469,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/social'
+    | '/streak'
     | '/b/$id'
     | '/exam/historico'
     | '/library/$deckId'
@@ -507,6 +517,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shop'
     | '/sitemap.xml'
+    | '/streak'
     | '/b/$id'
     | '/exam/historico'
     | '/library/$deckId'
@@ -552,6 +563,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/sitemap.xml'
     | '/social'
+    | '/streak'
     | '/b/$id'
     | '/exam/historico'
     | '/library/$deckId'
@@ -602,6 +614,7 @@ export interface RootRouteChildren {
   ShopRoute: typeof ShopRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SocialRoute: typeof SocialRouteWithChildren
+  StreakRoute: typeof StreakRoute
   BIdRoute: typeof BIdRoute
   ExamHistoricoRoute: typeof ExamHistoricoRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
@@ -623,6 +636,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/streak': {
+      id: '/streak'
+      path: '/streak'
+      fullPath: '/streak'
+      preLoaderRoute: typeof StreakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/social': {
       id: '/social'
       path: '/social'
@@ -1055,6 +1075,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopRoute: ShopRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SocialRoute: SocialRouteWithChildren,
+  StreakRoute: StreakRoute,
   BIdRoute: BIdRoute,
   ExamHistoricoRoute: ExamHistoricoRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
