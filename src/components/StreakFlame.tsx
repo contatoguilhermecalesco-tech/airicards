@@ -39,35 +39,19 @@ export function StreakFlame({
 
   // Intensidade sobe com a streak (limitada), usada pelos cosméticos.
   const intensity = Math.min(1, streak / 30);
-  const glowColor = theme && isActive ? theme.color : state === "risk" ? "#fbbf24" : "#fb7185";
-  const glowAccent = theme && isActive ? theme.accent : state === "risk" ? "#fed7aa" : "#fecdd3";
 
   return (
     <div
-      className={`relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl border transition-all duration-500 ${ring} ${
-        isActive ? "shadow-[0_0_26px_-10px_currentColor]" : ""
-      }`}
+      className={`relative grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-2xl border transition-colors ${ring}`}
     >
-      {isActive && (
+      {theme && isActive && (
         <>
           <span
             aria-hidden
-            className="pointer-events-none absolute -inset-2 rounded-full opacity-60 blur-lg motion-safe:animate-[emberGlow_2600ms_ease-in-out_infinite]"
+            className="pointer-events-none absolute inset-0 opacity-70 motion-safe:animate-[emberGlow_2600ms_ease-in-out_infinite]"
             style={{
-              background: `radial-gradient(closest-side, ${glowColor}55, transparent 72%)`,
+              background: `radial-gradient(closest-side at 50% 85%, ${theme.color}55, transparent 72%)`,
             }}
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-2 rounded-full opacity-35 blur-md"
-            style={{
-              background: `radial-gradient(closest-side, ${glowAccent}55, transparent 68%)`,
-            }}
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute bottom-1 h-5 w-8 rounded-full blur-md opacity-50 motion-safe:animate-[emberGlow_1800ms_ease-in-out_infinite]"
-            style={{ background: glowColor }}
           />
           {[0, 1, 2].map((i) => (
             <span
@@ -76,24 +60,14 @@ export function StreakFlame({
               className="pointer-events-none absolute bottom-1 h-1 w-1 rounded-full motion-safe:animate-[emberRise_2800ms_linear_infinite]"
               style={{
                 left: `${26 + i * 18}%`,
-                background: glowAccent,
+                background: theme.color,
                 opacity: 0.45 + intensity * 0.4,
                 animationDelay: `${i * 700}ms`,
-                boxShadow: `0 0 6px ${glowColor}`,
+                boxShadow: `0 0 6px ${theme.color}`,
               }}
             />
           ))}
         </>
-      )}
-
-      {theme && isActive && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-70 motion-safe:animate-[emberGlow_2600ms_ease-in-out_infinite]"
-          style={{
-            background: `radial-gradient(closest-side at 50% 85%, ${theme.color}55, transparent 72%)`,
-          }}
-        />
       )}
 
       {theme?.glyph === "marionette" && theme.art ? (
@@ -127,37 +101,19 @@ export function StreakFlame({
           />
         </span>
       ) : (
-        <span className="relative grid h-[30px] w-[30px] place-items-center">
-          <span
-            aria-hidden
-            className={`pointer-events-none absolute inset-[2px] rounded-full blur-[5px] transition-opacity duration-500 ${
-              isActive ? "opacity-70" : "opacity-0"
-            }`}
-            style={{
-              background: `radial-gradient(closest-side, ${glowColor}99, transparent 72%)`,
-            }}
-          />
-          <Flame
-            className={`relative z-10 h-[24px] w-[24px] transition-transform duration-500 ${
-              state === "alive" && studiedToday ? "motion-safe:animate-pulse" : ""
-            } ${state === "risk" ? "motion-safe:animate-[flicker_1400ms_ease-in-out_infinite]" : ""} ${
-              state === "ashes" ? "opacity-40 rotate-6" : ""
-            }`}
-            strokeWidth={2.25}
-            style={theme && isActive ? { color: theme.color } : undefined}
-            fill={state === "alive" || state === "risk" ? "currentColor" : "none"}
-            fillOpacity={
-              state === "alive" ? (studiedToday ? 0.42 : 0.28) : state === "risk" ? 0.3 : 0
-            }
-          />
-          {isActive && (
-            <span
-              aria-hidden
-              className="pointer-events-none absolute bottom-[2px] h-[3px] w-[10px] rounded-full blur-[2px] opacity-80"
-              style={{ background: glowAccent }}
-            />
-          )}
-        </span>
+        <Flame
+          className={`relative h-[22px] w-[22px] transition-transform ${
+            state === "alive" && studiedToday ? "motion-safe:animate-pulse" : ""
+          } ${state === "risk" ? "motion-safe:animate-[flicker_1400ms_ease-in-out_infinite]" : ""} ${
+            state === "ashes" ? "opacity-40 rotate-6" : ""
+          }`}
+          strokeWidth={2.25}
+          style={theme && isActive ? { color: theme.color } : undefined}
+          fill={state === "alive" || state === "risk" ? "currentColor" : "none"}
+          fillOpacity={
+            state === "alive" ? (studiedToday ? 0.3 : 0.18) : state === "risk" ? 0.22 : 0
+          }
+        />
       )}
     </div>
   );
