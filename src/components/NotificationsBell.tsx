@@ -9,7 +9,7 @@ import {
   Moon,
   ArrowUpRight,
 } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 
 import {
   initNotifications,
@@ -30,7 +30,6 @@ function isSocial(n: Notification) {
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
   const { notifications, tags, readIds } = useNotifications();
   const prefs = useNotificationPrefs();
@@ -104,21 +103,6 @@ export function NotificationsBell() {
   const handleClick = (n: Notification) => {
     void markAsRead(n.id);
     setOpen(false);
-    if (n.action_route) {
-      const route = n.action_route;
-      const qIdx = route.indexOf("?");
-      if (qIdx >= 0) {
-        const pathname = route.slice(0, qIdx) || "/";
-        const params = new URLSearchParams(route.slice(qIdx + 1));
-        const search: Record<string, string> = {};
-        params.forEach((v, k) => {
-          search[k] = v;
-        });
-        void navigate({ to: pathname as any, search: search as any });
-      } else {
-        void navigate({ to: route as any });
-      }
-    }
   };
 
   return (

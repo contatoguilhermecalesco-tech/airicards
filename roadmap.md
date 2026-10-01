@@ -6,3 +6,4 @@
 - [x] Integrar navegação e metadados
 - [ ] Validar compilação e experiência em desktop/mobile
 - [x] Corrigir envio, persistência e exibição de comentários no feed Social
+- [x] Corrigir os direcionamentos das ações na Central de Notificações
