@@ -449,14 +449,6 @@ export function NotificationRow({
     </div>
   );
 
-  if (route && onClick) {
-    return (
-      <button onClick={onClick} className="block w-full">
-        {body}
-      </button>
-    );
-  }
-
   if (route) {
     return (
       <Link
