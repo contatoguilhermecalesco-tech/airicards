@@ -9,138 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AtualizacoesRouteImport } from './routes/atualizacoes'
-import { Route as DesafiosRouteImport } from './routes/desafios'
-import { Route as DuelRouteImport } from './routes/duel'
-import { Route as EnemiesRouteImport } from './routes/enemies'
-import { Route as ForjaRouteImport } from './routes/forja'
-import { Route as InventoryRouteImport } from './routes/inventory'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
-import { Route as NotificacoesRouteImport } from './routes/notificacoes'
-import { Route as NovidadesRouteImport } from './routes/novidades'
-import { Route as PerfilRouteImport } from './routes/perfil'
-import { Route as RankRouteImport } from './routes/rank'
-import { Route as ReviewRouteImport } from './routes/review'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ShopRouteImport } from './routes/shop'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SocialRouteImport } from './routes/social'
 import { Route as StreakRouteImport } from './routes/streak'
-import { Route as BIdRouteImport } from './routes/b.$id'
-import { Route as ExamIndexRouteImport } from './routes/exam.index'
-import { Route as ExamHistoricoRouteImport } from './routes/exam.historico'
-import { Route as LibraryIndexRouteImport } from './routes/library.index'
-import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
-import { Route as NovidadesIndexRouteImport } from './routes/novidades.index'
-import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
-import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
-import { Route as SocialIndexRouteImport } from './routes/social.index'
-import { Route as SocialStatsRouteImport } from './routes/social.stats'
+import { Route as SocialRouteImport } from './routes/social'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReviewRouteImport } from './routes/review'
+import { Route as RankRouteImport } from './routes/rank'
+import { Route as PerfilRouteImport } from './routes/perfil'
+import { Route as NovidadesRouteImport } from './routes/novidades'
+import { Route as NotificacoesRouteImport } from './routes/notificacoes'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as InventoryRouteImport } from './routes/inventory'
+import { Route as ForjaRouteImport } from './routes/forja'
+import { Route as EnemiesRouteImport } from './routes/enemies'
+import { Route as DuelRouteImport } from './routes/duel'
+import { Route as DesafiosRouteImport } from './routes/desafios'
+import { Route as AtualizacoesRouteImport } from './routes/atualizacoes'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
-import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
-import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
-import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
-import { Route as StudyListeningHistoryRouteImport } from './routes/study.listening.history'
-import { Route as StudyReadingIndexRouteImport } from './routes/study.reading.index'
-import { Route as StudyReadingHistoryRouteImport } from './routes/study.reading.history'
-import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
-import { Route as StudySpeakingHistoryRouteImport } from './routes/study.speaking.history'
+import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as NovidadesIndexRouteImport } from './routes/novidades.index'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
+import { Route as ExamIndexRouteImport } from './routes/exam.index'
+import { Route as SocialStatsRouteImport } from './routes/social.stats'
+import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
+import { Route as NovidadesIdRouteImport } from './routes/novidades.$id'
+import { Route as LibraryDeckIdRouteImport } from './routes/library.$deckId'
+import { Route as ExamHistoricoRouteImport } from './routes/exam.historico'
+import { Route as BIdRouteImport } from './routes/b.$id'
 import { Route as StudyWritingIndexRouteImport } from './routes/study.writing.index'
+import { Route as StudySpeakingIndexRouteImport } from './routes/study.speaking.index'
+import { Route as StudyReadingIndexRouteImport } from './routes/study.reading.index'
+import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
+import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyWritingHistoryRouteImport } from './routes/study.writing.history'
-import { Route as StudyListeningHistoryIndexRouteImport } from './routes/study.listening.history.index'
-import { Route as StudyListeningHistoryIdRouteImport } from './routes/study.listening.history.$id'
-import { Route as StudyReadingHistoryIndexRouteImport } from './routes/study.reading.history.index'
-import { Route as StudyReadingHistoryIdRouteImport } from './routes/study.reading.history.$id'
-import { Route as StudySpeakingHistoryIndexRouteImport } from './routes/study.speaking.history.index'
-import { Route as StudySpeakingHistoryIdRouteImport } from './routes/study.speaking.history.$id'
+import { Route as StudySpeakingHistoryRouteImport } from './routes/study.speaking.history'
+import { Route as StudyReadingHistoryRouteImport } from './routes/study.reading.history'
+import { Route as StudyListeningHistoryRouteImport } from './routes/study.listening.history'
+import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 import { Route as StudyWritingHistoryIndexRouteImport } from './routes/study.writing.history.index'
+import { Route as StudySpeakingHistoryIndexRouteImport } from './routes/study.speaking.history.index'
+import { Route as StudyReadingHistoryIndexRouteImport } from './routes/study.reading.history.index'
+import { Route as StudyListeningHistoryIndexRouteImport } from './routes/study.listening.history.index'
 import { Route as StudyWritingHistoryIdRouteImport } from './routes/study.writing.history.$id'
+import { Route as StudySpeakingHistoryIdRouteImport } from './routes/study.speaking.history.$id'
+import { Route as StudyReadingHistoryIdRouteImport } from './routes/study.reading.history.$id'
+import { Route as StudyListeningHistoryIdRouteImport } from './routes/study.listening.history.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AtualizacoesRoute = AtualizacoesRouteImport.update({
-  id: '/atualizacoes',
-  path: '/atualizacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DesafiosRoute = DesafiosRouteImport.update({
-  id: '/desafios',
-  path: '/desafios',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DuelRoute = DuelRouteImport.update({
-  id: '/duel',
-  path: '/duel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnemiesRoute = EnemiesRouteImport.update({
-  id: '/enemies',
-  path: '/enemies',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForjaRoute = ForjaRouteImport.update({
-  id: '/forja',
-  path: '/forja',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InventoryRoute = InventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificacoesRoute = NotificacoesRouteImport.update({
-  id: '/notificacoes',
-  path: '/notificacoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NovidadesRoute = NovidadesRouteImport.update({
-  id: '/novidades',
-  path: '/novidades',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PerfilRoute = PerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RankRoute = RankRouteImport.update({
-  id: '/rank',
-  path: '/rank',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReviewRoute = ReviewRouteImport.update({
-  id: '/review',
-  path: '/review',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopRoute = ShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const StreakRoute = StreakRouteImport.update({
+  id: '/streak',
+  path: '/streak',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialRoute = SocialRouteImport.update({
@@ -148,49 +68,94 @@ const SocialRoute = SocialRouteImport.update({
   path: '/social',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StreakRoute = StreakRouteImport.update({
-  id: '/streak',
-  path: '/streak',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BIdRoute = BIdRouteImport.update({
-  id: '/b/$id',
-  path: '/b/$id',
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExamIndexRoute = ExamIndexRouteImport.update({
-  id: '/exam/',
-  path: '/exam/',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExamHistoricoRoute = ExamHistoricoRouteImport.update({
-  id: '/exam/historico',
-  path: '/exam/historico',
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryIndexRoute = LibraryIndexRouteImport.update({
-  id: '/library/',
-  path: '/library/',
+const RankRoute = RankRouteImport.update({
+  id: '/rank',
+  path: '/rank',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
-  id: '/library/$deckId',
-  path: '/library/$deckId',
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NovidadesIndexRoute = NovidadesIndexRouteImport.update({
+const NovidadesRoute = NovidadesRouteImport.update({
+  id: '/novidades',
+  path: '/novidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificacoesRoute = NotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InventoryRoute = InventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForjaRoute = ForjaRouteImport.update({
+  id: '/forja',
+  path: '/forja',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnemiesRoute = EnemiesRouteImport.update({
+  id: '/enemies',
+  path: '/enemies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DuelRoute = DuelRouteImport.update({
+  id: '/duel',
+  path: '/duel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosRoute = DesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtualizacoesRoute = AtualizacoesRouteImport.update({
+  id: '/atualizacoes',
+  path: '/atualizacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => NovidadesRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-const NovidadesIdRoute = NovidadesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => NovidadesRoute,
-} as any)
-const PerfilIdRoute = PerfilIdRouteImport.update({
-  id: '/perfil_/$id',
-  path: '/perfil/$id',
+const StudyIndexRoute = StudyIndexRouteImport.update({
+  id: '/study/',
+  path: '/study/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialIndexRoute = SocialIndexRouteImport.update({
@@ -198,54 +163,49 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SocialRoute,
 } as any)
+const NovidadesIndexRoute = NovidadesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NovidadesRoute,
+} as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExamIndexRoute = ExamIndexRouteImport.update({
+  id: '/exam/',
+  path: '/exam/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SocialStatsRoute = SocialStatsRouteImport.update({
   id: '/stats',
   path: '/stats',
   getParentRoute: () => SocialRoute,
 } as any)
-const StudyIndexRoute = StudyIndexRouteImport.update({
-  id: '/study/',
-  path: '/study/',
+const PerfilIdRoute = PerfilIdRouteImport.update({
+  id: '/perfil_/$id',
+  path: '/perfil/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
-  id: '/deck/$owner/$slug',
-  path: '/deck/$owner/$slug',
+const NovidadesIdRoute = NovidadesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => NovidadesRoute,
+} as any)
+const LibraryDeckIdRoute = LibraryDeckIdRouteImport.update({
+  id: '/library/$deckId',
+  path: '/library/$deckId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudyGrammarIndexRoute = StudyGrammarIndexRouteImport.update({
-  id: '/study/grammar/',
-  path: '/study/grammar/',
+const ExamHistoricoRoute = ExamHistoricoRouteImport.update({
+  id: '/exam/historico',
+  path: '/exam/historico',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudyListeningIndexRoute = StudyListeningIndexRouteImport.update({
-  id: '/study/listening/',
-  path: '/study/listening/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudyListeningHistoryRoute = StudyListeningHistoryRouteImport.update({
-  id: '/study/listening/history',
-  path: '/study/listening/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudyReadingIndexRoute = StudyReadingIndexRouteImport.update({
-  id: '/study/reading/',
-  path: '/study/reading/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudyReadingHistoryRoute = StudyReadingHistoryRouteImport.update({
-  id: '/study/reading/history',
-  path: '/study/reading/history',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudySpeakingIndexRoute = StudySpeakingIndexRouteImport.update({
-  id: '/study/speaking/',
-  path: '/study/speaking/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudySpeakingHistoryRoute = StudySpeakingHistoryRouteImport.update({
-  id: '/study/speaking/history',
-  path: '/study/speaking/history',
+const BIdRoute = BIdRouteImport.update({
+  id: '/b/$id',
+  path: '/b/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudyWritingIndexRoute = StudyWritingIndexRouteImport.update({
@@ -253,43 +213,50 @@ const StudyWritingIndexRoute = StudyWritingIndexRouteImport.update({
   path: '/study/writing/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudySpeakingIndexRoute = StudySpeakingIndexRouteImport.update({
+  id: '/study/speaking/',
+  path: '/study/speaking/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyReadingIndexRoute = StudyReadingIndexRouteImport.update({
+  id: '/study/reading/',
+  path: '/study/reading/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyListeningIndexRoute = StudyListeningIndexRouteImport.update({
+  id: '/study/listening/',
+  path: '/study/listening/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyGrammarIndexRoute = StudyGrammarIndexRouteImport.update({
+  id: '/study/grammar/',
+  path: '/study/grammar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudyWritingHistoryRoute = StudyWritingHistoryRouteImport.update({
   id: '/study/writing/history',
   path: '/study/writing/history',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudyListeningHistoryIndexRoute =
-  StudyListeningHistoryIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => StudyListeningHistoryRoute,
-  } as any)
-const StudyListeningHistoryIdRoute = StudyListeningHistoryIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => StudyListeningHistoryRoute,
+const StudySpeakingHistoryRoute = StudySpeakingHistoryRouteImport.update({
+  id: '/study/speaking/history',
+  path: '/study/speaking/history',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const StudyReadingHistoryIndexRoute =
-  StudyReadingHistoryIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => StudyReadingHistoryRoute,
-  } as any)
-const StudyReadingHistoryIdRoute = StudyReadingHistoryIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => StudyReadingHistoryRoute,
+const StudyReadingHistoryRoute = StudyReadingHistoryRouteImport.update({
+  id: '/study/reading/history',
+  path: '/study/reading/history',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const StudySpeakingHistoryIndexRoute =
-  StudySpeakingHistoryIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => StudySpeakingHistoryRoute,
-  } as any)
-const StudySpeakingHistoryIdRoute = StudySpeakingHistoryIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => StudySpeakingHistoryRoute,
+const StudyListeningHistoryRoute = StudyListeningHistoryRouteImport.update({
+  id: '/study/listening/history',
+  path: '/study/listening/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
+  id: '/deck/$owner/$slug',
+  path: '/deck/$owner/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StudyWritingHistoryIndexRoute =
   StudyWritingHistoryIndexRouteImport.update({
@@ -297,10 +264,43 @@ const StudyWritingHistoryIndexRoute =
     path: '/',
     getParentRoute: () => StudyWritingHistoryRoute,
   } as any)
+const StudySpeakingHistoryIndexRoute =
+  StudySpeakingHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudySpeakingHistoryRoute,
+  } as any)
+const StudyReadingHistoryIndexRoute =
+  StudyReadingHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudyReadingHistoryRoute,
+  } as any)
+const StudyListeningHistoryIndexRoute =
+  StudyListeningHistoryIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => StudyListeningHistoryRoute,
+  } as any)
 const StudyWritingHistoryIdRoute = StudyWritingHistoryIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => StudyWritingHistoryRoute,
+} as any)
+const StudySpeakingHistoryIdRoute = StudySpeakingHistoryIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => StudySpeakingHistoryRoute,
+} as any)
+const StudyReadingHistoryIdRoute = StudyReadingHistoryIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => StudyReadingHistoryRoute,
+} as any)
+const StudyListeningHistoryIdRoute = StudyListeningHistoryIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => StudyListeningHistoryRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -636,123 +636,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/atualizacoes': {
-      id: '/atualizacoes'
-      path: '/atualizacoes'
-      fullPath: '/atualizacoes'
-      preLoaderRoute: typeof AtualizacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/desafios': {
-      id: '/desafios'
-      path: '/desafios'
-      fullPath: '/desafios'
-      preLoaderRoute: typeof DesafiosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/duel': {
-      id: '/duel'
-      path: '/duel'
-      fullPath: '/duel'
-      preLoaderRoute: typeof DuelRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/enemies': {
-      id: '/enemies'
-      path: '/enemies'
-      fullPath: '/enemies'
-      preLoaderRoute: typeof EnemiesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forja': {
-      id: '/forja'
-      path: '/forja'
-      fullPath: '/forja'
-      preLoaderRoute: typeof ForjaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inventory': {
-      id: '/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof InventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notificacoes': {
-      id: '/notificacoes'
-      path: '/notificacoes'
-      fullPath: '/notificacoes'
-      preLoaderRoute: typeof NotificacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/novidades': {
-      id: '/novidades'
-      path: '/novidades'
-      fullPath: '/novidades'
-      preLoaderRoute: typeof NovidadesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/perfil': {
-      id: '/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof PerfilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rank': {
-      id: '/rank'
-      path: '/rank'
-      fullPath: '/rank'
-      preLoaderRoute: typeof RankRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/review': {
-      id: '/review'
-      path: '/review'
-      fullPath: '/review'
-      preLoaderRoute: typeof ReviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
+    '/streak': {
+      id: '/streak'
+      path: '/streak'
+      fullPath: '/streak'
+      preLoaderRoute: typeof StreakRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social': {
@@ -762,67 +650,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/streak': {
-      id: '/streak'
-      path: '/streak'
-      fullPath: '/streak'
-      preLoaderRoute: typeof StreakRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/b/$id': {
-      id: '/b/$id'
-      path: '/b/$id'
-      fullPath: '/b/$id'
-      preLoaderRoute: typeof BIdRouteImport
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/exam/': {
-      id: '/exam/'
-      path: '/exam'
-      fullPath: '/exam/'
-      preLoaderRoute: typeof ExamIndexRouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/exam/historico': {
-      id: '/exam/historico'
-      path: '/exam/historico'
-      fullPath: '/exam/historico'
-      preLoaderRoute: typeof ExamHistoricoRouteImport
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/library/': {
-      id: '/library/'
-      path: '/library'
-      fullPath: '/library/'
-      preLoaderRoute: typeof LibraryIndexRouteImport
+    '/rank': {
+      id: '/rank'
+      path: '/rank'
+      fullPath: '/rank'
+      preLoaderRoute: typeof RankRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/library/$deckId': {
-      id: '/library/$deckId'
-      path: '/library/$deckId'
-      fullPath: '/library/$deckId'
-      preLoaderRoute: typeof LibraryDeckIdRouteImport
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/novidades/': {
-      id: '/novidades/'
+    '/novidades': {
+      id: '/novidades'
+      path: '/novidades'
+      fullPath: '/novidades'
+      preLoaderRoute: typeof NovidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notificacoes': {
+      id: '/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof NotificacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inventory': {
+      id: '/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof InventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forja': {
+      id: '/forja'
+      path: '/forja'
+      fullPath: '/forja'
+      preLoaderRoute: typeof ForjaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enemies': {
+      id: '/enemies'
+      path: '/enemies'
+      fullPath: '/enemies'
+      preLoaderRoute: typeof EnemiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/duel': {
+      id: '/duel'
+      path: '/duel'
+      fullPath: '/duel'
+      preLoaderRoute: typeof DuelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/desafios': {
+      id: '/desafios'
+      path: '/desafios'
+      fullPath: '/desafios'
+      preLoaderRoute: typeof DesafiosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atualizacoes': {
+      id: '/atualizacoes'
+      path: '/atualizacoes'
+      fullPath: '/atualizacoes'
+      preLoaderRoute: typeof AtualizacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
       path: '/'
-      fullPath: '/novidades/'
-      preLoaderRoute: typeof NovidadesIndexRouteImport
-      parentRoute: typeof NovidadesRoute
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/novidades/$id': {
-      id: '/novidades/$id'
-      path: '/$id'
-      fullPath: '/novidades/$id'
-      preLoaderRoute: typeof NovidadesIdRouteImport
-      parentRoute: typeof NovidadesRoute
-    }
-    '/perfil_/$id': {
-      id: '/perfil_/$id'
-      path: '/perfil/$id'
-      fullPath: '/perfil/$id'
-      preLoaderRoute: typeof PerfilIdRouteImport
+    '/study/': {
+      id: '/study/'
+      path: '/study'
+      fullPath: '/study/'
+      preLoaderRoute: typeof StudyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/social/': {
@@ -832,6 +783,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/novidades/': {
+      id: '/novidades/'
+      path: '/'
+      fullPath: '/novidades/'
+      preLoaderRoute: typeof NovidadesIndexRouteImport
+      parentRoute: typeof NovidadesRoute
+    }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exam/': {
+      id: '/exam/'
+      path: '/exam'
+      fullPath: '/exam/'
+      preLoaderRoute: typeof ExamIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/social/stats': {
       id: '/social/stats'
       path: '/stats'
@@ -839,67 +811,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialStatsRouteImport
       parentRoute: typeof SocialRoute
     }
-    '/study/': {
-      id: '/study/'
-      path: '/study'
-      fullPath: '/study/'
-      preLoaderRoute: typeof StudyIndexRouteImport
+    '/perfil_/$id': {
+      id: '/perfil_/$id'
+      path: '/perfil/$id'
+      fullPath: '/perfil/$id'
+      preLoaderRoute: typeof PerfilIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/deck/$owner/$slug': {
-      id: '/deck/$owner/$slug'
-      path: '/deck/$owner/$slug'
-      fullPath: '/deck/$owner/$slug'
-      preLoaderRoute: typeof DeckOwnerSlugRouteImport
+    '/novidades/$id': {
+      id: '/novidades/$id'
+      path: '/$id'
+      fullPath: '/novidades/$id'
+      preLoaderRoute: typeof NovidadesIdRouteImport
+      parentRoute: typeof NovidadesRoute
+    }
+    '/library/$deckId': {
+      id: '/library/$deckId'
+      path: '/library/$deckId'
+      fullPath: '/library/$deckId'
+      preLoaderRoute: typeof LibraryDeckIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/study/grammar/': {
-      id: '/study/grammar/'
-      path: '/study/grammar'
-      fullPath: '/study/grammar/'
-      preLoaderRoute: typeof StudyGrammarIndexRouteImport
+    '/exam/historico': {
+      id: '/exam/historico'
+      path: '/exam/historico'
+      fullPath: '/exam/historico'
+      preLoaderRoute: typeof ExamHistoricoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/study/listening/': {
-      id: '/study/listening/'
-      path: '/study/listening'
-      fullPath: '/study/listening/'
-      preLoaderRoute: typeof StudyListeningIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/study/listening/history': {
-      id: '/study/listening/history'
-      path: '/study/listening/history'
-      fullPath: '/study/listening/history'
-      preLoaderRoute: typeof StudyListeningHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/study/reading/': {
-      id: '/study/reading/'
-      path: '/study/reading'
-      fullPath: '/study/reading/'
-      preLoaderRoute: typeof StudyReadingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/study/reading/history': {
-      id: '/study/reading/history'
-      path: '/study/reading/history'
-      fullPath: '/study/reading/history'
-      preLoaderRoute: typeof StudyReadingHistoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/study/speaking/': {
-      id: '/study/speaking/'
-      path: '/study/speaking'
-      fullPath: '/study/speaking/'
-      preLoaderRoute: typeof StudySpeakingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/study/speaking/history': {
-      id: '/study/speaking/history'
-      path: '/study/speaking/history'
-      fullPath: '/study/speaking/history'
-      preLoaderRoute: typeof StudySpeakingHistoryRouteImport
+    '/b/$id': {
+      id: '/b/$id'
+      path: '/b/$id'
+      fullPath: '/b/$id'
+      preLoaderRoute: typeof BIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/study/writing/': {
@@ -909,6 +853,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyWritingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/study/speaking/': {
+      id: '/study/speaking/'
+      path: '/study/speaking'
+      fullPath: '/study/speaking/'
+      preLoaderRoute: typeof StudySpeakingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study/reading/': {
+      id: '/study/reading/'
+      path: '/study/reading'
+      fullPath: '/study/reading/'
+      preLoaderRoute: typeof StudyReadingIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study/listening/': {
+      id: '/study/listening/'
+      path: '/study/listening'
+      fullPath: '/study/listening/'
+      preLoaderRoute: typeof StudyListeningIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study/grammar/': {
+      id: '/study/grammar/'
+      path: '/study/grammar'
+      fullPath: '/study/grammar/'
+      preLoaderRoute: typeof StudyGrammarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/study/writing/history': {
       id: '/study/writing/history'
       path: '/study/writing/history'
@@ -916,47 +888,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyWritingHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/study/listening/history/': {
-      id: '/study/listening/history/'
-      path: '/'
-      fullPath: '/study/listening/history/'
-      preLoaderRoute: typeof StudyListeningHistoryIndexRouteImport
-      parentRoute: typeof StudyListeningHistoryRoute
+    '/study/speaking/history': {
+      id: '/study/speaking/history'
+      path: '/study/speaking/history'
+      fullPath: '/study/speaking/history'
+      preLoaderRoute: typeof StudySpeakingHistoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/study/listening/history/$id': {
-      id: '/study/listening/history/$id'
-      path: '/$id'
-      fullPath: '/study/listening/history/$id'
-      preLoaderRoute: typeof StudyListeningHistoryIdRouteImport
-      parentRoute: typeof StudyListeningHistoryRoute
+    '/study/reading/history': {
+      id: '/study/reading/history'
+      path: '/study/reading/history'
+      fullPath: '/study/reading/history'
+      preLoaderRoute: typeof StudyReadingHistoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/study/reading/history/': {
-      id: '/study/reading/history/'
-      path: '/'
-      fullPath: '/study/reading/history/'
-      preLoaderRoute: typeof StudyReadingHistoryIndexRouteImport
-      parentRoute: typeof StudyReadingHistoryRoute
+    '/study/listening/history': {
+      id: '/study/listening/history'
+      path: '/study/listening/history'
+      fullPath: '/study/listening/history'
+      preLoaderRoute: typeof StudyListeningHistoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/study/reading/history/$id': {
-      id: '/study/reading/history/$id'
-      path: '/$id'
-      fullPath: '/study/reading/history/$id'
-      preLoaderRoute: typeof StudyReadingHistoryIdRouteImport
-      parentRoute: typeof StudyReadingHistoryRoute
-    }
-    '/study/speaking/history/': {
-      id: '/study/speaking/history/'
-      path: '/'
-      fullPath: '/study/speaking/history/'
-      preLoaderRoute: typeof StudySpeakingHistoryIndexRouteImport
-      parentRoute: typeof StudySpeakingHistoryRoute
-    }
-    '/study/speaking/history/$id': {
-      id: '/study/speaking/history/$id'
-      path: '/$id'
-      fullPath: '/study/speaking/history/$id'
-      preLoaderRoute: typeof StudySpeakingHistoryIdRouteImport
-      parentRoute: typeof StudySpeakingHistoryRoute
+    '/deck/$owner/$slug': {
+      id: '/deck/$owner/$slug'
+      path: '/deck/$owner/$slug'
+      fullPath: '/deck/$owner/$slug'
+      preLoaderRoute: typeof DeckOwnerSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/study/writing/history/': {
       id: '/study/writing/history/'
@@ -965,12 +923,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyWritingHistoryIndexRouteImport
       parentRoute: typeof StudyWritingHistoryRoute
     }
+    '/study/speaking/history/': {
+      id: '/study/speaking/history/'
+      path: '/'
+      fullPath: '/study/speaking/history/'
+      preLoaderRoute: typeof StudySpeakingHistoryIndexRouteImport
+      parentRoute: typeof StudySpeakingHistoryRoute
+    }
+    '/study/reading/history/': {
+      id: '/study/reading/history/'
+      path: '/'
+      fullPath: '/study/reading/history/'
+      preLoaderRoute: typeof StudyReadingHistoryIndexRouteImport
+      parentRoute: typeof StudyReadingHistoryRoute
+    }
+    '/study/listening/history/': {
+      id: '/study/listening/history/'
+      path: '/'
+      fullPath: '/study/listening/history/'
+      preLoaderRoute: typeof StudyListeningHistoryIndexRouteImport
+      parentRoute: typeof StudyListeningHistoryRoute
+    }
     '/study/writing/history/$id': {
       id: '/study/writing/history/$id'
       path: '/$id'
       fullPath: '/study/writing/history/$id'
       preLoaderRoute: typeof StudyWritingHistoryIdRouteImport
       parentRoute: typeof StudyWritingHistoryRoute
+    }
+    '/study/speaking/history/$id': {
+      id: '/study/speaking/history/$id'
+      path: '/$id'
+      fullPath: '/study/speaking/history/$id'
+      preLoaderRoute: typeof StudySpeakingHistoryIdRouteImport
+      parentRoute: typeof StudySpeakingHistoryRoute
+    }
+    '/study/reading/history/$id': {
+      id: '/study/reading/history/$id'
+      path: '/$id'
+      fullPath: '/study/reading/history/$id'
+      preLoaderRoute: typeof StudyReadingHistoryIdRouteImport
+      parentRoute: typeof StudyReadingHistoryRoute
+    }
+    '/study/listening/history/$id': {
+      id: '/study/listening/history/$id'
+      path: '/$id'
+      fullPath: '/study/listening/history/$id'
+      preLoaderRoute: typeof StudyListeningHistoryIdRouteImport
+      parentRoute: typeof StudyListeningHistoryRoute
     }
   }
 }
