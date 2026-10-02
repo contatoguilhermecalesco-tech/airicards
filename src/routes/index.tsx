@@ -97,7 +97,6 @@ function Home() {
   const reviewedToday = useCardsReviewedToday();
   const streak = useStreak();
   const nextMilestone = nextStreakMilestone(streak.current);
-  const milestoneProgress = streak.current === 0 ? 0 : Math.min(1, streak.current / nextMilestone);
   const studiedToday = reviewedToday > 0;
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
@@ -461,7 +460,7 @@ function Home() {
 
       {/* Streak — sequência de dias */}
       <div className="contents lg:block lg:col-span-4 lg:col-start-9 lg:row-start-2 [&>section]:lg:mt-0">
-        <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} milestoneProgress={milestoneProgress} />
+        <StreakCard streak={streak} studiedToday={studiedToday} nextMilestone={nextMilestone} />
       </div>
 
 
@@ -915,12 +914,10 @@ function StreakCard({
   streak,
   studiedToday,
   nextMilestone,
-  milestoneProgress,
 }: {
   streak: Streak;
   studiedToday: boolean;
   nextMilestone: number;
-  milestoneProgress: number;
 }) {
   const now = new Date();
   const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
