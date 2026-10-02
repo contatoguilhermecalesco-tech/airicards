@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen, Shield, Zap } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Lock, GraduationCap, Flame, Trophy, AlertTriangle, Check, Swords, Skull, Crown, ShoppingBag, TrendingUp, Layers, BookOpen, Shield, Zap, Info } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -923,6 +923,23 @@ function StreakCard({
   milestoneProgress: number;
 }) {
   const now = new Date();
+  const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const monday = new Date(now);
+  monday.setHours(12, 0, 0, 0);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const weekDays = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + index);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    return {
+      key,
+      label: ["S", "T", "Q", "Q", "S", "S", "D"][index],
+      fullLabel: date.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric" }),
+      isToday: key === todayKey,
+      isFuture: date.getTime() > now.getTime(),
+      isDone: streak.history?.[key] === "done" || (key === todayKey && studiedToday),
+    };
+  });
 
   const atRisk = streak.current > 0 && !studiedToday && now.getHours() >= 19;
   const isBroken = streak.current === 0 && streak.longest > 0;
@@ -946,17 +963,22 @@ function StreakCard({
 
   return (
     <section
-      className="animate-fade-in mt-6"
+      className="streak-card-scope animate-fade-in mt-6"
       style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
     >
-      <div className={`${GLASS_BASE} relative p-4`}>
-        <GlassHighlight />
+      <div className="relative overflow-hidden rounded-2xl border border-streak-border bg-streak-panel/90 p-5 shadow-streak backdrop-blur-2xl backdrop-saturate-150">
+        <span aria-hidden className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-streak-primary/65 to-transparent" />
 
-        {/* ambient halo */}
         <div
           aria-hidden
-          className={`pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl transition-opacity duration-500 ${haloOpacity}`}
+          className={`pointer-events-none absolute -left-10 -top-12 h-40 w-40 rounded-full blur-3xl transition-opacity duration-500 ${haloOpacity}`}
           style={{ background: haloBg }}
+        />
+
+        <Info
+          aria-label="A sequência aumenta quando você revisa ao menos uma carta por dia"
+          className="absolute right-4 top-4 h-3.5 w-3.5 text-muted-foreground/45"
+          strokeWidth={2}
         />
 
         {/* Smoke wisps when broken */}
@@ -973,86 +995,67 @@ function StreakCard({
           </>
         )}
 
-        <div className="relative flex items-center gap-4">
-          <StreakFlame
-            state={flameState}
-            studiedToday={studiedToday}
-            theme={flameTheme}
-            streak={streak.current}
-          />
-
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline gap-1.5 flex-wrap">
-              <p
-                className={`text-[22px] font-semibold leading-none tabular-nums transition-colors ${
-                  flameState === "ashes" ? "text-muted-foreground/60 line-through decoration-1" : "text-foreground"
-                }`}
-              >
-                {isBroken ? streak.longest : streak.current}
-              </p>
-              <p className="text-[13px] font-medium text-muted-foreground">
-                {isBroken
-                  ? "dias · recorde"
-                  : `${streak.current === 1 ? "dia" : "dias"} seguido${streak.current === 1 ? "" : "s"}`}
-              </p>
-              {!isBroken && streak.longest > 0 && streak.current >= streak.longest && streak.current > 0 && (
-                <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-amber-400/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-amber-300">
-                  <Trophy className="h-2.5 w-2.5" strokeWidth={2.5} />
-                  recorde
-                </span>
-              )}
+        <div className="relative grid grid-cols-[minmax(0,0.82fr)_minmax(0,1.3fr)] items-center gap-5">
+          <div className="min-w-0 border-r border-streak-border pr-4">
+            <div className="flex items-center gap-3">
+              <StreakFlame state={flameState} studiedToday={studiedToday} theme={flameTheme} streak={streak.current} />
+              <div>
+                <p className={`text-[30px] font-bold leading-none tabular-nums ${isBroken ? "text-muted-foreground/60" : "text-foreground"}`}>
+                  {isBroken ? streak.longest : streak.current}
+                </p>
+                <p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">
+                  {isBroken ? "recorde anterior" : streak.current === 1 ? "dia seguido" : "dias seguidos"}
+                </p>
+              </div>
             </div>
-            <p className="mt-1.5 text-[11px] font-medium text-muted-foreground">
-              {isBroken
-                ? "Sua chama apagou · revise hoje para reacender"
-                : streak.current === 0
-                  ? "Revise 1 carta hoje para começar sua sequência"
-                  : studiedToday
-                    ? `Continue amanhã · próximo marco ${nextMilestone} dias`
-                    : `Revise hoje para manter · próximo marco ${nextMilestone} dias`}
-            </p>
-            {/* progress toward next milestone */}
-            <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/[0.06]">
-              <div
-                className={`h-full rounded-full transition-all duration-700 ${
-                  isBroken
-                    ? "bg-white/10"
-                    : flameState === "risk"
-                      ? "bg-gradient-to-r from-amber-300 to-orange-300"
-                      : "bg-gradient-to-r from-orange-300 via-amber-300 to-rose-300"
-                }`}
-                style={{ width: `${isBroken ? 0 : milestoneProgress * 100}%` }}
-              />
+            <div className="mt-3 flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
+              <Trophy className="h-3 w-3 text-streak-primary" strokeWidth={2.25} />
+              <span>Recorde {streak.longest}d</span>
+              <span aria-hidden className="text-muted-foreground/30">·</span>
+              <span>Marco {nextMilestone}d</span>
+            </div>
+          </div>
+
+          <div className="min-w-0 pt-1">
+            <p className="mb-3 text-[10px] font-semibold uppercase text-muted-foreground">Esta semana</p>
+            <div className="grid grid-cols-7 gap-1">
+              {weekDays.map((day) => (
+                <div key={day.key} className="flex min-w-0 flex-col items-center gap-2" aria-label={`${day.fullLabel}: ${day.isDone ? "concluído" : day.isFuture ? "próximo" : "pendente"}`}>
+                  <span
+                    className={`grid h-6 w-6 place-items-center rounded-full border transition-all duration-300 ${
+                      day.isDone
+                        ? "border-streak-success bg-streak-success text-streak-success-foreground shadow-streak-day"
+                        : day.isToday
+                          ? "border-streak-primary bg-streak-primary/10 text-streak-primary ring-2 ring-streak-primary/10"
+                          : day.isFuture
+                            ? "border-dashed border-streak-border text-muted-foreground/30"
+                            : "border-streak-border bg-streak-muted text-muted-foreground/35"
+                    }`}
+                  >
+                    {day.isDone ? <Check className="h-3 w-3" strokeWidth={3} /> : day.isToday ? <span className="h-1.5 w-1.5 rounded-full bg-current" /> : null}
+                  </span>
+                  <span className={`text-[9px] font-semibold ${day.isToday ? "text-streak-primary" : "text-muted-foreground/55"}`}>{day.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
 
-        {/* Contextual banners */}
-        {isBroken && (
-          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] px-3 py-2">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" strokeWidth={2.5} />
-            <p className="text-[11px] font-medium text-muted-foreground">
-              Perdeu {streak.longest} dia{streak.longest === 1 ? "" : "s"} de sequência. Recomece agora.
-            </p>
-          </div>
-        )}
-        {atRisk && !isBroken && (
-          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-amber-300/25 bg-amber-400/[0.07] px-3 py-2">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-300" strokeWidth={2.5} />
-            <p className="text-[11px] font-medium text-amber-100/90">
-              Sua chama está fraca · sequência de {streak.current} dia{streak.current === 1 ? "" : "s"} termina à meia-noite
-            </p>
-          </div>
-        )}
-        {studiedToday && streak.current > 0 && !atRisk && !isBroken && (
-          <div className="relative mt-3 flex items-center gap-2 rounded-xl border border-orange-300/20 bg-orange-400/[0.05] px-3 py-2">
-            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-300" strokeWidth={2.75} />
-            <p className="text-[11px] font-medium text-muted-foreground">
-              +1 dia conquistado hoje · recorde {streak.longest}
-            </p>
-          </div>
-        )}
+        <div className={`relative mt-4 flex items-center gap-2 border-t border-streak-border pt-3 ${atRisk ? "text-warning" : isBroken ? "text-muted-foreground" : "text-streak-success"}`}>
+          {atRisk || isBroken ? <AlertTriangle className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} /> : <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={2.75} />}
+          <p className="text-[10px] font-medium text-muted-foreground">
+            {isBroken
+              ? "Revise uma carta hoje para reacender sua sequência"
+              : atRisk
+                ? "Revise hoje — sua sequência termina à meia-noite"
+                : studiedToday && streak.current > 0
+                  ? "+1 dia conquistado hoje"
+                  : streak.current === 0
+                    ? "Revise uma carta para começar"
+                    : "Uma revisão hoje mantém sua chama acesa"}
+          </p>
+        </div>
       </div>
 
       <style>{`
