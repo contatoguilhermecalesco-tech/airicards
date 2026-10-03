@@ -11,3 +11,4 @@
 
 - Atualizações operacionais usam tabelas e leituras próprias, separadas das notificações pessoais, para manter contadores e estados independentes.
 - Comentários sociais retornam a linha criada e atualizam o feed local imediatamente; o tempo real sincroniza os demais perfis.
+- Exclusões de cartas e decks mantêm marcadores sincronizados para impedir restauração por caches ou dispositivos desatualizados.
