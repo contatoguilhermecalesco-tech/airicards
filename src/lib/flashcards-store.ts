@@ -39,6 +39,49 @@ export type Deck = {
 };
 
 type State = { decks: Deck[]; cards: Card[]; meta?: Record<string, unknown> };
+type DeletionMap = Record<string, number>;
+const DELETED_CARDS_META_KEY = "deletedCardIds";
+const DELETED_DECKS_META_KEY = "deletedDeckIds";
+
+function readDeletionMap(meta: Record<string, unknown> | undefined, key: string): DeletionMap {
+  const value = meta?.[key];
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const entries = Object.entries(value).filter(
+    (entry): entry is [string, number] => typeof entry[1] === "number" && Number.isFinite(entry[1]),
+  );
+  return Object.fromEntries(entries);
+}
+
+function mergeSyncMeta(
+  remoteMeta: Record<string, unknown> | undefined,
+  localMeta: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+  if (!remoteMeta && !localMeta) return undefined;
+  return {
+    ...(remoteMeta ?? {}),
+    ...(localMeta ?? {}),
+    [DELETED_CARDS_META_KEY]: {
+      ...readDeletionMap(remoteMeta, DELETED_CARDS_META_KEY),
+      ...readDeletionMap(localMeta, DELETED_CARDS_META_KEY),
+    },
+    [DELETED_DECKS_META_KEY]: {
+      ...readDeletionMap(remoteMeta, DELETED_DECKS_META_KEY),
+      ...readDeletionMap(localMeta, DELETED_DECKS_META_KEY),
+    },
+  };
+}
+
+function withoutDeletedItems(input: State, meta: Record<string, unknown> | undefined): State {
+  const deletedCards = readDeletionMap(meta, DELETED_CARDS_META_KEY);
+  const deletedDecks = readDeletionMap(meta, DELETED_DECKS_META_KEY);
+  return {
+    decks: input.decks.filter((deck) => deletedDecks[deck.id] === undefined),
+    cards: input.cards.filter(
+      (card) => deletedCards[card.id] === undefined && deletedDecks[card.deckId] === undefined,
+    ),
+    meta,
+  };
+}
 export type StreakDayStatus = "done";
 export type Streak = {
   current: number;
@@ -245,25 +288,29 @@ async function pullFromCloud(profileId: string, opts?: { force?: boolean }) {
       Date.now() - lastLocalMutationAt < LOCAL_MUTATION_WINDOW_MS;
     const shouldMerge = (!hydrated && pendingSaveBeforeHydration) || withinLocalWindow;
 
+    const mergedMeta = mergeSyncMeta(remote.meta, state.meta);
+    const cleanRemote = withoutDeletedItems(remote, mergedMeta);
+    const cleanLocal = withoutDeletedItems(state, mergedMeta);
+
     if (shouldMerge) {
-      const remoteDeckIds = new Set(remote.decks.map((d) => d.id));
-      const remoteCardIds = new Set(remote.cards.map((c) => c.id));
-      const extraDecks = state.decks.filter((d) => !remoteDeckIds.has(d.id));
-      const extraCards = state.cards.filter((c) => !remoteCardIds.has(c.id));
-      state = {
+      const remoteDeckIds = new Set(cleanRemote.decks.map((d) => d.id));
+      const remoteCardIds = new Set(cleanRemote.cards.map((c) => c.id));
+      const extraDecks = cleanLocal.decks.filter((d) => !remoteDeckIds.has(d.id));
+      const extraCards = cleanLocal.cards.filter((c) => !remoteCardIds.has(c.id));
+      state = withoutDeletedItems({
         decks: [...extraDecks, ...remote.decks],
         cards: [...extraCards, ...remote.cards],
-        // Meta local vence dentro da janela de mutação recente para não
-        // perder progresso de missões/combo feito nos últimos segundos.
-        meta: state.meta ?? remote.meta,
-      };
+        // Campos locais recentes vencem, mas marcadores de exclusão sempre
+        // são unidos para impedir que uma cópia remota antiga recrie itens.
+        meta: mergedMeta,
+      }, mergedMeta);
       // Se preservamos itens locais, precisamos re-enviar pro servidor para
       // que o outro device também os veja.
       if (extraDecks.length > 0 || extraCards.length > 0) {
         pendingSaveBeforeHydration = true;
       }
     } else {
-      state = remote;
+      state = cleanRemote;
     }
     // BUGFIX: quando o `home` remoto era de um dia anterior, sobrescrevíamos
     // o objeto inteiro e perdíamos `streak` + `punishments`. Agora apenas
@@ -521,9 +568,21 @@ export function createDeck(name: string, description?: string, color?: string): 
 
 export function deleteDeck(id: string) {
   const affectedCards = state.cards.filter((c) => c.deckId === id).map((c) => c.id);
+  const deletedAt = Date.now();
+  const deletedDeckIds = {
+    ...readDeletionMap(state.meta, DELETED_DECKS_META_KEY),
+    [id]: deletedAt,
+  };
+  const deletedCardIds = { ...readDeletionMap(state.meta, DELETED_CARDS_META_KEY) };
+  for (const cardId of affectedCards) deletedCardIds[cardId] = deletedAt;
   state = {
     decks: state.decks.filter((d) => d.id !== id),
     cards: state.cards.filter((c) => c.deckId !== id),
+    meta: {
+      ...(state.meta ?? {}),
+      [DELETED_DECKS_META_KEY]: deletedDeckIds,
+      [DELETED_CARDS_META_KEY]: deletedCardIds,
+    },
   };
   emit();
   // Deleção: remove marcadores locais desses ids — nada a "confirmar" mais.
@@ -573,7 +632,17 @@ export function createCard(
 }
 
 export function deleteCard(id: string) {
-  state = { ...state, cards: state.cards.filter((c) => c.id !== id) };
+  state = {
+    ...state,
+    cards: state.cards.filter((c) => c.id !== id),
+    meta: {
+      ...(state.meta ?? {}),
+      [DELETED_CARDS_META_KEY]: {
+        ...readDeletionMap(state.meta, DELETED_CARDS_META_KEY),
+        [id]: Date.now(),
+      },
+    },
+  };
   emit();
   pendingItems.delete(id);
   emitPendingItems();
