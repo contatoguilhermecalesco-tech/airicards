@@ -21,7 +21,9 @@ import {
 import { Package } from "lucide-react";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 import { RiotPatchBody } from "@/lib/patch-notes";
+import { toast } from "sonner";
 
+const PUBLIC_APP_URL = "https://airicards.lovable.app";
 
 export const Route = createFileRoute("/novidades/$id")({
   head: ({ params }) => ({
@@ -124,20 +126,36 @@ function NovidadeDetailPage() {
 
   async function share() {
     if (!entry) return;
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const url = `${PUBLIC_APP_URL}/novidades/${encodeURIComponent(entry.id)}`;
     const shareData = {
       title: `airi · ${entry.title}`,
       text: entry.body.slice(0, 140),
       url,
     };
     try {
-      if (navigator.share) {
+      if (typeof navigator.share === "function") {
         await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(url);
+        return;
       }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link das Patch Notes copiado");
     } catch {
-      // silencioso
+      const input = document.createElement("textarea");
+      input.value = url;
+      input.setAttribute("readonly", "");
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      const copied = document.execCommand("copy");
+      input.remove();
+      if (copied) toast.success("Link das Patch Notes copiado");
+      else toast.error("Não foi possível copiar o link");
     }
   }
 
