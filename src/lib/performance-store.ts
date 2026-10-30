@@ -59,6 +59,8 @@ export function getWeaknesses(cards: Card[]): Weakness[] {
     phrasal: { label: "Phrasal verbs", detail: "Verbos acompanhados de partículas" },
     grammar: { label: "Gramática", detail: "Estruturas e tempos verbais" },
     translation: { label: "Tradução de frases", detail: "Compreensão e construção de frases" },
+    listening: { label: "Listening", detail: "Compreensão de áudio e transcrições" },
+    writing: { label: "Escrita", detail: "Produção escrita e construção de textos" },
     sentences: { label: "Construção de frases", detail: "Frases completas e contexto" },
   };
   return [...groups.entries()].map(([id, items]) => {
