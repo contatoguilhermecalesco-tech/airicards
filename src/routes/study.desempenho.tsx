@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft, ArrowRight, BookOpen, Brain, CalendarDays, Clock3, Flame,
-  GraduationCap, Layers3, Target, TrendingUp, Trophy, Zap,
+  GraduationCap, Layers3, Target, TrendingUp,
 } from "lucide-react";
 import { useStore, useStreak, getDueCards } from "@/lib/flashcards-store";
 import {
