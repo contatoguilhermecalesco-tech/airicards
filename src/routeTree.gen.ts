@@ -40,6 +40,7 @@ import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
 import { Route as StudyParabelRouteImport } from './routes/study.parabel'
+import { Route as StudyDesempenhoRouteImport } from './routes/study.desempenho'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
@@ -214,6 +215,11 @@ const StudyParabelRoute = StudyParabelRouteImport.update({
   path: '/study/parabel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyDesempenhoRoute = StudyDesempenhoRouteImport.update({
+  id: '/study/desempenho',
+  path: '/study/desempenho',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
   id: '/deck/$owner/$slug',
   path: '/deck/$owner/$slug',
@@ -341,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
   '/study/parabel': typeof StudyParabelRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -390,6 +397,7 @@ export interface FileRoutesByTo {
   '/social': typeof SocialIndexRoute
   '/study': typeof StudyIndexRoute
   '/study/parabel': typeof StudyParabelRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/grammar': typeof StudyGrammarIndexRoute
   '/study/listening': typeof StudyListeningIndexRoute
@@ -632,6 +640,7 @@ export interface RootRouteChildren {
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
   StudyParabelRoute: typeof StudyParabelRoute
+  StudyDesempenhoRoute: typeof StudyDesempenhoRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
   StudyListeningHistoryRoute: typeof StudyListeningHistoryRouteWithChildren
   StudyReadingHistoryRoute: typeof StudyReadingHistoryRouteWithChildren
@@ -1101,6 +1110,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
   StudyParabelRoute: StudyParabelRoute,
+  StudyDesempenhoRoute: StudyDesempenhoRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
   StudyListeningHistoryRoute: StudyListeningHistoryRouteWithChildren,
   StudyReadingHistoryRoute: StudyReadingHistoryRouteWithChildren,
