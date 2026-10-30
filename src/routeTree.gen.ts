@@ -348,7 +348,6 @@ export interface FileRoutesByFullPath {
   '/study/': typeof StudyIndexRoute
   '/study/parabel': typeof StudyParabelRoute
   '/study/desempenho': typeof StudyDesempenhoRoute
-  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -867,6 +866,13 @@ declare module '@tanstack/react-router' {
       path: '/study/parabel'
       fullPath: '/study/parabel'
       preLoaderRoute: typeof StudyParabelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/study/desempenho': {
+      id: '/study/desempenho'
+      path: '/study/desempenho'
+      fullPath: '/study/desempenho'
+      preLoaderRoute: typeof StudyDesempenhoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/study/': {
