@@ -80,11 +80,14 @@ function PerformancePage() {
     return { label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""), count: sessions.filter((session) => session.date >= date.getTime() && session.date < next.getTime()).reduce((sum, session) => sum + session.cards, 0) };
   });
   const vocabularyCards = cards.filter((card) => card.mode !== "sentence");
+  const uniqueVocabularyCards = [...new Map(vocabularyCards.map((card) => [
+    (card.targetWord || card.front).trim().toLowerCase(), card,
+  ])).values()];
   const vocab = {
-    studied: vocabularyCards.length,
-    learning: vocabularyCards.filter((card) => ["unstable", "almost"].includes(classifyCard(card, now))).length,
-    mastered: vocabularyCards.filter((card) => classifyCard(card, now) === "mastered").length,
-    due: vocabularyCards.filter((card) => card.dueAt <= now).length,
+    studied: uniqueVocabularyCards.length,
+    learning: uniqueVocabularyCards.filter((card) => ["unstable", "almost"].includes(classifyCard(card, now))).length,
+    mastered: uniqueVocabularyCards.filter((card) => classifyCard(card, now) === "mastered").length,
+    due: uniqueVocabularyCards.filter((card) => card.dueAt <= now).length,
   };
 
   return (
@@ -151,7 +154,7 @@ function PerformancePage() {
       </>}
 
       {tab === "sessions" && <section className="rounded-2xl border bg-surface p-5">
-        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-semibold">Histórico de sessões</h2><p className="mt-1 text-xs text-muted-foreground">Acertos, erros, duração e pontos registrados em cada sessão. O histórico começa a contar após esta atualização.</p></div><span className="text-xs text-muted-foreground">{sessions.length} sessões</span></div>
+        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-semibold">Histórico de sessões</h2><p className="mt-1 text-xs text-muted-foreground">Acertos, erros, duração e pontos registrados em cada sessão. XP é pontuação de desempenho; LP acompanha as recompensas da revisão. O histórico começa a contar agora.</p></div><span className="text-xs text-muted-foreground">{sessions.length} sessões</span></div>
         <div className="space-y-2">
           {sessions.map((session) => <SessionRow key={session.id} session={session} />)}
           {!sessions.length && <Empty text="Suas sessões concluídas aparecerão aqui. Termine uma revisão de cartas para começar seu histórico." />}
