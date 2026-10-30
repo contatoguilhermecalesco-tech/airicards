@@ -79,16 +79,7 @@ function PerformancePage() {
     const next = new Date(date); next.setMonth(next.getMonth() + 1);
     return { label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""), count: sessions.filter((session) => session.date >= date.getTime() && session.date < next.getTime()).reduce((sum, session) => sum + session.cards, 0) };
   });
-  const vocabularyTimeline = [...Array(6)].map((_, i) => {
-    const date = new Date(); date.setDate(1); date.setMonth(date.getMonth() - (5 - i));
-    const next = new Date(date); next.setMonth(next.getMonth() + 1);
-    const cohort = uniqueVocabularyCards.filter((card) => card.createdAt >= date.getTime() && card.createdAt < next.getTime());
-    return {
-      label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""),
-      added: cohort.length,
-      mastered: cohort.filter((card) => classifyCard(card, now) === "mastered").length,
-    };
-  });
+
   const vocabularyCards = cards.filter((card) => card.mode !== "sentence");
   const uniqueVocabularyCards = [...new Map(vocabularyCards.map((card) => [
     (card.targetWord || card.front).trim().toLowerCase(), card,
@@ -99,6 +90,16 @@ function PerformancePage() {
     mastered: uniqueVocabularyCards.filter((card) => classifyCard(card, now) === "mastered").length,
     due: uniqueVocabularyCards.filter((card) => card.dueAt <= now).length,
   };
+  const vocabularyTimeline = [...Array(6)].map((_, i) => {
+    const date = new Date(); date.setDate(1); date.setMonth(date.getMonth() - (5 - i));
+    const next = new Date(date); next.setMonth(next.getMonth() + 1);
+    const cohort = uniqueVocabularyCards.filter((card) => card.createdAt >= date.getTime() && card.createdAt < next.getTime());
+    return {
+      label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""),
+      added: cohort.length,
+      mastered: cohort.filter((card) => classifyCard(card, now) === "mastered").length,
+    };
+  });
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6 sm:pt-12">
