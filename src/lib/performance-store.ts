@@ -45,8 +45,13 @@ export function getWeaknesses(cards: Card[]): Weakness[] {
   const groups = new Map<string, Card[]>();
   for (const card of cards) {
     const text = `${card.front} ${card.back} ${card.targetWord ?? ""}`.toLowerCase();
+    const source = (card.source ?? "").toLowerCase();
     let id = card.mode === "expression" ? "expressions" : card.mode === "sentence" ? "sentences" : "vocabulary";
-    if (/\b(phrasal verb|give up|look up|put off|turn on|take off|run out|find out)\b/.test(text)) id = "phrasal";
+    if (/listen|audio|transcri/.test(source)) id = "listening";
+    else if (/writ|essay|redac/.test(source)) id = "writing";
+    else if (/\b(phrasal verb|give up|look up|put off|turn on|take off|run out|find out)\b/.test(text)) id = "phrasal";
+    else if (/\b(am|is|are|was|were|have|has|had|will|would|did|does)\b/.test(text)) id = "grammar";
+    else if (card.mode === "sentence") id = "translation";
     else if (/\b(am|is|are|was|were|have|has|had|will|would|did|does)\b/.test(text)) id = "grammar";
     else if (card.mode === "sentence") id = "translation";
     const list = groups.get(id) ?? [];
