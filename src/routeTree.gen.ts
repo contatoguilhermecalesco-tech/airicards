@@ -39,6 +39,7 @@ import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
+import { Route as StudyParabelRouteImport } from './routes/study.parabel'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
@@ -208,6 +209,11 @@ const StudyIndexRoute = StudyIndexRouteImport.update({
   path: '/study/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudyParabelRoute = StudyParabelRouteImport.update({
+  id: '/study/parabel',
+  path: '/study/parabel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
   id: '/deck/$owner/$slug',
   path: '/deck/$owner/$slug',
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -382,6 +389,7 @@ export interface FileRoutesByTo {
   '/novidades': typeof NovidadesIndexRoute
   '/social': typeof SocialIndexRoute
   '/study': typeof StudyIndexRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/grammar': typeof StudyGrammarIndexRoute
   '/study/listening': typeof StudyListeningIndexRoute
@@ -429,6 +437,7 @@ export interface FileRoutesById {
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -622,6 +631,7 @@ export interface RootRouteChildren {
   ExamIndexRoute: typeof ExamIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
+  StudyParabelRoute: typeof StudyParabelRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
   StudyListeningHistoryRoute: typeof StudyListeningHistoryRouteWithChildren
   StudyReadingHistoryRoute: typeof StudyReadingHistoryRouteWithChildren
@@ -838,6 +848,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/stats'
       preLoaderRoute: typeof SocialStatsRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/study/parabel': {
+      id: '/study/parabel'
+      path: '/study/parabel'
+      fullPath: '/study/parabel'
+      preLoaderRoute: typeof StudyParabelRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/study/': {
       id: '/study/'
@@ -1083,6 +1100,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExamIndexRoute: ExamIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
+  StudyParabelRoute: StudyParabelRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
   StudyListeningHistoryRoute: StudyListeningHistoryRouteWithChildren,
   StudyReadingHistoryRoute: StudyReadingHistoryRouteWithChildren,
