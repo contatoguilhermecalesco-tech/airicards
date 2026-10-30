@@ -57,8 +57,11 @@ function PerformancePage() {
   const totalTime = sessions.reduce((sum, session) => sum + session.durationMs, 0);
   const accuracy = totalReviewed ? Math.round((totalCorrect / totalReviewed) * 100) : 0;
   const avgCards = sessions.length ? Math.round(totalReviewed / sessions.length) : 0;
-  const activeDays = new Set(sessions.map((session) => dayKey(session.date))).size;
-  const studiedDays = new Set(sessions.map((session) => dayKey(session.date)));
+  const studiedDays = new Set([
+    ...sessions.map((session) => dayKey(session.date)),
+    ...Object.entries(streak.history ?? {}).filter(([, status]) => status === "done").map(([key]) => key),
+  ]);
+  const activeDays = studiedDays.size;
   const daysWithoutStudy = Math.max(0, 30 - [...Array(30)].filter((_, i) => {
     const date = new Date(); date.setDate(date.getDate() - i); return studiedDays.has(dayKey(date.getTime()));
   }).length);
