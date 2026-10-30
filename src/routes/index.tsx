@@ -111,9 +111,9 @@ function Home() {
           </div>
           <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-foreground sm:text-[32px]">{salute}{name ? `, ${name}` : ""}</h1>
         </div>
-        <Link to="/profile" aria-label="Abrir perfil" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.05] text-sm font-semibold text-primary">
+        <div aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.05] text-sm font-semibold text-primary">
           {name ? name.slice(0, 1).toUpperCase() : "A"}
-        </Link>
+        </div>
       </header>
 
       <section className="animate-fade-in mt-7" style={{ animationDelay: "50ms", animationFillMode: "backwards" }}>
