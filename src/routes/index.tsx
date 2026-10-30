@@ -115,31 +115,31 @@ function Home() {
           <p className="text-sm font-medium text-muted-foreground">Seu próximo passo</p>
           <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary">Sessão diária</span>
         </div>
-        <div className="relative overflow-hidden rounded-[26px] border border-primary/20 bg-gradient-to-br from-[#211a35] via-[#171426] to-[#11101b] p-5 shadow-[0_18px_50px_-32px_rgba(139,92,246,0.55)] sm:p-7">
+        <div className="relative overflow-hidden rounded-[26px] border border-primary/20 bg-gradient-to-br from-[#a78bfa] via-[#8064d8] to-[#51418f] p-5 shadow-[0_18px_50px_-32px_rgba(139,92,246,0.55)] sm:p-7">
           <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
           <div className="relative">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <h2 className="text-[25px] font-semibold leading-tight tracking-tight text-foreground sm:text-[30px]">{due === 0 ? "Tudo em dia!" : "Hora de aprender"}</h2>
-                <p className="mt-2 max-w-[270px] text-sm leading-relaxed text-muted-foreground">
+                <h2 className="text-[25px] font-semibold leading-tight tracking-tight text-white sm:text-[30px]">{due === 0 ? "Tudo em dia!" : "Hora de aprender"}</h2>
+                <p className="mt-2 max-w-[270px] text-sm leading-relaxed text-white/75">
                   {cards.length === 0 ? "Adicione seu primeiro deck e comece sua jornada." : due > 0 ? `${due} carta${due === 1 ? "" : "s"} esperando por você.` : nextDueInMs !== null ? `Sua próxima revisão estará disponível em ${formatNextIn(nextDueInMs)}.` : "Você concluiu suas revisões por enquanto. Que tal aprender algo novo?"}
                 </p>
               </div>
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-[0_0_28px_-12px_rgba(167,139,250,0.8)]">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-primary/20 bg-white/15 text-white shadow-[0_0_28px_-12px_rgba(255,255,255,0.55)]">
                 <BookOpen className="h-7 w-7" strokeWidth={1.8} />
               </div>
             </div>
             <div className="mt-6">
-              <div className="mb-2 flex items-center justify-between text-xs"><span className="text-muted-foreground">Progresso de hoje</span><span className="font-semibold tabular-nums text-foreground">{pctLabel}%</span></div>
+              <div className="mb-2 flex items-center justify-between text-xs"><span className="text-white/75">Progresso de hoje</span><span className="font-semibold tabular-nums text-white">{pctLabel}%</span></div>
               <div role="progressbar" aria-label="Progresso das revisões de hoje" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pctLabel} className="h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-gradient-to-r from-violet-300 via-primary to-fuchsia-400 transition-all duration-700" style={{ width: `${pctLabel}%` }} />
+                <div className="h-full rounded-full bg-gradient-to-r from-white/80 to-white transition-all duration-700" style={{ width: `${pctLabel}%` }} />
               </div>
             </div>
             <div className="mt-5">
               {cards.length === 0 ? (
                 <Link to="/library" className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground transition-transform active:scale-[0.98]">Criar meu primeiro deck <ArrowRight className="h-4 w-4" /></Link>
               ) : due > 0 ? (
-                <button type="button" onClick={() => setConfirmOpen(true)} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-[0_8px_24px_-12px_rgba(139,92,246,0.9)] transition-all hover:brightness-110 active:scale-[0.98]">Começar a estudar <ArrowRight className="h-4 w-4" /></button>
+                <button type="button" onClick={() => setConfirmOpen(true)} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-semibold text-[#51418f] shadow-[0_8px_24px_-12px_rgba(40,25,80,0.55)] transition-all hover:brightness-110 active:scale-[0.98]">Começar a estudar <ArrowRight className="h-4 w-4" /></button>
               ) : (
                 <Link to="/library" className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-3.5 text-sm font-semibold text-foreground transition-colors hover:bg-white/10">Explorar meus decks <BookOpen className="h-4 w-4" /></Link>
               )}
@@ -166,18 +166,18 @@ function Home() {
 
       {cycle && (
         <section className="animate-fade-in mt-6 space-y-3">
-          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+          <div className="relative overflow-hidden rounded-[26px] border border-emerald-200/15 bg-gradient-to-br from-[#4e9b78] via-[#286d60] to-[#183f43] p-4 text-white shadow-[0_18px_48px_-30px_rgba(45,160,125,0.65)] sm:p-5">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
                   <Sparkles className="h-4.5 w-4.5" />
                 </span>
                 <div>
-                  <h2 className="text-sm font-semibold text-foreground">Sua trilha de aprendizado</h2>
-                  <p className="text-[11px] text-muted-foreground">Semana {cycle.week} de 8</p>
+                  <h2 className="text-sm font-semibold text-white">Sua trilha de aprendizado</h2>
+                  <p className="text-[11px] text-white/70">Semana {cycle.week} de 8</p>
                 </div>
               </div>
-              <span className="text-xs font-semibold text-primary">{Math.round((cycle.week / 8) * 100)}%</span>
+              <span className="text-xs font-semibold text-white">{Math.round((cycle.week / 8) * 100)}%</span>
             </div>
             <div className="mt-4 flex items-center gap-1.5" aria-label={`Semana ${cycle.week} de 8`}>
               {Array.from({ length: 8 }, (_, index) => {
@@ -186,29 +186,29 @@ function Home() {
                 const current = step === cycle.week;
                 return (
                   <div key={step} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
-                    <span className={`h-2 w-full rounded-full transition-colors ${complete || current ? "bg-primary" : "bg-white/10"} ${current ? "ring-2 ring-primary/20 ring-offset-2 ring-offset-[#171426]" : ""}`} />
-                    <span className={`text-[9px] tabular-nums ${current ? "font-bold text-primary" : complete ? "text-muted-foreground" : "text-muted-foreground/50"}`}>{step}</span>
+                    <span className={`h-2 w-full rounded-full transition-colors ${complete || current ? "bg-white" : "bg-black/20"} ${current ? "ring-2 ring-primary/20 ring-offset-2 ring-offset-[#286d60]" : ""}`} />
+                    <span className={`text-[9px] tabular-nums ${current ? "font-bold text-white" : complete ? "text-white/75" : "text-white/40"}`}>{step}</span>
                   </div>
                 );
               })}
             </div>
             <div className="mt-3">
-              <p className="text-sm font-semibold text-foreground">{cycle.grammar.topic}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{cycle.grammar.application}</p>
-              <p className="mt-2 text-[11px] text-muted-foreground">Foco de hoje: {todayFocus.label} · {todayFocus.focus}</p>
+              <p className="text-sm font-semibold text-white">{cycle.grammar.topic}</p>
+              <p className="mt-0.5 text-xs text-white/75">{cycle.grammar.application}</p>
+              <p className="mt-2 text-[11px] text-white/65">Foco de hoje: {todayFocus.label} · {todayFocus.focus}</p>
             </div>
-            <Link to="/study" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:opacity-80">
+            <Link to="/study" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white hover:opacity-80">
               Ver minha trilha <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          <Link to="/desafios" className="group flex items-center gap-3 rounded-2xl border border-primary/15 bg-primary/[0.06] px-4 py-3.5 transition-colors hover:border-primary/30 hover:bg-primary/[0.09]">
+          <Link to="/desafios" className="group flex items-center gap-3 overflow-hidden rounded-[26px] border border-orange-200/15 bg-gradient-to-br from-[#e69a69] via-[#c66b63] to-[#854b73] px-4 py-4 text-white shadow-[0_18px_48px_-30px_rgba(220,120,110,0.65)] transition-all hover:brightness-105 active:scale-[0.99]">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
               <Target className="h-5 w-5" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-semibold text-foreground">Desafios diários</span>
-              <span className="mt-0.5 block text-xs text-muted-foreground">Complete missões e conquiste recompensas</span>
+              <span className="block text-sm font-semibold text-white">Desafios diários</span>
+              <span className="mt-0.5 block text-xs text-white/75">Complete missões e conquiste recompensas</span>
             </span>
             <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </Link>
