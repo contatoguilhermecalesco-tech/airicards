@@ -5,7 +5,7 @@ const Input = z.object({
   scenario: z.string().min(3).max(160),
   context: z.string().min(10).max(1200),
   level: z.enum(["beginner", "intermediate", "advanced"]),
-  answer: z.string().min(2).max(2500),
+  answer: z.string().min(2).max(8000),
 });
 
 export type ParabelFeedback = {
