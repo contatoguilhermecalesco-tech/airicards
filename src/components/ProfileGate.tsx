@@ -82,6 +82,7 @@ function Shell({ children }: { children: ReactNode }) {
 
 function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
   const [metas, setMetas] = useState<ProfileMeta[] | null>(null);
+  const [selected, setSelected] = useState<Profile | null>(null);
   const [chosen, setChosen] = useState<Profile | null>(null);
 
   useEffect(() => {
@@ -110,136 +111,80 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
     );
   }
 
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 5
-      ? "Boa madrugada"
-      : hour < 12
-        ? "Bom dia"
-        : hour < 18
-          ? "Boa tarde"
-          : "Boa noite";
-
   return (
     <Shell>
-      <div className="flex flex-col items-center">
-        <Logo size="lg" />
-        <p
-          className="mt-8 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b69ae8]/80"
-          style={BODY_FONT}
-        >
-          {greeting}
+      <div className="flex flex-col items-center text-center">
+        <div className="relative mb-5 grid h-[76px] w-[76px] place-items-center rounded-full border border-[#b69ae8]/25 bg-[#28232f] shadow-[0_0_55px_-18px_rgba(182,154,232,0.42)]">
+          <Logo size="sm" />
+          <span className="pointer-events-none absolute inset-[-13px] rounded-full border border-[#b69ae8]/[0.08]" />
+        </div>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#b69ae8]/80">
+          AIRI · SEU ESPAÇO DE ESTUDOS
         </p>
-        <h1
-          className="mt-2 text-center text-[27px] font-semibold leading-tight tracking-tight text-white"
-          style={HEADING_FONT}
-        >
-          Quem está estudando?
+        <h1 className="mt-3 text-[26px] font-semibold leading-tight tracking-tight text-white" style={HEADING_FONT}>
+          Escolha seu perfil
         </h1>
-        <p className="mt-2 text-center text-[13px] text-white/50">
-          Toque no perfil para continuar.
+        <p className="mt-2 max-w-[270px] text-[13px] leading-relaxed text-white/45">
+          Selecione o avatar para continuar.
         </p>
       </div>
 
-      <div className="mt-7 overflow-hidden rounded-[20px] border border-white/[0.075] bg-[#202020]/90 shadow-[0_18px_50px_-34px_rgba(0,0,0,0.9)] backdrop-blur-sm">
-        {PROFILES.map((p, i) => {
+      <div className="mx-auto mt-9 grid w-full max-w-[310px] grid-cols-2 gap-4">
+        {PROFILES.map((p) => {
           const meta = metas?.find((m) => m.id === p.id);
-          const subtitle = !meta
-            ? "Carregando…"
-            : meta.hasPin
-              ? "PIN configurado"
-              : "Novo perfil · criar PIN";
-          const initial = p.name.charAt(0).toUpperCase();
+          const active = selected?.id === p.id;
           return (
             <button
               key={p.id}
-              onClick={() => setChosen(p)}
+              type="button"
+              onClick={() => setSelected(p)}
               disabled={!metas}
-              className={`group relative flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition duration-200 hover:bg-white/[0.035] active:bg-white/[0.055] disabled:opacity-50 ${
-                i > 0 ? "border-t border-white/[0.06]" : ""
-              }`}
+              aria-pressed={active}
+              className={"group flex min-h-[142px] flex-col items-center justify-center gap-3 rounded-[22px] border p-4 transition duration-200 active:scale-[0.97] disabled:opacity-50 " + (active
+                ? "border-[#b69ae8] bg-[#30283b] shadow-[0_0_0_1px_rgba(182,154,232,0.24),0_10px_32px_-18px_rgba(182,154,232,0.6)]"
+                : "border-white/[0.07] bg-[#222222] hover:border-white/[0.15] hover:bg-[#292929]")}
             >
-              <span aria-hidden className="relative">
+              <span className={"rounded-[20px] p-[3px] transition duration-200 " + (active ? "bg-[#b69ae8] shadow-[0_0_22px_rgba(182,154,232,0.32)]" : "bg-white/[0.07] group-hover:bg-white/[0.13]")}>
                 <ProfileAvatar
                   profileId={p.id}
-                  initial={initial}
+                  initial={p.name.charAt(0).toUpperCase()}
                   gradient={p.gradient}
-                  size={48}
+                  size={68}
+                  radius={17}
                   fontScale={0.36}
-                  ring="rgba(255,255,255,0.15)"
+                  ring="rgba(255,255,255,0.12)"
                 />
-                {meta?.hasPin && (
-                  <span
-                    aria-hidden
-                    className="absolute -bottom-0.5 -right-0.5 grid h-4 w-4 place-items-center rounded-full bg-black ring-2 ring-black"
-                  >
-                    <svg
-                      width="9"
-                      height="9"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#a78bfa"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="4" y="11" width="16" height="10" rx="2" />
-                      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-                    </svg>
-                  </span>
-                )}
               </span>
-              <span className="flex-1 min-w-0">
-                <span
-                  className="block truncate text-[16px] font-semibold text-white"
-                  style={HEADING_FONT}
-                >
-                  {p.name}
-                </span>
-                <span className="mt-0.5 block truncate text-[12px] text-white/45">
-                  {subtitle}
+              <span className="min-w-0 text-center">
+                <span className="block truncate text-[14px] font-semibold text-white" style={HEADING_FONT}>{p.name}</span>
+                <span className="mt-1 block text-[10px] text-white/40">
+                  {!meta ? "Carregando…" : meta.hasPin ? "Perfil protegido" : "Novo perfil"}
                 </span>
               </span>
-              <svg
-                className="shrink-0 text-white/25 transition group-hover:translate-x-0.5 group-hover:text-[#c9b6ed]"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="M9 6l6 6-6 6" />
-              </svg>
             </button>
           );
         })}
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-white/35">
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden
-        >
-          <rect x="4" y="11" width="16" height="10" rx="2" />
-          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+      <button
+        type="button"
+        onClick={() => selected && setChosen(selected)}
+        disabled={!selected || !metas}
+        className="mx-auto mt-7 flex h-[52px] w-full max-w-[310px] items-center justify-center gap-3 rounded-[17px] bg-[#b69ae8] px-6 text-[14px] font-semibold text-[#1c1724] shadow-[0_10px_28px_-16px_rgba(182,154,232,0.7)] transition duration-200 hover:bg-[#c4acee] active:scale-[0.985] disabled:cursor-not-allowed disabled:bg-[#34313a] disabled:text-white/25 disabled:shadow-none"
+        style={HEADING_FONT}
+      >
+        Continuar
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
-        <span>Protegido por PIN · criptografia bcrypt</span>
-      </div>
+      </button>
+
+      <p className="mt-6 text-center text-[10px] text-white/30">
+        Acesso individual protegido por PIN
+      </p>
     </Shell>
   );
 }
-
 function PinPad({
   profile,
   needsCreate,
@@ -355,30 +300,28 @@ function PinPad({
         </p>
       </div>
 
-      {/* Dot indicator */}
-      <div
-        className="mt-8 flex items-center justify-center gap-3"
-        onClick={() => inputRef.current?.focus()}
-        role="presentation"
-      >
-        {dots.map((i) => {
-          const active = i < filled;
-          const inRange = i < targetLen;
-          return (
-            <span
-              key={i}
-              className={`h-3 w-3 rounded-full transition-all duration-200 ${
-                active
-                  ? "bg-[#b69ae8] scale-110 shadow-[0_0_12px_rgba(182,154,232,0.35)]"
-                  : inRange
-                    ? "bg-white/15"
-                    : "bg-white/[0.06]"
-              }`}
-            />
-          );
-        })}
+      {/* PIN field with progress dots and quick submit */}
+      <div className="mt-8 flex items-center gap-3 rounded-full border border-white/[0.07] bg-[#202020] p-2 pl-5 shadow-[inset_5px_5px_12px_rgba(0,0,0,0.24),inset_-4px_-4px_10px_rgba(255,255,255,0.018)]">
+        <div className="flex min-h-[34px] flex-1 items-center gap-2" onClick={() => inputRef.current?.focus()} role="presentation">
+          {dots.map((i) => (
+            <span key={i} className={"h-[9px] w-[9px] rounded-full transition-all duration-200 " + (i < filled ? "scale-110 bg-[#b69ae8] shadow-[0_0_10px_rgba(182,154,232,0.4)]" : "bg-white/15")} />
+          ))}
+          {busy && <span className="ml-1 text-[11px] text-white/40">Verificando…</span>}
+        </div>
+        {stage === "enter" && (
+          <button
+            type="button"
+            onClick={() => submit(pin)}
+            disabled={busy || pin.length < 4}
+            aria-label="Confirmar PIN"
+            className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full bg-[#b69ae8] text-[#1c1724] transition hover:bg-[#c4acee] active:scale-95 disabled:bg-[#39343f] disabled:text-white/25"
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </button>
+        )}
       </div>
-
       {/* Hidden input capturing keyboard */}
       <input
         ref={inputRef}
@@ -404,26 +347,26 @@ function PinPad({
         </p>
       )}
 
-      {/* Numeric keypad — iOS style */}
-      <div className="mt-8 grid grid-cols-3 gap-3">
+      {/* Soft circular keypad */}
+      <div className="mx-auto mt-8 grid w-full max-w-[292px] grid-cols-3 justify-items-center gap-x-4 gap-y-3">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((n) => (
           <button
             key={n}
             type="button"
             disabled={busy}
             onClick={() => onChange(value + n)}
-            className="h-[58px] rounded-[17px] border border-white/[0.07] bg-[#222222] text-[24px] font-medium text-white transition duration-200 hover:border-[#b69ae8]/25 hover:bg-[#292929] active:scale-[0.97] active:bg-[#303030] disabled:opacity-50"
+            className="grid h-[72px] w-[72px] place-items-center rounded-full border border-white/[0.035] bg-[#202020] text-[23px] font-medium text-white shadow-[6px_7px_16px_rgba(0,0,0,0.28),-4px_-4px_12px_rgba(255,255,255,0.018)] transition duration-150 hover:bg-[#29252f] hover:text-[#d6c6f2] active:scale-[0.94] active:shadow-inner disabled:opacity-50"
             style={HEADING_FONT}
           >
             {n}
           </button>
         ))}
-        <div />
+        <span />
         <button
           type="button"
           disabled={busy}
           onClick={() => onChange(value + "0")}
-          className="h-16 rounded-2xl border border-white/[0.07] bg-[#111114] text-[26px] font-medium text-white transition active:scale-[0.96] active:bg-white/[0.06] hover:bg-white/[0.03] disabled:opacity-50"
+          className="grid h-[72px] w-[72px] place-items-center rounded-full border border-white/[0.035] bg-[#202020] text-[23px] font-medium text-white shadow-[6px_7px_16px_rgba(0,0,0,0.28),-4px_-4px_12px_rgba(255,255,255,0.018)] transition duration-150 hover:bg-[#29252f] hover:text-[#d6c6f2] active:scale-[0.94] active:shadow-inner disabled:opacity-50"
           style={HEADING_FONT}
         >
           0
@@ -432,37 +375,15 @@ function PinPad({
           type="button"
           disabled={busy || value.length === 0}
           onClick={() => onChange(value.slice(0, -1))}
-          className="grid h-[58px] place-items-center rounded-[17px] text-white/55 transition hover:bg-white/[0.035] hover:text-white active:scale-[0.97] disabled:opacity-30"
           aria-label="Apagar"
+          className="grid h-[72px] w-[72px] place-items-center rounded-full text-white/55 transition duration-150 hover:bg-white/[0.04] hover:text-white active:scale-[0.94] disabled:opacity-25"
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M22 5H10L3 12l7 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
             <path d="M18 9l-6 6M12 9l6 6" />
           </svg>
         </button>
       </div>
-
-      {stage === "enter" && (
-        <button
-          type="button"
-          onClick={() => submit(pin)}
-          disabled={busy || pin.length < 4}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-[#b69ae8] px-8 py-3.5 text-[14px] font-semibold text-[#1c1724] shadow-[0_8px_24px_-14px_rgba(182,154,232,0.65)] hover:bg-[#c4acee] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-30"
-          style={HEADING_FONT}
-        >
-          {busy ? "Entrando…" : "Entrar"}
-        </button>
-      )}
-
       <button
         type="button"
         onClick={onCancel}
