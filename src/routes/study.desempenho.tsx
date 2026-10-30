@@ -74,11 +74,17 @@ function PerformancePage() {
     const end = new Date(start); end.setDate(end.getDate() + 7);
     return { label: `Sem. ${i + 1}`, count: sessions.filter((s) => s.date >= start.getTime() && s.date < end.getTime()).reduce((sum, s) => sum + s.cards, 0) };
   });
+  const monthly = [...Array(6)].map((_, i) => {
+    const date = new Date(); date.setDate(1); date.setMonth(date.getMonth() - (5 - i));
+    const next = new Date(date); next.setMonth(next.getMonth() + 1);
+    return { label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""), count: sessions.filter((session) => session.date >= date.getTime() && session.date < next.getTime()).reduce((sum, session) => sum + session.cards, 0) };
+  });
+  const vocabularyCards = cards.filter((card) => card.mode !== "sentence");
   const vocab = {
-    studied: cards.length,
-    learning: cards.filter((card) => classifyCard(card, now) === "unstable" || classifyCard(card, now) === "almost").length,
-    mastered: categories.mastered.length,
-    due: dueCards.length,
+    studied: vocabularyCards.length,
+    learning: vocabularyCards.filter((card) => ["unstable", "almost"].includes(classifyCard(card, now))).length,
+    mastered: vocabularyCards.filter((card) => classifyCard(card, now) === "mastered").length,
+    due: vocabularyCards.filter((card) => card.dueAt <= now).length,
   };
 
   return (
@@ -118,6 +124,7 @@ function PerformancePage() {
           <ChartPanel title="Evolução semanal · últimos 30 dias" subtitle="Quantidade de cartas por semana">
             <Bars items={last30} />
           </ChartPanel>
+          <div className="lg:col-span-2"><ChartPanel title="Evolução mensal · últimos 6 meses" subtitle="Quantidade de cartas revisadas por mês"><Bars items={monthly} /></ChartPanel></div>
         </section>
         <section className="mt-5 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border bg-surface p-5">
