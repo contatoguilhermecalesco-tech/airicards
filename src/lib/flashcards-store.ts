@@ -817,12 +817,12 @@ function daysBetween(a: string, b: string): number {
   return Math.round((db - da) / 86_400_000);
 }
 
-/** Poda histórico para manter só os últimos ~60 dias. */
+/** Mantém até ~400 dias de frequência para alimentar o calendário anual e a evolução mensal. */
 function pruneHistory(history: Record<string, StreakDayStatus> | undefined): Record<string, StreakDayStatus> {
   const out: Record<string, StreakDayStatus> = {};
   if (!history) return out;
   const today = todayKey();
-  const cutoff = parseDayKey(today).getTime() - 60 * 86_400_000;
+  const cutoff = parseDayKey(today).getTime() - 400 * 86_400_000;
   for (const [k, v] of Object.entries(history)) {
     if (parseDayKey(k).getTime() >= cutoff) out[k] = v;
   }
