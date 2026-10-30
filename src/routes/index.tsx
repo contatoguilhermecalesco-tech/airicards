@@ -473,7 +473,7 @@ function Home() {
 
           <Link
             to="/enemies"
-            className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-rose-300/30`}
+            className="group relative block overflow-hidden border-y border-rose-300/20 bg-transparent py-3.5 transition-all duration-300 sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-4"
           >
             <GlassHighlight />
             <div
@@ -659,7 +659,7 @@ function Home() {
       {/* Decks list */}
       {decks.length > 0 && (
         <section
-          className="animate-fade-in mt-10 lg:col-span-12 lg:col-start-1 lg:row-start-8 lg:mt-4"
+          className="animate-fade-in mt-8 lg:col-span-12 lg:col-start-1 lg:row-start-8 lg:mt-4"
           style={{ animationDelay: "180ms", animationFillMode: "backwards" }}
         >
 
@@ -694,7 +694,6 @@ function Home() {
                     params={{ deckId: d.id }}
                     className="group flex items-center gap-4 border-b border-white/[0.09] bg-transparent py-3.5 transition-all duration-300 active:scale-[0.995] sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-4"
                   >
-                    <GlassHighlight />
                     <div
                       className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-xl border ${
                         dueInDeck > 0
@@ -1075,5 +1074,4 @@ function StreakCard({
     </section>
   );
 }
-
 
