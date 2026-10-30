@@ -7,7 +7,6 @@ import {
   Mic,
   PenLine,
   Sparkles,
-  TrendingUp,
 } from "lucide-react";
 import { useAppSettings } from "@/lib/app-settings";
 
