@@ -12,6 +12,7 @@ import {
   ENEMY_THRESHOLD,
   registerHomeSession,
 } from "@/lib/flashcards-store";
+import { recordStudySession } from "@/lib/performance-store";
 import { matchAnswer } from "@/lib/answer-match";
 import { toast } from "sonner";
 import { awardLp, LP } from "@/lib/rank-store";
@@ -48,7 +49,7 @@ import { ShardDropOverlay } from "@/components/hunt/ShardDropOverlay";
 
 
 type ReviewMode = "due" | "enemies";
-type Search = { deck?: string; mode?: ReviewMode };
+type Search = { deck?: string; mode?: ReviewMode; cards?: string };
 
 export const Route = createFileRoute("/review")({
   head: () => ({
@@ -60,6 +61,7 @@ export const Route = createFileRoute("/review")({
   validateSearch: (search: Record<string, unknown>): Search => ({
     deck: typeof search.deck === "string" ? search.deck : undefined,
     mode: search.mode === "enemies" ? "enemies" : undefined,
+    cards: typeof search.cards === "string" ? search.cards : undefined,
   }),
   component: Review,
 });
@@ -88,7 +90,7 @@ function renderSentence(sentence: string, target: string) {
 }
 
 function Review() {
-  const { deck: deckId, mode } = Route.useSearch();
+  const { deck: deckId, mode, cards: focusCards } = Route.useSearch();
   const isEnemyRun = mode === "enemies";
 
   const [queue, setQueue] = useState<string[]>([]);
@@ -96,6 +98,11 @@ function Review() {
   const [showBack, setShowBack] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
+  const sessionStartedAt = useRef(Date.now());
+  const sessionCorrect = useRef(0);
+  const sessionWrong = useRef(0);
+  const sessionLp = useRef(0);
+  const sessionSaved = useRef(false);
   const [hitFlash, setHitFlash] = useState(false);
   const [dmgFx, setDmgFx] = useState<
     { id: number; text: string; tone: "damage" | "heal" }[]
@@ -166,9 +173,12 @@ function Review() {
   useEffect(() => {
     if (!deckId && !isEnemyRun) registerHomeSession();
     if (isEnemyRun) resetCombo();
-    const source = isEnemyRun
-      ? getEnemyCards(deckId).filter((c) => !isDefeated(c))
-      : getDueCards(deckId, Date.now());
+    const focusedIds = focusCards?.split(",").filter(Boolean);
+    const source = focusedIds?.length
+      ? allCards.filter((card) => focusedIds.includes(card.id))
+      : isEnemyRun
+        ? getEnemyCards(deckId).filter((c) => !isDefeated(c))
+        : getDueCards(deckId, Date.now());
     const ordered = [...source].sort(
       (a, b) =>
         difficultyScore(b) - difficultyScore(a) + (Math.random() - 0.5) * 0.6,
@@ -178,7 +188,12 @@ function Review() {
     setIndex(0);
     setShowBack(false);
     setReviewed(0);
-  }, [deckId, isEnemyRun]);
+    sessionStartedAt.current = Date.now();
+    sessionCorrect.current = 0;
+    sessionWrong.current = 0;
+    sessionLp.current = 0;
+    sessionSaved.current = false;
+  }, [deckId, isEnemyRun, focusCards]);
 
 
 
@@ -202,6 +217,21 @@ function Review() {
   );
 
   const finished = queue.length > 0 && index >= queue.length;
+
+  useEffect(() => {
+    if (!finished || sessionSaved.current) return;
+    sessionSaved.current = true;
+    const total = sessionCorrect.current + sessionWrong.current;
+    recordStudySession({
+      cards: total,
+      correct: sessionCorrect.current,
+      wrong: sessionWrong.current,
+      durationMs: Math.max(0, Date.now() - sessionStartedAt.current),
+      lp: sessionLp.current,
+      xp: Math.max(0, sessionCorrect.current * 2 + Math.floor(total / 5)),
+      deckName: deckName ?? (focusCards ? "Reforço inteligente" : isEnemyRun ? "Cartas inimigas" : "Todos os baralhos"),
+    });
+  }, [finished, deckName, focusCards, isEnemyRun]);
 
   const [askDifficulty, setAskDifficulty] = useState(false);
   const [notice, setNotice] = useState<
@@ -293,6 +323,8 @@ function Review() {
     
     awardLp(LP.reviewWrong, "review.wrong", sessionMultiplier);
     reviewCard(current.id, "again");
+    sessionWrong.current += 1;
+    sessionLp.current -= 4;
     setReviewed((n) => n + 1);
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
@@ -317,6 +349,8 @@ function Review() {
     
     // Ganhos de LP baseados na dificuldade escolhida
     const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
+    sessionCorrect.current += 1;
+    sessionLp.current += lpGain;
     const reason = g === "easy" ? "review.easy" : g === "good" ? "review.good" : "review.hard";
     awardLp(lpGain, reason, sessionMultiplier);
     
