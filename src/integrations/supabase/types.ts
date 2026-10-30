@@ -549,6 +549,8 @@ export type Database = {
           grammar_progress: Json
           home_sessions: Json
           profile_id: string
+          parabel_history?: Json
+          parabel_history: Json
           rank: Json
           study_history: Json
           updated_at: string
@@ -571,6 +573,7 @@ export type Database = {
           grammar_progress?: Json
           home_sessions?: Json
           profile_id?: string
+          parabel_history?: Json
           rank?: Json
           study_history?: Json
           updated_at?: string
