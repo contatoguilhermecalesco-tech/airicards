@@ -11,6 +11,7 @@ export type ParabelEntry = {
   level: "beginner" | "intermediate" | "advanced";
   answer: string;
   feedback: ParabelFeedback;
+  xp?: number;
 };
 
 function isBrowser() { return typeof window !== "undefined"; }
