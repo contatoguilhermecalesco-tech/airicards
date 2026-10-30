@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, GraduationCap, Flame, Swords, Skull, Crown, ShoppingBag, BookOpen } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, GraduationCap, Flame, Swords, Skull, Crown, ShoppingBag, BookOpen, Zap } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +19,7 @@ import {
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
+import { useAppSettings } from "@/lib/app-settings";
 
 
 
@@ -66,18 +67,6 @@ function formatNextIn(ms: number): string {
 }
 
 // Reusable Liquid Glass surface — rim light + subtle depth, kept crisp
-const GLASS_BASE =
-  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.045] backdrop-blur-md backdrop-saturate-125 shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)]";
-
-function GlassHighlight() {
-  return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 hidden h-px bg-gradient-to-r from-transparent via-white/25 to-transparent md:block"
-    />
-  );
-}
-
 function Home() {
   const profile = useCurrentProfile();
   const decks = useStore((s) => s.decks);
@@ -87,10 +76,6 @@ function Home() {
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
-    [cards, now],
-  );
-  const pending = useMemo(
-    () => cards.filter((c) => c.dueAt > now).length,
     [cards, now],
   );
   const nextDueInMs = useMemo(() => {
@@ -103,19 +88,13 @@ function Home() {
 
   const hour = new Date().getHours();
   const { salute, icon, eyebrow } = greetingFor(hour);
-  const timeLabel = useMemo(() => {
-    const d = new Date();
-    const hh = d.getHours().toString().padStart(2, "0");
-    const mm = d.getMinutes().toString().padStart(2, "0");
-    const weekday = d.toLocaleDateString("pt-BR", { weekday: "long" });
-    return `${hh}:${mm} · ${weekday.charAt(0).toUpperCase()}${weekday.slice(1)}`;
-  }, [now]);
   const name = profile?.name ?? "";
   const cycle = useCycleWeek();
   const todayFocus = getTodayFocus();
 
   // Rank do perfil
   const rank = useRank();
+  const appSettings = useAppSettings();
 
   const dailyTarget = Math.max(1, due + reviewedToday);
   const pctLabel = Math.round(Math.min(1, reviewedToday / dailyTarget) * 100);
@@ -128,7 +107,7 @@ function Home() {
       <header className="animate-fade-in flex items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
-            {icon}<span>{eyebrow}</span><span aria-hidden className="h-1 w-1 rounded-full bg-muted-foreground/40" /><span className="truncate tabular-nums">{timeLabel}</span>
+            {icon}<span>{eyebrow}</span>
           </div>
           <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-foreground sm:text-[32px]">{salute}{name ? `, ${name}` : ""}</h1>
         </div>
@@ -228,8 +207,9 @@ function Home() {
         <div className="grid grid-cols-4 gap-2">
           <Link to="/enemies" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Skull className="h-5 w-5 text-rose-300" /><span className="text-[11px] font-medium text-muted-foreground">Chefões</span></Link>
           <Link to="/social" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Swords className="h-5 w-5 text-fuchsia-300" /><span className="text-[11px] font-medium text-muted-foreground">Duelo</span></Link>
-          <Link to="/exam" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><GraduationCap className="h-5 w-5 text-violet-300" /><span className="text-[11px] font-medium text-muted-foreground">Prova</span></Link>
+          {appSettings.exam_visible && <Link to="/exam" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><GraduationCap className="h-5 w-5 text-violet-300" /><span className="text-[11px] font-medium text-muted-foreground">Prova</span></Link>}
           <Link to="/shop" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><ShoppingBag className="h-5 w-5 text-amber-200" /><span className="text-[11px] font-medium text-muted-foreground">Loja</span></Link>
+          <Link to="/inventory" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Zap className="h-5 w-5 text-cyan-200" /><span className="text-[11px] font-medium text-muted-foreground">Power-ups</span></Link>
         </div>
       </section>
     </main>
