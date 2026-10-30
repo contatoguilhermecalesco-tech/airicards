@@ -70,21 +70,21 @@ function SocialPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-[760px] px-4 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
-      <header className="mb-5 flex items-end justify-between gap-3 pb-2">
+    <main className="mx-auto w-full max-w-[680px] px-4 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
+      <header className="mb-4 flex items-center justify-between gap-3 pb-1">
         <div className="min-w-0">
-          <h1 className="truncate text-[28px] font-semibold tracking-tight text-foreground">Social</h1>
+          <h1 className="truncate text-[25px] font-semibold tracking-tight text-foreground">Social</h1>
         </div>
         <Link to="/social/stats" className="inline-flex items-center gap-1.5 pb-1 text-[12px] font-medium text-muted-foreground transition hover:text-foreground"><BarChart3 className="h-3.5 w-3.5" /> Comparar</Link>
       </header>
 
-      <div className="mb-5 grid grid-cols-3 border-b border-border/60">
+      <div className="mb-6 grid grid-cols-3 border-b border-border/50">
         {nav.map(({ id, label, icon: Icon, badge }) => (
           <button
             key={id}
             type="button"
             onClick={() => setSection(id)}
-            className={`relative flex h-10 items-center justify-center gap-2 border-b-2 border-transparent text-[12px] font-medium transition ${section === id ? "border-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            className={`relative flex h-9 items-center justify-center gap-1.5 border-b-2 border-transparent text-[11px] font-medium transition ${section === id ? "border-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             <Icon className="h-4 w-4" />{label}
             {badge ? <span className="min-w-4 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{badge}</span> : null}
@@ -104,19 +104,19 @@ function SocialPage() {
 
 function Feed({ meId }: { meId: ProfileId }) {
   const rawEvents = useUnifiedFeed(30);
-  const [visible, setVisible] = useState(6);
+  const [visible, setVisible] = useState(4);
   const events = useMemo(() => consolidateRankEvents(rawEvents), [rawEvents]);
 
   if (!events.length) return <Empty icon={Sparkles} title="O feed está tranquilo" body="As próximas conquistas de vocês aparecerão aqui." />;
 
   return (
     <div>
-      <div className="mb-2"><h2 className="text-[13px] font-medium text-muted-foreground">Atividades recentes</h2></div>
-      <ol className="border-t border-border/50">
+      <div className="mb-3"><h2 className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Recentes</h2></div>
+      <ol className="space-y-3">
         {events.slice(0, visible).map((event) => <FeedPost key={event.id} event={event} meId={meId} />)}
       </ol>
       {visible < events.length ? (
-        <Button variant="ghost" onClick={() => setVisible((value) => value + 6)} className="mt-3 w-full text-muted-foreground">Ver mais atividades</Button>
+        <Button variant="ghost" size="sm" onClick={() => setVisible((value) => value + 4)} className="mt-2 w-full text-muted-foreground">Ver mais</Button>
       ) : null}
     </div>
   );
@@ -162,25 +162,25 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
   }
 
   return (
-    <li className="border-b border-border/50 py-3.5">
-      <div className="flex gap-3">
-        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={32} />
+    <li className="border-b border-border/40 pb-3">
+      <div className="flex gap-2.5">
+        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={30} />
         <article className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-[13px] font-semibold text-foreground">{event.profileId === meId ? "Você" : actor.name}</p>
-            <span className="text-[11px] text-muted-foreground">{timeAgo(event.createdAt)}</span>
+            <span className="text-[10px] text-muted-foreground">{timeAgo(event.createdAt)}</span>
           </div>
-          <p className="mt-1.5 text-[13px] leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
-          <div className="mt-1.5 flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => toggleReaction(event.id, meId, "❤️")} className={`rounded-full ${liked ? "text-primary" : "text-muted-foreground"}`}>
+          <p className="mt-1 text-[12px] leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
+          <div className="mt-1 flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={() => toggleReaction(event.id, meId, "❤️")} className={`h-7 rounded-full px-2 text-[11px] ${liked ? "text-primary" : "text-muted-foreground"}`}>
               <Heart className={liked ? "fill-current" : ""} /> {reactions.filter((reaction) => reaction.emoji === "❤️").length || "Curtir"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowComments((value) => !value)} className="rounded-full text-muted-foreground">
+            <Button variant="ghost" size="sm" onClick={() => setShowComments((value) => !value)} className="h-7 rounded-full px-2 text-[11px] text-muted-foreground">
               <MessageCircle /> {comments.length || "Comentar"}
             </Button>
           </div>
           {showComments ? (
-            <div className="mt-3 rounded-xl bg-secondary/30 p-3">
+            <div className="mt-2 rounded-lg bg-secondary/25 p-2.5">
               {comments.length === 0 ? <p className="mb-3 text-[12px] text-muted-foreground">Seja o primeiro a comentar.</p> : null}
               {comments.map((comment) => {
                 const author = profileMeta(comment.profileId);
@@ -207,14 +207,14 @@ function DuelSection({ meId, score, duel }: { meId: ProfileId; score: { g: numbe
   const friendId = otherProfile(meId);
   const mine = meId === "guilherme" ? score.g : score.a;
   const theirs = meId === "guilherme" ? score.a : score.g;
-  return <div><div className="mb-5"><h2 className="text-[18px] font-semibold text-foreground">Duelo semanal</h2><p className="text-[12px] text-muted-foreground">As mesmas cartas para os dois. A melhor precisão vence.</p></div><div className="border-y border-border/60 py-7"><div className="mx-auto flex max-w-md items-center justify-between"><DuelAvatarLarge id={meId} score={mine} label="Você" /><div className="text-center"><Swords className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">{duel?.status === "active" ? "Ao vivo" : "Semana"}</p></div><DuelAvatarLarge id={friendId} score={theirs} label={profileMeta(friendId).name} /></div></div><Button asChild className="mt-5 w-full"><Link to="/duel">{duel?.status === "active" ? "Continuar duelo" : duel ? "Ver resultado" : "Criar novo duelo"}<ChevronRight /></Link></Button><div className="mt-7 grid grid-cols-3 divide-x divide-border border-y border-border/60 py-4 text-center"><DuelRule value="5" label="cartas" /><DuelRule value="48h" label="prazo" /><DuelRule value="1×" label="por semana" /></div></div>;
+  return <div><div className="mb-4"><h2 className="text-[17px] font-semibold text-foreground">Duelo semanal</h2></div><div className="border-y border-border/50 py-5"><div className="mx-auto flex max-w-md items-center justify-between"><DuelAvatarLarge id={meId} score={mine} label="Você" /><div className="text-center"><Swords className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">{duel?.status === "active" ? "Ao vivo" : "Semana"}</p></div><DuelAvatarLarge id={friendId} score={theirs} label={profileMeta(friendId).name} /></div></div><Button asChild className="mt-4 w-full"><Link to="/duel">{duel?.status === "active" ? "Continuar duelo" : duel ? "Ver resultado" : "Criar novo duelo"}<ChevronRight /></Link></Button></div>;
 }
 
 function DuelAvatarLarge({ id, score, label }: { id: ProfileId; score: number; label: string }) { const p = profileMeta(id); return <div className="text-center"><ProfileAvatar profileId={id} initial={p.initial} gradient={p.gradient} size={58} className="mx-auto" /><p className="mt-2 text-[12px] font-medium text-foreground">{label}</p><p className="text-[24px] font-semibold tabular-nums text-foreground">{score}</p></div>; }
 function DuelRule({ value, label }: { value: string; label: string }) { return <div><p className="text-[15px] font-semibold text-foreground">{value}</p><p className="text-[10px] uppercase text-muted-foreground">{label}</p></div>; }
 
 function Gifts({ pending, sent, friendName }: { pending: ReturnType<typeof usePendingGifts>; sent: ReturnType<typeof useSentGifts>; friendName: string }) {
-  return <div><div className="mb-5"><h2 className="text-[18px] font-semibold text-foreground">Presentes</h2><p className="text-[12px] text-muted-foreground">Cartas compartilhadas entre você e {friendName}.</p></div>{pending.length ? <GiftInbox /> : <Empty icon={Gift} title="Nenhum presente novo" body={`Quando ${friendName} enviar uma carta, ela aparecerá aqui.`} />}{sent.length ? <section className="mt-7"><h3 className="mb-2 text-[12px] font-semibold uppercase text-muted-foreground">Enviados</h3><ul className="border-t border-border/60">{sent.map((gift) => <li key={gift.id} className="flex items-center gap-3 border-b border-border/60 py-3"><span className="text-muted-foreground">{gift.status === "imported" ? <Check className="h-4 w-4 text-success" /> : gift.status === "declined" ? <XIcon className="h-4 w-4" /> : <Gift className="h-4 w-4 text-primary" />}</span><div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium text-foreground">{gift.front}</p><p className="truncate text-[11px] text-muted-foreground">{gift.back}</p></div><span className="text-[10px] uppercase text-muted-foreground">{gift.status === "pending" ? "Pendente" : gift.status === "imported" ? "Aceita" : "Recusada"}</span></li>)}</ul></section> : null}</div>;
+  return <div><div className="mb-4"><h2 className="text-[17px] font-semibold text-foreground">Presentes</h2></div>{pending.length ? <GiftInbox /> : <Empty icon={Gift} title="Nenhum presente novo" body={`Quando ${friendName} enviar uma carta, ela aparecerá aqui.`} />}{sent.length ? <section className="mt-5"><h3 className="mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">Enviados</h3><ul className="border-t border-border/60">{sent.map((gift) => <li key={gift.id} className="flex items-center gap-3 border-b border-border/60 py-3"><span className="text-muted-foreground">{gift.status === "imported" ? <Check className="h-4 w-4 text-success" /> : gift.status === "declined" ? <XIcon className="h-4 w-4" /> : <Gift className="h-4 w-4 text-primary" />}</span><div className="min-w-0 flex-1"><p className="truncate text-[12px] font-medium text-foreground">{gift.front}</p></div><span className="text-[10px] uppercase text-muted-foreground">{gift.status === "pending" ? "Pendente" : gift.status === "imported" ? "Aceita" : "Recusada"}</span></li>)}</ul></section> : null}</div>;
 }
 
 function eventTitle(event: ActivityEvent, name: string) { const p = event.payload; if (event.kind === "rank_up") return `${name} chegou ao ${formatRank(p.toTier, p.toDivision)}`; if (event.kind === "streak_milestone") return `${name} completou ${String(p.days ?? "")} dias de sequência`; if (event.kind === "exam_done") return `${name} concluiu a prova mensal`; if (event.kind === "duel_won") return `${name} venceu o duelo da semana`; return `${name} derrotou uma carta inimiga`; }
