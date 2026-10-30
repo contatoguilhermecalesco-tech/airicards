@@ -175,6 +175,25 @@ function StudyIndex() {
         </Link>
       </section>
 
+
+      <section className="mb-10">
+        <Link to="/study/parabel" className="group relative block overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-br from-violet-500/15 via-fuchsia-500/10 to-surface p-5 transition hover:border-violet-400/40 sm:p-6">
+          <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-violet-500/15 blur-3xl" />
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-violet-300/20 bg-violet-400/15 text-2xl">💬</div>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-violet-300">Novo modo</span>
+                <span className="rounded-full border border-violet-300/20 bg-violet-300/10 px-2 py-0.5 text-[10px] font-semibold text-violet-200">PARABEL</span>
+              </div>
+              <h2 className="mt-1 text-xl font-semibold">Inglês para a vida real</h2>
+              <p className="mt-1 text-sm text-muted-foreground">Entre em situações reais, responda livremente e receba feedback da IA.</p>
+            </div>
+            <ArrowRight className="h-5 w-5 shrink-0 text-violet-300 transition-transform group-hover:translate-x-1" />
+          </div>
+        </Link>
+      </section>
+
       <section aria-labelledby="modes-title">
         <div className="mb-3 px-1">
           <h2 id="modes-title" className="text-sm font-semibold">Sua semana de inglês</h2>
