@@ -27,6 +27,7 @@ import {
   UserRound,
   Zap,
   Layers,
+  TrendingUp,
 } from "lucide-react";
 
 import { StatChip, ArlysIcon } from "@/components/StatChip";
@@ -61,6 +62,7 @@ import { CosmeticInventory } from "@/components/profile/CosmeticInventory";
 import { Button } from "@/components/ui/button";
 import { ProfileActivityFeed } from "@/components/ProfileActivityFeed";
 import { FriendsList } from "@/components/profile/FriendsList";
+import { PerformancePage } from "@/routes/study.desempenho";
 
 
 
@@ -319,7 +321,7 @@ function PerfilPage() {
   const [editingBio, setEditingBio] = useState(false);
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [tab, setTab] = useState<"perfil" | "atividade">("perfil");
+  const [tab, setTab] = useState<"perfil" | "atividade" | "desempenho">("perfil");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -864,7 +866,7 @@ function PerfilPage() {
        <div className="min-w-0">
        <div className="mb-5 border-b border-border">
          <div className="flex min-w-0 items-center gap-6 overflow-x-auto">
-           {(["perfil", "atividade"] as const).map((t) => (
+           {(["perfil", "atividade", "desempenho"] as const).map((t) => (
              <button
                key={t}
                type="button"
@@ -875,7 +877,7 @@ function PerfilPage() {
                    : "text-muted-foreground hover:text-foreground"
                }`}
              >
-               {t === "perfil" ? "Perfil" : "Atividade"}
+               {t === "perfil" ? "Perfil" : t === "atividade" ? "Atividade" : <span className="inline-flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5" /> Desempenho</span>}
              </button>
            ))}
          </div>
@@ -890,6 +892,8 @@ function PerfilPage() {
            </p>
            {profile ? <ProfileActivityFeed profileId={profile.id} limit={30} /> : null}
          </section>
+       ) : tab === "desempenho" ? (
+         <PerformancePage embedded />
        ) : (
        <>
        {/* ============ SLOTS ============ */}
