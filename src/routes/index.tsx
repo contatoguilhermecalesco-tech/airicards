@@ -84,7 +84,7 @@ function GlassHighlight() {
   return (
     <span
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent"
+      className="pointer-events-none absolute inset-x-0 top-0 hidden h-px bg-gradient-to-r from-transparent via-white/25 to-transparent md:block"
     />
   );
 }
@@ -240,7 +240,7 @@ function Home() {
           }}
         />
         <div
-          className={`${GLASS_BASE} rounded-[24px] p-5 sm:rounded-[28px] sm:p-8`}
+          className={`${GLASS_BASE} rounded-[24px] border-white/[0.1] bg-[#171525]/90 p-5 shadow-[0_18px_55px_-32px_rgba(124,107,216,0.55)] sm:rounded-[28px] sm:p-8`}
         >
           <GlassHighlight />
           <div
@@ -517,7 +517,7 @@ function Home() {
 
       {/* Stats — glass chips com contexto */}
       <section
-        className="animate-fade-in mt-6 grid grid-cols-2 gap-2.5 lg:col-span-8 lg:col-start-1 lg:row-start-4 lg:mt-0 lg:grid-cols-4 lg:gap-3"
+        className="animate-fade-in mt-7 grid grid-cols-2 gap-x-4 gap-y-0 lg:col-span-8 lg:col-start-1 lg:row-start-4 lg:mt-0 lg:grid-cols-4 lg:gap-3"
         style={{ animationDelay: "120ms", animationFillMode: "backwards" }}
       >
         <StatChip
@@ -613,7 +613,7 @@ function Home() {
 
           <Link
             to="/exam"
-            className={`${GLASS_BASE} group block p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30`}
+            className="group block border-y border-white/[0.09] bg-transparent py-3.5 transition-all duration-300 sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-4"
           >
             <GlassHighlight />
             <div
@@ -692,7 +692,7 @@ function Home() {
                   <Link
                     to="/library/$deckId"
                     params={{ deckId: d.id }}
-                    className={`${GLASS_BASE} group flex items-center gap-4 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-white/[0.055] active:scale-[0.995]`}
+                    className="group flex items-center gap-4 border-b border-white/[0.09] bg-transparent py-3.5 transition-all duration-300 active:scale-[0.995] sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-4"
                   >
                     <GlassHighlight />
                     <div
@@ -757,11 +757,11 @@ function StatChip({
 }) {
   return (
     <div
-      className={`${GLASS_BASE} group p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.06] ${
-        accent ? "border-primary/25 bg-primary/[0.06]" : ""
-      }`}
+      className={`group relative border-b border-white/[0.09] bg-transparent px-1 py-3.5 shadow-none transition-all duration-300 sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-3.5 sm:backdrop-blur-md sm:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] ${
+        accent ? "sm:border-primary/25 sm:bg-primary/[0.06]" : ""
+      }` }
     >
-      <GlassHighlight />
+      <div className="hidden sm:block"><GlassHighlight /></div>
       {accent && (
         <div
           aria-hidden
@@ -808,12 +808,12 @@ function RankTile({ rank }: { rank: ReturnType<typeof useRank> }) {
 
   return (
     <section
-      className="animate-fade-in mt-6 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
+      className="animate-fade-in mt-7 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-0"
       style={{ animationDelay: "135ms", animationFillMode: "backwards" }}
     >
       <Link
         to="/rank"
-        className={`${GLASS_BASE} group relative block overflow-hidden p-4 transition-all duration-300 hover:-translate-y-0.5`}
+        className={`group relative block overflow-hidden border-y border-white/[0.09] bg-transparent py-3.5 transition-all duration-300 sm:rounded-2xl sm:border sm:bg-white/[0.045] sm:p-4 sm:backdrop-blur-md sm:shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)] hover:-translate-y-0.5`}
         style={{
           borderColor: `${tierColor.glow}33`,
         }}
@@ -963,7 +963,7 @@ function StreakCard({
       className="streak-card-scope animate-fade-in mt-6"
       style={{ animationDelay: "100ms", animationFillMode: "backwards" }}
     >
-      <div className="relative overflow-hidden rounded-2xl border border-streak-border bg-streak-panel/90 p-5 shadow-streak backdrop-blur-2xl backdrop-saturate-150">
+      <div className="relative overflow-hidden border-y border-streak-border bg-transparent py-4 shadow-none sm:rounded-2xl sm:border sm:bg-streak-panel/90 sm:p-5 sm:shadow-streak sm:backdrop-blur-2xl sm:backdrop-saturate-150">
         <span aria-hidden className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-streak-primary/65 to-transparent" />
 
         <div
@@ -1075,6 +1075,5 @@ function StreakCard({
     </section>
   );
 }
-
 
 
