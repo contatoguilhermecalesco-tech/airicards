@@ -52,8 +52,6 @@ export function getWeaknesses(cards: Card[]): Weakness[] {
     else if (/\b(phrasal verb|give up|look up|put off|turn on|take off|run out|find out)\b/.test(text)) id = "phrasal";
     else if (/\b(am|is|are|was|were|have|has|had|will|would|did|does)\b/.test(text)) id = "grammar";
     else if (card.mode === "sentence") id = "translation";
-    else if (/\b(am|is|are|was|were|have|has|had|will|would|did|does)\b/.test(text)) id = "grammar";
-    else if (card.mode === "sentence") id = "translation";
     const list = groups.get(id) ?? [];
     list.push(card);
     groups.set(id, list);
