@@ -55,8 +55,9 @@ function PerformancePage() {
   const totalWrong = cards.reduce((sum, card) => sum + (card.lapses ?? 0), 0);
   const totalReviewed = totalCorrect + totalWrong;
   const totalTime = sessions.reduce((sum, session) => sum + session.durationMs, 0);
+  const sessionCards = sessions.reduce((sum, session) => sum + session.cards, 0);
   const accuracy = totalReviewed ? Math.round((totalCorrect / totalReviewed) * 100) : 0;
-  const avgCards = sessions.length ? Math.round(totalReviewed / sessions.length) : 0;
+  const avgCards = sessions.length ? Math.round(sessionCards / sessions.length) : 0;
   const studiedDays = new Set([
     ...sessions.map((session) => dayKey(session.date)),
     ...Object.entries(streak.history ?? {}).filter(([, status]) => status === "done").map(([key]) => key),
@@ -128,7 +129,7 @@ function PerformancePage() {
         <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">Cartas e acertos usam os contadores acumulados disponíveis nos baralhos. Tempo, horários e histórico detalhado passam a ser registrados a partir desta atualização.</p>
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Metric icon={<Layers3 className="h-4 w-4" />} label="Cartas revisadas" value={totalReviewed.toLocaleString("pt-BR")} />
-          <Metric icon={<Target className="h-4 w-4" />} label="Taxa de acerto" value={sessions.length ? `${accuracy}%` : "—"} />
+          <Metric icon={<Target className="h-4 w-4" />} label="Taxa de acerto" value={totalReviewed ? `${accuracy}%` : "—"} />
           <Metric icon={<Clock3 className="h-4 w-4" />} label="Tempo estudado" value={totalTime ? duration(totalTime) : "—"} />
           <Metric icon={<CalendarDays className="h-4 w-4" />} label="Frequência" value={`${activeDays} dias`} />
           <Metric icon={<BookOpen className="h-4 w-4" />} label="Média por sessão" value={sessions.length ? `${avgCards} cartas` : "—"} />
