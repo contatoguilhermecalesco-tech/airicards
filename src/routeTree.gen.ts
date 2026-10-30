@@ -348,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/study/': typeof StudyIndexRoute
   '/study/parabel': typeof StudyParabelRoute
   '/study/desempenho': typeof StudyDesempenhoRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -446,6 +447,7 @@ export interface FileRoutesById {
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
   '/study/parabel': typeof StudyParabelRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -498,6 +500,7 @@ export interface FileRouteTypes {
     | '/novidades/'
     | '/social/'
     | '/study/'
+    | '/study/desempenho'
     | '/deck/$owner/$slug'
     | '/study/listening/history'
     | '/study/reading/history'
@@ -546,6 +549,7 @@ export interface FileRouteTypes {
     | '/novidades'
     | '/social'
     | '/study'
+    | '/study/desempenho'
     | '/deck/$owner/$slug'
     | '/study/grammar'
     | '/study/listening'
