@@ -18,8 +18,15 @@ export function ProfileGate({ children }: { children: ReactNode }) {
   const profile = useCurrentProfile();
   const hydrated = useProfileHydrated();
   const [loadingProfile, setLoadingProfile] = useState<Profile | null>(null);
+  const [introComplete, setIntroComplete] = useState(false);
 
-  if (!hydrated) return null;
+  useEffect(() => {
+    if (!hydrated || profile) return;
+    const timeout = window.setTimeout(() => setIntroComplete(true), 2400);
+    return () => window.clearTimeout(timeout);
+  }, [hydrated, profile]);
+
+  if (!hydrated || (!profile && !introComplete)) return <WelcomeSplash />;
 
   if (loadingProfile) {
     return <ProfileLoading profile={loadingProfile} />;
@@ -37,6 +44,37 @@ export function ProfileGate({ children }: { children: ReactNode }) {
   }
 
   return <>{children}</>;
+}
+
+function WelcomeSplash() {
+  const [message, setMessage] = useState("Preparando seu espaço de estudos");
+
+  useEffect(() => {
+    const a = window.setTimeout(() => setMessage("Organizando sua experiência"), 850);
+    const b = window.setTimeout(() => setMessage("Tudo pronto para começar"), 1650);
+    return () => { window.clearTimeout(a); window.clearTimeout(b); };
+  }, []);
+
+  return (
+    <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#171717] px-6" style={BODY_FONT} aria-label="Carregando AIRI">
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-[42%] h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(182,154,232,0.13), transparent 70%)", animation: "airi-glow 3s ease-in-out infinite" }} />
+      <div className="relative flex w-full max-w-[320px] flex-col items-center text-center">
+        <div className="relative grid h-[112px] w-[112px] place-items-center">
+          <span aria-hidden className="absolute inset-0 rounded-full border border-[#b69ae8]/20" style={{ animation: "airi-ring 2.4s ease-out infinite" }} />
+          <span aria-hidden className="absolute inset-[12px] rounded-full border border-[#b69ae8]/10" />
+          <Logo size="sm" />
+        </div>
+        <p className="mt-8 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#b69ae8]/75">Seu espaço de aprendizado</p>
+        <h1 className="mt-3 text-[30px] font-semibold tracking-[-0.04em] text-white" style={HEADING_FONT}>Bem-vindo ao <span className="text-[#c4acee]">AIRI</span></h1>
+        <p className="mt-2 min-h-[20px] text-[12px] text-white/45" aria-live="polite">{message}</p>
+        <div className="mt-9 h-[3px] w-[172px] overflow-hidden rounded-full bg-white/[0.08]" role="progressbar" aria-label="Preparando o AIRI">
+          <div className="h-full w-full origin-left scale-x-0 rounded-full bg-[#b69ae8]" style={{ animation: "airi-progress 2.4s cubic-bezier(0.22,1,0.36,1) forwards", boxShadow: "0 0 12px rgba(182,154,232,0.55)" }} />
+        </div>
+        <p className="mt-4 text-[9px] font-medium uppercase tracking-[0.2em] text-white/20">Um momento</p>
+      </div>
+      <style>{`@keyframes airi-progress{to{transform:scaleX(1)}}@keyframes airi-glow{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(.94)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}@keyframes airi-ring{0%{transform:scale(.82);opacity:.65}75%,100%{transform:scale(1.28);opacity:0}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}`}</style>
+    </main>
+  );
 }
 
 function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
