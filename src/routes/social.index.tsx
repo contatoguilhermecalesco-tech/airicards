@@ -75,18 +75,18 @@ function SocialPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-[1180px] px-3 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
-      <header className="mb-5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border/60 pb-5">
+    <main className="mx-auto w-full max-w-[1120px] px-4 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
+      <header className="mb-5 flex items-end justify-between gap-3 border-b border-border/60 pb-4">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase text-primary">Comunidade airi</p>
-          <h1 className="truncate text-[26px] font-semibold text-foreground">Social</h1>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Comunidade airi</p>
+          <h1 className="truncate text-[28px] font-semibold tracking-tight text-foreground">Social</h1>
         </div>
         <Button asChild variant="ghost" size="sm" className="rounded-full text-muted-foreground">
           <Link to="/social/stats"><BarChart3 /> Comparar</Link>
         </Button>
       </header>
 
-      <div className="mb-4 grid grid-cols-3 border-b border-border/60 lg:hidden">
+      <div className="mb-5 grid grid-cols-3 gap-1 rounded-xl border border-border/50 bg-secondary/30 p-1 lg:hidden">
         {nav.map(({ id, label, icon: Icon, badge }) => (
           <button
             key={id}
@@ -96,21 +96,21 @@ function SocialPage() {
           >
             <Icon className="h-4 w-4" />{label}
             {badge ? <span className="min-w-4 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{badge}</span> : null}
-            {section === id ? <span className="absolute inset-x-5 bottom-0 h-0.5 bg-primary" /> : null}
+            {section === id ? <span className="hidden" /> : null}
           </button>
         ))}
       </div>
 
-      <div className="lg:grid lg:grid-cols-[176px_minmax(0,1fr)_270px] lg:gap-7">
-        <aside className="hidden border-r border-border/60 pr-5 lg:block">
-          <nav className="sticky top-24 space-y-1">
+      <div className="lg:grid lg:grid-cols-[150px_minmax(0,1fr)_250px] lg:gap-6">
+        <aside className="hidden pr-2 lg:block">
+          <nav className="sticky top-24 space-y-1.5">
             {nav.map(({ id, label, icon: Icon, badge }) => (
               <Button
                 key={id}
                 type="button"
                 variant="ghost"
                 onClick={() => setSection(id)}
-                className={`w-full justify-start rounded-md ${section === id ? "bg-accent text-foreground" : "text-muted-foreground"}`}
+                className={`w-full justify-start rounded-xl ${section === id ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}
               >
                 <Icon /> <span className="flex-1 text-left">{label}</span>
                 {badge ? <span className="text-[11px] text-primary">{badge}</span> : null}
@@ -125,15 +125,15 @@ function SocialPage() {
           {section === "duel" ? <DuelSection meId={meId} score={score} duel={duel} /> : null}
         </section>
 
-        <aside className="mt-7 space-y-7 border-t border-border/60 pt-6 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <aside className="mt-8 space-y-6  pt-5 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
           <section>
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold text-foreground">Amigo</h2>
               <Users className="h-4 w-4 text-muted-foreground" />
             </div>
-            <Link to="/perfil/$id" params={{ id: friendId }} className="group flex items-center gap-3 border-b border-border/50 pb-4">
+            <Link to="/perfil/$id" params={{ id: friendId }} className="group flex items-center gap-3 rounded-xl bg-secondary/25 p-3 transition hover:bg-secondary/45">
               <div className="relative">
-                <ProfileAvatar profileId={friendId} initial={friend.initial} gradient={friend.gradient} size={42} />
+                <ProfileAvatar profileId={friendId} initial={friend.initial} gradient={friend.gradient} size={38} />
                 <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-success" />
               </div>
               <div className="min-w-0 flex-1">
@@ -159,8 +159,8 @@ function Feed({ meId }: { meId: ProfileId }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-end justify-between">
-        <div><h2 className="text-[18px] font-semibold text-foreground">Atividades recentes</h2><p className="text-[12px] text-muted-foreground">O progresso de vocês, sem repetições.</p></div>
+      <div className="mb-4 flex items-end justify-between border-b border-border/60 pb-3">
+        <div><h2 className="text-[17px] font-semibold tracking-tight text-foreground">Atividades recentes</h2><p className="text-[12px] text-muted-foreground">O progresso de vocês, sem repetições.</p></div>
         <span className="text-[11px] text-muted-foreground">{events.length} publicações</span>
       </div>
       <ol className="border-t border-border/60">
@@ -213,22 +213,22 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
   }
 
   return (
-    <li className="border-b border-border/60 py-5">
+    <li className="border-b border-border/50 py-4">
       <div className="flex gap-3">
-        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={40} />
+        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={36} />
         <article className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-[13px] font-semibold text-foreground">{event.profileId === meId ? "Você" : actor.name}</p>
             <span className="text-[11px] text-muted-foreground">{timeAgo(event.createdAt)}</span>
           </div>
-          <div className="mt-2 flex gap-3">
-            <span className="mt-0.5 text-primary">{eventIcon(event.kind)}</span>
+          <div className="mt-2 flex gap-2">
+            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">{eventIcon(event.kind)}</span>
             <div>
-              <p className="text-[15px] font-medium leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
+              <p className="text-[14px] font-semibold leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
               <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{eventDescription(event)}</p>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-1">
+          <div className="mt-2 flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={() => toggleReaction(event.id, meId, "❤️")} className={`rounded-full ${liked ? "text-primary" : "text-muted-foreground"}`}>
               <Heart className={liked ? "fill-current" : ""} /> {reactions.filter((reaction) => reaction.emoji === "❤️").length || "Curtir"}
             </Button>
@@ -237,14 +237,14 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
             </Button>
           </div>
           {showComments ? (
-            <div className="mt-3 border-l border-border pl-3">
+            <div className="mt-3 rounded-xl bg-secondary/30 p-3">
               {comments.length === 0 ? <p className="mb-3 text-[12px] text-muted-foreground">Seja o primeiro a comentar.</p> : null}
               {comments.map((comment) => {
                 const author = profileMeta(comment.profileId);
                 return <div key={comment.id} className="mb-3 flex gap-2"><ProfileAvatar profileId={comment.profileId} initial={author.initial} gradient={author.gradient} size={24} /><div><p className="text-[11px] font-semibold text-foreground">{comment.profileId === meId ? "Você" : author.name}</p><p className="text-[12px] text-muted-foreground">{comment.body}</p></div></div>;
               })}
               <form onSubmit={submitComment} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
-                <input value={body} onChange={(e) => setBody(e.target.value)} maxLength={280} placeholder="Escreva um comentário" className="min-w-0 rounded-md border border-border bg-secondary/50 px-3 text-[12px] text-foreground outline-none focus:border-primary" />
+                <input value={body} onChange={(e) => setBody(e.target.value)} maxLength={280} placeholder="Escreva um comentário" className="min-w-0 rounded-lg border border-border/70 bg-background/70 px-3 text-[12px] text-foreground outline-none focus:border-primary" />
                 <Button type="submit" size="icon" disabled={!body.trim() || sending} aria-label={sending ? "Enviando comentário" : "Enviar comentário"}><Send /></Button>
               </form>
             </div>
