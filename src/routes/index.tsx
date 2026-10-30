@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Flame, Crown, BookOpen } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Flame, Crown, BookOpen, Target } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,11 +165,54 @@ function Home() {
       </section>
 
       {cycle && (
-        <Link to="/study" className="animate-fade-in mt-6 flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] px-4 py-3.5 transition-colors hover:bg-white/[0.05]">
-          <Sparkles className="h-5 w-5 shrink-0 text-primary" />
-          <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-foreground">Plano de estudos</span><span className="mt-0.5 block truncate text-xs text-muted-foreground">{todayFocus.label} · {todayFocus.focus}</span></span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
-        </Link>
+        <section className="animate-fade-in mt-6 space-y-3">
+          <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Sparkles className="h-4.5 w-4.5" />
+                </span>
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Sua trilha de aprendizado</h2>
+                  <p className="text-[11px] text-muted-foreground">Semana {cycle.week} de 8</p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-primary">{Math.round((cycle.week / 8) * 100)}%</span>
+            </div>
+            <div className="mt-4 flex items-center gap-1.5" aria-label={`Semana ${cycle.week} de 8`}>
+              {Array.from({ length: 8 }, (_, index) => {
+                const step = index + 1;
+                const complete = step < cycle.week;
+                const current = step === cycle.week;
+                return (
+                  <div key={step} className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+                    <span className={`h-2 w-full rounded-full transition-colors ${complete || current ? "bg-primary" : "bg-white/10"} ${current ? "ring-2 ring-primary/20 ring-offset-2 ring-offset-[#171426]" : ""}`} />
+                    <span className={`text-[9px] tabular-nums ${current ? "font-bold text-primary" : complete ? "text-muted-foreground" : "text-muted-foreground/50"}`}>{step}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3">
+              <p className="text-sm font-semibold text-foreground">{cycle.grammar.topic}</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">{cycle.grammar.application}</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">Foco de hoje: {todayFocus.label} · {todayFocus.focus}</p>
+            </div>
+            <Link to="/study" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:opacity-80">
+              Ver minha trilha <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <Link to="/desafios" className="group flex items-center gap-3 rounded-2xl border border-primary/15 bg-primary/[0.06] px-4 py-3.5 transition-colors hover:border-primary/30 hover:bg-primary/[0.09]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Target className="h-5 w-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-semibold text-foreground">Desafios diários</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">Complete missões e conquiste recompensas</span>
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </section>
       )}
 
     </main>
