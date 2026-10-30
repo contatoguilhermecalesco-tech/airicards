@@ -82,7 +82,7 @@ function PerformancePage() {
   const vocabularyCards = cards.filter((card) => card.mode !== "sentence");
   const uniqueVocabularyCards = [...new Map(vocabularyCards.map((card) => [
     (card.targetWord || card.front).trim().toLowerCase(), card,
-  ])).values()];
+  ] as const)).values()];
   const vocab = {
     studied: uniqueVocabularyCards.length,
     learning: uniqueVocabularyCards.filter((card) => ["unstable", "almost"].includes(classifyCard(card, now))).length,
