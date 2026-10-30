@@ -67,9 +67,9 @@ function StatsPage() {
   if (!me) return null;
 
   return (
-    <div className="mx-auto max-w-3xl px-[clamp(0.75rem,3vw,1.5rem)] pb-24 pt-6 sm:pb-10">
+    <div className="mx-auto max-w-3xl px-4 pb-24 pt-5 sm:px-6 sm:pb-10">
       {/* Header */}
-      <header className="animate-fade-in mb-6">
+      <header className="animate-fade-in mb-5">
         <Link
           to="/social"
           className="mb-3 inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground"
@@ -80,7 +80,7 @@ function StatsPage() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Comparação
         </p>
-        <h1 className="mt-1 text-[28px] font-semibold tracking-tight text-foreground">
+        <h1 className="mt-1 text-[26px] font-semibold tracking-tight text-foreground">
           Perfis lado a lado
         </h1>
         <p className="mt-1 text-[14px] text-muted-foreground">
@@ -89,13 +89,13 @@ function StatsPage() {
       </header>
 
       {/* Player headers */}
-      <div className="mb-4 grid grid-cols-2 gap-3">
+      <div className="mb-4 grid grid-cols-2 gap-2.5">
         <PlayerHeader profile={g} rank={gRank} isMe={me.id === g.id} />
         <PlayerHeader profile={a} rank={aRank} isMe={me.id === a.id} />
       </div>
 
       {/* Metric rows */}
-      <div className="space-y-2.5">
+      <div className="space-y-1.5">
         <MetricRow
           icon={<Flame className="h-4 w-4 text-orange-400" strokeWidth={2.25} />}
           label="Sequência atual"
@@ -207,14 +207,14 @@ function PlayerHeader({
   const colors = rank ? TIER_COLORS[rank.tier] : null;
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border p-4 ${
+      className={`relative overflow-hidden rounded-xl border p-3 ${
         isMe
           ? "border-primary/30 bg-primary/[0.05]"
           : "border-white/[0.08] bg-white/[0.03]"
       }`}
     >
       <div
-        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-30 blur-2xl"
+        className="pointer-events-none absolute -right-8 -top-8 h-20 w-20 rounded-full opacity-20 blur-2xl"
         style={{ background: profile.gradient }}
       />
       <div className="relative flex items-center gap-3">
@@ -222,7 +222,7 @@ function PlayerHeader({
           profileId={profile.id}
           initial={profile.initial}
           gradient={profile.gradient}
-          size={44}
+          size={38}
           radius={16}
           fontScale={0.36}
           className="shadow-lg"
@@ -278,10 +278,10 @@ function MetricRow({
   const tied = l === r;
 
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border/60 px-2 py-3">
       <ValueCell value={leftValue} unit={unit} highlight={!tied && leftWins} align="right" />
       <div className="flex flex-col items-center gap-0.5 px-1">
-        <div className="grid h-7 w-7 place-items-center rounded-full bg-primary/10">
+        <div className="grid h-6 w-6 place-items-center rounded-lg bg-primary/10">
           {icon}
         </div>
         <span className="text-[9.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
@@ -339,7 +339,7 @@ function MasteryBar({
   const l = (stats.learning / total) * 100;
   const e = (stats.enemies / total) * 100;
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
+    <div className="rounded-xl border border-border/60 bg-secondary/20 p-3">
       <p className="mb-2 text-[11.5px] font-semibold text-foreground">{profile.name}</p>
       <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/[0.04]">
         <div className="bg-emerald-400/80" style={{ width: `${m}%` }} />
@@ -380,7 +380,7 @@ function WeakPointsCard({
   const total = items.reduce((s, i) => s + i.count, 0);
 
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3">
+    <div className="rounded-xl border border-border/60 bg-secondary/20 p-3">
       <p className="mb-2 text-[11.5px] font-semibold text-foreground">{profile.name}</p>
       {total === 0 ? (
         <p className="py-2 text-center text-[11.5px] text-muted-foreground">
