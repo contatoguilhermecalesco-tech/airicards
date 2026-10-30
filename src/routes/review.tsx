@@ -230,6 +230,7 @@ function Review() {
       lp: sessionLp.current,
       xp: Math.max(0, sessionCorrect.current * 2 + Math.floor(total / 5)),
       deckName: deckName ?? (focusCards ? "Reforço inteligente" : isEnemyRun ? "Cartas inimigas" : "Todos os baralhos"),
+      hour: new Date(sessionStartedAt.current).getHours(),
     });
   }, [finished, deckName, focusCards, isEnemyRun]);
 
@@ -324,7 +325,7 @@ function Review() {
     awardLp(LP.reviewWrong, "review.wrong", sessionMultiplier);
     reviewCard(current.id, "again");
     sessionWrong.current += 1;
-    sessionLp.current -= 4;
+    sessionLp.current -= 4 * (sessionMultiplier + 1);
     setReviewed((n) => n + 1);
     setHitFlash(true);
     setTimeout(() => setHitFlash(false), 600);
@@ -350,7 +351,7 @@ function Review() {
     // Ganhos de LP baseados na dificuldade escolhida
     const lpGain = g === "easy" ? LP.reviewEasy : g === "good" ? LP.reviewGood : LP.reviewHard;
     sessionCorrect.current += 1;
-    sessionLp.current += lpGain;
+    sessionLp.current += lpGain * (sessionMultiplier + 1);
     const reason = g === "easy" ? "review.easy" : g === "good" ? "review.good" : "review.hard";
     awardLp(lpGain, reason, sessionMultiplier);
     
