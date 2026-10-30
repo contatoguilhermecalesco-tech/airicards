@@ -57,13 +57,20 @@ function StreakPage() {
   today.setHours(0, 0, 0, 0);
   const todayKey = dateKey(today);
 
+  const calendarStart = startOfWeek(today);
+  calendarStart.setDate(calendarStart.getDate() - 51 * 7);
   const calendarDays = Array.from({ length: 364 }, (_, index) => {
+    const date = new Date(calendarStart);
+    date.setDate(calendarStart.getDate() + index);
+    const key = dateKey(date);
+    return { key, date, done: history[key] === "done", future: date > today };
+  });
+  const last30 = Array.from({ length: 30 }, (_, index) => {
     const date = new Date(today);
-    date.setDate(today.getDate() - (363 - index));
+    date.setDate(today.getDate() - (29 - index));
     const key = dateKey(date);
     return { key, date, done: history[key] === "done" };
   });
-  const last30 = calendarDays.slice(-30);
   const studiedLast30 = last30.filter((day) => day.done).length;
   const missedLast30 = 30 - studiedLast30;
   const consistency = Math.round((studiedLast30 / 30) * 100);
@@ -73,7 +80,7 @@ function StreakPage() {
     start.setDate(start.getDate() - (7 * (7 - index)));
     const end = new Date(start);
     end.setDate(end.getDate() + 7);
-    const count = calendarDays.filter((day) => day.date >= start && day.date < end && day.done).length;
+    const count = calendarDays.filter((day) => day.date >= start && day.date < end && day.date <= today && day.done).length;
     return {
       label: start.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", ""),
       count,
@@ -156,7 +163,7 @@ function StreakPage() {
             <div className="mb-2 flex justify-between px-1 text-[10px] text-muted-foreground">{monthLabels.map((day) => <span key={day.key}>{day.date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</span>)}</div>
             <div className="grid grid-flow-col grid-rows-7 gap-1">
               {calendarDays.map(({ key, done }) => (
-                <div key={key} title={`${formatDateKey(key)} · ${done ? "Estudou" : "Sem estudo registrado"}`} className={`aspect-square min-w-0 rounded-[3px] border ${done ? "border-emerald-300/30 bg-emerald-400/75" : "border-white/[0.035] bg-white/[0.055]"} ${key === todayKey ? "ring-1 ring-primary ring-offset-1 ring-offset-background" : ""}`} />
+                <div key={key} title={`${formatDateKey(key)} · ${done ? "Estudou" : "Sem estudo registrado"}`} className={`aspect-square min-w-0 rounded-[3px] border ${date > today ? "border-transparent bg-transparent" : done ? "border-emerald-300/30 bg-emerald-400/75" : "border-white/[0.035] bg-white/[0.055]"} ${key === todayKey ? "ring-1 ring-primary ring-offset-1 ring-offset-background" : ""}`} />
               ))}
             </div>
           </div>
