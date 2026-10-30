@@ -88,7 +88,7 @@ export type Streak = {
   longest: number;
   lastDay: string; // dateKey of the last day the user reviewed ≥1 card
   startedOn?: string; // dateKey when the current streak began
-  history?: Record<string, StreakDayStatus>; // últimos ~60 dias
+  history?: Record<string, StreakDayStatus>; // últimos ~400 dias
   milestonesReached?: number[]; // marcos já recompensados
 };
 type PunishmentsState = {
