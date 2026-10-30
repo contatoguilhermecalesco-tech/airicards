@@ -21,14 +21,14 @@ export function useStudySessions() {
   return useMeta<StudySessionRecord[]>(SESSION_KEY) ?? [];
 }
 
-export function recordStudySession(input: Omit<StudySessionRecord, "id" | "date" | "hour">) {
+export function recordStudySession(input: Omit<StudySessionRecord, "id" | "date" | "hour"> & { hour?: number }) {
   const now = Date.now();
   const current = getMeta<StudySessionRecord[]>(SESSION_KEY) ?? [];
   const next: StudySessionRecord[] = [{
     ...input,
     id: `session-${now}-${Math.random().toString(36).slice(2, 7)}`,
     date: now,
-    hour: new Date(now).getHours(),
+    hour: input.hour ?? new Date(now).getHours(),
   }, ...current].slice(0, MAX_SESSIONS);
   setMeta(SESSION_KEY, next);
 }
