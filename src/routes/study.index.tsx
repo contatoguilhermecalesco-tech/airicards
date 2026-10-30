@@ -7,6 +7,7 @@ import {
   Mic,
   PenLine,
   Sparkles,
+  TrendingUp,
 } from "lucide-react";
 import { useAppSettings } from "@/lib/app-settings";
 
@@ -175,6 +176,17 @@ function StudyIndex() {
         </Link>
       </section>
 
+
+      <section className="mb-5">
+        <Link to="/study/desempenho" className="group flex items-center gap-4 rounded-2xl border bg-surface p-4 transition-colors hover:border-primary/30 hover:bg-accent/50 sm:p-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><TrendingUp className="h-5 w-5" /></div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[15px] font-semibold">Meu desempenho</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Acompanhe suas sessões, vocabulário, pontos fracos e revisões.</p>
+          </div>
+          <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </section>
 
       <section className="mb-10">
         <Link to="/study/parabel" className="group relative block overflow-hidden rounded-3xl border border-violet-400/20 bg-gradient-to-br from-violet-500/15 via-fuchsia-500/10 to-surface p-5 transition hover:border-violet-400/40 sm:p-6">
