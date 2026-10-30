@@ -251,7 +251,7 @@ function StreakPage() {
 
 function Metric({ label, value, suffix }: { label: string; value: number; suffix: string }) {
   return (
-    <div className="sm:px-5 sm:border-l sm:border-white/10 first:sm:border-l-0 first:sm:pl-0">
+    <div className="sm:px-5 sm:border-l sm:border-white/10 sm:first:border-l-0 sm:first:pl-0">
       <p className="text-[10px] font-medium text-muted-foreground">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}<span className="ml-1.5 text-[10px] font-normal tracking-normal text-muted-foreground">{suffix}</span></p>
     </div>
