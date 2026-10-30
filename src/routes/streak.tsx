@@ -162,7 +162,7 @@ function StreakPage() {
           <div className="min-w-[620px]">
             <div className="mb-2 flex justify-between px-1 text-[10px] text-muted-foreground">{monthLabels.map((day) => <span key={day.key}>{day.date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}</span>)}</div>
             <div className="grid grid-flow-col grid-rows-7 gap-1">
-              {calendarDays.map(({ key, done }) => (
+              {calendarDays.map(({ key, done, future }) => (
                 <div key={key} title={`${formatDateKey(key)} · ${done ? "Estudou" : "Sem estudo registrado"}`} className={`aspect-square min-w-0 rounded-[3px] border ${future ? "border-transparent bg-transparent" : done ? "border-emerald-300/30 bg-emerald-400/75" : "border-white/[0.035] bg-white/[0.055]"} ${key === todayKey ? "ring-1 ring-primary ring-offset-1 ring-offset-background" : ""}`} />
               ))}
             </div>
