@@ -10,6 +10,7 @@ import {
   Sparkles,
   Star,
   TrendingUp,
+  Target,
   Trophy,
   Zap,
 } from "lucide-react";
@@ -138,7 +139,7 @@ function StreakPage() {
 
       <section className="grid gap-8 border-b border-white/10 pb-9 lg:grid-cols-[1.15fr_.85fr] lg:gap-14">
         <div>
-          <div className="flex items-center gap-2 text-orange-200"><TargetIcon /><p className="text-[10px] font-semibold uppercase tracking-[0.2em]">Próximo marco</p></div>
+          <div className="flex items-center gap-2 text-orange-200"><Target className="h-4 w-4" /><p className="text-[10px] font-semibold uppercase tracking-[0.2em]">Próximo marco</p></div>
           <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
             <p className="text-3xl font-semibold tracking-tight tabular-nums">{streak.current}<span className="text-base font-normal text-muted-foreground"> / {nextMilestone} dias</span></p>
             <p className="text-xs text-muted-foreground"><span className="font-semibold text-orange-200">{Math.max(0, nextMilestone - streak.current)} dias</span> restantes</p>
@@ -250,7 +251,7 @@ function StreakPage() {
 
 function Metric({ label, value, suffix }: { label: string; value: number; suffix: string }) {
   return (
-    <div className="sm:px-5 sm:first:pl-0 sm:not-first:border-l sm:not-first:border-white/10">
+    <div className="sm:px-5 sm:border-l sm:border-white/10 first:sm:border-l-0 first:sm:pl-0">
       <p className="text-[10px] font-medium text-muted-foreground">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}<span className="ml-1.5 text-[10px] font-normal tracking-normal text-muted-foreground">{suffix}</span></p>
     </div>
@@ -276,6 +277,3 @@ function EvolutionChart({ title, items, max }: { title: string; items: { label: 
   );
 }
 
-function TargetIcon() {
-  return <CalendarDays className="h-4 w-4" />;
-}
