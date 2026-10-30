@@ -5,16 +5,13 @@ import {
   BarChart3,
   Check,
   ChevronRight,
-  Flame,
   Gift,
-  GraduationCap,
   Heart,
   Home,
   MessageCircle,
   Send,
   Sparkles,
   Swords,
-  Trophy,
   X as XIcon,
 } from "lucide-react";
 import { GiftInbox } from "@/components/GiftInbox";
@@ -220,9 +217,7 @@ function Gifts({ pending, sent, friendName }: { pending: ReturnType<typeof usePe
   return <div><div className="mb-5"><h2 className="text-[18px] font-semibold text-foreground">Presentes</h2><p className="text-[12px] text-muted-foreground">Cartas compartilhadas entre você e {friendName}.</p></div>{pending.length ? <GiftInbox /> : <Empty icon={Gift} title="Nenhum presente novo" body={`Quando ${friendName} enviar uma carta, ela aparecerá aqui.`} />}{sent.length ? <section className="mt-7"><h3 className="mb-2 text-[12px] font-semibold uppercase text-muted-foreground">Enviados</h3><ul className="border-t border-border/60">{sent.map((gift) => <li key={gift.id} className="flex items-center gap-3 border-b border-border/60 py-3"><span className="text-muted-foreground">{gift.status === "imported" ? <Check className="h-4 w-4 text-success" /> : gift.status === "declined" ? <XIcon className="h-4 w-4" /> : <Gift className="h-4 w-4 text-primary" />}</span><div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium text-foreground">{gift.front}</p><p className="truncate text-[11px] text-muted-foreground">{gift.back}</p></div><span className="text-[10px] uppercase text-muted-foreground">{gift.status === "pending" ? "Pendente" : gift.status === "imported" ? "Aceita" : "Recusada"}</span></li>)}</ul></section> : null}</div>;
 }
 
-function eventIcon(kind: ActivityEvent["kind"]) { if (kind === "rank_up") return <Trophy className="h-4 w-4" />; if (kind === "streak_milestone") return <Flame className="h-4 w-4" />; if (kind === "exam_done") return <GraduationCap className="h-4 w-4" />; if (kind === "duel_won") return <Swords className="h-4 w-4" />; return <Sparkles className="h-4 w-4" />; }
 function eventTitle(event: ActivityEvent, name: string) { const p = event.payload; if (event.kind === "rank_up") return `${name} chegou ao ${formatRank(p.toTier, p.toDivision)}`; if (event.kind === "streak_milestone") return `${name} completou ${String(p.days ?? "")} dias de sequência`; if (event.kind === "exam_done") return `${name} concluiu a prova mensal`; if (event.kind === "duel_won") return `${name} venceu o duelo da semana`; return `${name} derrotou uma carta inimiga`; }
-function eventDescription(event: ActivityEvent) { if (event.kind === "rank_up") return "Uma nova etapa foi alcançada no airi Rank."; if (event.kind === "streak_milestone") return "Consistência que merece ser celebrada."; if (event.kind === "exam_done") return "Mais uma avaliação concluída no plano de estudos."; if (event.kind === "duel_won") return "Rodada finalizada com a melhor pontuação."; return "Mais um desafio removido da Arena."; }
 function formatRank(tier: unknown, division: unknown) { const tierText = String(tier ?? "").trim(); const divisionText = String(division ?? "").trim(); const normalized = tierText.charAt(0).toUpperCase() + tierText.slice(1).toLowerCase(); return `${normalized}${divisionText ? ` ${divisionText.toUpperCase()}` : ""}`.trim(); }
 function timeAgo(iso: string) { const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000); if (minutes < 1) return "agora"; if (minutes < 60) return `${minutes} min`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours}h`; return `${Math.floor(hours / 24)}d`; }
 function Empty({ icon: Icon, title, body }: { icon: typeof Gift; title: string; body: string }) { return <div className="border-y border-border/60 py-12 text-center"><Icon className="mx-auto h-5 w-5 text-primary" /><p className="mt-3 text-[14px] font-semibold text-foreground">{title}</p><p className="mx-auto mt-1 max-w-xs text-[12px] text-muted-foreground">{body}</p></div>; }
