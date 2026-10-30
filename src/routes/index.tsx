@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, GraduationCap, Flame, Swords, Skull, Crown, ShoppingBag, BookOpen, Zap } from "lucide-react";
+import { ArrowRight, ChevronRight, Moon, Sun, Sunrise, Sunset, Sparkles, Flame, Crown, BookOpen } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +19,6 @@ import {
 import { useCurrentProfile } from "@/lib/profile";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
-import { useAppSettings } from "@/lib/app-settings";
 
 
 
@@ -69,7 +68,6 @@ function formatNextIn(ms: number): string {
 // Reusable Liquid Glass surface — rim light + subtle depth, kept crisp
 function Home() {
   const profile = useCurrentProfile();
-  const decks = useStore((s) => s.decks);
   const cards = useStore((s) => s.cards);
   const reviewedToday = useCardsReviewedToday();
   const streak = useStreak();
@@ -94,7 +92,6 @@ function Home() {
 
   // Rank do perfil
   const rank = useRank();
-  const appSettings = useAppSettings();
 
   const dailyTarget = Math.max(1, due + reviewedToday);
   const pctLabel = Math.round(Math.min(1, reviewedToday / dailyTarget) * 100);
@@ -110,9 +107,6 @@ function Home() {
             {icon}<span>{eyebrow}</span>
           </div>
           <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-foreground sm:text-[32px]">{salute}{name ? `, ${name}` : ""}</h1>
-        </div>
-        <div aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.05] text-sm font-semibold text-primary">
-          {name ? name.slice(0, 1).toUpperCase() : "A"}
         </div>
       </header>
 
@@ -170,30 +164,6 @@ function Home() {
         <Link to="/rank" className="flex min-w-0 items-center gap-2 text-right"><Crown className="h-4 w-4 shrink-0" style={{ color: TIER_COLORS[rank.tier].glow }} /><span className="truncate text-xs font-medium text-foreground">{TIER_LABEL[rank.tier]} {!isElite(rank.tier) && DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}</span></Link>
       </section>
 
-      {decks.length > 0 && (
-        <section className="animate-fade-in mt-8" style={{ animationDelay: "100ms", animationFillMode: "backwards" }}>
-          <div className="mb-3 flex items-center justify-between">
-            <div><h2 className="text-lg font-semibold tracking-tight text-foreground">Continue aprendendo</h2><p className="mt-0.5 text-xs text-muted-foreground">Seus espaços de estudo</p></div>
-            <Link to="/library" className="text-xs font-semibold text-primary hover:opacity-80">Ver todos</Link>
-          </div>
-          <ul className="space-y-2">
-            {decks.slice(0, 3).map((d) => {
-              const total = cards.filter((c) => c.deckId === d.id).length;
-              const dueInDeck = cards.filter((c) => c.deckId === d.id && c.dueAt <= Date.now()).length;
-              return (
-                <li key={d.id}>
-                  <Link to="/library/$deckId" params={{ deckId: d.id }} className="group flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-3.5 py-3 transition-colors hover:border-primary/25 hover:bg-white/[0.055] active:scale-[0.995]">
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><BookOpen className="h-5 w-5" strokeWidth={1.8} /></div>
-                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold text-foreground">{d.name}</p><p className="mt-0.5 text-xs text-muted-foreground">{dueInDeck > 0 ? `${dueInDeck} para revisar` : `${total} carta${total === 1 ? "" : "s"}`}</p></div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
       {cycle && (
         <Link to="/study" className="animate-fade-in mt-6 flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] px-4 py-3.5 transition-colors hover:bg-white/[0.05]">
           <Sparkles className="h-5 w-5 shrink-0 text-primary" />
@@ -202,16 +172,6 @@ function Home() {
         </Link>
       )}
 
-      <section className="animate-fade-in mt-7">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Explore</p>
-        <div className="grid grid-cols-4 gap-2">
-          <Link to="/enemies" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Skull className="h-5 w-5 text-rose-300" /><span className="text-[11px] font-medium text-muted-foreground">Chefões</span></Link>
-          <Link to="/social" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Swords className="h-5 w-5 text-fuchsia-300" /><span className="text-[11px] font-medium text-muted-foreground">Duelo</span></Link>
-          {appSettings.exam_visible && <Link to="/exam" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><GraduationCap className="h-5 w-5 text-violet-300" /><span className="text-[11px] font-medium text-muted-foreground">Prova</span></Link>}
-          <Link to="/shop" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><ShoppingBag className="h-5 w-5 text-amber-200" /><span className="text-[11px] font-medium text-muted-foreground">Loja</span></Link>
-          <Link to="/inventory" className="flex flex-col items-center gap-2 rounded-xl px-1 py-2 text-center transition-colors hover:bg-white/[0.04]"><Zap className="h-5 w-5 text-cyan-200" /><span className="text-[11px] font-medium text-muted-foreground">Power-ups</span></Link>
-        </div>
-      </section>
     </main>
   );
 }
