@@ -79,6 +79,16 @@ function PerformancePage() {
     const next = new Date(date); next.setMonth(next.getMonth() + 1);
     return { label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""), count: sessions.filter((session) => session.date >= date.getTime() && session.date < next.getTime()).reduce((sum, session) => sum + session.cards, 0) };
   });
+  const vocabularyTimeline = [...Array(6)].map((_, i) => {
+    const date = new Date(); date.setDate(1); date.setMonth(date.getMonth() - (5 - i));
+    const next = new Date(date); next.setMonth(next.getMonth() + 1);
+    const cohort = uniqueVocabularyCards.filter((card) => card.createdAt >= date.getTime() && card.createdAt < next.getTime());
+    return {
+      label: date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""),
+      added: cohort.length,
+      mastered: cohort.filter((card) => classifyCard(card, now) === "mastered").length,
+    };
+  });
   const vocabularyCards = cards.filter((card) => card.mode !== "sentence");
   const uniqueVocabularyCards = [...new Map(vocabularyCards.map((card) => [
     (card.targetWord || card.front).trim().toLowerCase(), card,
@@ -168,8 +178,16 @@ function PerformancePage() {
           <Metric icon={<GraduationCap className="h-4 w-4" />} label="Dominadas" value={String(vocab.mastered)} />
           <Metric icon={<Clock3 className="h-4 w-4" />} label="Para revisar" value={String(vocab.due)} />
         </div>
+        <section className="grid gap-4 sm:grid-cols-2">
+          <ChartPanel title="Novas palavras por mês" subtitle="Palavras únicas adicionadas aos seus baralhos">
+            <Bars items={vocabularyTimeline.map((item) => ({ label: item.label, count: item.added }))} />
+          </ChartPanel>
+          <ChartPanel title="Palavras dominadas por mês" subtitle="Estado atual das palavras adicionadas em cada mês">
+            <Bars items={vocabularyTimeline.map((item) => ({ label: item.label, count: item.mastered }))} />
+          </ChartPanel>
+        </section>
         <div className="rounded-2xl border bg-surface p-5">
-          <h2 className="font-semibold">Evolução do vocabulário</h2>
+          <h2 className="font-semibold">Progresso por baralho</h2>
           <p className="mt-1 text-xs text-muted-foreground">Cartas cadastradas e dominadas ao longo do tempo.</p>
           <div className="mt-4 space-y-3">
             {decks.map((deck) => {
