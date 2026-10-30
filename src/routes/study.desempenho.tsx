@@ -36,7 +36,7 @@ function launchLink(ids: string[]) {
   return { to: "/review" as const, search: { cards: ids.join(",") } };
 }
 
-function PerformancePage() {
+export function PerformancePage({ embedded = false }: { embedded?: boolean }) {
   const [tab, setTab] = useState<Tab>("overview");
   const cards = useStore((state) => state.cards);
   const decks = useStore((state) => state.decks);
@@ -107,12 +107,12 @@ function PerformancePage() {
   });
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6 sm:pt-12">
-      <Link to="/study" className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Áreas de estudo</Link>
+    <main className={embedded ? "w-full" : "mx-auto min-h-screen w-full max-w-6xl px-4 pb-28 pt-8 sm:px-6 sm:pt-12"}>
+      {!embedded && <Link to="/study" className="mb-5 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Áreas de estudo</Link>}
       <header className="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">AIRI · CENTRAL DE APRENDIZADO</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Desempenho</h1>
+          {!embedded && <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">AIRI · CENTRAL DE APRENDIZADO</p>}
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Meu desempenho</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Entenda seu ritmo, acompanhe o vocabulário e descubra o que merece mais atenção.</p>
         </div>
         <div className="rounded-2xl border bg-surface px-4 py-3">
