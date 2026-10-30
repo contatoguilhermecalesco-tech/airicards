@@ -15,7 +15,6 @@ import {
   Sparkles,
   Swords,
   Trophy,
-  Users,
   X as XIcon,
 } from "lucide-react";
 import { GiftInbox } from "@/components/GiftInbox";
@@ -74,24 +73,21 @@ function SocialPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-[1120px] px-4 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
-      <header className="mb-5 flex items-end justify-between gap-3 border-b border-border/60 pb-4">
+    <main className="mx-auto w-full max-w-[760px] px-4 pb-28 pt-5 sm:px-6 sm:pb-10 sm:pt-7">
+      <header className="mb-5 flex items-end justify-between gap-3 pb-2">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">Comunidade airi</p>
           <h1 className="truncate text-[28px] font-semibold tracking-tight text-foreground">Social</h1>
         </div>
-        <Button asChild variant="ghost" size="sm" className="rounded-full text-muted-foreground">
-          <Link to="/social/stats"><BarChart3 /> Comparar</Link>
-        </Button>
+        <Link to="/social/stats" className="inline-flex items-center gap-1.5 pb-1 text-[12px] font-medium text-muted-foreground transition hover:text-foreground"><BarChart3 className="h-3.5 w-3.5" /> Comparar</Link>
       </header>
 
-      <div className="mb-5 grid grid-cols-3 gap-1 rounded-xl border border-border/50 bg-secondary/30 p-1 lg:hidden">
+      <div className="mb-5 grid grid-cols-3 border-b border-border/60">
         {nav.map(({ id, label, icon: Icon, badge }) => (
           <button
             key={id}
             type="button"
             onClick={() => setSection(id)}
-            className={`relative flex h-9 items-center justify-center gap-2 rounded-lg text-[12px] font-medium transition ${section === id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+            className={`relative flex h-10 items-center justify-center gap-2 border-b-2 border-transparent text-[12px] font-medium transition ${section === id ? "border-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
             <Icon className="h-4 w-4" />{label}
             {badge ? <span className="min-w-4 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{badge}</span> : null}
@@ -100,51 +96,11 @@ function SocialPage() {
         ))}
       </div>
 
-      <div className="lg:grid lg:grid-cols-[150px_minmax(0,1fr)_250px] lg:gap-6">
-        <aside className="hidden pr-2 lg:block">
-          <nav className="sticky top-24 space-y-1.5">
-            {nav.map(({ id, label, icon: Icon, badge }) => (
-              <Button
-                key={id}
-                type="button"
-                variant="ghost"
-                onClick={() => setSection(id)}
-                className={`w-full justify-start rounded-xl ${section === id ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50"}`}
-              >
-                <Icon /> <span className="flex-1 text-left">{label}</span>
-                {badge ? <span className="text-[11px] text-primary">{badge}</span> : null}
-              </Button>
-            ))}
-          </nav>
-        </aside>
-
-        <section className="min-w-0">
-          {section === "feed" ? <Feed meId={meId} /> : null}
-          {section === "gifts" ? <Gifts pending={pending} sent={sent} friendName={friend.name} /> : null}
-          {section === "duel" ? <DuelSection meId={meId} score={score} duel={duel} /> : null}
-        </section>
-
-        <aside className="mt-8 space-y-6 border-t border-border/60 pt-5 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
-          <section>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[15px] font-semibold text-foreground">Amigo</h2>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <Link to="/perfil/$id" params={{ id: friendId }} className="group flex items-center gap-3 rounded-xl bg-secondary/25 p-3 transition hover:bg-secondary/45">
-              <div className="relative">
-                <ProfileAvatar profileId={friendId} initial={friend.initial} gradient={friend.gradient} size={38} />
-                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-background bg-success" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-semibold text-foreground">{friend.name}</p>
-                <p className="text-[11px] text-muted-foreground">Parceiro de estudos</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5" />
-            </Link>
-          </section>
-          <DuelAside meId={meId} score={score} duel={duel} />
-        </aside>
-      </div>
+      <section className="mx-auto min-w-0 max-w-[680px]">
+        {section === "feed" ? <Feed meId={meId} /> : null}
+        {section === "gifts" ? <Gifts pending={pending} sent={sent} friendName={friend.name} /> : null}
+        {section === "duel" ? <DuelSection meId={meId} score={score} duel={duel} /> : null}
+      </section>
     </main>
   );
 }
@@ -158,11 +114,8 @@ function Feed({ meId }: { meId: ProfileId }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-end justify-between border-b border-border/60 pb-3">
-        <div><h2 className="text-[17px] font-semibold tracking-tight text-foreground">Atividades recentes</h2><p className="text-[12px] text-muted-foreground">O progresso de vocês, sem repetições.</p></div>
-        <span className="text-[11px] text-muted-foreground">{events.length} publicações</span>
-      </div>
-      <ol className="border-t border-border/60">
+      <div className="mb-2"><h2 className="text-[13px] font-medium text-muted-foreground">Atividades recentes</h2></div>
+      <ol className="border-t border-border/50">
         {events.slice(0, visible).map((event) => <FeedPost key={event.id} event={event} meId={meId} />)}
       </ol>
       {visible < events.length ? (
@@ -212,22 +165,16 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
   }
 
   return (
-    <li className="border-b border-border/50 py-4">
+    <li className="border-b border-border/50 py-3.5">
       <div className="flex gap-3">
-        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={36} />
+        <ProfileAvatar profileId={event.profileId} initial={actor.initial} gradient={actor.gradient} size={32} />
         <article className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="truncate text-[13px] font-semibold text-foreground">{event.profileId === meId ? "Você" : actor.name}</p>
             <span className="text-[11px] text-muted-foreground">{timeAgo(event.createdAt)}</span>
           </div>
-          <div className="mt-2 flex gap-2">
-            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">{eventIcon(event.kind)}</span>
-            <div>
-              <p className="text-[14px] font-semibold leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
-              <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{eventDescription(event)}</p>
-            </div>
-          </div>
-          <div className="mt-2 flex items-center gap-1">
+          <p className="mt-1.5 text-[13px] leading-snug text-foreground">{eventTitle(event, event.profileId === meId ? "Você" : actor.name)}</p>
+          <div className="mt-1.5 flex items-center gap-1">
             <Button variant="ghost" size="sm" onClick={() => toggleReaction(event.id, meId, "❤️")} className={`rounded-full ${liked ? "text-primary" : "text-muted-foreground"}`}>
               <Heart className={liked ? "fill-current" : ""} /> {reactions.filter((reaction) => reaction.emoji === "❤️").length || "Curtir"}
             </Button>
@@ -252,13 +199,6 @@ function FeedPost({ event, meId }: { event: ActivityEvent; meId: ProfileId }) {
       </div>
     </li>
   );
-}
-
-function DuelAside({ meId, score, duel }: { meId: ProfileId; score: { g: number; a: number }; duel: ReturnType<typeof useWeeklyDuel> }) {
-  const friendId = otherProfile(meId);
-  const mine = meId === "guilherme" ? score.g : score.a;
-  const theirs = meId === "guilherme" ? score.a : score.g;
-  return <section><div className="mb-3 flex items-center justify-between"><h2 className="text-[15px] font-semibold text-foreground">Duelo semanal</h2><span className="text-[10px] uppercase text-muted-foreground">{duel?.status === "active" ? "Em andamento" : "Placar"}</span></div><div className="flex items-center justify-between border-y border-border/60 py-4"><DuelAvatar id={meId} score={mine} label="Você" /><span className="text-[11px] font-semibold text-muted-foreground">VS</span><DuelAvatar id={friendId} score={theirs} label={profileMeta(friendId).name} /></div><Button asChild variant="ghost" className="mt-2 w-full justify-between text-muted-foreground"><Link to="/duel">{duel ? "Abrir duelo" : "Criar duelo"}<ChevronRight /></Link></Button></section>;
 }
 
 function DuelAvatar({ id, score, label }: { id: ProfileId; score: number; label: string }) {
