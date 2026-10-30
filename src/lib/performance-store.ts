@@ -71,7 +71,7 @@ export function getWeaknesses(cards: Card[]): Weakness[] {
     const misses = items.reduce((sum, card) => sum + (card.lapses ?? 0), 0);
     const rate = attempts ? Math.round((misses / attempts) * 100) : 0;
     return { id, ...labels[id], cards: items, rate };
-  }).filter((item) => item.cards.length > 0)
+  }).filter((item) => item.cards.length > 0 && item.rate > 0)
     .sort((a, b) => b.rate - a.rate || b.cards.length - a.cards.length);
 }
 
