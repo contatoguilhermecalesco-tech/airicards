@@ -73,16 +73,16 @@
   --radius: 1rem;
 
   /* Almost-black with a whisper of violet — very close to pure black */
-  --background: oklch(0.055 0.012 295);
+  --background: oklch(0.115 0.012 295);
   --foreground: oklch(0.97 0.005 285);
 
-  --surface: oklch(0.085 0.015 295);
-  --surface-elevated: oklch(0.105 0.017 295);
+  --surface: oklch(0.145 0.014 295);
+  --surface-elevated: oklch(0.17 0.017 295);
 
-  --card: oklch(0.08 0.014 295);
+  --card: oklch(0.14 0.014 295);
   --card-foreground: oklch(0.97 0.005 285);
 
-  --popover: oklch(0.1 0.016 295);
+  --popover: oklch(0.16 0.016 295);
   --popover-foreground: oklch(0.97 0.005 285);
 
   /* Soft, muted purple — not neon */
@@ -90,13 +90,13 @@
   --primary-foreground: oklch(0.16 0.02 285);
   --primary-soft: oklch(0.55 0.09 300);
 
-  --secondary: oklch(0.12 0.018 295);
+  --secondary: oklch(0.18 0.018 295);
   --secondary-foreground: oklch(0.95 0.005 285);
 
-  --muted: oklch(0.1 0.016 295);
+  --muted: oklch(0.16 0.016 295);
   --muted-foreground: oklch(0.66 0.018 290);
 
-  --accent: oklch(0.14 0.02 300);
+  --accent: oklch(0.21 0.022 300);
   --accent-foreground: oklch(0.97 0.005 285);
 
   --destructive: oklch(0.62 0.16 20);
@@ -118,11 +118,11 @@
   --profile-raised: oklch(0.273 0.007 265);
   --profile-shadow: oklch(0 0 0 / 0.72);
 
-  --nav-surface: oklch(0.105 0.016 295 / 0.9);
+  --nav-surface: oklch(0.15 0.016 295 / 0.92);
   --nav-border: oklch(1 0 0 / 0.1);
 
   /* Streak: vidro violeta discreto com confirmação verde. */
-  --streak-panel: oklch(0.11 0.025 305 / 0.92);
+  --streak-panel: oklch(0.16 0.025 305 / 0.94);
   --streak-border: oklch(0.65 0.14 295 / 0.16);
   --streak-primary: oklch(0.65 0.14 295);
   --streak-success: oklch(0.75 0.15 155);
@@ -234,12 +234,12 @@
   }
 
   body {
+    /* Luz ambiente violeta sutil, sem competir com o conteúdo. */
     background-image:
-      radial-gradient(
-        ellipse 80% 50% at 50% -10%,
-        color-mix(in oklab, var(--primary) 4.5%, transparent),
-        transparent 60%
-      );
+      radial-gradient(ellipse 58% 42% at 8% 4%, color-mix(in oklab, var(--primary) 11%, transparent), transparent 72%),
+      radial-gradient(ellipse 52% 38% at 100% 42%, color-mix(in oklab, var(--primary) 7%, transparent), transparent 74%),
+      radial-gradient(ellipse 70% 46% at 48% 100%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 76%),
+      linear-gradient(145deg, color-mix(in oklab, var(--background) 94%, var(--primary)), var(--background) 48%, color-mix(in oklab, var(--background) 96%, var(--primary)));
     background-attachment: fixed;
     /* iOS safe areas so nada fica atrás do notch / home indicator */
     padding-left: env(safe-area-inset-left);
