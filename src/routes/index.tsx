@@ -224,7 +224,7 @@ function Home() {
       </header>
 
 
-      {/* Hero — Liquid Glass */}
+      {/* Hero — Liquid Glass | atualização visual da Home */}
       <section
         className="animate-fade-in relative mt-5 sm:mt-8 lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:row-span-2 lg:mt-0"
         style={{ animationDelay: "60ms", animationFillMode: "backwards" }}
