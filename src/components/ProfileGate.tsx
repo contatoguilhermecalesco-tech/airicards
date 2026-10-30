@@ -54,7 +54,7 @@ function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 function Shell({ children }: { children: ReactNode }) {
   return (
     <main
-      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-black px-5 py-10"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#171717] px-5 py-10"
       style={BODY_FONT}
     >
       {/* Subtle top spotlight — no blur, just gradient */}
@@ -63,7 +63,7 @@ function Shell({ children }: { children: ReactNode }) {
         className="pointer-events-none absolute inset-x-0 top-0 h-[60vh]"
         style={{
           background:
-            "radial-gradient(60% 60% at 50% 0%, rgba(139,125,255,0.10) 0%, rgba(139,125,255,0) 70%)",
+            "radial-gradient(60% 60% at 50% 0%, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0) 70%)",
         }}
       />
       {/* Hairline grid vignette */}
@@ -72,10 +72,10 @@ function Shell({ children }: { children: ReactNode }) {
         className="pointer-events-none absolute inset-0 opacity-[0.35]"
         style={{
           backgroundImage:
-            "radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,0.04), transparent 70%)",
+            "linear-gradient(180deg, rgba(255,255,255,0.012), transparent 48%)",
         }}
       />
-      <div className="relative w-full max-w-[420px]">{children}</div>
+      <div className="relative w-full max-w-[400px] animate-fade-in">{children}</div>
     </main>
   );
 }
@@ -125,23 +125,23 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
       <div className="flex flex-col items-center">
         <Logo size="lg" />
         <p
-          className="mt-10 text-[12px] font-medium uppercase tracking-[0.24em] text-white/40"
+          className="mt-8 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b69ae8]/80"
           style={BODY_FONT}
         >
           {greeting}
         </p>
         <h1
-          className="mt-2 text-center text-[28px] font-semibold leading-tight tracking-tight text-white"
+          className="mt-2 text-center text-[27px] font-semibold leading-tight tracking-tight text-white"
           style={HEADING_FONT}
         >
           Quem está estudando?
         </h1>
-        <p className="mt-2 text-center text-[14px] text-white/45">
+        <p className="mt-2 text-center text-[13px] text-white/50">
           Toque no perfil para continuar.
         </p>
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-[22px] border border-white/[0.07] bg-[#0f0f12]">
+      <div className="mt-7 overflow-hidden rounded-[20px] border border-white/[0.075] bg-[#202020]/90 shadow-[0_18px_50px_-34px_rgba(0,0,0,0.9)] backdrop-blur-sm">
         {PROFILES.map((p, i) => {
           const meta = metas?.find((m) => m.id === p.id);
           const subtitle = !meta
@@ -155,7 +155,7 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
               key={p.id}
               onClick={() => setChosen(p)}
               disabled={!metas}
-              className={`group relative flex w-full items-center gap-4 px-4 py-4 text-left transition active:bg-white/[0.04] hover:bg-white/[0.025] disabled:opacity-50 ${
+              className={`group relative flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition duration-200 hover:bg-white/[0.035] active:bg-white/[0.055] disabled:opacity-50 ${
                 i > 0 ? "border-t border-white/[0.06]" : ""
               }`}
             >
@@ -191,17 +191,17 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
               </span>
               <span className="flex-1 min-w-0">
                 <span
-                  className="block truncate text-[17px] font-semibold text-white"
+                  className="block truncate text-[16px] font-semibold text-white"
                   style={HEADING_FONT}
                 >
                   {p.name}
                 </span>
-                <span className="mt-0.5 block truncate text-[13px] text-white/45">
+                <span className="mt-0.5 block truncate text-[12px] text-white/45">
                   {subtitle}
                 </span>
               </span>
               <svg
-                className="shrink-0 text-white/25 transition group-hover:translate-x-0.5 group-hover:text-white/60"
+                className="shrink-0 text-white/25 transition group-hover:translate-x-0.5 group-hover:text-[#c9b6ed]"
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
@@ -219,7 +219,7 @@ function ProfilePicker({ onLinked }: { onLinked: (p: Profile) => void }) {
         })}
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/35">
+      <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-white/35">
         <svg
           width="12"
           height="12"
@@ -369,7 +369,7 @@ function PinPad({
               key={i}
               className={`h-3 w-3 rounded-full transition-all duration-200 ${
                 active
-                  ? "bg-white scale-110"
+                  ? "bg-[#b69ae8] scale-110 shadow-[0_0_12px_rgba(182,154,232,0.35)]"
                   : inRange
                     ? "bg-white/15"
                     : "bg-white/[0.06]"
@@ -412,7 +412,7 @@ function PinPad({
             type="button"
             disabled={busy}
             onClick={() => onChange(value + n)}
-            className="h-16 rounded-2xl border border-white/[0.07] bg-[#111114] text-[26px] font-medium text-white transition active:scale-[0.96] active:bg-white/[0.06] hover:bg-white/[0.03] disabled:opacity-50"
+            className="h-[58px] rounded-[17px] border border-white/[0.07] bg-[#222222] text-[24px] font-medium text-white transition duration-200 hover:border-[#b69ae8]/25 hover:bg-[#292929] active:scale-[0.97] active:bg-[#303030] disabled:opacity-50"
             style={HEADING_FONT}
           >
             {n}
@@ -432,7 +432,7 @@ function PinPad({
           type="button"
           disabled={busy || value.length === 0}
           onClick={() => onChange(value.slice(0, -1))}
-          className="grid h-16 place-items-center rounded-2xl text-white/60 transition active:scale-[0.96] active:bg-white/[0.04] hover:text-white disabled:opacity-30"
+          className="grid h-[58px] place-items-center rounded-[17px] text-white/55 transition hover:bg-white/[0.035] hover:text-white active:scale-[0.97] disabled:opacity-30"
           aria-label="Apagar"
         >
           <svg
@@ -456,7 +456,7 @@ function PinPad({
           type="button"
           onClick={() => submit(pin)}
           disabled={busy || pin.length < 4}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-white px-8 py-4 text-[15px] font-semibold text-black transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-30"
+          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-[#b69ae8] px-8 py-3.5 text-[14px] font-semibold text-[#1c1724] shadow-[0_8px_24px_-14px_rgba(182,154,232,0.65)] hover:bg-[#c4acee] transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-30"
           style={HEADING_FONT}
         >
           {busy ? "Entrando…" : "Entrar"}
@@ -478,7 +478,7 @@ function PinPad({
 function ProfileLoading({ profile }: { profile: Profile }) {
   return (
     <main
-      className="flex min-h-screen flex-col items-center justify-center bg-black px-6"
+      className="flex min-h-screen flex-col items-center justify-center bg-[#171717] px-6"
       style={BODY_FONT}
     >
       <div className="flex w-full max-w-sm flex-col items-center">
