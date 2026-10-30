@@ -1053,6 +1053,10 @@ function StreakCard({
                     : "Uma revisão hoje mantém sua chama acesa"}
           </p>
         </div>
+        <Link to="/streak" className="relative mt-4 flex items-center justify-between gap-3 border-t border-streak-border pt-3 text-[11px] font-semibold text-streak-primary transition-colors hover:text-foreground">
+          <span>Ver calendário, evolução e recompensas</span>
+          <ChevronRight className="h-4 w-4" />
+        </Link>
       </div>
 
       <style>{`
