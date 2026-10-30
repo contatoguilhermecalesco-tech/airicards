@@ -151,7 +151,7 @@ function PerformancePage() {
       </>}
 
       {tab === "sessions" && <section className="rounded-2xl border bg-surface p-5">
-        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-semibold">Histórico de sessões</h2><p className="mt-1 text-xs text-muted-foreground">Acertos, erros, duração e pontos registrados em cada sessão.</p></div><span className="text-xs text-muted-foreground">{sessions.length} sessões</span></div>
+        <div className="mb-4 flex items-center justify-between"><div><h2 className="font-semibold">Histórico de sessões</h2><p className="mt-1 text-xs text-muted-foreground">Acertos, erros, duração e pontos registrados em cada sessão. O histórico começa a contar após esta atualização.</p></div><span className="text-xs text-muted-foreground">{sessions.length} sessões</span></div>
         <div className="space-y-2">
           {sessions.map((session) => <SessionRow key={session.id} session={session} />)}
           {!sessions.length && <Empty text="Suas sessões concluídas aparecerão aqui. Termine uma revisão de cartas para começar seu histórico." />}
@@ -181,7 +181,7 @@ function PerformancePage() {
       </section>}
 
       {tab === "weaknesses" && <section className="rounded-2xl border bg-surface p-5">
-        <div className="mb-4"><h2 className="font-semibold">Sistema de fraquezas</h2><p className="mt-1 text-xs text-muted-foreground">Estimativa baseada no histórico de lapsos e acertos das cartas, agrupada por tipo de conteúdo.</p></div>
+        <div className="mb-4"><h2 className="font-semibold">Sistema de fraquezas</h2><p className="mt-1 text-xs text-muted-foreground">Estimativa baseada no histórico de lapsos e acertos das cartas. Listening e escrita dependem de cartas com origem identificada.</p></div>
         <div className="space-y-3">
           {weaknesses.map((item) => <div key={item.id} className="rounded-xl border bg-background/50 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="text-sm font-semibold">{item.label}</h3><p className="text-xs text-muted-foreground">{item.detail} · {item.cards.length} cartas</p></div><span className="rounded-full bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-300">{item.rate}% reincidência</span></div><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-amber-400" style={{ width: `${item.rate}%` }} /></div><Link {...launchLink(item.cards.map((card) => card.id))} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">Treinar este tema <ArrowRight className="h-3.5 w-3.5" /></Link></div>)}
           {!weaknesses.length && <Empty text="Ainda não há dados suficientes para detectar dificuldades. Revise algumas cartas primeiro." />}
