@@ -15,7 +15,6 @@ import {
   Sparkles,
   Swords,
   Trophy,
-  UserRound,
   Users,
   X as XIcon,
 } from "lucide-react";
@@ -92,11 +91,11 @@ function SocialPage() {
             key={id}
             type="button"
             onClick={() => setSection(id)}
-            className={`relative flex h-11 items-center justify-center gap-2 text-[12px] font-medium transition ${section === id ? "text-foreground" : "text-muted-foreground"}`}
+            className={`relative flex h-9 items-center justify-center gap-2 rounded-lg text-[12px] font-medium transition ${section === id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
           >
             <Icon className="h-4 w-4" />{label}
             {badge ? <span className="min-w-4 rounded-full bg-primary px-1 text-[9px] text-primary-foreground">{badge}</span> : null}
-            {section === id ? <span className="hidden" /> : null}
+            {section === id ? <span className="sr-only">Selecionado</span> : null}
           </button>
         ))}
       </div>
@@ -125,7 +124,7 @@ function SocialPage() {
           {section === "duel" ? <DuelSection meId={meId} score={score} duel={duel} /> : null}
         </section>
 
-        <aside className="mt-8 space-y-6  pt-5 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
+        <aside className="mt-8 space-y-6 border-t border-border/60 pt-5 lg:mt-0 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
           <section>
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[15px] font-semibold text-foreground">Amigo</h2>
