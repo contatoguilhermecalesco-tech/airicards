@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, ArrowUpRight, Check, CheckCheck, ChevronRight, CircleCheck, Inbox } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { iconFromKey } from "@/lib/notification-icons";
 import { subscribeProfile } from "@/lib/profile";
 import {
@@ -60,7 +60,6 @@ function UpdateItem({ update, read, onOpen, last }: { update: SystemUpdate; read
 export function SystemUpdatesBell() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const { updates, readIds, loading, profileId, readDiagnostic } = useSystemUpdates();
   const unread = useMemo(() => updates.filter((update) => !readIds.has(update.id)).length, [updates, readIds]);
   const activeCount = useMemo(() => updates.filter((item) => ["maintenance", "offline", "degraded"].includes(item.status)).length, [updates]);
