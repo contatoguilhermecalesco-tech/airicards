@@ -945,6 +945,36 @@ export type Database = {
         Relationships: []
       }
     }
+      app_area_maintenance: {
+        Row: {
+          area_key: string
+          enabled: boolean
+          expected_return_at: string | null
+          internal_note: string | null
+          message: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          area_key: string
+          enabled?: boolean
+          expected_return_at?: string | null
+          internal_note?: string | null
+          message?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          area_key?: string
+          enabled?: boolean
+          expected_return_at?: string | null
+          internal_note?: string | null
+          message?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
     Views: {
       [_ in never]: never
     }
