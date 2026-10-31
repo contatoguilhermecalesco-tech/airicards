@@ -42,7 +42,7 @@ function AchievementsPage() {
     const reviewed = cards.reduce((sum, card) => sum + (card.successes ?? 0) + (card.lapses ?? 0), 0);
     const defeated = cards.filter(isDefeated).length;
     const peak = TIER_ORDER.indexOf(rank.peakTier);
-    const studyDays = Object.keys(streak.history ?? {}).length;
+    const studyDays = Math.max(Object.keys(streak.history ?? {}).length, streak.longest > 0 ? 1 : 0);
     const completedDuels = duels.length;
     const milestones: Omit<Achievement, "unlocked">[] = [
       { id: "first-study", title: "Primeiro passo", description: "Complete seu primeiro dia de estudos.", icon: BookOpen, current: Math.min(studyDays, 1), target: 1, category: "Estudos", accent: "#b69ae8", trophy: "Bronze" },
