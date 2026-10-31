@@ -52,88 +52,13 @@ function isBrowser() {
   return typeof window !== "undefined";
 }
 
-function smartStorageKey(profileId: string) {
-  return `airi.smartNotifications.${profileId}.v1`;
-}
-
-function smartReadsKey(profileId: string) {
-  return `airi.smartNotificationReads.${profileId}.v1`;
-}
-
-function readSmartNotifications(profileId: string): Notification[] {
-  if (!isBrowser()) return [];
-  try {
-    const raw = localStorage.getItem(smartStorageKey(profileId));
-    return raw ? (JSON.parse(raw) as Notification[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function readSmartIds(profileId: string): Set<string> {
-  if (!isBrowser()) return new Set();
-  try {
-    const raw = localStorage.getItem(smartReadsKey(profileId));
-    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
-  } catch {
-    return new Set();
-  }
-}
-
-export function getSmartNotificationTagId(kind: "study" | "streak" | "rank" | "reward" | "record" | "duel"): string | null {
-  const patterns: Record<typeof kind, RegExp> = {
-    study: /estud|study|revis|learning/i,
-    streak: /streak|sequ[eê]ncia/i,
-    rank: /rank|classifica/i,
-    reward: /recomp|presente|gift/i,
-    record: /record|conquista|achievement/i,
-    duel: /duel|desafio|social/i,
-  };
-  return tags.find((tag) => patterns[kind].test(tag.name))?.id ?? null;
-}
-
-export function addSmartNotification(input: {
-  profileId: string;
-  key: string;
-  tag_id?: string | null;
-  title: string;
-  body: string;
-  icon?: string;
-  action_label?: string;
-  action_route?: string;
-}) {
-  const profileId = input.profileId;
-  if (!profileId || !isBrowser()) return;
-  const current = readSmartNotifications(profileId);
-  if (current.some((item) => item.id === `smart:${input.key}`)) return;
-  const item: Notification = {
-    id: `smart:${input.key}`,
-    title: input.title,
-    body: input.body,
-    tag_id: input.tag_id ?? null,
-    icon: input.icon ?? null,
-    action_label: input.action_label ?? null,
-    action_route: input.action_route ?? null,
-    created_at: new Date().toISOString(),
-  };
-  const next = [item, ...current].slice(0, 40);
-  localStorage.setItem(smartStorageKey(profileId), JSON.stringify(next));
-  if (activeProfile === profileId) {
-    notifications = [...next, ...notifications.filter((n) => !n.id.startsWith("smart:"))];
-    emit();
-  }
-}
-
 async function fetchAll() {
   const [t, n] = await Promise.all([
     supabase.from("notification_tags").select("*").order("name"),
     supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(100),
   ]);
   if (!t.error && t.data) tags = t.data as NotificationTag[];
-  if (!n.error && n.data) {
-    const smart = activeProfile ? readSmartNotifications(activeProfile) : [];
-    notifications = [...smart, ...(n.data as Notification[])];
-  }
+  if (!n.error && n.data) notifications = n.data as Notification[];
   emit();
 }
 
@@ -143,10 +68,7 @@ async function fetchReads(profileId: string) {
     .select("notification_id")
     .eq("profile_id", profileId);
   if (!error && data) {
-    readIds = new Set([
-      ...data.map((r) => r.notification_id),
-      ...(activeProfile ? readSmartIds(activeProfile) : []),
-    ]);
+    readIds = new Set(data.map((r) => r.notification_id));
     emit();
   }
 }
@@ -214,12 +136,6 @@ export async function markAsRead(notificationId: string) {
   if (readIds.has(notificationId)) return;
   readIds = new Set(readIds).add(notificationId);
   emit();
-  if (notificationId.startsWith("smart:")) {
-    const local = readSmartIds(p.id);
-    local.add(notificationId);
-    localStorage.setItem(smartReadsKey(p.id), JSON.stringify([...local]));
-    return;
-  }
   await supabase
     .from("notification_reads")
     .upsert({ notification_id: notificationId, profile_id: p.id }, { onConflict: "notification_id,profile_id" });
@@ -233,19 +149,13 @@ export async function markAllAsRead() {
   const next = new Set(readIds);
   unread.forEach((n) => next.add(n.id));
   readIds = next;
-  const local = readSmartIds(p.id);
-  const remote = unread.filter((n) => !n.id.startsWith("smart:"));
-  unread.filter((n) => n.id.startsWith("smart:")).forEach((n) => local.add(n.id));
-  localStorage.setItem(smartReadsKey(p.id), JSON.stringify([...local]));
   emit();
-  if (remote.length > 0) {
-    await supabase
-      .from("notification_reads")
-      .upsert(
-        remote.map((n) => ({ notification_id: n.id, profile_id: p.id })),
-        { onConflict: "notification_id,profile_id" },
-      );
-  }
+  await supabase
+    .from("notification_reads")
+    .upsert(
+      unread.map((n) => ({ notification_id: n.id, profile_id: p.id })),
+      { onConflict: "notification_id,profile_id" },
+    );
 }
 
 // ===== Admin helpers =====
