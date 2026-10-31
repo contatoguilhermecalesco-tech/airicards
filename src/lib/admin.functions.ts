@@ -503,32 +503,3 @@ export const adminSetStreakFn = createServerFn({ method: "POST" })
       startedOn: startedOn,
     };
   });
-
-
-// ---------- Smart progress notifications settings --------------------------
-export const adminGetSmartNotificationsEnabledFn = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ enabled: boolean }> => {
-    await assertAdmin(context.supabase);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
-      .from("smart_notification_settings")
-      .select("enabled")
-      .eq("id", true)
-      .single();
-    if (error) throw error;
-    return { enabled: data.enabled === true };
-  });
-
-export const adminSetSmartNotificationsEnabledFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ enabled: z.boolean() }).parse(input))
-  .handler(async ({ data, context }): Promise<{ enabled: boolean }> => {
-    await assertAdmin(context.supabase);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("smart_notification_settings")
-      .upsert({ id: true, enabled: data.enabled, updated_at: new Date().toISOString() }, { onConflict: "id" });
-    if (error) throw error;
-    return { enabled: data.enabled };
-  });
