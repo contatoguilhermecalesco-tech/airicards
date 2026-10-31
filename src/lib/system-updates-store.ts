@@ -133,7 +133,14 @@ export async function createSystemUpdate(input: Omit<SystemUpdate, "id" | "creat
   emit();
 }
 
-export async function updateSystemUpdate(id: string, input: Partial<Omit<SystemUpdate, "id" | "created_at" | "updated_at">>) {\n  const { error } = await supabase.from("system_updates").update(input).eq("id", id);\n  if (error) throw error;\n  await fetchUpdates();\n  emit();\n}\n\nexport async function deleteSystemUpdate(id: string) {
+export async function updateSystemUpdate(id: string, input: Partial<Omit<SystemUpdate, "id" | "created_at" | "updated_at">>) {
+  const { error } = await supabase.from("system_updates").update(input).eq("id", id);
+  if (error) throw error;
+  await fetchUpdates();
+  emit();
+}
+
+export async function deleteSystemUpdate(id: string) {
   const { error } = await supabase.from("system_updates").delete().eq("id", id);
   if (error) throw error;
   await fetchUpdates();
