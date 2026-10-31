@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { Clock3, Wrench } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsAdmin } from "@/lib/profile";
 
 type MaintenanceRow = { area_key: string; enabled: boolean; message: string; expected_return_at: string | null };
 
@@ -26,7 +25,6 @@ const ROUTE_AREAS: Array<{ prefix: string; area: string }> = [
 
 export function MaintenanceGate({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isAdmin = useIsAdmin();
   const [rows, setRows] = useState<MaintenanceRow[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -54,7 +52,7 @@ export function MaintenanceGate({ children }: { children: ReactNode }) {
   const area = ROUTE_AREAS.find((item) => pathname === item.prefix || pathname.startsWith(item.prefix + "/"))?.area;
   const maintenance = useMemo(() => rows.find((row) => row.area_key === area && row.enabled), [rows, area]);
 
-  if (!area || isAdmin || !loaded || !maintenance) return <>{children}</>;
+  if (!area || !loaded || !maintenance) return <>{children}</>;
 
   const expected = maintenance.expected_return_at
     ? new Date(maintenance.expected_return_at)
