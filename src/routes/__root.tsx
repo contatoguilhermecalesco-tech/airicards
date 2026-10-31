@@ -18,6 +18,7 @@ import appCss from "../styles.css?url";
 import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
+import { MaintenanceGate } from "../components/MaintenanceGate";
 import { NotificationsBell } from "../components/NotificationsBell";
 import { SystemUpdatesBell } from "../components/SystemUpdatesBell";
 import { RankEmblem } from "../components/RankBadge";
@@ -848,7 +849,7 @@ function RootComponent() {
         */}
         <div className="min-h-dvh pb-[calc(72px+env(safe-area-inset-bottom))] sm:pb-0">
           <TopBar />
-          <Outlet />
+          <MaintenanceGate><Outlet /></MaintenanceGate>
           <BottomBar />
           <Suspense fallback={null}>
             <RankPromotionOverlay />
