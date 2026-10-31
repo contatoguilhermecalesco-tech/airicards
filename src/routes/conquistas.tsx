@@ -75,97 +75,51 @@ function AchievementsPage() {
   const visible = filter === "Desbloqueadas" ? achievements.filter((item) => item.unlocked) : achievements;
 
   return (
-    <main className="min-h-dvh bg-background px-4 pb-28 pt-5 text-foreground sm:px-6 sm:pb-10">
-      <div className="mx-auto w-full max-w-3xl">
-        <Link to="/" className="mb-7 inline-flex h-10 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.025] px-3 text-sm text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Voltar
-        </Link>
+    <main className="min-h-dvh bg-[#111214] px-4 pb-28 pt-5 text-[#f3f3f5] sm:px-6 sm:pb-10">
+      <div className="mx-auto w-full max-w-5xl">
+        <Link to="/" className="mb-6 inline-flex items-center gap-2 text-xs font-medium text-[#92949b] transition hover:text-white"><ArrowLeft className="h-4 w-4" /> Voltar</Link>
 
-        <header className="mb-7">
-          <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-primary/75">
-            <Trophy className="h-3.5 w-3.5" /> Sua jornada
+        <header className="mb-6 border-b border-white/[0.08] pb-5">
+          <div className="flex items-center justify-between gap-4">
+            <div><p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#aaaeb8]">AIRI · PERFIL DO JOGADOR</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Troféus</h1><p className="mt-1.5 text-sm text-[#92949b]">Sua coleção de conquistas e marcos de estudo.</p></div>
+            <div className="shrink-0 text-right"><p className="text-3xl font-semibold tabular-nums tracking-tight">{unlockedCount}<span className="text-lg text-[#777a82]">/{achievements.length}</span></p><p className="text-[9px] uppercase tracking-[0.2em] text-[#92949b]">desbloqueados</p></div>
           </div>
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Conquistas</h1>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">Cada pequena evolução conta. Veja o que você já alcançou e o que vem pela frente.</p>
-            </div>
-            <div className="shrink-0 text-right">
-              <p className="text-2xl font-semibold tabular-nums">{unlockedCount}<span className="text-base text-muted-foreground">/{achievements.length}</span></p>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">conquistadas</p>
-            </div>
-          </div>
+          <div className="mt-5 flex items-center gap-3"><div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full bg-gradient-to-r from-[#8b79bd] to-[#c9b8f2] transition-all duration-700" style={{ width: `${(unlockedCount / achievements.length) * 100}%` }} /></div><span className="text-[11px] tabular-nums text-[#a6a7ad]">{Math.round((unlockedCount / achievements.length) * 100)}%</span></div>
         </header>
 
-        <section className="mb-7 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 sm:p-5">
-          <div className="mb-3 flex items-center justify-between text-xs">
-            <span className="font-medium text-foreground/85">Sua coleção</span>
-            <span className="tabular-nums text-muted-foreground">{Math.round((unlockedCount / achievements.length) * 100)}% completa</span>
+        <section className="mb-7 overflow-hidden rounded-2xl border border-[#c9b8f2]/20 bg-[radial-gradient(ellipse_at_80%_20%,rgba(169,139,220,0.16),transparent_48%),linear-gradient(120deg,#24212b,#19191e_65%,#17171b)] p-4 sm:p-5">
+          <div className="flex items-center gap-4">
+            <div className="relative grid h-[76px] w-[76px] shrink-0 place-items-center rounded-full border border-[#d7c5ff]/35 bg-[radial-gradient(circle_at_35%_25%,#625579,#30283e_58%,#211c2a)] text-[#e2d5ff] shadow-[0_8px_30px_rgba(0,0,0,0.35),inset_0_1px_5px_rgba(255,255,255,0.18)]"><div className="absolute inset-1 rounded-full border border-white/10" /><Trophy className="h-9 w-9 drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)]" strokeWidth={1.4} /></div>
+            <div className="min-w-0 flex-1"><p className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#c9b8f2]">Troféu especial · Platina</p><h2 className="mt-1 text-lg font-semibold tracking-tight">{platinum.unlocked ? "Lenda do AIRI" : "A Platina espera por você"}</h2><p className="mt-1 text-xs leading-relaxed text-[#a6a1af]">{platinum.unlocked ? "Coleção completa. Você alcançou o topo." : "Desbloqueie todos os troféus para completar sua coleção."}</p></div>
+            <div className="text-right"><p className="text-lg font-semibold tabular-nums text-[#d8c8ff]">{platinum.current}<span className="text-xs text-[#8d849a]">/{platinum.target}</span></p><p className="text-[9px] uppercase tracking-wider text-[#8d849a]">marcos</p></div>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/[0.07]">
-            <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${(unlockedCount / achievements.length) * 100}%` }} />
-          </div>
-          <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Continue estudando para revelar novas conquistas.
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {trophyCounts.map(({ tier, count, total }) => <div key={tier} className="rounded-lg border border-white/[0.06] bg-black/20 px-2 py-2 text-center"><p className={"text-[9px] font-bold uppercase tracking-[0.16em] " + (tier === "Bronze" ? "text-[#c58b61]" : tier === "Prata" ? "text-[#c5cbd5]" : tier === "Ouro" ? "text-[#e5c16e]" : "text-[#c9b8f2]")}>{tier}</p><p className="mt-0.5 text-sm font-semibold tabular-nums text-[#e7e7eb]">{count}<span className="text-[10px] text-[#777a82]">/{total}</span></p></div>)}
           </div>
         </section>
 
-        <section className="mb-7 rounded-2xl border border-[#c9b8f2]/20 bg-[#c9b8f2]/[0.045] p-4 sm:p-5">
-          <div className="flex items-center gap-3">
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl border border-[#c9b8f2]/30 bg-[#c9b8f2]/10 text-[#d8c8ff]"><Trophy className="h-7 w-7" strokeWidth={1.5} /></div>
-            <div className="min-w-0 flex-1"><p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c9b8f2]">Troféu de platina</p><h2 className="mt-0.5 text-base font-semibold">{platinum.unlocked ? "A lenda foi escrita" : "Lenda do AIRI"}</h2><p className="mt-0.5 text-[11px] text-muted-foreground">{platinum.unlocked ? "Você conquistou todos os troféus." : "Complete toda a coleção para conquistar a Platina."}</p></div>
-            <span className="text-sm font-semibold tabular-nums text-[#d8c8ff]">{platinum.current}/{platinum.target}</span>
-          </div>
-          <div className="mt-4 grid grid-cols-4 gap-2">{trophyCounts.map(({ tier, count, total }) => <div key={tier} className="rounded-xl bg-black/15 px-2 py-2 text-center"><p className={"text-[10px] font-semibold " + (tier === "Bronze" ? "text-[#c58b61]" : tier === "Prata" ? "text-[#c3c8d2]" : tier === "Ouro" ? "text-[#e5c16e]" : "text-[#c9b8f2]")}>{tier}</p><p className="mt-0.5 text-xs font-semibold tabular-nums">{count}<span className="text-muted-foreground">/{total}</span></p></div>)}</div>
-        </section>
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">Marcos disponíveis</h2>
-          <div className="flex rounded-full border border-white/[0.08] bg-white/[0.025] p-1">
-            {(["Todas", "Desbloqueadas"] as const).map((item) => (
-              <button key={item} onClick={() => setFilter(item)} className={`rounded-full px-3 py-1.5 text-[11px] font-medium transition ${filter === item ? "bg-primary/15 text-primary" : "text-muted-foreground hover:text-foreground"}`}>
-                {item}
-              </button>
-            ))}
-          </div>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div><h2 className="text-sm font-semibold">Coleção de troféus</h2><p className="mt-0.5 text-[11px] text-[#858890]">Cada emblema representa uma conquista.</p></div>
+          <div className="flex rounded-lg border border-white/[0.08] bg-[#191a1e] p-1">{(["Todas", "Desbloqueadas"] as const).map((item) => <button key={item} onClick={() => setFilter(item)} className={`rounded-md px-3 py-1.5 text-[10px] font-semibold transition ${filter === item ? "bg-[#35343d] text-white shadow-sm" : "text-[#858890] hover:text-white"}`}>{item}</button>)}</div>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
           {visible.map((item) => {
             const Icon = item.icon;
+            const metal = item.trophy === "Bronze" ? { main: "#c58b61", light: "#edc29b", dark: "#68452f" } : item.trophy === "Prata" ? { main: "#c5cbd5", light: "#f3f5f8", dark: "#656b75" } : item.trophy === "Ouro" ? { main: "#e5c16e", light: "#fff0b5", dark: "#80632b" } : { main: "#c9b8f2", light: "#f0e7ff", dark: "#665187" };
             const progress = Math.min(100, (item.current / item.target) * 100);
-            return (
-              <article key={item.id} className={`flex items-center gap-3.5 rounded-2xl border p-3.5 transition sm:gap-4 sm:p-4 ${item.unlocked ? "border-primary/20 bg-primary/[0.045]" : "border-white/[0.07] bg-white/[0.02]"}`}>
-                <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[15px] border" style={{ color: item.unlocked ? item.accent : "hsl(var(--muted-foreground))", borderColor: item.unlocked ? `${item.accent}45` : "rgba(255,255,255,0.07)", background: item.unlocked ? `${item.accent}16` : "rgba(255,255,255,0.025)" }}>
-                  <Icon className="h-5 w-5" strokeWidth={1.8} />
-                  {item.unlocked && <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full border-2 border-background bg-primary text-primary-foreground"><Check className="h-2.5 w-2.5" /></span>}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className={`text-[13px] font-semibold ${item.unlocked ? "text-foreground" : "text-foreground/85"}`}>{item.title}</h3>
-                    <span className={"rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide " + (item.trophy === "Bronze" ? "bg-[#c58b61]/10 text-[#c58b61]" : item.trophy === "Prata" ? "bg-[#c3c8d2]/10 text-[#c3c8d2]" : item.trophy === "Ouro" ? "bg-[#e5c16e]/10 text-[#e5c16e]" : "bg-[#c9b8f2]/10 text-[#c9b8f2]")}>{item.trophy}</span>
-                    {item.unlocked && <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-primary">Conquistada</span>}
-                  </div>
-                  <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{item.description}</p>
-                  {!item.unlocked && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
-                        <div className="h-full rounded-full" style={{ width: `${progress}%`, background: item.accent }} />
-                      </div>
-                      <span className="min-w-[52px] text-right text-[10px] tabular-nums text-muted-foreground">{item.current.toLocaleString("pt-BR")}/{item.target.toLocaleString("pt-BR")}</span>
-                    </div>
-                  )}
-                </div>
-                {!item.unlocked && <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground/45" />}
-              </article>
-            );
+            return <article key={item.id} className={`relative flex min-h-[174px] flex-col items-center overflow-hidden rounded-xl border px-3 py-4 text-center transition sm:min-h-[190px] ${item.unlocked ? "border-white/[0.13] bg-[linear-gradient(145deg,#292a2f,#202126_58%,#1b1c20)] shadow-[0_5px_18px_rgba(0,0,0,0.16)]" : "border-white/[0.055] bg-[#191a1e]"}`}>
+              <div className="absolute right-2.5 top-2.5 text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: item.unlocked ? metal.main : "#656870" }}>{item.trophy}</div>
+              <div className="relative mt-2 grid h-[66px] w-[66px] place-items-center rounded-full border shadow-[inset_0_2px_5px_rgba(255,255,255,0.16),0_5px_12px_rgba(0,0,0,0.28)]" style={{ color: item.unlocked ? metal.light : "#62656d", borderColor: item.unlocked ? `${metal.main}88` : "#45474d", background: item.unlocked ? `radial-gradient(circle at 35% 25%,${metal.main},${metal.dark} 78%)` : "radial-gradient(circle at 35% 25%,#42444b,#292b30 78%)", filter: item.unlocked ? "none" : "saturate(0.25)" }}><div className="absolute inset-[5px] rounded-full border" style={{ borderColor: item.unlocked ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)" }} /><Icon className="relative h-7 w-7 drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]" strokeWidth={1.6} />{item.unlocked && <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[#24252a] bg-[#d8d9dc] text-[#25262a]"><Check className="h-3 w-3" /></span>}</div>
+              <h3 className={`mt-3 text-xs font-semibold leading-tight ${item.unlocked ? "text-[#f0f0f3]" : "text-[#a0a2a9]"}`}>{item.title}</h3>
+              <p className="mt-1 line-clamp-2 min-h-[28px] text-[10px] leading-relaxed text-[#858890]">{item.description}</p>
+              {!item.unlocked ? <div className="mt-auto flex w-full items-center gap-2 pt-3"><div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full" style={{ width: `${progress}%`, background: metal.main }} /></div><span className="text-[9px] tabular-nums text-[#92949b]">{item.current.toLocaleString("pt-BR")}/{item.target.toLocaleString("pt-BR")}</span></div> : <p className="mt-auto pt-3 text-[8px] font-bold uppercase tracking-[0.18em]" style={{ color: metal.main }}>Desbloqueado</p>}
+            </article>;
           })}
-          {visible.length === 0 && <div className="rounded-2xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-muted-foreground">Você ainda não desbloqueou conquistas. Sua próxima pode estar logo ali.</div>}
+          {visible.length === 0 && <div className="col-span-full rounded-xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-[#858890]">Você ainda não desbloqueou troféus. Continue estudando para conquistar o primeiro.</div>}
         </div>
 
-        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/[0.06] bg-white/[0.015] px-4 py-3">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Medal className="h-4 w-4 text-primary" /> Continue construindo sua jornada.</div>
-          <Link to="/desafios" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition hover:opacity-80">Ver desafios <ArrowLeft className="h-3.5 w-3.5 rotate-180" /></Link>
-        </div>
+        <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.07] pt-4"><p className="flex items-center gap-2 text-[11px] text-[#858890]"><Medal className="h-4 w-4 text-[#aaaeb8]" /> Sua jornada continua.</p><Link to="/desafios" className="text-[11px] font-semibold text-[#c9b8f2] transition hover:text-white">Ver desafios →</Link></div>
       </div>
     </main>
   );
