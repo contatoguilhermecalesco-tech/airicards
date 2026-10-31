@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft, BookOpen, Check, Crown, Flame, Lock, Medal, Swords,
-  Target, Trophy, Sparkles, Star, ShieldCheck,
+  ArrowLeft, Award, BookOpenCheck, Brain, CalendarCheck, Check, Crown, Flame,
+  Gem, GraduationCap, LibraryBig, Medal, Shield, Swords, Target, Trophy, Zap,
 } from "lucide-react";
 import { useStore, useStreak, isDefeated } from "@/lib/flashcards-store";
 import { useRank, TIER_ORDER } from "@/lib/rank-store";
@@ -45,28 +45,28 @@ function AchievementsPage() {
     const studyDays = Math.max(Object.keys(streak.history ?? {}).length, streak.longest > 0 ? 1 : 0);
     const completedDuels = duels.length;
     const milestones: Omit<Achievement, "unlocked">[] = [
-      { id: "first-study", title: "Primeiro passo", description: "Complete seu primeiro dia de estudos.", icon: BookOpen, current: Math.min(studyDays, 1), target: 1, category: "Estudos", accent: "#b69ae8", trophy: "Bronze" },
-      { id: "reviews-10", title: "Aquecimento", description: "Revise 10 cartas.", icon: Target, current: Math.min(reviewed, 10), target: 10, category: "Estudos", accent: "#b69ae8", trophy: "Bronze" },
-      { id: "reviews-100", title: "Memória em construção", description: "Revise 100 cartas.", icon: Target, current: Math.min(reviewed, 100), target: 100, category: "Estudos", accent: "#8f9ce8", trophy: "Bronze" },
-      { id: "reviews-500", title: "Ritmo de aprendizado", description: "Revise 500 cartas.", icon: BookOpen, current: Math.min(reviewed, 500), target: 500, category: "Estudos", accent: "#8f9ce8", trophy: "Prata" },
-      { id: "reviews-1000", title: "Mente afiada", description: "Revise 1.000 cartas.", icon: Star, current: Math.min(reviewed, 1000), target: 1000, category: "Estudos", accent: "#d6b36a", trophy: "Ouro" },
-      { id: "reviews-5000", title: "Biblioteca viva", description: "Revise 5.000 cartas.", icon: Medal, current: Math.min(reviewed, 5000), target: 5000, category: "Estudos", accent: "#d6b36a", trophy: "Ouro" },
+      { id: "first-study", title: "Primeiro passo", description: "Complete seu primeiro dia de estudos.", icon: GraduationCap, current: Math.min(studyDays, 1), target: 1, category: "Estudos", accent: "#b69ae8", trophy: "Bronze" },
+      { id: "reviews-10", title: "Aquecimento", description: "Revise 10 cartas.", icon: Zap, current: Math.min(reviewed, 10), target: 10, category: "Estudos", accent: "#b69ae8", trophy: "Bronze" },
+      { id: "reviews-100", title: "Memória em construção", description: "Revise 100 cartas.", icon: Brain, current: Math.min(reviewed, 100), target: 100, category: "Estudos", accent: "#8f9ce8", trophy: "Bronze" },
+      { id: "reviews-500", title: "Ritmo de aprendizado", description: "Revise 500 cartas.", icon: BookOpenCheck, current: Math.min(reviewed, 500), target: 500, category: "Estudos", accent: "#8f9ce8", trophy: "Prata" },
+      { id: "reviews-1000", title: "Mente afiada", description: "Revise 1.000 cartas.", icon: Award, current: Math.min(reviewed, 1000), target: 1000, category: "Estudos", accent: "#d6b36a", trophy: "Ouro" },
+      { id: "reviews-5000", title: "Biblioteca viva", description: "Revise 5.000 cartas.", icon: LibraryBig, current: Math.min(reviewed, 5000), target: 5000, category: "Estudos", accent: "#d6b36a", trophy: "Ouro" },
       { id: "streak-7", title: "Uma semana por você", description: "Mantenha 7 dias seguidos de estudos.", icon: Flame, current: Math.min(streak.longest, 7), target: 7, category: "Jornada", accent: "#e99a69", trophy: "Bronze" },
-      { id: "streak-30", title: "Constância lendária", description: "Alcance 30 dias de sequência.", icon: Flame, current: Math.min(streak.longest, 30), target: 30, category: "Jornada", accent: "#e99a69", trophy: "Prata" },
-      { id: "streak-100", title: "Disciplina de aço", description: "Alcance 100 dias de sequência.", icon: Flame, current: Math.min(streak.longest, 100), target: 100, category: "Jornada", accent: "#d6b36a", trophy: "Ouro" },
+      { id: "streak-30", title: "Constância lendária", description: "Alcance 30 dias de sequência.", icon: CalendarCheck, current: Math.min(streak.longest, 30), target: 30, category: "Jornada", accent: "#e99a69", trophy: "Prata" },
+      { id: "streak-100", title: "Disciplina de aço", description: "Alcance 100 dias de sequência.", icon: Zap, current: Math.min(streak.longest, 100), target: 100, category: "Jornada", accent: "#d6b36a", trophy: "Ouro" },
       { id: "first-duel", title: "Primeiro confronto", description: "Finalize seu primeiro duelo.", icon: Swords, current: Math.min(completedDuels, 1), target: 1, category: "Competitivo", accent: "#8e9de8", trophy: "Bronze" },
-      { id: "duels-10", title: "Veterano da arena", description: "Finalize 10 duelos.", icon: Swords, current: Math.min(completedDuels, 10), target: 10, category: "Competitivo", accent: "#8e9de8", trophy: "Prata" },
-      { id: "rank-silver", title: "Prata conquistada", description: "Alcance o Rank Prata.", icon: Medal, current: Math.min(peak + 1, TIER_ORDER.indexOf("silver") + 1), target: TIER_ORDER.indexOf("silver") + 1, category: "Competitivo", accent: "#c0c5d0", trophy: "Bronze" },
+      { id: "duels-10", title: "Veterano da arena", description: "Finalize 10 duelos.", icon: Shield, current: Math.min(completedDuels, 10), target: 10, category: "Competitivo", accent: "#8e9de8", trophy: "Prata" },
+      { id: "rank-silver", title: "Prata conquistada", description: "Alcance o Rank Prata.", icon: Shield, current: Math.min(peak + 1, TIER_ORDER.indexOf("silver") + 1), target: TIER_ORDER.indexOf("silver") + 1, category: "Competitivo", accent: "#c0c5d0", trophy: "Bronze" },
       { id: "gold-rank", title: "Em busca do ouro", description: "Alcance o Rank Ouro.", icon: Crown, current: Math.min(peak + 1, TIER_ORDER.indexOf("gold") + 1), target: TIER_ORDER.indexOf("gold") + 1, category: "Competitivo", accent: "#e5c16e", trophy: "Prata" },
-      { id: "rank-diamond", title: "Além do limite", description: "Alcance o Rank Diamante.", icon: Star, current: Math.min(peak + 1, TIER_ORDER.indexOf("diamond") + 1), target: TIER_ORDER.indexOf("diamond") + 1, category: "Competitivo", accent: "#8fd7e8", trophy: "Ouro" },
-      { id: "first-enemy", title: "Caçador de nêmesis", description: "Derrote sua primeira carta inimiga.", icon: ShieldCheck, current: Math.min(defeated, 1), target: 1, category: "Jornada", accent: "#d58b9b", trophy: "Bronze" },
-      { id: "enemies-10", title: "Limpando o caminho", description: "Derrote 10 cartas inimigas.", icon: ShieldCheck, current: Math.min(defeated, 10), target: 10, category: "Jornada", accent: "#d58b9b", trophy: "Prata" },
+      { id: "rank-diamond", title: "Além do limite", description: "Alcance o Rank Diamante.", icon: Gem, current: Math.min(peak + 1, TIER_ORDER.indexOf("diamond") + 1), target: TIER_ORDER.indexOf("diamond") + 1, category: "Competitivo", accent: "#8fd7e8", trophy: "Ouro" },
+      { id: "first-enemy", title: "Caçador de nêmesis", description: "Derrote sua primeira carta inimiga.", icon: Shield, current: Math.min(defeated, 1), target: 1, category: "Jornada", accent: "#d58b9b", trophy: "Bronze" },
+      { id: "enemies-10", title: "Limpando o caminho", description: "Derrote 10 cartas inimigas.", icon: Swords, current: Math.min(defeated, 10), target: 10, category: "Jornada", accent: "#d58b9b", trophy: "Prata" },
     ];
     const earned = milestones.filter((item) => item.current >= item.target).length;
     const allEarned = earned === milestones.length;
     return [
       ...milestones.map((item) => ({ ...item, unlocked: item.current >= item.target })),
-      { id: "platinum", title: "Lenda do AIRI", description: "Desbloqueie todos os outros troféus da coleção.", icon: Trophy, current: allEarned ? 1 : earned, target: milestones.length, unlocked: allEarned, category: "Jornada" as const, accent: "#c9b8f2", trophy: "Platina" as const },
+      { id: "platinum", title: "Lenda do AIRI", description: "Desbloqueie todos os outros troféus da coleção.", icon: Crown, current: allEarned ? 1 : earned, target: milestones.length, unlocked: allEarned, category: "Jornada" as const, accent: "#c9b8f2", trophy: "Platina" as const },
     ];
   }, [cards, streak, rank, duels]);
   const unlockedCount = achievements.filter((item) => item.unlocked).length;
@@ -110,7 +110,7 @@ function AchievementsPage() {
             const progress = Math.min(100, (item.current / item.target) * 100);
             return <article key={item.id} className={`relative flex min-h-[174px] flex-col items-center overflow-hidden rounded-xl border px-3 py-4 text-center transition sm:min-h-[190px] ${item.unlocked ? "border-white/[0.13] bg-[linear-gradient(145deg,#292a2f,#202126_58%,#1b1c20)] shadow-[0_5px_18px_rgba(0,0,0,0.16)]" : "border-white/[0.055] bg-[#191a1e]"}`}>
               <div className="absolute right-2.5 top-2.5 text-[8px] font-bold uppercase tracking-[0.16em]" style={{ color: item.unlocked ? metal.main : "#656870" }}>{item.trophy}</div>
-              <div className="relative mt-2 grid h-[66px] w-[66px] place-items-center rounded-full border shadow-[inset_0_2px_5px_rgba(255,255,255,0.16),0_5px_12px_rgba(0,0,0,0.28)]" style={{ color: item.unlocked ? metal.light : "#62656d", borderColor: item.unlocked ? `${metal.main}88` : "#45474d", background: item.unlocked ? `radial-gradient(circle at 35% 25%,${metal.main},${metal.dark} 78%)` : "radial-gradient(circle at 35% 25%,#42444b,#292b30 78%)", filter: item.unlocked ? "none" : "saturate(0.25)" }}><div className="absolute inset-[5px] rounded-full border" style={{ borderColor: item.unlocked ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)" }} /><Icon className="relative h-7 w-7 drop-shadow-[0_2px_3px_rgba(0,0,0,0.45)]" strokeWidth={1.6} />{item.unlocked && <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[#24252a] bg-[#d8d9dc] text-[#25262a]"><Check className="h-3 w-3" /></span>}</div>
+              <div className="relative mt-2 grid h-[66px] w-[66px] place-items-center rounded-full border shadow-[inset_0_2px_5px_rgba(255,255,255,0.16),0_5px_12px_rgba(0,0,0,0.28)]" style={{ color: item.unlocked ? metal.light : "#62656d", borderColor: item.unlocked ? `${metal.main}88` : "#45474d", background: item.unlocked ? `radial-gradient(circle at 32% 22%,${metal.light},${metal.main} 34%,${metal.dark} 82%)` : "radial-gradient(circle at 35% 25%,#42444b,#292b30 78%)", filter: item.unlocked ? "none" : "saturate(0.25)" }}><div className="absolute inset-[5px] rounded-full border" style={{ borderColor: item.unlocked ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)" }} /><Icon className="relative h-7 w-7 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]" strokeWidth={1.8} />{item.unlocked && <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full border-2 border-[#24252a] bg-[#d8d9dc] text-[#25262a]"><Check className="h-3 w-3" /></span>}</div>
               <h3 className={`mt-3 text-xs font-semibold leading-tight ${item.unlocked ? "text-[#f0f0f3]" : "text-[#a0a2a9]"}`}>{item.title}</h3>
               <p className="mt-1 line-clamp-2 min-h-[28px] text-[10px] leading-relaxed text-[#858890]">{item.description}</p>
               {!item.unlocked ? <div className="mt-auto flex w-full items-center gap-2 pt-3"><div className="h-1 flex-1 overflow-hidden rounded-full bg-white/[0.08]"><div className="h-full rounded-full" style={{ width: `${progress}%`, background: metal.main }} /></div><span className="text-[9px] tabular-nums text-[#92949b]">{item.current.toLocaleString("pt-BR")}/{item.target.toLocaleString("pt-BR")}</span></div> : <p className="mt-auto pt-3 text-[8px] font-bold uppercase tracking-[0.18em]" style={{ color: metal.main }}>Desbloqueado</p>}
