@@ -554,6 +554,21 @@ export const adminSetAreaMaintenanceFn = createServerFn({ method: "POST" })
       }, { onConflict: "area_key" })
       .select("area_key, enabled, message, expected_return_at, internal_note, updated_by, updated_at")
       .single();
-    if (error) throw error;
+    if (error) {
+      console.error("[Maintenance] Failed to save area setting", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+      if (error.code === "42P01" || error.code === "PGRST205") {
+        throw new Error("A tabela de manutenção não existe no Supabase. Execute a migration 20261031020000_app_area_maintenance.sql no SQL Editor.");
+      }
+      if (error.code === "42501") {
+        throw new Error("O Supabase bloqueou a gravação por permissão. Verifique a chave SUPABASE_SERVICE_ROLE_KEY no ambiente do servidor.");
+      }
+      throw new Error(`Falha ao salvar manutenção (${error.code ?? "sem código"}): ${error.message}`);
+    }
+    if (!row) throw new Error("O Supabase não retornou a configuração salva. Tente novamente.");
     return row as AppAreaMaintenanceRow;
   });
