@@ -944,7 +944,6 @@ export type Database = {
         }
         Relationships: []
       }
-    }
       app_area_maintenance: {
         Row: {
           area_key: string
