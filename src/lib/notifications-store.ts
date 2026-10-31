@@ -80,6 +80,18 @@ function readSmartIds(profileId: string): Set<string> {
   }
 }
 
+export function getSmartNotificationTagId(kind: "study" | "streak" | "rank" | "reward" | "record" | "duel"): string | null {
+  const patterns: Record<typeof kind, RegExp> = {
+    study: /estud|study|revis|learning/i,
+    streak: /streak|sequ[eê]ncia/i,
+    rank: /rank|classifica/i,
+    reward: /recomp|presente|gift/i,
+    record: /record|conquista|achievement/i,
+    duel: /duel|desafio|social/i,
+  };
+  return tags.find((tag) => patterns[kind].test(tag.name))?.id ?? null;
+}
+
 export function addSmartNotification(input: {
   profileId: string;
   key: string;
