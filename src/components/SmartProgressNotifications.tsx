@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addSmartNotification } from "@/lib/notifications-store";
+import { addSmartNotification, getSmartNotificationTagId } from "@/lib/notifications-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useStore, useStreak, useCardsReviewedToday, getDueCards } from "@/lib/flashcards-store";
 import { useRank, TIER_ORDER, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
@@ -84,6 +84,7 @@ export function SmartProgressNotifications() {
       if (dueCount >= 5) {
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("study"),
           key: `reviews-${today}`,
           title: "🧠 Cartas aguardando revisão",
           body: `Você tem ${dueCount} cartas prontas para revisar. Uma sessão curta já ajuda a manter a memória ativa.`,
@@ -99,6 +100,7 @@ export function SmartProgressNotifications() {
       if (now.getHours() >= 18 && streak.current > 0 && streak.lastDay === dayKey(yesterday)) {
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("streak"),
           key: `streak-risk-${today}`,
           title: "🔥 Seu streak está em risco",
           body: `Você está com ${streak.current} dia(s) de sequência. Faça uma revisão hoje para não perder o ritmo.`,
@@ -116,6 +118,7 @@ export function SmartProgressNotifications() {
         const division = rank.division ? ` ${DIVISION_ROMAN[rank.division]}` : "";
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("rank"),
           key: `rank-${today}-${score}`,
           title: "🏆 Novo rank alcançado!",
           body: `Parabéns! Você chegou a ${TIER_LABEL[rank.tier]}${division}.`,
@@ -133,6 +136,7 @@ export function SmartProgressNotifications() {
       if (cosmetics > previousCosmetics) {
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("reward"),
           key: `reward-${today}`,
           title: "🎁 Nova recompensa desbloqueada",
           body: "Um novo item entrou no seu inventário. Confira sua coleção e escolha como usar.",
@@ -149,6 +153,7 @@ export function SmartProgressNotifications() {
       if (reviewedToday >= 10 && reviewedToday > best) {
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("record"),
           key: `record-${today}`,
           title: "📈 Novo recorde pessoal",
           body: `Você revisou ${reviewedToday} cartas hoje — seu melhor resultado até agora!`,
@@ -165,6 +170,7 @@ export function SmartProgressNotifications() {
       if (duel?.status === "active" && !duelResults.some((result) => result.profileId === profile.id)) {
         addSmartNotification({
           profileId: profile.id,
+          tag_id: getSmartNotificationTagId("duel"),
           key: `duel-${duel.id}-${profile.id}`,
           title: "⚔️ Novo duelo disponível",
           body: `O desafio da semana está pronto. Encare ${duel.deckName} antes do prazo terminar.`,
