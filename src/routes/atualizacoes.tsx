@@ -99,6 +99,10 @@ function SystemUpdatesPage() {
   const latestIssue = activeIssues[0] ?? null;
   const selected = updates.find((update) => update.id === selectedId) ?? null;
   const relatedUpdate = selected?.related_update_id ? updates.find((item) => item.id === selected.related_update_id) : null;
+  const timelineRoot = selected ? (selected.related_update_id ? relatedUpdate : selected) : null;
+  const timelineItems = timelineRoot ? updates
+    .filter((item) => item.id === timelineRoot.id || item.related_update_id === timelineRoot.id)
+    .sort((left, right) => new Date(left.created_at).getTime() - new Date(right.created_at).getTime()) : [];
 
   const filtered = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("pt-BR");
@@ -202,6 +206,32 @@ function SystemUpdatesPage() {
               {selected.expected_return_at && selected.status !== "resolved" && <p className="flex items-center gap-2"><Clock3 className="h-3.5 w-3.5" />Previsão de retorno: {dateTimeLabel(selected.expected_return_at)}</p>}
               {selected.status === "resolved" && relatedUpdate && <p className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" /><span>Este comunicado normaliza: <strong className="font-semibold text-foreground/80">{relatedUpdate.title}</strong></span></p>}
             </div>
+            {timelineItems.length > 1 && (
+              <div className="mt-6">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div><h3 className="text-sm font-semibold text-foreground">Linha do tempo</h3><p className="mt-0.5 text-[11px] text-foreground/45">Acompanhe cada etapa desta ocorrência.</p></div>
+                  <span className="rounded-full bg-white/[0.05] px-2.5 py-1 text-[10px] text-foreground/50">{timelineItems.length} etapas</span>
+                </div>
+                <ol className="space-y-0">
+                  {timelineItems.map((item, index) => {
+                    const isLast = index === timelineItems.length - 1;
+                    const isCurrent = item.id === selected.id;
+                    return <li key={item.id} className="relative flex gap-3 pb-5 last:pb-0">
+                      {!isLast && <span className="absolute left-[5px] top-3 h-full w-px bg-white/[0.12]" />}
+                      <span className="relative z-10 mt-1.5 h-[11px] w-[11px] shrink-0 rounded-full border-2" style={{ borderColor: item.color, backgroundColor: item.status === "resolved" ? item.color : "var(--background)" }} />
+                      <div className={`min-w-0 flex-1 rounded-xl px-3 py-2.5 ${isCurrent ? "bg-white/[0.055]" : ""}`}>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className={`text-xs font-semibold ${isCurrent ? "text-foreground" : "text-foreground/80"}`}>{item.title}</p>
+                          <span className="text-[10px] text-foreground/40">{dateTimeLabel(item.created_at)}</span>
+                        </div>
+                        <p className="mt-1 text-xs leading-5 text-foreground/55">{item.body}</p>
+                        <p className="mt-1 text-[10px] font-semibold" style={{ color: item.color }}>{STATUS[item.status].label}</p>
+                      </div>
+                    </li>;
+                  })}
+                </ol>
+              </div>
+            )}
             {selected.action_label && selected.action_route && <button type="button" onClick={() => openAction(selected)} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:opacity-90">{selected.action_label}<ArrowUpRight className="h-4 w-4" /></button>}
             <button type="button" onClick={() => setSelectedId(null)} className="mt-2 w-full rounded-xl px-4 py-2.5 text-xs font-medium text-foreground/55 transition hover:bg-white/[0.04] hover:text-foreground">Fechar</button>
           </section>
