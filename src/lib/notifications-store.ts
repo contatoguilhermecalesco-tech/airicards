@@ -81,6 +81,7 @@ function readSmartIds(profileId: string): Set<string> {
 }
 
 export function addSmartNotification(input: {
+  profileId: string;
   key: string;
   title: string;
   body: string;
@@ -88,7 +89,7 @@ export function addSmartNotification(input: {
   action_label?: string;
   action_route?: string;
 }) {
-  const profileId = activeProfile;
+  const profileId = input.profileId;
   if (!profileId || !isBrowser()) return;
   const current = readSmartNotifications(profileId);
   if (current.some((item) => item.id === `smart:${input.key}`)) return;
@@ -104,8 +105,10 @@ export function addSmartNotification(input: {
   };
   const next = [item, ...current].slice(0, 40);
   localStorage.setItem(smartStorageKey(profileId), JSON.stringify(next));
-  notifications = [...next, ...notifications.filter((n) => !n.id.startsWith("smart:"))];
-  emit();
+  if (activeProfile === profileId) {
+    notifications = [...next, ...notifications.filter((n) => !n.id.startsWith("smart:"))];
+    emit();
+  }
 }
 
 async function fetchAll() {
