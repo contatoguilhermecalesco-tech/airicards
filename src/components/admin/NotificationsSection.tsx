@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Bell, Loader2, Send, Sparkles, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import { adminGetSmartNotificationsEnabledFn, adminSetSmartNotificationsEnabledFn } from "@/lib/admin.functions";
 import {
   createNotification,
   deleteNotification,
@@ -41,11 +40,6 @@ export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
 export function NotificationsSection() {
   const { notifications, tags } = useNotifications();
   const generate = useServerFn(generateNotification);
-  const getSmartEnabled = useServerFn(adminGetSmartNotificationsEnabledFn);
-  const setSmartEnabled = useServerFn(adminSetSmartNotificationsEnabledFn);
-  const [smartEnabled, setSmartEnabledState] = useState(true);
-  const [smartLoading, setSmartLoading] = useState(true);
-  const [smartSaving, setSmartSaving] = useState(false);
 
   const [idea, setIdea] = useState("");
   const [tagId, setTagId] = useState<string>("");
@@ -58,33 +52,6 @@ export function NotificationsSection() {
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    void getSmartEnabled().then((result) => {
-      if (alive) setSmartEnabledState(result.enabled);
-    }).catch((e) => {
-      if (alive) setErr((e as Error).message);
-    }).finally(() => {
-      if (alive) setSmartLoading(false);
-    });
-    return () => { alive = false; };
-  }, []);
-
-  async function handleSmartToggle() {
-    const next = !smartEnabled;
-    setSmartSaving(true);
-    setErr(null);
-    try {
-      const result = await setSmartEnabled({ data: { enabled: next } });
-      setSmartEnabledState(result.enabled);
-      setOk(next ? "Notificações inteligentes ativadas." : "Notificações inteligentes desativadas.");
-    } catch (e) {
-      setErr((e as Error).message);
-    } finally {
-      setSmartSaving(false);
-    }
-  }
 
   async function handleGenerate() {
     if (!idea.trim()) return;
@@ -147,18 +114,6 @@ export function NotificationsSection() {
         </div>
       </div>
 
-      <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-white/[0.02] p-3">
-        <div className="min-w-0">
-          <p className="text-sm font-medium">Notificações inteligentes de progresso</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Controla avisos automáticos de streak, revisões, rank, recompensas, recordes e duelos para todos os perfis.</p>
-          <p className={`mt-1 text-[11px] font-medium ${smartEnabled ? "text-emerald-400" : "text-muted-foreground"}`}>
-            {smartLoading ? "Verificando configuração…" : smartEnabled ? "Ativadas" : "Desativadas"}
-          </p>
-        </div>
-        <button type="button" role="switch" aria-checked={smartEnabled} aria-label="Ativar notificações inteligentes" disabled={smartLoading || smartSaving} onClick={() => void handleSmartToggle()} className={`relative h-7 w-12 shrink-0 rounded-full border transition disabled:opacity-50 ${smartEnabled ? "border-emerald-400/40 bg-emerald-500/25" : "border-white/10 bg-white/10"}`}>
-          <span className={`absolute top-0.5 h-5 w-5 rounded-full transition-all ${smartEnabled ? "left-[23px] bg-emerald-400" : "left-0.5 bg-white/70"}`} />
-        </button>
-      </div>
       <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
         <label className="mb-1.5 flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
           <Sparkles className="h-3 w-3" strokeWidth={2.5} />
