@@ -51,6 +51,10 @@ export function SmartProgressNotifications() {
   const [clock, setClock] = useState(() => Date.now());
 
   useEffect(() => {
+    if (profile?.id) void initNotifications();
+  }, [profile?.id]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => setClock(Date.now()), 30 * 60_000);
     return () => window.clearInterval(timer);
   }, []);
@@ -60,7 +64,6 @@ export function SmartProgressNotifications() {
     let cancelled = false;
 
     const run = async () => {
-      await initNotifications();
       if (cancelled) return;
 
       const prefix = `airi.smartProgress.${profile.id}.`;
