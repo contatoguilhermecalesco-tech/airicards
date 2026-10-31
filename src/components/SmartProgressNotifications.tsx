@@ -45,6 +45,8 @@ export function SmartProgressNotifications() {
   const duelResults = useDuelResults(duel?.id);
   const reviewedToday = useCardsReviewedToday();
   const [clock, setClock] = useState(() => Date.now());
+  const [smartEnabled, setSmartEnabled] = useState(false);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(Date.now()), 30 * 60_000);
@@ -52,7 +54,7 @@ export function SmartProgressNotifications() {
   }, []);
 
   useEffect(() => {
-    if (!profile?.id || !wallet.loaded) return;
+    if (!profile?.id || !wallet.loaded || !settingsLoaded || !smartEnabled) return;
     let cancelled = false;
 
     const run = async () => {
