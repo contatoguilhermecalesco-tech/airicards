@@ -120,8 +120,8 @@ export async function markSystemUpdateRead(updateId: string) {
   emit();
   const { error } = await supabase
     .from("system_update_reads")
-    .upsert({ update_id: updateId, profile_id: profile.id }, { onConflict: "update_id,profile_id" });
-  if (error) {
+    .insert({ update_id: updateId, profile_id: profile.id });
+  if (error && error.code !== "23505") {
     readIds = previous;
     emit();
     console.error("[airi] system update read failed", error);
@@ -139,11 +139,10 @@ export async function markAllSystemUpdatesRead() {
   unread.forEach((update) => next.add(update.id));
   readIds = next;
   emit();
-  const { error } = await supabase.from("system_update_reads").upsert(
+  const { error } = await supabase.from("system_update_reads").insert(
     unread.map((update) => ({ update_id: update.id, profile_id: profile.id })),
-    { onConflict: "update_id,profile_id" },
   );
-  if (error) {
+  if (error && error.code !== "23505") {
     readIds = previous;
     emit();
     console.error("[airi] system updates read-all failed", error);
