@@ -503,3 +503,57 @@ export const adminSetStreakFn = createServerFn({ method: "POST" })
       startedOn: startedOn,
     };
   });
+
+export type AppAreaMaintenanceRow = {
+  area_key: string;
+  enabled: boolean;
+  message: string;
+  expected_return_at: string | null;
+  internal_note: string | null;
+  updated_by: string | null;
+  updated_at: string;
+};
+
+export const adminFetchAreaMaintenanceFn = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AppAreaMaintenanceRow[]> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("app_area_maintenance")
+      .select("area_key, enabled, message, expected_return_at, internal_note, updated_by, updated_at")
+      .order("area_key");
+    if (error) throw error;
+    return (data ?? []) as AppAreaMaintenanceRow[];
+  });
+
+const areaMaintenanceSchema = z.object({
+  areaKey: z.enum(["social","review","library","study","duels","challenges","rank","achievements","shop","inventory","enemies","news","profile","forge","settings"]),
+  enabled: z.boolean(),
+  message: z.string().trim().min(1).max(500),
+  expectedReturnAt: z.string().datetime().nullable(),
+  internalNote: z.string().max(1000).nullable(),
+});
+
+export const adminSetAreaMaintenanceFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => areaMaintenanceSchema.parse(input))
+  .handler(async ({ data, context }): Promise<AppAreaMaintenanceRow> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("app_area_maintenance")
+      .upsert({
+        area_key: data.areaKey,
+        enabled: data.enabled,
+        message: data.message,
+        expected_return_at: data.expectedReturnAt,
+        internal_note: data.internalNote,
+        updated_by: "admin",
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "area_key" })
+      .select("area_key, enabled, message, expected_return_at, internal_note, updated_by, updated_at")
+      .single();
+    if (error) throw error;
+    return row as AppAreaMaintenanceRow;
+  });
