@@ -119,7 +119,7 @@ export function SmartProgressNotifications() {
       const previousCosmetics = readNumber(cosmeticsKey, cosmetics);
       if (cosmetics > previousCosmetics) {
         addSmartNotification({
-          key: `reward-${today}-${cosmetics}`,
+          key: `reward-${today}`,
           title: "🎁 Nova recompensa desbloqueada",
           body: "Um novo item entrou no seu inventário. Confira sua coleção e escolha como usar.",
           icon: "gift",
@@ -134,7 +134,7 @@ export function SmartProgressNotifications() {
       const best = readNumber(recordKey, reviewedToday);
       if (reviewedToday >= 10 && reviewedToday > best) {
         addSmartNotification({
-          key: `record-${today}-${reviewedToday}`,
+          key: `record-${today}`,
           title: "📈 Novo recorde pessoal",
           body: `Você revisou ${reviewedToday} cartas hoje — seu melhor resultado até agora!`,
           icon: "trending-up",
