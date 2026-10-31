@@ -19,6 +19,7 @@ import airiLogo from "../assets/airi-logo.png.asset.json";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ProfileGate } from "../components/ProfileGate";
 import { NotificationsBell } from "../components/NotificationsBell";
+import { SmartProgressNotifications } from "../components/SmartProgressNotifications";
 import { SystemUpdatesBell } from "../components/SystemUpdatesBell";
 import { RankEmblem } from "../components/RankBadge";
 import { useRank, TIER_LABEL, DIVISION_ROMAN, TIER_COLORS, isElite } from "../lib/rank-store";
@@ -850,6 +851,7 @@ function RootComponent() {
           <TopBar />
           <Outlet />
           <BottomBar />
+          <SmartProgressNotifications />
           <Suspense fallback={null}>
             <RankPromotionOverlay />
             <StreakMilestoneOverlay />
