@@ -5,7 +5,7 @@ import {
   Target, Trophy, Sparkles, Star, ShieldCheck,
 } from "lucide-react";
 import { useStore, useStreak, isDefeated } from "@/lib/flashcards-store";
-import { useRank, TIER_ORDER, TIER_LABEL } from "@/lib/rank-store";
+import { useRank, TIER_ORDER } from "@/lib/rank-store";
 import { useDuelHistory } from "@/lib/social-store";
 
 export const Route = createFileRoute("/conquistas")({
