@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentProfile } from "@/lib/profile";
+import { ensureBootstrap, getCurrentProfile } from "@/lib/profile";
 
 export type SystemUpdateStatus = "maintenance" | "offline" | "degraded" | "info" | "resolved";
 
@@ -30,6 +30,7 @@ let snapshot: Snapshot = { updates, readIds, loading };
 const serverSnapshot: Snapshot = { updates: [], readIds: new Set<string>(), loading: true };
 const listeners = new Set<() => void>();
 let channel: ReturnType<typeof supabase.channel> | null = null;
+let initSequence = 0;
 
 function emit() {
   snapshot = { updates, readIds, loading };
@@ -57,21 +58,31 @@ async function fetchReads(profileId: string) {
 
 export async function initSystemUpdates() {
   if (typeof window === "undefined") return;
-  const profile = getCurrentProfile();
-  activeProfile = profile?.id ?? null;
+  const sequence = ++initSequence;
   loading = true;
   emit();
   try {
+    // O perfil é resolvido de forma assíncrona pelo Supabase Auth.
+    // Nunca carregar leituras antes de concluir essa vinculação.
+    await ensureBootstrap();
+    const profile = getCurrentProfile();
+    const profileId = profile?.id ?? null;
+    if (sequence !== initSequence) return;
+    activeProfile = profileId;
+    readIds = new Set();
     await fetchUpdates();
-    if (activeProfile) await fetchReads(activeProfile);
-    else readIds = new Set();
+    if (profileId) await fetchReads(profileId);
+    if (sequence !== initSequence) return;
   } catch (error) {
     console.error("[airi] system updates load failed", error);
   } finally {
-    loading = false;
-    emit();
+    if (sequence === initSequence) {
+      loading = false;
+      emit();
+    }
   }
 
+  if (sequence !== initSequence) return;
   if (channel) void supabase.removeChannel(channel);
   channel = supabase
     .channel("system-updates-live")
@@ -79,8 +90,9 @@ export async function initSystemUpdates() {
       void fetchUpdates().then(emit).catch((error) => console.error("[airi] system updates refresh failed", error));
     })
     .on("postgres_changes", { event: "*", schema: "public", table: "system_update_reads" }, () => {
-      if (!activeProfile) return;
-      void fetchReads(activeProfile).then(emit).catch((error) => console.error("[airi] system reads refresh failed", error));
+      const profileId = activeProfile;
+      if (!profileId) return;
+      void fetchReads(profileId).then(emit).catch((error) => console.error("[airi] system reads refresh failed", error));
     })
     .subscribe();
 }
@@ -100,21 +112,29 @@ export function useSystemUpdatesUnread() {
 }
 
 export async function markSystemUpdateRead(updateId: string) {
+  await ensureBootstrap();
   const profile = getCurrentProfile();
   if (!profile || readIds.has(updateId)) return;
+  const previous = readIds;
   readIds = new Set(readIds).add(updateId);
   emit();
   const { error } = await supabase
     .from("system_update_reads")
     .upsert({ update_id: updateId, profile_id: profile.id }, { onConflict: "update_id,profile_id" });
-  if (error) console.error("[airi] system update read failed", error);
+  if (error) {
+    readIds = previous;
+    emit();
+    console.error("[airi] system update read failed", error);
+  }
 }
 
 export async function markAllSystemUpdatesRead() {
+  await ensureBootstrap();
   const profile = getCurrentProfile();
   if (!profile) return;
   const unread = updates.filter((update) => !readIds.has(update.id));
   if (!unread.length) return;
+  const previous = readIds;
   const next = new Set(readIds);
   unread.forEach((update) => next.add(update.id));
   readIds = next;
@@ -123,7 +143,11 @@ export async function markAllSystemUpdatesRead() {
     unread.map((update) => ({ update_id: update.id, profile_id: profile.id })),
     { onConflict: "update_id,profile_id" },
   );
-  if (error) console.error("[airi] system updates read-all failed", error);
+  if (error) {
+    readIds = previous;
+    emit();
+    console.error("[airi] system updates read-all failed", error);
+  }
 }
 
 export async function createSystemUpdate(input: Omit<SystemUpdate, "id" | "created_at" | "updated_at">) {
