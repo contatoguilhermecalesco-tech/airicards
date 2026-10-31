@@ -27,10 +27,6 @@ function readNumber(key: string, fallback: number) {
   }
 }
 
-function readString(key: string) {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-
 function writeValue(key: string, value: string | number) {
   try { localStorage.setItem(key, String(value)); } catch { /* storage unavailable */ }
 }
@@ -76,7 +72,7 @@ export function SmartProgressNotifications() {
           key: `reviews-${today}`,
           title: "🧠 Cartas aguardando revisão",
           body: `Você tem ${dueCount} cartas prontas para revisar. Uma sessão curta já ajuda a manter a memória ativa.`,
-          icon: "book-open",
+          icon: "book",
           action_label: "Revisar agora",
           action_route: "/review",
         });
@@ -124,7 +120,7 @@ export function SmartProgressNotifications() {
           body: "Um novo item entrou no seu inventário. Confira sua coleção e escolha como usar.",
           icon: "gift",
           action_label: "Ver inventário",
-          action_route: "/inventario",
+          action_route: "/inventory",
         });
       }
       writeValue(cosmeticsKey, Math.max(cosmetics, previousCosmetics));
@@ -137,7 +133,7 @@ export function SmartProgressNotifications() {
           key: `record-${today}`,
           title: "📈 Novo recorde pessoal",
           body: `Você revisou ${reviewedToday} cartas hoje — seu melhor resultado até agora!`,
-          icon: "trending-up",
+          icon: "star",
           action_label: "Continuar estudando",
           action_route: "/review",
         });
@@ -152,7 +148,7 @@ export function SmartProgressNotifications() {
           key: `duel-${duel.id}-${profile.id}`,
           title: "⚔️ Novo duelo disponível",
           body: `O desafio da semana está pronto. Encare ${duel.deckName} antes do prazo terminar.`,
-          icon: "swords",
+          icon: "target",
           action_label: "Abrir duelo",
           action_route: "/duel",
         });
