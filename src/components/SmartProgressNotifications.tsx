@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addSmartNotification, initNotifications } from "@/lib/notifications-store";
+import { addSmartNotification } from "@/lib/notifications-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useStore, useStreak, useCardsReviewedToday, getDueCards } from "@/lib/flashcards-store";
 import { useRank, TIER_ORDER, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
@@ -47,10 +47,6 @@ export function SmartProgressNotifications() {
   const [clock, setClock] = useState(() => Date.now());
 
   useEffect(() => {
-    if (profile?.id) void initNotifications();
-  }, [profile?.id]);
-
-  useEffect(() => {
     const timer = window.setInterval(() => setClock(Date.now()), 30 * 60_000);
     return () => window.clearInterval(timer);
   }, []);
@@ -69,6 +65,7 @@ export function SmartProgressNotifications() {
       // Cartas pendentes: avisa apenas quando há um volume relevante, no máximo uma vez/dia.
       if (dueCount >= 5) {
         addSmartNotification({
+          profileId: profile.id,
           key: `reviews-${today}`,
           title: "🧠 Cartas aguardando revisão",
           body: `Você tem ${dueCount} cartas prontas para revisar. Uma sessão curta já ajuda a manter a memória ativa.`,
