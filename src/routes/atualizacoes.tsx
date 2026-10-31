@@ -76,6 +76,8 @@ function UpdateRow({ update, read }: { update: SystemUpdate; read: boolean }) {
           <span style={{ color: update.color }}>{STATUS[update.status].label}</span>
           {update.affected_area && <><span aria-hidden>·</span><span>{update.affected_area}</span></>}
           <span aria-hidden>·</span><span>{timeLabel(update.created_at)}</span>
+          {update.expected_return_at && update.status !== "resolved" && <><span aria-hidden>·</span><span>Previsão: {timeLabel(update.expected_return_at)} · {dateLabel(update.expected_return_at)}</span></>}
+          {update.status === "resolved" && update.related_update_id && <><span aria-hidden>·</span><span>Problema resolvido</span></>}
           {update.action_label && <><span aria-hidden>·</span><span className="text-primary">{update.action_label}</span></>}
         </span>
       </span>
