@@ -5,6 +5,7 @@ import { useStore, useStreak, useCardsReviewedToday, getDueCards } from "@/lib/f
 import { useRank, TIER_ORDER, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
 import { useWallet } from "@/lib/wallet-store";
 import { useWeeklyDuel, useDuelResults } from "@/lib/social-store";
+import { supabase } from "@/integrations/supabase/client";
 
 function dayKey(date = new Date()) {
   const y = date.getFullYear();
@@ -47,6 +48,21 @@ export function SmartProgressNotifications() {
   const [clock, setClock] = useState(() => Date.now());
   const [smartEnabled, setSmartEnabled] = useState(false);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const loadSetting = async () => {
+      const { data, error } = await supabase.from("smart_notification_settings").select("enabled").eq("id", true).maybeSingle();
+      if (!alive) return;
+      setSmartEnabled(!error && data?.enabled === true);
+      setSettingsLoaded(true);
+    };
+    void loadSetting();
+    const channel = supabase.channel("smart-notification-settings-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "smart_notification_settings" }, () => { void loadSetting(); })
+      .subscribe();
+    return () => { alive = false; void supabase.removeChannel(channel); };
+  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(Date.now()), 30 * 60_000);
