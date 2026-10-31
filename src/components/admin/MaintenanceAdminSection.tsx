@@ -23,6 +23,24 @@ const AREAS = [
 
 const DEFAULT_MESSAGE = "Esta seção está passando por uma manutenção temporária para melhorar sua experiência no AIRI. Voltaremos em breve!";
 
+function getActionErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object") {
+    const value = error as Record<string, unknown>;
+    const candidates = [value.message, value.error, value.data, value.cause, value.statusText];
+    for (const candidate of candidates) {
+      if (typeof candidate === "string" && candidate.trim()) return candidate;
+      if (candidate && typeof candidate === "object") {
+        const nested = candidate as Record<string, unknown>;
+        for (const key of ["message", "error", "description"]) {
+          if (typeof nested[key] === "string" && nested[key]) return nested[key] as string;
+        }
+      }
+    }
+  }
+  return fallback;
+}
+
 export function MaintenanceAdminSection() {
   const fetchSettings = useServerFn(adminFetchAreaMaintenanceFn);
   const saveSetting = useServerFn(adminSetAreaMaintenanceFn);
@@ -51,7 +69,7 @@ export function MaintenanceAdminSection() {
         setInternalNote(active.internal_note ?? "");
       }
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : "Não foi possível carregar as áreas.");
+      setFeedback(getActionErrorMessage(error, "Não foi possível carregar as áreas."));
     } finally {
       setLoading(false);
     }
@@ -82,7 +100,7 @@ export function MaintenanceAdminSection() {
       setRows((previous) => [...previous.filter((row) => row.area_key !== saved.area_key), saved]);
       setFeedback(enabled ? "Manutenção ativada. A área foi bloqueada para os usuários." : "Área liberada. O acesso foi restaurado.");
     } catch (error) {
-      setFeedback(error instanceof Error ? error.message : "Não foi possível salvar a configuração.");
+      setFeedback(getActionErrorMessage(error, "Não foi possível salvar a configuração. Verifique o console do navegador para detalhes."));
     } finally {
       setSaving(false);
     }
