@@ -857,8 +857,10 @@ export type Database = {
           body: string
           color: string
           created_at: string
+          expected_return_at: string | null
           icon: string
           id: string
+          related_update_id: string | null
           status: string
           title: string
           updated_at: string
@@ -870,8 +872,10 @@ export type Database = {
           body: string
           color?: string
           created_at?: string
+          expected_return_at?: string | null
           icon?: string
           id?: string
+          related_update_id?: string | null
           status: string
           title: string
           updated_at?: string
@@ -883,8 +887,10 @@ export type Database = {
           body?: string
           color?: string
           created_at?: string
+          expected_return_at?: string | null
           icon?: string
           id?: string
+          related_update_id?: string | null
           status?: string
           title?: string
           updated_at?: string
