@@ -61,7 +61,7 @@ export function SystemUpdatesBell() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { updates, readIds, loading } = useSystemUpdates();
+  const { updates, readIds, loading, profileId, readDiagnostic } = useSystemUpdates();
   const unread = useMemo(() => updates.filter((update) => !readIds.has(update.id)).length, [updates, readIds]);
   const activeCount = useMemo(() => updates.filter((item) => ["maintenance", "offline", "degraded"].includes(item.status)).length, [updates]);
 
@@ -85,10 +85,8 @@ export function SystemUpdatesBell() {
   }, [open]);
 
   function openUpdate(update: SystemUpdate) {
+    // Diagnóstico temporário: mantém o dropdown aberto para exibir o retorno real da gravação.
     void markSystemUpdateRead(update.id);
-    setOpen(false);
-    if (update.action_route) void navigate({ to: update.action_route as never });
-    else void navigate({ to: "/atualizacoes" });
   }
 
   return (
@@ -118,6 +116,18 @@ export function SystemUpdatesBell() {
             )}
           </div>
           <div className="h-px shrink-0 bg-white/[0.07]" />
+          <div className="border-b border-white/[0.06] px-4 py-2 text-[10px] text-foreground/45">
+            Perfil identificado: <span className="font-semibold text-foreground/75">{profileId ?? "nenhum"}</span>
+          </div>
+          {readDiagnostic && (
+            <div className="border-b border-white/[0.06] bg-white/[0.035] px-4 py-3 text-[10px] leading-relaxed">
+              <p className="font-semibold text-foreground/80">Diagnóstico da leitura</p>
+              <p className="mt-1 text-foreground/60">{readDiagnostic.action} · {readDiagnostic.result}</p>
+              <p className="mt-1 break-all text-foreground/45">Perfil: {readDiagnostic.profileId ?? "NULL"}{readDiagnostic.updateId ? ` · Comunicado: ${readDiagnostic.updateId}` : ""}</p>
+              {readDiagnostic.code && <p className="mt-1 font-semibold text-amber-300">Código: {readDiagnostic.code}</p>}
+              {readDiagnostic.message && <p className="mt-1 break-words text-red-300">{readDiagnostic.message}</p>}
+            </div>
+          )}
           {activeCount > 0 && (
             <div className="flex items-center gap-2 border-b border-white/[0.05] bg-amber-400/[0.045] px-4 py-2">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" />
