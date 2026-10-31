@@ -249,6 +249,14 @@ const MORE_ITEMS = [
     matcher: (p: string) => p.startsWith("/desafios"),
   },
   {
+    to: "/conquistas",
+    label: "Conquistas",
+    description: "Marcos e evolução dos seus estudos",
+    icon: Trophy,
+    color: "#d6b36a",
+    matcher: (p: string) => p.startsWith("/conquistas"),
+  },
+  {
     to: "/perfil",
     label: "Meu perfil",
     description: "Cosméticos equipados e vitrine",
