@@ -518,7 +518,7 @@ function Review() {
         />
       )}
 
-      <div className="relative z-30 mx-auto flex min-h-screen max-w-2xl flex-col px-5 pt-5 pb-8">
+      <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 pt-5 pb-8 sm:px-6">
 
 
         {/* Top bar */}
@@ -700,9 +700,9 @@ function Review() {
             skin={skin}
           />
         ) : (
-          <div className="mt-8 flex flex-1 flex-col">
+          <div className="mt-6 flex flex-1 flex-col justify-center">
             {/* Card */}
-            <div className="flex flex-1 items-center justify-center">
+            <div className="flex items-center justify-center">
               {currentIsEnemy ? (
                 <EnemyCard
                   key={currentId}
@@ -803,7 +803,7 @@ function Review() {
 
 
             {/* Actions — digitação obrigatória */}
-            <div className="mt-8">
+            <div className="mt-6">
               {!verdict ? (
                 <TypeAnswerPanel
                   inputRef={inputRef}
@@ -894,7 +894,7 @@ function NormalCard({
   const themed = !isDefaultTableSkin(skin);
   return (
     <div
-      className="group relative w-full overflow-hidden rounded-[28px] border border-white/[0.08] bg-gradient-to-b from-white/[0.05] to-white/[0.02] px-6 py-10 sm:py-14 animate-in fade-in slide-in-from-bottom-2 duration-300"
+      className="group relative w-full max-w-xl overflow-hidden rounded-[28px] border border-white/[0.09] bg-gradient-to-b from-white/[0.055] to-white/[0.018] px-6 py-9 sm:py-11 animate-in fade-in slide-in-from-bottom-2 duration-300"
       style={{
         backdropFilter: "blur(20px) saturate(140%)",
         boxShadow:
@@ -907,7 +907,7 @@ function NormalCard({
         aria-hidden
         className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"
       />
-      <div className="relative flex min-h-[220px] flex-col items-center justify-center gap-6 text-center sm:min-h-[280px]">
+      <div className="relative flex min-h-[210px] flex-col items-center justify-center gap-5 text-center sm:min-h-[240px]">
         <p
           className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.24em] text-primary/70"
           style={themed ? { color: skin.accent } : undefined}
@@ -1339,12 +1339,12 @@ function TypeAnswerPanel({
         className={`mt-3 w-full rounded-full py-4 text-[15px] font-semibold transition active:scale-[0.99] disabled:opacity-40 disabled:active:scale-100 ${
           isEnemy
             ? "bg-destructive text-destructive-foreground"
-            : "bg-foreground text-background"
+            : "bg-primary text-primary-foreground"
         }`}
         style={{
           boxShadow: isEnemy
             ? "0 10px 30px -10px hsl(var(--destructive) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.2)"
-            : "0 10px 30px -10px hsl(var(--primary) / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.3)",
+            : "0 12px 32px -12px hsl(var(--primary) / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.18)",
         }}
       >
         <span className="inline-flex items-center justify-center gap-2">
