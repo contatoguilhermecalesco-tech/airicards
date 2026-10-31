@@ -95,6 +95,7 @@ export function getSmartNotificationTagId(kind: "study" | "streak" | "rank" | "r
 export function addSmartNotification(input: {
   profileId: string;
   key: string;
+  tag_id?: string | null;
   title: string;
   body: string;
   icon?: string;
@@ -109,7 +110,7 @@ export function addSmartNotification(input: {
     id: `smart:${input.key}`,
     title: input.title,
     body: input.body,
-    tag_id: null,
+    tag_id: input.tag_id ?? null,
     icon: input.icon ?? null,
     action_label: input.action_label ?? null,
     action_route: input.action_route ?? null,
