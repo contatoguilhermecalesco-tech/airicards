@@ -80,6 +80,7 @@ export function SmartProgressNotifications() {
       const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
       if (now.getHours() >= 18 && streak.current > 0 && streak.lastDay === dayKey(yesterday)) {
         addSmartNotification({
+          profileId: profile.id,
           key: `streak-risk-${today}`,
           title: "🔥 Seu streak está em risco",
           body: `Você está com ${streak.current} dia(s) de sequência. Faça uma revisão hoje para não perder o ritmo.`,
@@ -96,6 +97,7 @@ export function SmartProgressNotifications() {
       if (score > previousScore) {
         const division = rank.division ? ` ${DIVISION_ROMAN[rank.division]}` : "";
         addSmartNotification({
+          profileId: profile.id,
           key: `rank-${today}-${score}`,
           title: "🏆 Novo rank alcançado!",
           body: `Parabéns! Você chegou a ${TIER_LABEL[rank.tier]}${division}.`,
@@ -112,6 +114,7 @@ export function SmartProgressNotifications() {
       const previousCosmetics = readNumber(cosmeticsKey, cosmetics);
       if (cosmetics > previousCosmetics) {
         addSmartNotification({
+          profileId: profile.id,
           key: `reward-${today}`,
           title: "🎁 Nova recompensa desbloqueada",
           body: "Um novo item entrou no seu inventário. Confira sua coleção e escolha como usar.",
@@ -127,6 +130,7 @@ export function SmartProgressNotifications() {
       const best = readNumber(recordKey, reviewedToday);
       if (reviewedToday >= 10 && reviewedToday > best) {
         addSmartNotification({
+          profileId: profile.id,
           key: `record-${today}`,
           title: "📈 Novo recorde pessoal",
           body: `Você revisou ${reviewedToday} cartas hoje — seu melhor resultado até agora!`,
@@ -142,6 +146,7 @@ export function SmartProgressNotifications() {
       // Duelo ativo ainda não respondido por este perfil.
       if (duel?.status === "active" && !duelResults.some((result) => result.profileId === profile.id)) {
         addSmartNotification({
+          profileId: profile.id,
           key: `duel-${duel.id}-${profile.id}`,
           title: "⚔️ Novo duelo disponível",
           body: `O desafio da semana está pronto. Encare ${duel.deckName} antes do prazo terminar.`,
