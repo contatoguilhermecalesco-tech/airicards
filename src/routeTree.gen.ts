@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AtualizacoesRouteImport } from './routes/atualizacoes'
 import { Route as DesafiosRouteImport } from './routes/desafios'
+import { Route as ConquistasRouteImport } from './routes/conquistas'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as ForjaRouteImport } from './routes/forja'
@@ -78,6 +79,11 @@ const AtualizacoesRoute = AtualizacoesRouteImport.update({
 const DesafiosRoute = DesafiosRouteImport.update({
   id: '/desafios',
   path: '/desafios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConquistasRoute = ConquistasRouteImport.update({
+  id: '/conquistas',
+  path: '/conquistas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DuelRoute = DuelRouteImport.update({
@@ -320,6 +326,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
+  '/conquistas': typeof ConquistasRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -372,6 +379,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
+  '/conquistas': typeof ConquistasRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -419,6 +427,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
   '/desafios': typeof DesafiosRoute
+  '/conquistas': typeof ConquistasRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -473,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/atualizacoes'
     | '/desafios'
+    | '/conquistas'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -524,6 +534,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/atualizacoes'
     | '/desafios'
+    | '/conquistas'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -569,6 +580,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/atualizacoes'
     | '/desafios'
+    | '/conquistas'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -620,6 +632,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AtualizacoesRoute: typeof AtualizacoesRoute
   DesafiosRoute: typeof DesafiosRoute
+  ConquistasRoute: typeof ConquistasRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
   ForjaRoute: typeof ForjaRoute
@@ -1097,6 +1110,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AtualizacoesRoute: AtualizacoesRoute,
   DesafiosRoute: DesafiosRoute,
+  ConquistasRoute: ConquistasRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
   ForjaRoute: ForjaRoute,
