@@ -578,6 +578,7 @@ export type Database = {
           exams: Json
           grammar_progress: Json
           home_sessions: Json
+          parabel_history: Json
           profile_id: string
           rank: Json
           study_history: Json
@@ -589,6 +590,7 @@ export type Database = {
           exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
+          parabel_history?: Json
           profile_id: string
           rank?: Json
           study_history?: Json
@@ -600,6 +602,7 @@ export type Database = {
           exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
+          parabel_history?: Json
           profile_id?: string
           rank?: Json
           study_history?: Json
