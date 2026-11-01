@@ -59,7 +59,7 @@ export function ShopHero({
 
   return (
     <section
-      className={`relative isolate mb-5 overflow-hidden rounded-3xl border border-white/10 bg-[#0a0611] ${featured.length > 1 ? "cursor-pointer" : ""}`}
+      className={`relative isolate h-full min-h-[390px] overflow-hidden border border-[#8d7a45]/35 bg-[#07111b] shadow-[0_16px_40px_rgba(0,0,0,.35)] ${featured.length > 1 ? "cursor-pointer" : ""}`}
       onClick={() => featured.length > 1 && advance()}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -130,12 +130,12 @@ export function ShopHero({
         }}
       />
 
-      <div className="relative z-10 grid gap-4 p-4 pb-7 sm:aspect-[16/9] sm:max-h-[68vh] sm:grid-cols-[minmax(0,1fr)_260px] sm:gap-6 sm:p-8">
+      <div className="relative z-10 flex min-h-[390px] items-end p-5 pb-9 sm:min-h-[390px] sm:p-7 sm:pb-10">
 
 
         <div className="min-w-0 self-center">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/90 backdrop-blur">
+            <span className="inline-flex items-center gap-1.5 border border-[#d8bd76]/50 bg-black/45 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e7d49b] backdrop-blur">
               <Sparkles className="h-3 w-3" strokeWidth={2.75} />
               Em destaque
             </span>
@@ -145,7 +145,7 @@ export function ShopHero({
             </span>
           </div>
 
-          <h2 className="mt-3 text-[22px] font-bold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl">
+          <h2 className="mt-3 max-w-[560px] text-[22px] font-bold uppercase leading-tight tracking-[0.04em] text-white drop-shadow-md sm:text-4xl">
             {item.name}
           </h2>
           {item.tagline && (
@@ -159,7 +159,7 @@ export function ShopHero({
 
 
           <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-white/25 bg-black/30 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
+            <div className="inline-flex items-center gap-2 border border-white/25 bg-black/45 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
               <ArlysIcon className="h-4 w-4 text-white sm:h-5 sm:w-5" strokeWidth={2.5} />
               <span className="text-xl font-bold leading-none tabular-nums text-white sm:text-2xl">
                 {item.price}
@@ -171,7 +171,7 @@ export function ShopHero({
             <button
               onClick={(e) => { e.stopPropagation(); onBuy(item); }}
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
-              className="inline-flex min-w-0 max-w-full items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-black shadow-xl transition hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
+              className="inline-flex min-w-0 max-w-full items-center gap-2 border border-[#d7b96f] bg-[#c5a45b] px-4 py-2.5 text-[12px] font-bold uppercase tracking-wide text-[#11151b] shadow-xl transition hover:bg-[#e0c47b] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
               {busyId === item.id ? (
                 <>
