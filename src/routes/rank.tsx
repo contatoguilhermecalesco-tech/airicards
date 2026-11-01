@@ -78,36 +78,36 @@ function RankPage() {
         <ArrowLeft className="h-4 w-4" /> Início
       </Link>
 
-      <section className="relative mb-5 overflow-hidden border-y border-white/10 bg-[#15161b]">
-        <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "linear-gradient(110deg, " + colors.glow + " 0%, transparent 48%), linear-gradient(90deg, rgba(255,255,255,.035), transparent 70%)" }} />
-        <div className="relative flex flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:px-6">
+      <section className="relative mb-7 overflow-hidden border-y border-[#b99a62]/25 bg-[linear-gradient(110deg,#191a20_0%,#111217_48%,#19171a_100%)]">
+        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(ellipse at 15% 50%, " + colors.glow + " 0%, transparent 48%), linear-gradient(90deg, rgba(255,255,255,.035), transparent 75%)" }} /><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c7a66a]/55 to-transparent" />
+        <div className="relative flex flex-col gap-5 px-4 py-6 sm:flex-row sm:items-center sm:px-7 sm:py-7">
           <div className="flex min-w-0 items-center gap-4">
-            <RankEmblem tier={rank.tier} division={rank.division} size={82} />
+            <div className="relative shrink-0"><div className="absolute inset-0 scale-125 rounded-full blur-2xl" style={{ background: colors.glow }} /><RankEmblem tier={rank.tier} division={rank.division} size={96} /></div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Seu rank</p>
-              <h1 className="mt-1 text-3xl font-black uppercase italic tracking-tight sm:text-4xl" style={{ color: colors.text }}>{tierLabel(rank)}</h1>
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#c8ad7b]">Classificação ranqueada</p>
+              <h1 className="mt-1 text-3xl font-black uppercase italic tracking-[0.025em] sm:text-4xl" style={{ color: colors.text }}>{tierLabel(rank)}</h1>
               <p className="mt-1 text-sm text-white/65"><strong className="text-white">{rank.lp} LP</strong><span className="mx-2 text-white/25">|</span>{progress.label}</p>
             </div>
           </div>
           <div className="flex flex-1 items-center gap-4 sm:ml-8">
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex items-center justify-between text-[10px] text-white/45"><span>Progresso</span><span>{progressPct}%</span></div>
-              <div className="h-2 overflow-hidden bg-white/10">
+              <div className="h-1.5 overflow-hidden bg-white/10">
                 <div className="h-full" style={{ width: progressPct + "%", background: "linear-gradient(90deg, " + colors.from + ", " + colors.ring) }} />
               </div>
               <p className="mt-1 text-[10px] text-white/40">{Math.max(0, progress.max - progress.value)} LP para o próximo objetivo</p>
             </div>
-            <button onClick={() => setShareOpen(true)} className="shrink-0 border border-white/15 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-white/75 transition hover:bg-white/10">
+            <button onClick={() => setShareOpen(true)} className="shrink-0 border border-[#b99a62]/35 bg-[#b99a62]/[0.08] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#dfc99d] transition hover:bg-[#b99a62]/15">
               <Share2 className="mr-1.5 inline h-3.5 w-3.5" /> Compartilhar
             </button>
           </div>
         </div>
       </section>
 
-      <section className="mb-7">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2">
-          <h2 className="text-sm font-bold tracking-wide text-white">Leaderboard</h2>
-          <span className="text-[10px] uppercase tracking-wider text-white/35">Perfis deste dispositivo</span>
+      <section className="mb-8">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2 border-b border-[#b99a62]/25 pb-2.5">
+          <div><p className="mb-1 text-[9px] font-bold uppercase tracking-[0.25em] text-[#b99a62]">Temporada atual</p><h2 className="text-lg font-bold tracking-wide text-white">Classificação</h2></div>
+          <span className="pb-1 text-[9px] uppercase tracking-[0.16em] text-white/35">Perfis deste dispositivo</span>
         </div>
         <ProfilesLeaderboard />
       </section>
@@ -188,31 +188,31 @@ function ProfilesLeaderboard() {
   const rest = [...ranked.slice(3), ...entries.filter((entry) => !entry.rank)];
   return (
     <div className="min-w-0">
-      {podium.length > 0 && <div className="mb-4 grid grid-cols-3 gap-px bg-white/[0.08]">
+      {podium.length > 0 && <div className="relative mb-5 grid grid-cols-3 items-end border-b border-[#b99a62]/25 bg-[radial-gradient(ellipse_at_50%_100%,rgba(185,154,98,.10),transparent_68%)] pb-0">
         {[podium[1], podium[0], podium[2]].filter(Boolean).map((entry) => {
           const place = ranked.findIndex((item) => item.profileId === entry.profileId) + 1;
           const first = place === 1;
           const medal = place === 1 ? "#e9bd65" : place === 2 ? "#c7cbd2" : "#c88a58";
-          return <div key={entry.profileId} className={"relative flex min-w-0 flex-col items-center bg-[#15161b] px-2 py-4 text-center " + (first ? "sm:py-5" : "")}>
+          return <div key={entry.profileId} className={"relative flex min-w-0 flex-col items-center border-r border-white/[0.055] px-2 pb-5 pt-4 text-center last:border-r-0 " + (first ? "min-h-[226px] bg-gradient-to-b from-[#b99a62]/[0.10] to-transparent sm:min-h-[244px]" : "min-h-[206px] sm:min-h-[220px]")}>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: medal }}>{place === 1 ? "1º lugar" : place === 2 ? "2º lugar" : "3º lugar"}</span>
-            <span className="my-2 h-10 w-10 rounded-full border border-white/15" style={{ backgroundImage: entry.gradient }} />
+            <span className="my-2 h-10 w-10 rounded-full border border-[#c7ad7a]/35 shadow-[0_0_0_3px_rgba(255,255,255,.025)]" style={{ backgroundImage: entry.gradient }} />
             <p className="w-full truncate text-xs font-semibold text-white/90">{entry.name}</p>
             <div className="mt-1"><RankEmblem tier={entry.rank!.tier} division={entry.rank!.division} size={first ? 54 : 44} /></div>
             <p className="mt-1 text-[10px] font-semibold text-white/60">{tierLabel(entry.rank!)}</p>
-            <p className="mt-1 text-sm font-bold tabular-nums text-white">{entry.rank!.lp} <span className="text-[9px] font-medium text-white/40">LP</span></p>
+            <p className="mt-1 text-base font-bold tabular-nums text-white">{entry.rank!.lp} <span className="text-[9px] font-medium tracking-wider text-white/40">LP</span></p>
             {entry.isActive && <span className="mt-2 text-[8px] font-bold uppercase tracking-widest text-primary">Você</span>}
           </div>;
         })}
       </div>}
       <div className="overflow-x-auto">
         <div className="min-w-[340px]">
-          <div className="grid grid-cols-[42px_minmax(0,1fr)_minmax(90px,.7fr)_minmax(95px,.7fr)] items-center bg-[#24252b] px-3 py-2 text-[9px] font-bold uppercase tracking-widest text-white/45">
+          <div className="grid grid-cols-[38px_minmax(0,1fr)_minmax(78px,.7fr)_minmax(90px,.7fr)] items-center border-y border-white/10 bg-[#202127] px-3 py-2.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
             <span>#</span><span>Jogador</span><span>LP total</span><span className="text-right">Rank</span>
           </div>
           {rest.map((entry) => {
             const place = ranked.findIndex((item) => item.profileId === entry.profileId) + 1;
             const tc = TIER_COLORS[entry.rank?.tier ?? "iron"];
-            return <div key={entry.profileId} className={"grid grid-cols-[42px_minmax(0,1fr)_minmax(90px,.7fr)_minmax(95px,.7fr)] items-center border-b border-white/[0.08] px-3 py-2.5 " + (entry.isActive ? "bg-white/[0.045]" : "bg-[#191a1f]")}>
+            return <div key={entry.profileId} className={"grid grid-cols-[38px_minmax(0,1fr)_minmax(78px,.7fr)_minmax(90px,.7fr)] items-center border-b border-white/[0.065] px-3 py-3 transition-colors hover:bg-white/[0.035] " + (entry.isActive ? "bg-[#b99a62]/[0.07]" : "bg-transparent")}>
               <span className="text-xs tabular-nums text-white/45">{entry.rank ? place : "—"}</span>
               <div className="flex min-w-0 items-center gap-2"><span className="h-7 w-7 shrink-0 rounded-full border border-white/10" style={{ backgroundImage: entry.gradient }} /><span className="truncate text-xs font-medium text-white/85">{entry.name}{entry.isActive ? " · você" : ""}</span></div>
               <span className="text-xs tabular-nums text-white/65">{entry.rank ? entry.rank.totalEarned.toLocaleString("pt-BR") : "—"}</span>
@@ -221,7 +221,7 @@ function ProfilesLeaderboard() {
           })}
         </div>
       </div>
-      <div className="mt-2 flex items-center justify-between text-[9px] text-white/30"><span>Classificação local</span><button onClick={() => setTick((t) => t + 1)} className="inline-flex items-center gap-1 hover:text-white/65"><RefreshCw className="h-3 w-3" /> Atualizar</button></div>
+      <div className="mt-3 flex items-center justify-between text-[9px] text-white/30"><span>Classificação local</span><button onClick={() => setTick((t) => t + 1)} className="inline-flex items-center gap-1 hover:text-white/65"><RefreshCw className="h-3 w-3" /> Atualizar</button></div>
     </div>
   );
 }
