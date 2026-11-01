@@ -93,7 +93,7 @@ function RankPage() {
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex items-center justify-between text-[10px] text-white/45"><span>Progresso</span><span>{progressPct}%</span></div>
               <div className="h-1.5 overflow-hidden bg-white/10">
-                <div className="h-full" style={{ width: progressPct + "%", background: "linear-gradient(90deg, " + colors.from + ", " + colors.ring) }} />
+                <div className="h-full" style={{ width: progressPct + "%", background: "linear-gradient(90deg, " + colors.from + ", " + colors.ring + ")" }} />
               </div>
               <p className="mt-1 text-[10px] text-white/40">{Math.max(0, progress.max - progress.value)} LP para o próximo objetivo</p>
             </div>
