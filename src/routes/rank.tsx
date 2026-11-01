@@ -168,238 +168,145 @@ function RankPage() {
         </div>
       </section>
 
-      {/* O que é o rank */}
+      <div className="mt-4 grid items-start gap-4 xl:grid-cols-[1.08fr_0.92fr]">
+        <div className="min-w-0">
+          <ProfilesLeaderboard glass={GLASS} />
+        </div>
+
+        <div className="min-w-0 space-y-4">
+          {/* Trilha de progressão */}
+          <section className={`${GLASS} p-5`}>
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Trilha de rank</h2>
+              </div>
+              <Info className="h-4 w-4 text-muted-foreground" />
+            </div>
+            {(() => {
+              const TIERS: Tier[] = ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"];
+              const currentIdx = TIERS.indexOf(rank.tier);
+              return (
+                <div className="relative">
+                  <div className="absolute left-3 right-3 top-6 h-px bg-gradient-to-r from-white/15 via-primary/70 to-amber-400/70" />
+                  <ol className="relative grid grid-cols-5 gap-x-1 gap-y-4 sm:grid-cols-5">
+                    {TIERS.map((t, i) => {
+                      const tierColors = TIER_COLORS[t];
+                      const isCurrent = i === currentIdx;
+                      const reached = i <= currentIdx;
+                      return (
+                        <li key={t} className="flex min-w-0 flex-col items-center text-center">
+                          <div className={`relative z-10 rounded-full p-1 ${isCurrent ? "bg-[#171321] ring-2 ring-primary shadow-[0_0_18px_rgba(168,85,247,0.45)]" : "bg-[#10131b]"}`}>
+                            <RankEmblem tier={t} division={4} size={34} />
+                          </div>
+                          <span className="mt-1.5 text-[9px] font-bold uppercase tracking-wide" style={{ color: reached ? tierColors.text : "rgba(255,255,255,0.38)" }}>{TIER_LABEL[t]}</span>
+                          {isCurrent && <span className="mt-1 rounded-full bg-primary/15 px-1.5 py-0.5 text-[8px] font-bold uppercase text-primary">Atual</span>}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              );
+            })()}
+            <div className="mt-5 rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.12] to-transparent p-3">
+              <div className="flex items-center gap-3">
+                <RankEmblem tier={rank.tier} division={rank.division} size={54} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Sua posição atual</p>
+                  <p className="text-lg font-black uppercase italic" style={{ color: colors.text }}>{tierLabel(rank)}</p>
+                  <p className="text-xs text-muted-foreground">{rank.lp.toLocaleString("pt-BR")} LP</p>
+                </div>
+                <div className="border-l border-white/10 pl-3 text-right">
+                  <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">Próximo objetivo</p>
+                  <p className="mt-1 text-sm font-bold text-foreground">{progress.label}</p>
+                  <p className="text-xs text-primary">{Math.max(0, progress.max - progress.value)} LP restantes</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Estatísticas */}
+          <section className={`${GLASS} p-5`}>
+            <h2 className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-foreground">Estatísticas gerais</h2>
+            <div className="grid grid-cols-2 gap-2">
+              <StatCard label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.ring} />
+              <StatCard label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#fb7185" />
+              <StatCard label="Taxa de acerto" value={`${winRate}%`} accent="#34d399" />
+              <StatCard label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`} accent={TIER_COLORS[rank.peakTier].ring} />
+            </div>
+          </section>
+
+          {/* Atividade recente */}
+          <section className={`${GLASS} p-5`}>
+            <div className="mb-3 flex items-center gap-2">
+              <Trophy className="h-4 w-4 text-primary" />
+              <h2 className="text-xs font-black uppercase tracking-[0.16em] text-foreground">Atividade recente</h2>
+            </div>
+            {rank.history.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum evento ainda. Comece a revisar cartas para ganhar LP.</p>
+            ) : (
+              <ul className="divide-y divide-white/[0.07]">
+                {rank.history.slice(0, 5).map((event, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3 py-2.5">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-4 w-4" /></span>
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-foreground">{reasonLabel(event.reason)}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                      </div>
+                    </div>
+                    <span className={`shrink-0 text-xs font-black tabular-nums ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-muted-foreground"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
+
+      {/* Sobre o sistema de rank e regras de LP */}
       <section className={`${GLASS} mt-4 p-5`}>
         <div className="mb-3 flex items-center gap-2">
-          <Info className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold text-foreground">O que é o Rank?</h2>
+          <Info className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Como funciona o rank</h2>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          Seu rank transforma o estudo em uma jornada competitiva. Você ganha LP ao acertar cartas, derrotar inimigos e manter a constância; erros e abandono podem reduzir sua pontuação.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div>
-            <p className="text-sm leading-relaxed text-foreground">
-              O rank transforma o seu estudo de inglês em uma jornada de progressão.
-              Assim como nas ligas de e-sports, você sobe de elo conforme acerta
-              cartas, derrota inimigos e mantém constância nos estudos.
-            </p>
-          </div>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>Mostra o quanto você evoluiu de forma visual e motivadora.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>Cria metas de longo prazo: do Ferro ao Desafiante.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>Recompensa acertos, streaks e aulas com LP.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-rose-400" />
-              <span>Penaliza abandono e erros repetidos, mantendo o desafio real.</span>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Estatísticas */}
-      <section className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        <StatCard label="LP ganho" value={rank.totalEarned} accent={colors.ring} />
-        <StatCard label="LP perdido" value={rank.totalLost} accent="#c94a5a" />
-        <StatCard label="Taxa de acerto" value={`${winRate}%`} accent={colors.ring} />
-        <StatCard
-          label="Pico"
-          value={
-            isElite(rank.peakTier)
-              ? TIER_LABEL[rank.peakTier]
-              : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`
-          }
-          accent={TIER_COLORS[rank.peakTier].ring}
-        />
-      </section>
-
-      {/* Leaderboard entre perfis */}
-      <ProfilesLeaderboard glass={GLASS} />
-
-
-
-      {/* Divisões — trilha com LP necessário por tier */}
-      <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Trilha de rank</h2>
-          </div>
-          <span className="text-[11px] text-muted-foreground">LP total acumulado</span>
-        </div>
-
-        {/* LP acumulado ganho pelo jogador — usado para marcar tiers alcançados */}
-        {(() => {
-          const earned = rank.totalEarned - rank.totalLost;
-          const TIERS: Tier[] = [
-            "iron", "bronze", "silver", "gold", "platinum",
-            "emerald", "diamond", "master", "grandmaster", "challenger",
-          ];
-          const currentIdx = TIERS.indexOf(rank.tier);
-          return (
-            <ol className="space-y-1.5">
-              {TIERS.map((t, i) => {
-                const c = TIER_COLORS[t];
-                const lpNeeded = lpToReachTier(t);
-                const isCurrent = i === currentIdx;
-                const reached = i <= currentIdx;
-                const remaining = Math.max(0, lpNeeded - Math.max(0, earned));
-                return (
-                  <li
-                    key={t}
-                    className={`flex items-center gap-3 rounded-xl border px-3 py-2 transition ${
-                      isCurrent
-                        ? "border-white/20 bg-white/[0.06]"
-                        : reached
-                        ? "border-white/[0.08] bg-white/[0.025]"
-                        : "border-white/[0.05] bg-white/[0.015] opacity-70"
-                    }`}
-                    style={isCurrent ? { boxShadow: `0 0 22px ${c.glow}` } : undefined}
-                  >
-                    <div className="shrink-0">
-                      <RankEmblem tier={t} division={4} size={30} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span
-                          className="text-[13px] font-semibold tracking-tight"
-                          style={{ color: c.text }}
-                        >
-                          {TIER_LABEL[t]}
-                        </span>
-                        {isCurrent && (
-                          <span className="rounded-full border border-white/15 bg-white/[0.06] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white/80">
-                            Atual
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-0.5 text-[11px] text-muted-foreground">
-                        {i === 0
-                          ? "Ponto de partida"
-                          : `Requer ${lpNeeded.toLocaleString("pt-BR")} LP acumulados`}
-                      </p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      {reached ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
-                          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-                          Alcançado
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-white/60">
-                          <Lock className="h-3 w-3" strokeWidth={2.25} />
-                          faltam {remaining.toLocaleString("pt-BR")} LP
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          );
-        })()}
-
-        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-          Cada divisão custa 100 LP e a promoção exige 3 vitórias com no máximo 2 derrotas.
-          Recompensas foram calibradas para uma progressão mais lenta e valiosa.
-        </p>
-      </section>
-
-
-      {/* Histórico */}
-      <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-4 flex items-center gap-2">
-          <Trophy className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold text-foreground">Histórico recente</h2>
-        </div>
-        {rank.history.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            Nenhum evento ainda. Comece a revisar cartas para ganhar LP.
-          </p>
-        ) : (
-          <ul className="divide-y divide-white/[0.06]">
-            {rank.history.slice(0, 20).map((e, i) => (
-              <li key={i} className="flex items-center justify-between py-2.5">
-                <div className="flex flex-col">
-                  <span className="text-sm text-foreground">{reasonLabel(e.reason)}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(e.at).toLocaleString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-emerald-400">Como ganhar LP</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+              {[
+                ["Acerto fácil", "+3"], ["Acerto médio", "+2"], ["Acerto difícil", "+1"],
+                ["Derrotar inimigo", "+8"], ["Aula de gramática", "até +10"],
+                ["Redação ≥ 70", "+15"], ["Redação ≥ 90", "+30"],
+                ["Prova mensal (aprovado)", "+25 a +123"], ["Bônus diário de streak", "+2 a +12"],
+              ].map(([label, val]) => (
+                <div key={label} className="flex items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-2.5 py-2">
+                  <span className="text-muted-foreground">{label}</span><span className="font-bold text-emerald-400">{val}</span>
                 </div>
-                <span
-                  className={`text-sm font-semibold tabular-nums ${
-                    e.delta > 0 ? "text-emerald-400" : e.delta < 0 ? "text-rose-400" : "text-muted-foreground"
-                  }`}
-                >
-                  {e.delta > 0 ? "+" : ""}
-                  {e.delta} LP
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* Explicação de LP */}
-      <section className={`${GLASS} mt-4 p-5`}>
-        <h2 className="text-sm font-semibold text-foreground">Como ganhar LP</h2>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-          {[
-            ["Acerto fácil", "+3"],
-            ["Acerto médio", "+2"],
-            ["Acerto difícil", "+1"],
-            ["Derrotar inimigo", "+8"],
-            ["Aula de gramática", "até +10"],
-            ["Redação ≥ 70", "+15"],
-            ["Redação ≥ 90", "+30"],
-            ["Prova mensal (aprovado)", "+25 a +123"],
-            ["Bônus diário de streak", "+2 a +12"],
-          ].map(([label, val]) => (
-            <div
-              key={label}
-              className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2"
-            >
-              <span className="text-muted-foreground">{label}</span>
-              <span className="font-semibold tabular-nums text-emerald-400">{val}</span>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <h2 className="mt-5 text-sm font-semibold text-foreground">Como perder LP</h2>
-        <p className="mt-1 text-[11px] text-muted-foreground">
-          O rank não é um caminho de mão única — descuido custa LP.
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-          {[
-            ["Errar carta", "−4"],
-            ["Carta virou inimiga", "−12"],
-            ["Prova mensal reprovado (<50%)", "−25"],
-            ["Streak quebrado (1–2 dias)", "−10"],
-            ["Streak quebrado (3–6 dias)", "−20"],
-            ["Streak quebrado (7+ dias)", "−35"],
-            ["Inimigo ignorado (>24h)", "−3 cada · cap −15/dia"],
-            ["Inatividade (a partir do Ouro)", "−2/dia após 3 dias · cap −12/dia"],
-          ].map(([label, val]) => (
-            <div
-              key={label}
-              className="flex items-center justify-between rounded-xl border border-rose-500/15 bg-rose-500/[0.06] px-3 py-2"
-            >
-              <span className="text-muted-foreground">{label}</span>
-              <span className="font-semibold tabular-nums text-rose-400">{val}</span>
+          </div>
+          <div>
+            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-rose-400">Como perder LP</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+              {[
+                ["Errar carta", "−4"], ["Carta virou inimiga", "−12"],
+                ["Prova mensal reprovado (<50%)", "−25"], ["Streak quebrado (1–2 dias)", "−10"],
+                ["Streak quebrado (3–6 dias)", "−20"], ["Streak quebrado (7+ dias)", "−35"],
+                ["Inimigo ignorado (>24h)", "−3 cada · cap −15/dia"],
+                ["Inatividade (a partir do Ouro)", "−2/dia após 3 dias · cap −12/dia"],
+              ].map(([label, val]) => (
+                <div key={label} className="flex items-center justify-between gap-2 rounded-lg border border-rose-500/15 bg-rose-500/[0.05] px-2.5 py-2">
+                  <span className="text-muted-foreground">{label}</span><span className="font-bold text-rose-400">{val}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
+        <p className="mt-4 text-[10px] text-muted-foreground">Cada divisão custa 100 LP e a promoção exige 3 vitórias com no máximo 2 derrotas.</p>
       </section>
 
       {currentProfile && (
