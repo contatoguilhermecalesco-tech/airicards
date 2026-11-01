@@ -79,7 +79,7 @@ function DailyChallengesPage() {
       setFlash(m);
       setTimeout(() => setFlash(null), 2200);
     });
-    return () => unsub();
+    return () => { unsub(); };
   }, []);
 
   const totals = dailyMissionsTotals();

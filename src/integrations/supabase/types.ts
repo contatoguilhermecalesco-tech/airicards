@@ -105,6 +105,36 @@ export type Database = {
           },
         ]
       }
+      app_area_maintenance: {
+        Row: {
+          area_key: string
+          enabled: boolean
+          expected_return_at: string | null
+          internal_note: string | null
+          message: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          area_key: string
+          enabled?: boolean
+          expected_return_at?: string | null
+          internal_note?: string | null
+          message?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          area_key?: string
+          enabled?: boolean
+          expected_return_at?: string | null
+          internal_note?: string | null
+          message?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       app_profiles: {
         Row: {
           auth_user_id: string | null
@@ -548,8 +578,8 @@ export type Database = {
           exams: Json
           grammar_progress: Json
           home_sessions: Json
-          profile_id: string
           parabel_history: Json
+          profile_id: string
           rank: Json
           study_history: Json
           updated_at: string
@@ -560,6 +590,7 @@ export type Database = {
           exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
+          parabel_history?: Json
           profile_id: string
           rank?: Json
           study_history?: Json
@@ -571,8 +602,8 @@ export type Database = {
           exams?: Json
           grammar_progress?: Json
           home_sessions?: Json
-          profile_id?: string
           parabel_history?: Json
+          profile_id?: string
           rank?: Json
           study_history?: Json
           updated_at?: string
@@ -895,7 +926,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "system_updates_related_update_id_fkey"
+            columns: ["related_update_id"]
+            isOneToOne: false
+            referencedRelation: "system_updates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -950,36 +989,7 @@ export type Database = {
         }
         Relationships: []
       }
-      app_area_maintenance: {
-        Row: {
-          area_key: string
-          enabled: boolean
-          expected_return_at: string | null
-          internal_note: string | null
-          message: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          area_key: string
-          enabled?: boolean
-          expected_return_at?: string | null
-          internal_note?: string | null
-          message?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          area_key?: string
-          enabled?: boolean
-          expected_return_at?: string | null
-          internal_note?: string | null
-          message?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
+    }
     Views: {
       [_ in never]: never
     }
