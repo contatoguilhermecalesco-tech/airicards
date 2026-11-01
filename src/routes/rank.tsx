@@ -67,91 +67,83 @@ function RankPage() {
   }, [rank.totalEarned, rank.totalLost]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1180px] px-3 pb-10 pt-3 text-white sm:px-6 sm:pt-5">
-      <div className="overflow-hidden border border-white/[0.12] bg-[#17181c] shadow-[0_22px_70px_rgba(0,0,0,.32)]">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.09] bg-[#202126] px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45 transition hover:text-white">
-              <ArrowLeft className="h-3.5 w-3.5" /> Início
-            </Link>
-            <span className="hidden h-4 w-px bg-white/10 sm:block" />
-            <span className="text-[11px] font-black uppercase tracking-[0.24em] text-white">AIRI <span className="text-[#c5a46b]">/ RANK</span></span>
+    <main className="mx-auto min-h-screen max-w-[1240px] px-2 pb-10 pt-2 text-white sm:px-5 sm:pt-4">
+      <div className="overflow-hidden border border-white/[0.10] bg-[#1b1b1d] shadow-[0_24px_70px_rgba(0,0,0,.35)]">
+        <header className="flex min-h-11 items-center justify-between border-b border-white/[0.08] bg-[#202022] px-4 sm:px-6">
+          <div className="flex h-11 items-center gap-6 text-[9px] font-black uppercase tracking-[0.13em]">
+            <Link to="/" className="flex h-full items-center border-b-2 border-[#ff5a1f] px-2 text-white/90 hover:text-white">AIRI</Link>
+            <Link to="/study" className="text-white/40 transition hover:text-white">Estudar</Link>
+            <Link to="/desafios" className="text-white/40 transition hover:text-white">Desafios</Link>
+            <Link to="/conquistas" className="text-white/40 transition hover:text-white">Conquistas</Link>
           </div>
-          <nav className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-[0.16em] text-white/40 sm:gap-6">
-            <a href="#visao-geral" className="text-[#d7b879]">Visão geral</a>
-            <a href="#classificacao" className="transition hover:text-white">Classificação</a>
-            <a href="#temporada" className="transition hover:text-white">Temporada</a>
-          </nav>
-          <button onClick={() => setShareOpen(true)} className="inline-flex items-center gap-1.5 bg-[#d85a36] px-3.5 py-2 text-[9px] font-black uppercase tracking-[0.13em] text-white transition hover:bg-[#ed6841]">
-            <Share2 className="h-3 w-3" /> Compartilhar
-          </button>
+          <button onClick={() => setShareOpen(true)} className="inline-flex items-center gap-1.5 bg-[#ff5a1f] px-4 py-2 text-[9px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#ff713e]"><Share2 className="h-3 w-3" /> Compartilhar</button>
         </header>
 
-        <section id="visao-geral" className="grid gap-6 border-b border-white/[0.09] bg-[linear-gradient(110deg,#191b20_0%,#141519_58%,#1b1918_100%)] px-4 py-6 sm:px-6 lg:grid-cols-[1.25fr_.9fr] lg:gap-9 lg:px-8 lg:py-7">
-          <div>
-            <p className="mb-4 text-[9px] font-black uppercase tracking-[0.24em] text-[#c5a46b]">Sua liga</p>
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-              <div className="flex shrink-0 items-center gap-4 sm:block sm:text-center">
-                <div className="relative"><div className="absolute inset-0 scale-110 rounded-full blur-2xl" style={{ background: colors.glow }} /><RankEmblem tier={rank.tier} division={rank.division} size={104} /></div>
-                <div className="sm:mt-2"><p className="text-lg font-black uppercase tracking-wide" style={{ color: colors.text }}>{tierLabel(rank)}</p><p className="mt-0.5 text-[9px] uppercase tracking-[0.17em] text-white/40">Temporada atual</p></div>
-              </div>
-              <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-4 border-l border-white/[0.09] pl-0 sm:pl-6">
-                <Metric label="Pontuação" value={`${rank.lp} LP`} accent={colors.text} />
-                <Metric label="Taxa de acerto" value={`${winRate}%`} />
-                <Metric label="LP conquistados" value={rank.totalEarned.toLocaleString("pt-BR")} />
-                <Metric label="Sequência atual" value={`${streak.current} dias`} />
-                <div className="col-span-2 pt-1">
-                  <div className="mb-1.5 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-white/45"><span>Progresso da divisão</span><span>{progressPct}%</span></div>
-                  <div className="h-1.5 overflow-hidden bg-white/[0.10]"><div className="h-full transition-all" style={{ width: `${progressPct}%`, background: `linear-gradient(90deg,${colors.from},${colors.ring})` }} /></div>
-                  <p className="mt-1.5 text-[9px] text-white/35">{Math.max(0, progress.max - progress.value)} LP para {progress.label}</p>
-                </div>
+        <div className="flex min-h-10 items-center justify-between border-b border-white/[0.07] bg-[#242426] px-4 sm:px-6">
+          <nav className="flex h-10 items-center gap-5 text-[8px] font-bold uppercase tracking-[0.12em] sm:gap-8">
+            <a href="#liga" className="flex h-full items-center border-b border-[#ff5a1f] text-white">Visão geral</a>
+            <a href="#ladder" className="text-white/40 transition hover:text-white">Atividades</a>
+            <a href="#temporada" className="text-white/40 transition hover:text-white">Temporada</a>
+          </nav>
+          <span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Temporada atual</span>
+        </div>
+
+        <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
+          <p className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/75">Sua liga</p>
+          <div className="grid overflow-hidden bg-[#151517] lg:grid-cols-[156px_minmax(210px,1fr)_minmax(245px,1.15fr)]">
+            <div className="flex flex-col items-center justify-center border-b border-white/[0.07] bg-[#111113] px-3 py-5 text-center lg:border-b-0 lg:border-r lg:border-white/[0.06]">
+              <div className="relative"><div className="absolute inset-0 scale-125 rounded-full blur-2xl" style={{ background: colors.glow }} /><RankEmblem tier={rank.tier} division={rank.division} size={100} /></div>
+              <p className="mt-2 text-xs font-black uppercase tracking-wide" style={{ color: colors.text }}>{tierLabel(rank)}</p>
+              <p className="mt-0.5 text-[8px] text-white/35">Seu elo atual</p>
+            </div>
+
+            <div className="grid grid-cols-2 content-center gap-x-5 gap-y-4 border-b border-white/[0.07] px-4 py-5 sm:px-6 lg:border-b-0 lg:border-r lg:border-white/[0.06]">
+              <Metric label="League rank" value={`${rank.lp} LP`} accent={colors.text} />
+              <Metric label="League points" value={rank.totalEarned.toLocaleString("pt-BR")} />
+              <Metric label="% de acerto" value={`${winRate}%`} />
+              <Metric label="Resultados recentes" value={rank.history.length ? `${rank.history.filter((event) => event.delta > 0).length} vitórias` : "—"} />
+              <div className="col-span-2">
+                <div className="mb-1 flex items-center justify-between text-[8px] uppercase tracking-[0.12em] text-white/35"><span>Progresso para {progress.label}</span><span>{progressPct}%</span></div>
+                <div className="h-1 overflow-hidden bg-white/10"><div className="h-full" style={{ width: `${progressPct}%`, background: `linear-gradient(90deg, ${colors.from}, ${colors.ring})` }} /></div>
               </div>
             </div>
-          </div>
-          <div id="classificacao" className="border-t border-white/[0.09] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
-            <div className="mb-3 flex items-center justify-between"><p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#c5a46b]">Classificação local</p><span className="text-[9px] text-white/30">Neste dispositivo</span></div>
-            <ProfilesLeaderboard />
+
+            <div className="px-4 py-4 sm:px-5">
+              <div className="mb-2 flex items-center justify-between"><p className="text-[8px] font-black uppercase tracking-[0.15em] text-white/55">Leaderboard</p><span className="text-[8px] text-white/30">Perfis locais</span></div>
+              <ProfilesLeaderboard />
+            </div>
           </div>
         </section>
 
-        <section id="temporada" className="px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mb-4 flex items-center justify-between border-b border-white/[0.10] pb-2.5">
-            <div><p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#c5a46b]">Atividade ranqueada</p><h2 className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">Sua jornada</h2></div>
-            <span className="text-[9px] uppercase tracking-[0.12em] text-white/30">Temporada atual</span>
+        <section id="ladder" className="px-4 pb-6 sm:px-6 lg:px-7">
+          <div className="mb-3 flex items-center justify-between"><h2 className="text-[10px] font-black uppercase tracking-[0.16em] text-white/75">Atividades em destaque</h2><span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Continue evoluindo</span></div>
+          <div className="grid gap-2.5 md:grid-cols-3">
+            <ActivityBanner to="/study" eyebrow="Treino diário" title="SESSÃO DE ESTUDO" subtitle="Revise cartas e ganhe LP" tone="green" />
+            <ActivityBanner to="/desafios" eyebrow="Desafios" title="DESAFIE-SE" subtitle="Complete metas e avance" tone="red" />
+            <ActivityBanner to="/conquistas" eyebrow="Progresso" title="CONQUISTAS" subtitle="Veja tudo que já desbloqueou" tone="violet" />
           </div>
-          <div className="grid gap-0 md:grid-cols-3">
-            <section className="border-b border-white/[0.09] pb-5 md:border-b-0 md:border-r md:pr-6">
-              <h3 className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/55">Caminho dos elos</h3>
-              <div className="grid grid-cols-5 gap-x-1 gap-y-3 sm:grid-cols-10 md:grid-cols-5">
-                {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as Tier[]).map((tier, index, all) => {
-                  const currentIndex = all.indexOf(rank.tier);
-                  const current = tier === rank.tier;
-                  return <div key={tier} className={`flex flex-col items-center ${current ? "opacity-100" : index < currentIndex ? "opacity-65" : "opacity-25"}`}>
-                    <RankEmblem tier={tier} division={4} size={32} />
-                    <span className="mt-1 text-[7px] font-bold uppercase" style={{ color: TIER_COLORS[tier].text }}>{TIER_LABEL[tier]}</span>
-                  </div>;
-                })}
-              </div>
-              <div className="mt-4 flex items-center gap-3 border-t border-white/[0.08] pt-3">
-                <RankEmblem tier={rank.tier} division={rank.division} size={38} />
-                <div className="min-w-0"><p className="text-[8px] uppercase tracking-widest text-white/35">Próximo objetivo</p><p className="text-xs font-semibold text-white/85">{progress.label}</p></div>
-              </div>
-            </section>
+        </section>
 
-            <section className="border-b border-white/[0.09] py-5 md:border-b-0 md:border-r md:px-6 md:py-0">
-              <h3 className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/55">Desempenho da temporada</h3>
-              <div className="grid grid-cols-2 gap-x-5 gap-y-5">
-                <Metric label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.text} />
-                <Metric label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#e87979" />
-                <Metric label="Cartas dominadas" value={cardsMastered.toLocaleString("pt-BR")} />
-                <Metric label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`} />
-              </div>
-            </section>
-
-            <section className="pt-5 md:pl-6 md:pt-0">
-              <h3 className="mb-3 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/55"><Trophy className="h-3 w-3 text-[#c5a46b]" /> Histórico recente</h3>
-              {rank.history.length === 0 ? <p className="py-2 text-xs text-white/35">Nenhuma atividade registrada.</p> : <ul className="divide-y divide-white/[0.07]">{rank.history.slice(0, 4).map((event, index) => <li key={index} className="flex items-center justify-between gap-3 py-2"><div className="min-w-0"><p className="truncate text-[10px] text-white/75">{reasonLabel(event.reason)}</p><p className="text-[8px] text-white/30">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p></div><span className={`shrink-0 text-[10px] font-bold tabular-nums ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/35"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
-            </section>
+        <section id="temporada" className="grid gap-6 border-t border-white/[0.08] bg-[#171719] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-7">
+          <div>
+            <div className="mb-3 flex items-center justify-between"><h2 className="text-[9px] font-black uppercase tracking-[0.16em] text-white/60">Caminho dos elos</h2><span className="text-[8px] text-white/30">{progress.label}</span></div>
+            <div className="grid grid-cols-5 gap-y-3 sm:grid-cols-10">
+              {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as Tier[]).map((tier, index, all) => {
+                const currentIndex = all.indexOf(rank.tier);
+                const current = tier === rank.tier;
+                return <div key={tier} className={`flex flex-col items-center ${current ? "opacity-100" : index < currentIndex ? "opacity-60" : "opacity-20"}`}><RankEmblem tier={tier} division={4} size={30} /><span className="mt-1 text-[7px] font-bold uppercase" style={{ color: TIER_COLORS[tier].text }}>{TIER_LABEL[tier]}</span></div>;
+              })}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 border-t border-white/[0.08] pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <Metric label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.text} />
+            <Metric label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#e87979" />
+            <Metric label="Cartas dominadas" value={cardsMastered.toLocaleString("pt-BR")} />
+            <Metric label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`} />
+            <div className="col-span-2 border-t border-white/[0.08] pt-3">
+              <h3 className="mb-2 flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.14em] text-white/50"><Trophy className="h-3 w-3 text-[#c5a46b]" /> Histórico recente</h3>
+              {rank.history.length === 0 ? <p className="text-[10px] text-white/30">Nenhuma atividade registrada.</p> : <ul className="grid gap-x-5 sm:grid-cols-2">{rank.history.slice(0, 4).map((event, index) => <li key={index} className="flex items-center justify-between gap-2 border-b border-white/[0.05] py-1.5"><span className="truncate text-[9px] text-white/65">{reasonLabel(event.reason)}</span><span className={`shrink-0 text-[9px] font-bold ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/35"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
+            </div>
           </div>
         </section>
       </div>
@@ -161,7 +153,21 @@ function RankPage() {
 }
 
 function Metric({ label, value, accent }: { label: string; value: string | number; accent?: string }) {
-  return <div className="min-w-0"><p className="truncate text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">{label}</p><p className="mt-1 truncate text-sm font-bold tabular-nums" style={{ color: accent ?? "#f1f1f2" }}>{value}</p></div>;
+  return <div className="min-w-0"><p className="truncate text-[8px] font-bold uppercase tracking-[0.13em] text-white/35">{label}</p><p className="mt-1 truncate text-sm font-bold tabular-nums" style={{ color: accent ?? "#f1f1f2" }}>{value}</p></div>;
+}
+
+function ActivityBanner({ to, eyebrow, title, subtitle, tone }: { to: "/study" | "/desafios" | "/conquistas"; eyebrow: string; title: string; subtitle: string; tone: "green" | "red" | "violet" }) {
+  const tones = {
+    green: "from-emerald-700/90 via-emerald-900/80 to-[#10251f]",
+    red: "from-orange-700/90 via-rose-900/80 to-[#28151b]",
+    violet: "from-violet-700/90 via-purple-950/80 to-[#1c172b]",
+  };
+  return <Link to={to} className={`group relative flex min-h-[142px] flex-col justify-between overflow-hidden bg-gradient-to-br ${tones[tone]} p-3.5 transition hover:brightness-110`}>
+    <div className="absolute -right-5 -top-8 h-36 w-36 rotate-12 border-[18px] border-white/[0.06] transition duration-500 group-hover:rotate-6" />
+    <div className="relative flex items-center gap-1.5 text-[7px] font-black uppercase tracking-[0.13em] text-white/75"><span className="h-1.5 w-1.5 rounded-full bg-lime-400" />{eyebrow}</div>
+    <div className="relative"><p className="text-center text-xl font-black italic leading-none tracking-tight text-white drop-shadow-lg sm:text-2xl">{title}</p><p className="mt-2 text-center text-[8px] font-bold uppercase tracking-[0.1em] text-white/70">{subtitle}</p></div>
+    <div className="relative flex items-center justify-between border-t border-white/20 pt-2 text-[7px] font-black uppercase tracking-[0.12em] text-white/70"><span>Entrar</span><span className="text-sm transition group-hover:translate-x-1">→</span></div>
+  </Link>;
 }
 
 function ProfilesLeaderboard() {
