@@ -573,194 +573,122 @@ function ShopPage() {
         />
       )}
 
-      {/* Category chips */}
-      <div className="sticky top-14 z-10 -mx-2 mb-3 flex gap-1 overflow-x-auto rounded-full border border-white/10 bg-[oklch(0.14_0.02_285)]/85 p-1 backdrop-blur">
-        {CATEGORIES.map((c) => {
-          const Icon = c.icon;
-          const active = category === c.id;
-          return (
-            <button
-              key={c.id}
-              onClick={() => setCategory(c.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition ${
-                active
-                  ? "bg-primary text-primary-foreground shadow-glow"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-              {c.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Search + sort + view */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <label className="relative flex min-w-0 flex-1 items-center">
-          <Search
-            className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground"
-            strokeWidth={2.25}
-          />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por nome, descrição ou criador…"
-            className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-muted-foreground/70 focus:border-primary/40 focus:bg-white/[0.06]"
-          />
-        </label>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortMode)}
-          className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold outline-none transition hover:bg-white/[0.06]"
-        >
-          {SORTS.map((s) => (
-            <option key={s.id} value={s.id} className="bg-[oklch(0.14_0.02_285)]">
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-xs font-medium">
-          {(
-            [
-              { id: "vitrine" as const, icon: Sparkles, label: "Vitrine" },
-              { id: "grid" as const, icon: LayoutGrid, label: "Grid" },
-              { id: "list" as const, icon: List, label: "Lista" },
-            ]
-          ).map((v) => {
-            const Icon = v.icon;
-            const active = view === v.id;
-            return (
-              <button
-                key={v.id}
-                onClick={() => setView(v.id)}
-                aria-label={v.label}
-                title={v.label}
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition ${
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-                <span className="hidden sm:inline">{v.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Rarity chips + affordable */}
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        {(category === "all" || category === "cosmetic" || category === "bundle") && (
-          <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
-        )}
-        <button
-          type="button"
-          onClick={() => setAffordableOnly((v) => !v)}
-          className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-            affordableOnly
-              ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200"
-              : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
-          Só o que posso comprar
-        </button>
-      </div>
-
-      <PurchaseSuccessOverlay data={celebration} onClose={() => setCelebration(null)} />
-
-      {/* Toast */}
-      {flash && (
-        <div
-          className={`fixed inset-x-0 top-24 z-40 mx-auto w-max max-w-[90%] rounded-full px-4 py-2 text-sm font-medium shadow-2xl backdrop-blur ${
-            flash.kind === "ok"
-              ? "bg-emerald-500/20 text-emerald-200 ring-1 ring-emerald-400/30"
-              : "bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/30"
-          }`}
-        >
-          {flash.msg}
-        </div>
-      )}
-
-      {/* Results */}
-      <section>
-        {loading ? (
-          <SkeletonGrid view={view} />
-        ) : filtered.length === 0 ? (
-          <EmptyState
-            title={
-              q ? "Nada encontrado" : "Nenhum item por aqui"
-            }
-            hint={
-              q
-                ? "Tente ajustar a busca, categoria ou raridade."
-                : "Volte em breve — a loja é atualizada com frequência."
-            }
-          />
-        ) : view === "list" ? (
-          <ul className="flex flex-col gap-2">
-            {filtered.map((u) => (
-              <ListRow
-                key={`${u.kind}-${u.id}`}
-                item={u}
-                owned={ownedIds.has(u.id)}
-                canAfford={wallet.crystals >= u.price}
-                busy={busy === u.id}
-                onBuy={() => handleBuyUnified(u)}
-                onPreview={
-                  u.kind === "cosmetic" ? () => handlePreview(u) : undefined
-                }
-              />
-            ))}
-          </ul>
-        ) : (
-          <ul
-            className={
-              view === "vitrine"
-                ? "grid gap-4 sm:grid-cols-2"
-                : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-            }
-          >
-            {filtered.map((u) => {
-              const slot = featuredSlots.find((s) => s.item_id === u.id);
-              const splashUrl =
-                u.kind === "bundle"
-                  ? (slot?.splash_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.splash ?? null)
-                  : null;
-              const artUrl =
-                u.kind === "bundle"
-                  ? (slot?.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art ?? null)
-                  : null;
+      {/* Store navigation inspired by the game-client layout; hero above remains untouched. */}
+      <div className="mt-6 grid gap-4 lg:grid-cols-[184px_minmax(0,1fr)]">
+        <aside className="h-fit border-y border-white/[0.09] bg-card/40 py-2 lg:sticky lg:top-20 lg:border-y-0 lg:border-r lg:bg-transparent lg:py-0 lg:pr-3">
+          <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Categorias</p>
+          <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
+            {CATEGORIES.map((c) => {
+              const Icon = c.icon;
+              const active = category === c.id;
               return (
-                <UnifiedCard
-                  key={`${u.kind}-${u.id}`}
-                  item={u}
-                  view={view}
-                  owned={ownedIds.has(u.id)}
-                  stack={
-                    u.kind === "powerup"
-                      ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0)
-                      : 0
-                  }
-                  isMineDeck={
-                    u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id
-                  }
-                  canAfford={wallet.crystals >= u.price}
-                  busy={busy === u.id}
-                  onBuy={() => handleBuyUnified(u)}
-                  onPreview={
-                    u.kind === "cosmetic" ? () => handlePreview(u) : undefined
-                  }
-                  splashUrl={splashUrl}
-                  artUrl={artUrl}
-                />
+                <button
+                  key={c.id}
+                  onClick={() => setCategory(c.id)}
+                  className={`relative inline-flex min-h-10 shrink-0 items-center gap-2.5 border-l-2 px-3 text-left text-[11px] font-bold uppercase tracking-[0.08em] transition lg:w-full ${active ? "border-primary bg-primary/10 text-primary" : "border-transparent text-muted-foreground hover:bg-white/[0.04] hover:text-foreground"}`}
+                >
+                  <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} />
+                  {c.label}
+                </button>
               );
             })}
-          </ul>
-        )}
-      </section>
+          </nav>
+        </aside>
+
+        <div className="min-w-0">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.09] pb-2">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary">Coleção AIRI</p>
+              <h2 className="mt-0.5 text-lg font-semibold tracking-tight">{CATEGORIES.find((c) => c.id === category)?.label ?? "Todos os itens"}</h2>
+            </div>
+            <span className="text-[10px] tabular-nums text-muted-foreground">{filtered.length} itens</span>
+          </div>
+
+          {/* Search + sort + view */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <label className="relative flex min-w-[180px] flex-1 items-center">
+              <Search className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground" strokeWidth={2.25} />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Buscar por nome, descrição ou criador…"
+                className="w-full border border-white/10 bg-white/[0.035] py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-muted-foreground/70 focus:border-primary/50 focus:bg-white/[0.055]"
+              />
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortMode)}
+              className="border border-white/10 bg-card px-3 py-2.5 text-xs font-semibold text-foreground outline-none transition hover:bg-white/[0.06]"
+            >
+              {SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+            <div className="inline-flex border border-white/10 bg-white/[0.035] p-0.5 text-xs font-medium">
+              {[
+                { id: "vitrine" as const, icon: Sparkles, label: "Vitrine" },
+                { id: "grid" as const, icon: LayoutGrid, label: "Grid" },
+                { id: "list" as const, icon: List, label: "Lista" },
+              ].map((v) => {
+                const Icon = v.icon;
+                const active = view === v.id;
+                return (
+                  <button key={v.id} onClick={() => setView(v.id)} aria-label={v.label} title={v.label}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 transition ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                    <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
+                    <span className="hidden sm:inline">{v.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mb-4 flex flex-wrap items-center gap-2 border-b border-white/[0.07] pb-3">
+            {(category === "all" || category === "cosmetic" || category === "bundle") && (
+              <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
+            )}
+            <button type="button" onClick={() => setAffordableOnly((v) => !v)}
+              className={`ml-auto inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium transition ${affordableOnly ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200" : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground"}`}>
+              <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.5} /> Só o que posso comprar
+            </button>
+          </div>
+
+          {/* Results */}
+          <section>
+            {loading ? (
+              <SkeletonGrid view={view} />
+            ) : filtered.length === 0 ? (
+              <EmptyState title={q ? "Nada encontrado" : "Nenhum item por aqui"}
+                hint={q ? "Tente ajustar a busca, categoria ou raridade." : "Volte em breve — a loja é atualizada com frequência."} />
+            ) : view === "list" ? (
+              <ul className="flex flex-col gap-2">
+                {filtered.map((u) => (
+                  <ListRow key={`${u.kind}-${u.id}`} item={u} owned={ownedIds.has(u.id)}
+                    canAfford={wallet.crystals >= u.price} busy={busy === u.id}
+                    onBuy={() => handleBuyUnified(u)}
+                    onPreview={u.kind === "cosmetic" ? () => handlePreview(u) : undefined} />
+                ))}
+              </ul>
+            ) : (
+              <ul className={view === "vitrine" ? "grid gap-4 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"}>
+                {filtered.map((u) => {
+                  const slot = featuredSlots.find((s) => s.item_id === u.id);
+                  const splashUrl = u.kind === "bundle" ? (slot?.splash_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.splash ?? null) : null;
+                  const artUrl = u.kind === "bundle" ? (slot?.art_url ?? BUNDLE_ASSET_OVERRIDES[u.id]?.art ?? null) : null;
+                  return (
+                    <UnifiedCard key={`${u.kind}-${u.id}`} item={u} view={view}
+                      owned={ownedIds.has(u.id)}
+                      stack={u.kind === "powerup" ? (wallet.powerups[String((u.raw as ShopItem).payload.effect ?? u.id)] ?? 0) : 0}
+                      isMineDeck={u.kind === "decks" && profile?.id === (u.raw as PublishedDeckRow).owner_profile_id}
+                      canAfford={wallet.crystals >= u.price} busy={busy === u.id}
+                      onBuy={() => handleBuyUnified(u)}
+                      onPreview={u.kind === "cosmetic" ? () => handlePreview(u) : undefined}
+                      splashUrl={splashUrl} artUrl={artUrl} />
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+        </div>
+      </div>
 
       <p className="mt-8 text-center text-[11px] text-muted-foreground">
         Como ganhar Arlys? Streak diário, subir de rank, vencer duelos, tirar boas notas na prova mensal.
