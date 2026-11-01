@@ -85,180 +85,83 @@ function RankPage() {
         Início
       </Link>
 
-      {/* Hero do rank */}
-      <section
-        className={`${GLASS} border-white/[0.12] p-4 sm:p-6`}
-        style={{
-          backgroundImage: `radial-gradient(90% 110% at 85% 0%, ${colors.glow}, transparent 58%), linear-gradient(135deg, rgba(255,255,255,0.035), transparent 55%)`,
-        }}
-      >
-        
-        <div className="flex flex-col items-center gap-4 pt-5 sm:flex-row sm:items-center sm:gap-7 sm:pt-0">
-          <div className="relative shrink-0">
-            <div className="absolute inset-2 rounded-full blur-2xl" style={{ background: colors.glow }} />
-            <div className="relative drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]"><RankEmblem tier={rank.tier} division={rank.division} size={112} /></div>
+      {/* Cabeçalho competitivo */}
+      <section className="relative mb-5 overflow-hidden border-b border-white/[0.12] pb-5">
+        <div className="absolute inset-0 -z-10 opacity-70" style={{ backgroundImage: \`radial-gradient(75% 130% at 12% 0%, \${colors.glow}, transparent 70%), linear-gradient(90deg, rgba(255,255,255,0.035), transparent 65%)\` }} />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="relative shrink-0">
+              <div className="absolute inset-1 rounded-full blur-xl" style={{ background: colors.glow }} />
+              <div className="relative"><RankEmblem tier={rank.tier} division={rank.division} size={92} /></div>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">Seu elo atual</p>
+              <h1 className="mt-0.5 text-3xl font-black uppercase italic tracking-tight sm:text-4xl" style={{ color: colors.text }}>{tierLabel(rank)}</h1>
+              <p className="mt-1 text-xs text-white/55"><strong className="text-white">{rank.lp} LP</strong><span className="mx-2 text-white/20">·</span>{progress.label}</p>
+              <div className="mt-3 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full" style={{ width: \`\${progressPct}%\`, background: \`linear-gradient(90deg, \${colors.from}, \${colors.ring})\` }} />
+              </div>
+            </div>
           </div>
-          <div className="flex-1 text-center sm:text-left">
-            <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground sm:justify-start">
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: colors.ring, boxShadow: `0 0 10px ${colors.glow}` }} /> Seu rank atual
-            </p>
-            <h1
-              className="mt-1 text-4xl font-black uppercase italic tracking-tight sm:text-5xl"
-              style={{ color: colors.text }}
-            >
-              {tierLabel(rank)}
-            </h1>
-            <p className="mt-1 text-sm font-medium text-white/65">
-              <span className="font-black tabular-nums text-foreground">{rank.lp} LP</span><span className="mx-2 text-white/20">/</span>{progress.label}
-            </p>
-
-            <div className="mt-3 flex justify-center sm:justify-start">
-              <button
-                onClick={() => setShareOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1.5 text-xs font-medium text-foreground/85 backdrop-blur-md transition hover:bg-white/[0.12]"
-              >
-                <Share2 className="h-3.5 w-3.5" strokeWidth={2.5} />
-                Compartilhar conquista
-              </button>
-            </div>
-
-            {/* Barra de LP */}
-            <div className="mt-4">
-              <div className="h-3 w-full overflow-hidden rounded-full border border-white/[0.08] bg-black/50 p-[2px]">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${progressPct}%`,
-                    background: `linear-gradient(90deg, ${colors.from}, ${colors.ring})`,
-                    boxShadow: `0 0 20px ${colors.glow}`,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Série de promoção */}
-            {rank.promo && (
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-medium">
-                  <Sparkles className="h-3.5 w-3.5" style={{ color: colors.ring }} />
-                  Série de promoção
-                </div>
-                <div className="inline-flex items-center gap-1">
-                  {Array.from({ length: rank.promo.target + rank.promo.maxLosses - 1 }).map((_, i) => {
-                    const isWin = i < rank.promo!.wins;
-                    const isLoss = i >= rank.promo!.wins && i < rank.promo!.wins + rank.promo!.losses;
-                    return (
-                      <span
-                        key={i}
-                        className="h-3 w-3 rounded-full border border-white/20"
-                        style={{
-                          background: isWin ? colors.ring : isLoss ? "#c94a5a" : "transparent",
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {rank.promo.wins}V · {rank.promo.losses}D · precisa de {rank.promo.target}V
-                </span>
-              </div>
-            )}
+          <div className="flex flex-wrap items-center gap-3 sm:ml-auto sm:justify-end">
+            {rank.promo && <div className="text-xs text-white/55"><span className="font-semibold text-white">Promoção</span><span className="mx-2 text-white/20">·</span>{rank.promo.wins}V {rank.promo.losses}D / {rank.promo.target}V</div>}
+            <button onClick={() => setShareOpen(true)} className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/[0.06] px-3 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/10">
+              <Share2 className="h-3.5 w-3.5" /> Compartilhar
+            </button>
           </div>
         </div>
       </section>
 
-      <div className="mt-4 grid items-start gap-5 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="min-w-0">
-          <ProfilesLeaderboard glass={GLASS} />
+      {/* Classificação em primeiro plano */}
+      <section className="mb-7">
+        <div className="mb-3 flex items-center justify-between border-b border-white/[0.1] pb-2">
+          <div>
+            <h2 className="text-sm font-bold text-white">Classificação dos perfis</h2>
+            <p className="mt-0.5 text-[10px] text-white/40">Compare a evolução dos perfis deste dispositivo</p>
+          </div>
         </div>
+        <ProfilesLeaderboard glass={GLASS} />
+      </section>
 
-        <div className="min-w-0 space-y-5">
-          {/* Trilha de progressão */}
-          <section className={`${GLASS} p-5`}>
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-primary" />
-                <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Trilha de rank</h2>
-              </div>
-              <Info className="h-4 w-4 text-muted-foreground" />
+      {/* Informações secundárias */}
+      <div className="grid items-start gap-6 border-t border-white/[0.1] pt-5 lg:grid-cols-[1fr_1fr]">
+        <div className="min-w-0">
+          <section className="mb-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Progressão de elo</h2>
+              <span className="text-[10px] text-white/35">{progress.label}</span>
             </div>
-            {(() => {
-              const TIERS: Tier[] = ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"];
-              const currentIdx = TIERS.indexOf(rank.tier);
-              return (
-                <div className="relative">
-                  <div className="absolute left-3 right-3 top-6 h-px bg-gradient-to-r from-white/15 via-primary/70 to-amber-400/70" />
-                  <ol className="relative grid grid-cols-5 gap-x-1 gap-y-4 sm:grid-cols-5">
-                    {TIERS.map((t, i) => {
-                      const tierColors = TIER_COLORS[t];
-                      const isCurrent = i === currentIdx;
-                      const reached = i <= currentIdx;
-                      return (
-                        <li key={t} className="flex min-w-0 flex-col items-center text-center">
-                          <div className={`relative z-10 rounded-full p-1 ${isCurrent ? "bg-[#171321] ring-2 ring-primary shadow-[0_0_18px_rgba(168,85,247,0.45)]" : "bg-[#10131b]"}`}>
-                            <RankEmblem tier={t} division={4} size={34} />
-                          </div>
-                          <span className="mt-1.5 text-[9px] font-bold uppercase tracking-wide" style={{ color: reached ? tierColors.text : "rgba(255,255,255,0.38)" }}>{TIER_LABEL[t]}</span>
-                          {isCurrent && <span className="mt-1 rounded-full bg-primary/15 px-1.5 py-0.5 text-[8px] font-bold uppercase text-primary">Atual</span>}
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </div>
-              );
-            })()}
-            <div className="mt-5 rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.12] to-transparent p-3">
-              <div className="flex items-center gap-3">
-                <RankEmblem tier={rank.tier} division={rank.division} size={54} />
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Sua posição atual</p>
-                  <p className="text-lg font-black uppercase italic" style={{ color: colors.text }}>{tierLabel(rank)}</p>
-                  <p className="text-xs text-muted-foreground">{rank.lp.toLocaleString("pt-BR")} LP</p>
-                </div>
-                <div className="border-l border-white/10 pl-3 text-right">
-                  <p className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">Próximo objetivo</p>
-                  <p className="mt-1 text-sm font-bold text-foreground">{progress.label}</p>
-                  <p className="text-xs text-primary">{Math.max(0, progress.max - progress.value)} LP restantes</p>
-                </div>
-              </div>
+            <div className="relative py-2">
+              <div className="absolute left-3 right-3 top-7 h-px bg-gradient-to-r from-white/15 via-primary/60 to-amber-400/60" />
+              <ol className="relative grid grid-cols-5 gap-x-1 gap-y-4">
+                {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as Tier[]).map((t, i) => {
+                  const tierColors = TIER_COLORS[t];
+                  const isCurrent = t === rank.tier;
+                  const reached = ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"].indexOf(t) <= ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"].indexOf(rank.tier);
+                  return <li key={t} className="flex min-w-0 flex-col items-center text-center"><div className={\`relative z-10 \${isCurrent ? "drop-shadow-[0_0_10px_rgba(168,85,247,0.45)]" : "opacity-75"}\`}><RankEmblem tier={t} division={4} size={34} /></div><span className="mt-1 text-[8px] font-bold uppercase tracking-wide" style={{ color: reached ? tierColors.text : "rgba(255,255,255,0.3)" }}>{TIER_LABEL[t]}</span>{isCurrent && <span className="mt-0.5 text-[8px] font-bold uppercase text-primary">Atual</span>}</li>;
+                })}
+              </ol>
+            </div>
+            <div className="mt-4 flex items-center gap-3 border-t border-white/[0.08] pt-3">
+              <RankEmblem tier={rank.tier} division={rank.division} size={44} />
+              <div className="min-w-0 flex-1"><p className="text-[9px] uppercase tracking-widest text-white/40">Próximo objetivo</p><p className="text-sm font-semibold text-white">{progress.label}</p></div>
+              <p className="text-right text-xs font-semibold text-primary">{Math.max(0, progress.max - progress.value)} LP<br /><span className="text-[9px] font-normal text-white/40">restantes</span></p>
             </div>
           </section>
-
-          {/* Estatísticas */}
-          <section className="border-y border-white/[0.09] py-3">
-            <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">Temporada</h2>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+        </div>
+        <div className="min-w-0">
+          <section className="mb-5">
+            <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-white/60">Temporada</h2>
+            <div className="grid grid-cols-2 gap-x-5 gap-y-3 border-y border-white/[0.09] py-3">
               <StatCard label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.ring} />
               <StatCard label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#fb7185" />
-              <StatCard label="Taxa de acerto" value={`${winRate}%`} accent="#34d399" />
-              <StatCard label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`} accent={TIER_COLORS[rank.peakTier].ring} />
+              <StatCard label="Taxa de acerto" value={\`\${winRate}%\`} accent="#34d399" />
+              <StatCard label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : \`\${TIER_LABEL[rank.peakTier]} \${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}\`} accent={TIER_COLORS[rank.peakTier].ring} />
             </div>
           </section>
-
-          {/* Atividade recente */}
-          <section className="border-t border-white/[0.09] pt-4">
-            <div className="mb-2 flex items-center gap-2">
-              <Trophy className="h-3.5 w-3.5 text-primary" />
-              <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">Últimas partidas</h2>
-            </div>
-            {rank.history.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum evento ainda. Comece a revisar cartas para ganhar LP.</p>
-            ) : (
-              <ul className="divide-y divide-white/[0.07]">
-                {rank.history.slice(0, 4).map((event, i) => (
-                  <li key={i} className="flex items-center justify-between gap-3 border-b border-white/[0.055] py-2">
-                    <div className="flex min-w-0 items-center gap-2.5">
-                      
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-semibold text-foreground">{reasonLabel(event.reason)}</p>
-                        <p className="text-[9px] text-white/35">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                      </div>
-                    </div>
-                    <span className={`shrink-0 text-xs font-black tabular-nums ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-muted-foreground"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <section>
+            <div className="mb-2 flex items-center gap-2"><Trophy className="h-3.5 w-3.5 text-primary" /><h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Atividade recente</h2></div>
+            {rank.history.length === 0 ? <p className="py-3 text-xs text-white/40">Nenhuma atividade registrada ainda.</p> : <ul className="divide-y divide-white/[0.07]">{rank.history.slice(0, 5).map((event, i) => <li key={i} className="flex items-center justify-between gap-3 py-2"><div className="min-w-0"><p className="truncate text-xs text-white/80">{reasonLabel(event.reason)}</p><p className="text-[9px] text-white/35">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p></div><span className={\`shrink-0 text-xs font-bold tabular-nums \${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/40"}\`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
           </section>
         </div>
       </div>
