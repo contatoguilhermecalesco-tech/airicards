@@ -59,7 +59,7 @@ export function ShopHero({
 
   return (
     <section
-      className={`relative isolate h-full min-h-[390px] overflow-hidden border border-[#285c70]/35 bg-[#07111b] shadow-[0_16px_40px_rgba(0,0,0,.35)] ${featured.length > 1 ? "cursor-pointer" : ""}`}
+      className={`relative isolate h-full min-h-[390px] overflow-hidden border border-[#8d7a45]/35 bg-[#07111b] shadow-[0_16px_40px_rgba(0,0,0,.35)] ${featured.length > 1 ? "cursor-pointer" : ""}`}
       onClick={() => featured.length > 1 && advance()}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -135,7 +135,7 @@ export function ShopHero({
 
         <div className="min-w-0 self-center">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="inline-flex items-center gap-1.5 border border-[#56c8e8]/50 bg-black/45 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#a8e8f7] backdrop-blur">
+            <span className="inline-flex items-center gap-1.5 border border-[#d8bd76]/50 bg-black/45 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e7d49b] backdrop-blur">
               <Sparkles className="h-3 w-3" strokeWidth={2.75} />
               Em destaque
             </span>
@@ -171,7 +171,7 @@ export function ShopHero({
             <button
               onClick={(e) => { e.stopPropagation(); onBuy(item); }}
               disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
-              className="inline-flex min-w-0 max-w-full items-center gap-2 border border-[#55c8e8] bg-[#1686a8] px-4 py-2.5 text-[12px] font-bold uppercase tracking-wide text-[#11151b] shadow-xl transition hover:bg-[#25a8ce] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
+              className="inline-flex min-w-0 max-w-full items-center gap-2 border border-[#d7b96f] bg-[#c5a45b] px-4 py-2.5 text-[12px] font-bold uppercase tracking-wide text-[#11151b] shadow-xl transition hover:bg-[#e0c47b] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
             >
               {busyId === item.id ? (
                 <>
