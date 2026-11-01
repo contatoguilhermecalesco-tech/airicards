@@ -516,157 +516,58 @@ function ShopPage() {
   const loading = items === null || decks === null;
 
   return (
-    <main className="mx-auto max-w-6xl px-[clamp(0.75rem,4vw,1.5rem)] py-6">
-      <Link
-        to="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" strokeWidth={2.25} />
-        Início
-      </Link>
+    <main className="mx-auto min-h-screen max-w-[1320px] bg-[#07111b] px-2 pb-12 pt-3 text-[#e8e3d4] sm:px-5 sm:pt-5">
+      <div className="border border-[#8b7847]/35 bg-[#0b1722] shadow-[0_24px_70px_rgba(0,0,0,.35)]">
+        <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-[#b39a5b]/25 bg-[#0b141e] px-3 py-2.5 sm:px-6">
+          <div className="flex items-center gap-5">
+            <Link to="/" className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-[#e7d49b]"><span className="grid h-7 w-7 place-items-center border border-[#bba15f] text-sm">A</span>AIRI <span className="text-white/35">/ STORE</span></Link>
+            <span className="hidden h-6 w-px bg-white/10 sm:block" />
+            <span className="hidden text-[9px] font-bold uppercase tracking-[0.16em] text-white/40 sm:block">Coleções e itens exclusivos</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 border border-[#b39a5b]/45 bg-[#111d28] px-3 py-1.5">
+              <ArlysIcon className="h-4 w-4 text-[#e2c36f]" strokeWidth={2.25} />
+              <div className="leading-tight"><p className="text-[7px] font-bold uppercase tracking-[0.16em] text-white/40">Seu saldo</p><p className="text-sm font-bold tabular-nums text-[#f0d98e]">{wallet.crystals.toLocaleString("pt-BR")} <span className="text-[9px]">✦</span></p></div>
+            </div>
+            <button onClick={() => setHelpOpen(true)} aria-label="Como funciona a loja" className="grid h-9 w-9 place-items-center border border-white/15 bg-white/[0.03] text-white/65 transition hover:border-[#b39a5b]/60 hover:text-[#e7d49b]"><HelpCircle className="h-4 w-4" /></button>
+          </div>
+        </header>
 
-      {/* Top bar: title + balance + help */}
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-200">
-            <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Loja airi
-          </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Vitrine
-          </h1>
-          <p className="mt-1 max-w-lg text-sm text-muted-foreground">
-            Coleções, cosméticos, power-ups e decks premium. Filtre, pesquise e escolha o seu.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-2.5 backdrop-blur">
-            <ArlysIcon className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
-            <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Saldo
-              </p>
-              <p className="text-lg font-semibold tabular-nums">
-                {wallet.crystals}{" "}
-                <span className="text-[11px] font-medium text-muted-foreground">✦</span>
-              </p>
+        <nav className="flex min-h-11 items-center gap-5 overflow-x-auto border-b border-white/[0.08] bg-[#101b26] px-3 text-[9px] font-black uppercase tracking-[0.13em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:px-6">
+          {CATEGORIES.map((cat) => { const active = category === cat.id; return <button key={cat.id} onClick={() => setCategory(cat.id)} className={`flex h-11 shrink-0 items-center border-b-2 px-0.5 transition ${active ? "border-[#d6b86c] text-[#e9d69c]" : "border-transparent text-white/45 hover:text-white/85"}`}>{cat.label}</button>; })}
+        </nav>
+
+        <section className="grid gap-3 p-3 sm:p-5 lg:grid-cols-[minmax(0,1.7fr)_minmax(300px,1fr)]">
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center justify-between"><h1 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e3ce8f]">Em destaque</h1><span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Ofertas selecionadas</span></div>
+            {!loading && featured.length > 0 ? <ShopHero featured={featured.slice(0, Math.min(featured.length, 5))} wallet={wallet.crystals} onBuy={handleBuyFeatured} busyId={busy} ownedIds={ownedIds} /> : <div className="grid min-h-[390px] place-items-center border border-white/10 bg-[#101b26] text-xs text-white/35">{loading ? "Carregando vitrine…" : "Novidades em breve"}</div>}
+          </div>
+          <aside className="min-w-0">
+            <div className="mb-2 flex items-center justify-between"><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-[#e3ce8f]">Ofertas da loja</h2><span className="text-[8px] text-white/30">{Math.max(0, featured.length - 1)} itens</span></div>
+            <div className="grid grid-cols-2 gap-2">
+              {featured.slice(1,5).map((item) => <FeaturedOfferCard key={item.id} item={item} wallet={wallet.crystals} owned={ownedIds.has(item.id)} busy={busy === item.id} onBuy={() => handleBuyFeatured(item)} />)}
+              {featured.length <= 1 && <div className="col-span-2 grid min-h-[170px] place-items-center border border-white/[0.08] bg-[#101b26] text-[10px] text-white/30">Mais ofertas em breve</div>}
+            </div>
+          </aside>
+        </section>
+
+        <section className="border-t border-white/[0.08] bg-[#0a141e] px-3 py-3 sm:px-5">
+          <div className="mb-2 flex items-center justify-between"><h2 className="text-[10px] font-black uppercase tracking-[0.18em] text-[#e3ce8f]">Explore a coleção</h2><span className="text-[8px] uppercase tracking-[0.12em] text-white/30">{filtered.length} itens</span></div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="relative flex min-w-[180px] flex-1 items-center">
+              <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-white/35" strokeWidth={2.25} />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar itens…" className="w-full border border-white/10 bg-[#111d28] py-2 pl-9 pr-3 text-[11px] text-white outline-none transition placeholder:text-white/30 focus:border-[#b39a5b]/60" />
+            </label>
+            <select value={sort} onChange={(e) => setSort(e.target.value as SortMode)} className="border border-white/10 bg-[#111d28] px-3 py-2 text-[10px] text-white/75 outline-none"><option value="featured">Destaques</option>{SORTS.filter(s => s.id !== "featured").map(s => <option key={s.id} value={s.id}>{s.label}</option>)}</select>
+            <div className="flex border border-white/10 bg-[#111d28] p-0.5">
+              {[{id:"vitrine" as const,icon:Sparkles,label:"Vitrine"},{id:"grid" as const,icon:LayoutGrid,label:"Grade"},{id:"list" as const,icon:List,label:"Lista"}].map(v => {const Icon=v.icon;return <button key={v.id} onClick={()=>setView(v.id)} aria-label={v.label} className={`grid h-7 w-8 place-items-center ${view===v.id?"bg-[#8c7542]/35 text-[#e8d49b]":"text-white/40 hover:text-white"}`}><Icon className="h-3.5 w-3.5"/></button>;})}
             </div>
           </div>
-          <button
-            onClick={() => setHelpOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-foreground/90 backdrop-blur transition hover:bg-white/[0.09]"
-          >
-            <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Como funciona
-          </button>
-        </div>
-      </header>
-
-      {/* Vitrine hero */}
-      {!loading && featured.length > 0 && (
-        <ShopHero
-          featured={featured}
-          wallet={wallet.crystals}
-          onBuy={handleBuyFeatured}
-          busyId={busy}
-          ownedIds={ownedIds}
-        />
-      )}
-
-      {/* Category chips */}
-      <div className="sticky top-14 z-10 -mx-2 mb-3 flex gap-1 overflow-x-auto rounded-full border border-white/10 bg-[oklch(0.14_0.02_285)]/85 p-1 backdrop-blur">
-        {CATEGORIES.map((c) => {
-          const Icon = c.icon;
-          const active = category === c.id;
-          return (
-            <button
-              key={c.id}
-              onClick={() => setCategory(c.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition ${
-                active
-                  ? "bg-primary text-primary-foreground shadow-glow"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-              {c.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Search + sort + view */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <label className="relative flex min-w-0 flex-1 items-center">
-          <Search
-            className="pointer-events-none absolute left-3 h-4 w-4 text-muted-foreground"
-            strokeWidth={2.25}
-          />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por nome, descrição ou criador…"
-            className="w-full rounded-full border border-white/10 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm outline-none transition placeholder:text-muted-foreground/70 focus:border-primary/40 focus:bg-white/[0.06]"
-          />
-        </label>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortMode)}
-          className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold outline-none transition hover:bg-white/[0.06]"
-        >
-          {SORTS.map((s) => (
-            <option key={s.id} value={s.id} className="bg-[oklch(0.14_0.02_285)]">
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-xs font-medium">
-          {(
-            [
-              { id: "vitrine" as const, icon: Sparkles, label: "Vitrine" },
-              { id: "grid" as const, icon: LayoutGrid, label: "Grid" },
-              { id: "list" as const, icon: List, label: "Lista" },
-            ]
-          ).map((v) => {
-            const Icon = v.icon;
-            const active = view === v.id;
-            return (
-              <button
-                key={v.id}
-                onClick={() => setView(v.id)}
-                aria-label={v.label}
-                title={v.label}
-                className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition ${
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-                <span className="hidden sm:inline">{v.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Rarity chips + affordable */}
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        {(category === "all" || category === "cosmetic" || category === "bundle") && (
-          <RarityFilter value={rarityFilter} onChange={setRarityFilter} />
-        )}
-        <button
-          type="button"
-          onClick={() => setAffordableOnly((v) => !v)}
-          className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-            affordableOnly
-              ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200"
-              : "border-white/10 bg-white/[0.04] text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          <ArlysIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
-          Só o que posso comprar
-        </button>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {(category === "all" || category === "cosmetic" || category === "bundle") && <RarityFilter value={rarityFilter} onChange={setRarityFilter} />}
+            <button type="button" onClick={() => setAffordableOnly(v => !v)} className={`ml-auto inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-wide transition ${affordableOnly?"border-emerald-400/40 bg-emerald-500/10 text-emerald-200":"border-white/10 text-white/45 hover:text-white"}`}><ArlysIcon className="h-3 w-3"/> Só o que posso comprar</button>
+          </div>
+        </section>
       </div>
 
       <PurchaseSuccessOverlay data={celebration} onClose={() => setCelebration(null)} />
@@ -818,6 +719,27 @@ function ShopPage() {
 
     </main>
   );
+}
+
+function FeaturedOfferCard({ item, wallet, owned, busy, onBuy }: { item: FeaturedItem; wallet: number; owned: boolean; busy: boolean; onBuy: () => void }) {
+  const rarity = RARITY_META[item.rarity];
+  const art = item.artUrl || item.splashUrl;
+  const canAfford = wallet >= item.price;
+  return <article className="group relative min-w-0 overflow-hidden border border-white/[0.12] bg-[#101b26] transition hover:border-[#b39a5b]/60">
+    <button type="button" onClick={onBuy} disabled={busy || owned || (!canAfford && item.kind !== "bundle" && item.kind !== "deck")} className="block w-full text-left disabled:cursor-default">
+      <div className="relative aspect-[1.12/1] overflow-hidden" style={{background:rarity.gradient}}>
+        {art ? <img src={art} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/> : <div className="absolute inset-0 grid place-items-center"><span className="text-4xl drop-shadow-lg">{item.icon || "✦"}</span></div>}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07111b] via-transparent to-black/15"/>
+        <span className="absolute left-1.5 top-1.5 border border-white/20 bg-black/55 px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-wider text-white/85">{rarity.label}</span>
+        {owned && <span className="absolute right-1.5 top-1.5 bg-emerald-700/90 px-1.5 py-0.5 text-[7px] font-bold uppercase text-white">Adquirido</span>}
+      </div>
+      <div className="px-2 pb-2 pt-1.5">
+        <p className="line-clamp-2 min-h-[28px] text-[9px] font-semibold leading-snug text-white/90">{item.name}</p>
+        <div className="mt-1 flex items-center justify-between gap-1"><span className="flex items-center gap-1 text-[9px] font-bold tabular-nums text-[#e8d18a]"><ArlysIcon className="h-3 w-3"/>{item.price.toLocaleString("pt-BR")}</span><span className="text-[7px] uppercase tracking-wider text-white/35">{item.kind === "bundle" ? "Bundle" : item.kind === "deck" ? "Deck" : item.kind}</span></div>
+      </div>
+    </button>
+    <button type="button" onClick={onBuy} disabled={busy || owned || (!canAfford && item.kind !== "bundle" && item.kind !== "deck")} className="w-full border-t border-white/[0.08] bg-white/[0.03] py-1.5 text-[8px] font-black uppercase tracking-[0.12em] text-white/65 transition hover:bg-[#b39a5b]/15 hover:text-[#f0d995] disabled:opacity-40">{busy ? "Processando…" : owned ? "Adquirido" : item.kind === "bundle" ? "Ver bundle" : canAfford ? "Ver oferta" : "Saldo insuficiente"}</button>
+  </article>;
 }
 
 /* ---------------------- Rarity filter row ---------------------- */
