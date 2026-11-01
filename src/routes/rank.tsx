@@ -69,23 +69,23 @@ function RankPage() {
   return (
     <main className="mx-auto min-h-screen max-w-[1240px] px-2 pb-10 pt-2 text-white sm:px-5 sm:pt-4">
       <div className="overflow-hidden border border-white/[0.10] bg-[#1b1b1d] shadow-[0_24px_70px_rgba(0,0,0,.35)]">
-        <header className="flex min-h-11 items-center justify-between border-b border-white/[0.08] bg-[#202022] px-4 sm:px-6">
-          <div className="flex h-11 items-center gap-6 text-[9px] font-black uppercase tracking-[0.13em]">
-            <Link to="/" className="flex h-full items-center border-b-2 border-[#ff5a1f] px-2 text-white/90 hover:text-white">AIRI</Link>
-            <Link to="/study" className="text-white/40 transition hover:text-white">Estudar</Link>
-            <Link to="/desafios" className="text-white/40 transition hover:text-white">Desafios</Link>
-            <Link to="/conquistas" className="text-white/40 transition hover:text-white">Conquistas</Link>
-          </div>
-          <button onClick={() => setShareOpen(true)} className="inline-flex items-center gap-1.5 bg-[#ff5a1f] px-4 py-2 text-[9px] font-black uppercase tracking-[0.12em] text-white transition hover:bg-[#ff713e]"><Share2 className="h-3 w-3" /> Compartilhar</button>
+        <header className="flex min-w-0 items-center justify-between gap-2 border-b border-white/[0.08] bg-[#202022] px-2 sm:min-h-11 sm:px-6">
+          <nav className="flex h-11 min-w-0 flex-1 items-center gap-3 overflow-x-auto whitespace-nowrap text-[8px] font-black uppercase tracking-[0.09em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-6 sm:text-[9px] sm:tracking-[0.13em]">
+            <Link to="/" className="flex h-full shrink-0 items-center border-b-2 border-[#ff5a1f] px-1.5 text-white/90 hover:text-white">AIRI</Link>
+            <Link to="/study" className="shrink-0 text-white/40 transition hover:text-white">Estudar</Link>
+            <Link to="/desafios" className="shrink-0 text-white/40 transition hover:text-white">Desafios</Link>
+            <Link to="/conquistas" className="shrink-0 text-white/40 transition hover:text-white">Conquistas</Link>
+          </nav>
+          <button onClick={() => setShareOpen(true)} aria-label="Compartilhar rank" className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 bg-[#ff5a1f] px-2 text-[8px] font-black uppercase tracking-[0.08em] text-white transition hover:bg-[#ff713e] sm:px-4 sm:text-[9px] sm:tracking-[0.12em]"><Share2 className="h-3 w-3" /><span className="hidden sm:inline">Compartilhar</span><span className="sm:hidden">Share</span></button>
         </header>
 
-        <div className="flex min-h-10 items-center justify-between border-b border-white/[0.07] bg-[#242426] px-4 sm:px-6">
-          <nav className="flex h-10 items-center gap-5 text-[8px] font-bold uppercase tracking-[0.12em] sm:gap-8">
-            <a href="#liga" className="flex h-full items-center border-b border-[#ff5a1f] text-white">Visão geral</a>
-            <a href="#ladder" className="text-white/40 transition hover:text-white">Atividades</a>
-            <a href="#temporada" className="text-white/40 transition hover:text-white">Temporada</a>
+        <div className="flex min-w-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-[#242426] px-3 sm:min-h-10 sm:px-6">
+          <nav className="flex h-10 min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.08em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:text-[8px] sm:tracking-[0.12em]">
+            <a href="#liga" className="flex h-full shrink-0 items-center border-b border-[#ff5a1f] text-white">Visão geral</a>
+            <a href="#ladder" className="shrink-0 text-white/40 transition hover:text-white">Atividades</a>
+            <a href="#temporada" className="shrink-0 text-white/40 transition hover:text-white">Temporada</a>
           </nav>
-          <span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Temporada atual</span>
+          <span className="hidden shrink-0 text-[8px] uppercase tracking-[0.12em] text-white/30 sm:inline">Temporada atual</span>
         </div>
 
         <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
