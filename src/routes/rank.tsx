@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Trophy, Share2, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, Share2, Trophy } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -12,30 +12,26 @@ import {
   readRankForProfile,
   subscribeAllRanks,
   type Tier,
-  type RankState,
 } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 import { PROFILES, getCurrentProfile, useCurrentProfile } from "@/lib/profile";
 import { useStore, useStreak } from "@/lib/flashcards-store";
 import { ShareAchievement } from "@/components/ShareAchievement";
 
-
 export const Route = createFileRoute("/rank")({
   component: RankPage,
   head: () => ({
     meta: [
       { title: "Rank — airi" },
-      { name: "description", content: "Sua jornada de rank estilo LoL no airi." },
+      { name: "description", content: "Sua jornada ranqueada no airi." },
       { property: "og:title", content: "Rank — airi" },
-      { property: "og:description", content: "Do Ferro ao Desafiante — evolua com cada carta." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:description", content: "Evolua com cada carta." },
     ],
   }),
 });
 
 function reasonLabel(reason: string): string {
-  const map: Record<string, string> = {
+  const labels: Record<string, string> = {
     "review.easy": "Acerto (fácil)",
     "review.good": "Acerto (médio)",
     "review.hard": "Acerto (difícil)",
@@ -49,7 +45,7 @@ function reasonLabel(reason: string): string {
     "writing.great": "Redação excelente",
     "exam.completed": "Prova mensal",
   };
-  return map[reason] ?? reason;
+  return labels[reason] ?? reason;
 }
 
 function RankPage() {
@@ -61,167 +57,135 @@ function RankPage() {
   const streak = useStreak();
   const cards = useStore((s) => s.cards);
   const cardsMastered = useMemo(
-    () => cards.filter((c) => (c.reps ?? 0) >= 3 && (c.lapses ?? 0) === 0).length,
+    () => cards.filter((card) => (card.reps ?? 0) >= 3 && (card.lapses ?? 0) === 0).length,
     [cards],
   );
   const [shareOpen, setShareOpen] = useState(false);
-
   const winRate = useMemo(() => {
     const total = rank.totalEarned + rank.totalLost;
-    if (total === 0) return 0;
-    return Math.round((rank.totalEarned / total) * 100);
+    return total === 0 ? 0 : Math.round((rank.totalEarned / total) * 100);
   }, [rank.totalEarned, rank.totalLost]);
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl bg-[#0d0e12] px-3 pb-10 pt-3 text-white sm:px-6 sm:pt-5">
-      <Link to="/" className="mb-3 inline-flex items-center gap-2 text-xs text-white/45 transition hover:text-white">
-        <ArrowLeft className="h-4 w-4" /> Início
-      </Link>
-
-      <section className="relative mb-7 overflow-hidden border-y border-[#b99a62]/25 bg-[linear-gradient(110deg,#191a20_0%,#111217_48%,#19171a_100%)]">
-        <div className="absolute inset-0 opacity-50" style={{ backgroundImage: "radial-gradient(ellipse at 15% 50%, " + colors.glow + " 0%, transparent 48%), linear-gradient(90deg, rgba(255,255,255,.035), transparent 75%)" }} /><div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#c7a66a]/55 to-transparent" />
-        <div className="relative flex flex-col gap-5 px-4 py-6 sm:flex-row sm:items-center sm:px-7 sm:py-7">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="relative shrink-0"><div className="absolute inset-0 scale-125 rounded-full blur-2xl" style={{ background: colors.glow }} /><RankEmblem tier={rank.tier} division={rank.division} size={96} /></div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#c8ad7b]">Classificação ranqueada</p>
-              <h1 className="mt-1 text-3xl font-black uppercase italic tracking-[0.025em] sm:text-4xl" style={{ color: colors.text }}>{tierLabel(rank)}</h1>
-              <p className="mt-1 text-sm text-white/65"><strong className="text-white">{rank.lp} LP</strong><span className="mx-2 text-white/25">|</span>{progress.label}</p>
-            </div>
+    <main className="mx-auto min-h-screen max-w-[1180px] px-3 pb-10 pt-3 text-white sm:px-6 sm:pt-5">
+      <div className="overflow-hidden border border-white/[0.12] bg-[#17181c] shadow-[0_22px_70px_rgba(0,0,0,.32)]">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.09] bg-[#202126] px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45 transition hover:text-white">
+              <ArrowLeft className="h-3.5 w-3.5" /> Início
+            </Link>
+            <span className="hidden h-4 w-px bg-white/10 sm:block" />
+            <span className="text-[11px] font-black uppercase tracking-[0.24em] text-white">AIRI <span className="text-[#c5a46b]">/ RANK</span></span>
           </div>
-          <div className="flex flex-1 items-center gap-4 sm:ml-8">
-            <div className="min-w-0 flex-1">
-              <div className="mb-1 flex items-center justify-between text-[10px] text-white/45"><span>Progresso</span><span>{progressPct}%</span></div>
-              <div className="h-1.5 overflow-hidden bg-white/10">
-                <div className="h-full" style={{ width: progressPct + "%", background: "linear-gradient(90deg, " + colors.from + ", " + colors.ring) }} />
+          <nav className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-[0.16em] text-white/40 sm:gap-6">
+            <a href="#visao-geral" className="text-[#d7b879]">Visão geral</a>
+            <a href="#classificacao" className="transition hover:text-white">Classificação</a>
+            <a href="#temporada" className="transition hover:text-white">Temporada</a>
+          </nav>
+          <button onClick={() => setShareOpen(true)} className="inline-flex items-center gap-1.5 bg-[#d85a36] px-3.5 py-2 text-[9px] font-black uppercase tracking-[0.13em] text-white transition hover:bg-[#ed6841]">
+            <Share2 className="h-3 w-3" /> Compartilhar
+          </button>
+        </header>
+
+        <section id="visao-geral" className="grid gap-6 border-b border-white/[0.09] bg-[linear-gradient(110deg,#191b20_0%,#141519_58%,#1b1918_100%)] px-4 py-6 sm:px-6 lg:grid-cols-[1.25fr_.9fr] lg:gap-9 lg:px-8 lg:py-7">
+          <div>
+            <p className="mb-4 text-[9px] font-black uppercase tracking-[0.24em] text-[#c5a46b]">Sua liga</p>
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <div className="flex shrink-0 items-center gap-4 sm:block sm:text-center">
+                <div className="relative"><div className="absolute inset-0 scale-110 rounded-full blur-2xl" style={{ background: colors.glow }} /><RankEmblem tier={rank.tier} division={rank.division} size={104} /></div>
+                <div className="sm:mt-2"><p className="text-lg font-black uppercase tracking-wide" style={{ color: colors.text }}>{tierLabel(rank)}</p><p className="mt-0.5 text-[9px] uppercase tracking-[0.17em] text-white/40">Temporada atual</p></div>
               </div>
-              <p className="mt-1 text-[10px] text-white/40">{Math.max(0, progress.max - progress.value)} LP para o próximo objetivo</p>
+              <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-4 border-l border-white/[0.09] pl-0 sm:pl-6">
+                <Metric label="Pontuação" value={`${rank.lp} LP`} accent={colors.text} />
+                <Metric label="Taxa de acerto" value={`${winRate}%`} />
+                <Metric label="LP conquistados" value={rank.totalEarned.toLocaleString("pt-BR")} />
+                <Metric label="Sequência atual" value={`${streak.current} dias`} />
+                <div className="col-span-2 pt-1">
+                  <div className="mb-1.5 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-white/45"><span>Progresso da divisão</span><span>{progressPct}%</span></div>
+                  <div className="h-1.5 overflow-hidden bg-white/[0.10]"><div className="h-full transition-all" style={{ width: `${progressPct}%`, background: `linear-gradient(90deg,${colors.from},${colors.ring})` }} /></div>
+                  <p className="mt-1.5 text-[9px] text-white/35">{Math.max(0, progress.max - progress.value)} LP para {progress.label}</p>
+                </div>
+              </div>
             </div>
-            <button onClick={() => setShareOpen(true)} className="shrink-0 border border-[#b99a62]/35 bg-[#b99a62]/[0.08] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#dfc99d] transition hover:bg-[#b99a62]/15">
-              <Share2 className="mr-1.5 inline h-3.5 w-3.5" /> Compartilhar
-            </button>
           </div>
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2 border-b border-[#b99a62]/25 pb-2.5">
-          <div><p className="mb-1 text-[9px] font-bold uppercase tracking-[0.25em] text-[#b99a62]">Temporada atual</p><h2 className="text-lg font-bold tracking-wide text-white">Classificação</h2></div>
-          <span className="pb-1 text-[9px] uppercase tracking-[0.16em] text-white/35">Perfis deste dispositivo</span>
-        </div>
-        <ProfilesLeaderboard />
-      </section>
-
-      <div className="grid gap-7 border-t border-white/10 pt-5 lg:grid-cols-[1.1fr_.9fr]">
-        <section>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-white/60">Todos os elos</h2>
-            <span className="text-[10px] text-white/35">{progress.label}</span>
-          </div>
-          <ol className="grid grid-cols-5 gap-y-4 border-y border-white/[0.08] py-4 sm:grid-cols-10">
-            {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as Tier[]).map((t) => {
-              const current = t === rank.tier;
-              const reached = ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"].indexOf(t) <= ["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"].indexOf(rank.tier);
-              return <li key={t} className={"flex flex-col items-center text-center " + (current ? "opacity-100" : reached ? "opacity-75" : "opacity-30")}><div className={current ? "drop-shadow-[0_0_9px_rgba(168,85,247,.4)]" : ""}><RankEmblem tier={t} division={4} size={38} /></div><span className="mt-1 text-[8px] font-bold uppercase" style={{ color: TIER_COLORS[t].text }}>{TIER_LABEL[t]}</span>{current && <span className="mt-1 text-[8px] font-bold uppercase text-primary">Atual</span>}</li>;
-            })}
-          </ol>
-          <div className="mt-3 flex items-center gap-3">
-            <RankEmblem tier={rank.tier} division={rank.division} size={48} />
-            <div className="min-w-0 flex-1"><p className="text-[9px] uppercase tracking-widest text-white/40">Próximo objetivo</p><p className="text-sm font-semibold text-white">{progress.label}</p></div>
-            <p className="text-right text-sm font-bold text-primary">{Math.max(0, progress.max - progress.value)} LP<span className="block text-[9px] font-normal text-white/40">restantes</span></p>
+          <div id="classificacao" className="border-t border-white/[0.09] pt-5 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+            <div className="mb-3 flex items-center justify-between"><p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#c5a46b]">Classificação local</p><span className="text-[9px] text-white/30">Neste dispositivo</span></div>
+            <ProfilesLeaderboard />
           </div>
         </section>
 
-        <section>
-          <h2 className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-white/60">Temporada</h2>
-          <div className="grid grid-cols-2 gap-x-5 gap-y-4 border-y border-white/[0.08] py-4">
-            <StatCard label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.ring} />
-            <StatCard label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#fb7185" />
-            <StatCard label="Taxa de acerto" value={winRate + "%"} accent="#34d399" />
-            <StatCard label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : TIER_LABEL[rank.peakTier] + " " + DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]} accent={TIER_COLORS[rank.peakTier].ring} />
+        <section id="temporada" className="px-4 py-6 sm:px-6 lg:px-8">
+          <div className="mb-4 flex items-center justify-between border-b border-white/[0.10] pb-2.5">
+            <div><p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#c5a46b]">Atividade ranqueada</p><h2 className="mt-1 text-sm font-bold uppercase tracking-[0.08em]">Sua jornada</h2></div>
+            <span className="text-[9px] uppercase tracking-[0.12em] text-white/30">Temporada atual</span>
           </div>
-          <div className="mt-5">
-            <h2 className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-white/60"><Trophy className="h-3.5 w-3.5 text-primary" /> Histórico recente</h2>
-            {rank.history.length === 0 ? <p className="py-3 text-xs text-white/40">Nenhuma atividade registrada.</p> : <ul className="divide-y divide-white/[0.07]">{rank.history.slice(0, 5).map((event, i) => <li key={i} className="flex items-center justify-between gap-3 py-2"><div className="min-w-0"><p className="truncate text-xs text-white/80">{reasonLabel(event.reason)}</p><p className="text-[9px] text-white/35">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p></div><span className={"shrink-0 text-xs font-bold tabular-nums " + (event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/40")}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
+          <div className="grid gap-0 md:grid-cols-3">
+            <section className="border-b border-white/[0.09] pb-5 md:border-b-0 md:border-r md:pr-6">
+              <h3 className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/55">Caminho dos elos</h3>
+              <div className="grid grid-cols-5 gap-x-1 gap-y-3 sm:grid-cols-10 md:grid-cols-5">
+                {(["iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger"] as Tier[]).map((tier, index, all) => {
+                  const currentIndex = all.indexOf(rank.tier);
+                  const current = tier === rank.tier;
+                  return <div key={tier} className={`flex flex-col items-center ${current ? "opacity-100" : index < currentIndex ? "opacity-65" : "opacity-25"}`}>
+                    <RankEmblem tier={tier} division={4} size={32} />
+                    <span className="mt-1 text-[7px] font-bold uppercase" style={{ color: TIER_COLORS[tier].text }}>{TIER_LABEL[tier]}</span>
+                  </div>;
+                })}
+              </div>
+              <div className="mt-4 flex items-center gap-3 border-t border-white/[0.08] pt-3">
+                <RankEmblem tier={rank.tier} division={rank.division} size={38} />
+                <div className="min-w-0"><p className="text-[8px] uppercase tracking-widest text-white/35">Próximo objetivo</p><p className="text-xs font-semibold text-white/85">{progress.label}</p></div>
+              </div>
+            </section>
+
+            <section className="border-b border-white/[0.09] py-5 md:border-b-0 md:border-r md:px-6 md:py-0">
+              <h3 className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/55">Desempenho da temporada</h3>
+              <div className="grid grid-cols-2 gap-x-5 gap-y-5">
+                <Metric label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.text} />
+                <Metric label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#e87979" />
+                <Metric label="Cartas dominadas" value={cardsMastered.toLocaleString("pt-BR")} />
+                <Metric label="Pico da carreira" value={isElite(rank.peakTier) ? TIER_LABEL[rank.peakTier] : `${TIER_LABEL[rank.peakTier]} ${DIVISION_ROMAN[rank.peakDivision as 1 | 2 | 3 | 4]}`} />
+              </div>
+            </section>
+
+            <section className="pt-5 md:pl-6 md:pt-0">
+              <h3 className="mb-3 flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.18em] text-white/55"><Trophy className="h-3 w-3 text-[#c5a46b]" /> Histórico recente</h3>
+              {rank.history.length === 0 ? <p className="py-2 text-xs text-white/35">Nenhuma atividade registrada.</p> : <ul className="divide-y divide-white/[0.07]">{rank.history.slice(0, 4).map((event, index) => <li key={index} className="flex items-center justify-between gap-3 py-2"><div className="min-w-0"><p className="truncate text-[10px] text-white/75">{reasonLabel(event.reason)}</p><p className="text-[8px] text-white/30">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p></div><span className={`shrink-0 text-[10px] font-bold tabular-nums ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/35"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
+            </section>
           </div>
         </section>
       </div>
-
-      {currentProfile && (
-        <ShareAchievement
-          open={shareOpen}
-          onClose={() => setShareOpen(false)}
-          profile={currentProfile}
-          rank={rank}
-          streak={streak}
-          cardsMastered={cardsMastered}
-          totalCards={cards.length}
-        />
-      )}
+      {currentProfile && <ShareAchievement open={shareOpen} onClose={() => setShareOpen(false)} profile={currentProfile} rank={rank} streak={streak} cardsMastered={cardsMastered} totalCards={cards.length} />}
     </main>
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: string | number; accent: string }) {
-  return (
-    <div className="min-w-0 border-l border-white/[0.12] pl-3 first:border-0 first:pl-0">
-      <p className="truncate text-[9px] font-semibold uppercase tracking-[0.14em] text-white/40">{label}</p>
-      <p className="mt-1 truncate text-lg font-bold tabular-nums tracking-tight" style={{ color: accent }}>{value}</p>
-    </div>
-  );
+function Metric({ label, value, accent }: { label: string; value: string | number; accent?: string }) {
+  return <div className="min-w-0"><p className="truncate text-[8px] font-bold uppercase tracking-[0.15em] text-white/35">{label}</p><p className="mt-1 truncate text-sm font-bold tabular-nums" style={{ color: accent ?? "#f1f1f2" }}>{value}</p></div>;
 }
 
 function ProfilesLeaderboard() {
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    const onFocus = () => setTick((t) => t + 1);
+    const onFocus = () => setTick((value) => value + 1);
     window.addEventListener("focus", onFocus);
-    const unsub = subscribeAllRanks(() => setTick((t) => t + 1));
-    return () => { window.removeEventListener("focus", onFocus); unsub(); };
+    const unsubscribe = subscribeAllRanks(() => setTick((value) => value + 1));
+    return () => { window.removeEventListener("focus", onFocus); unsubscribe(); };
   }, []);
   void tick;
   const active = getCurrentProfile();
-  const entries = PROFILES.map((p) => ({ profileId: p.id, name: p.name, gradient: p.gradient, isActive: active?.id === p.id, rank: readRankForProfile(p.id) }));
+  const entries = PROFILES.map((profile) => ({ profileId: profile.id, name: profile.name, gradient: profile.gradient, isActive: active?.id === profile.id, rank: readRankForProfile(profile.id) }));
   entries.sort((a, b) => (b.rank?.totalEarned ?? -1) - (a.rank?.totalEarned ?? -1));
-  const ranked = entries.filter((entry) => entry.rank);
-  const podium = ranked.slice(0, 3);
-  const rest = [...ranked.slice(3), ...entries.filter((entry) => !entry.rank)];
-  return (
-    <div className="min-w-0">
-      {podium.length > 0 && <div className="relative mb-5 grid grid-cols-3 items-end border-b border-[#b99a62]/25 bg-[radial-gradient(ellipse_at_50%_100%,rgba(185,154,98,.10),transparent_68%)] pb-0">
-        {[podium[1], podium[0], podium[2]].filter(Boolean).map((entry) => {
-          const place = ranked.findIndex((item) => item.profileId === entry.profileId) + 1;
-          const first = place === 1;
-          const medal = place === 1 ? "#e9bd65" : place === 2 ? "#c7cbd2" : "#c88a58";
-          return <div key={entry.profileId} className={"relative flex min-w-0 flex-col items-center border-r border-white/[0.055] px-2 pb-5 pt-4 text-center last:border-r-0 " + (first ? "min-h-[226px] bg-gradient-to-b from-[#b99a62]/[0.10] to-transparent sm:min-h-[244px]" : "min-h-[206px] sm:min-h-[220px]")}>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: medal }}>{place === 1 ? "1º lugar" : place === 2 ? "2º lugar" : "3º lugar"}</span>
-            <span className="my-2 h-10 w-10 rounded-full border border-[#c7ad7a]/35 shadow-[0_0_0_3px_rgba(255,255,255,.025)]" style={{ backgroundImage: entry.gradient }} />
-            <p className="w-full truncate text-xs font-semibold text-white/90">{entry.name}</p>
-            <div className="mt-1"><RankEmblem tier={entry.rank!.tier} division={entry.rank!.division} size={first ? 54 : 44} /></div>
-            <p className="mt-1 text-[10px] font-semibold text-white/60">{tierLabel(entry.rank!)}</p>
-            <p className="mt-1 text-base font-bold tabular-nums text-white">{entry.rank!.lp} <span className="text-[9px] font-medium tracking-wider text-white/40">LP</span></p>
-            {entry.isActive && <span className="mt-2 text-[8px] font-bold uppercase tracking-widest text-primary">Você</span>}
-          </div>;
-        })}
-      </div>}
-      <div className="overflow-x-auto">
-        <div className="min-w-[340px]">
-          <div className="grid grid-cols-[38px_minmax(0,1fr)_minmax(78px,.7fr)_minmax(90px,.7fr)] items-center border-y border-white/10 bg-[#202127] px-3 py-2.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/45">
-            <span>#</span><span>Jogador</span><span>LP total</span><span className="text-right">Rank</span>
-          </div>
-          {rest.map((entry) => {
-            const place = ranked.findIndex((item) => item.profileId === entry.profileId) + 1;
-            const tc = TIER_COLORS[entry.rank?.tier ?? "iron"];
-            return <div key={entry.profileId} className={"grid grid-cols-[38px_minmax(0,1fr)_minmax(78px,.7fr)_minmax(90px,.7fr)] items-center border-b border-white/[0.065] px-3 py-3 transition-colors hover:bg-white/[0.035] " + (entry.isActive ? "bg-[#b99a62]/[0.07]" : "bg-transparent")}>
-              <span className="text-xs tabular-nums text-white/45">{entry.rank ? place : "—"}</span>
-              <div className="flex min-w-0 items-center gap-2"><span className="h-7 w-7 shrink-0 rounded-full border border-white/10" style={{ backgroundImage: entry.gradient }} /><span className="truncate text-xs font-medium text-white/85">{entry.name}{entry.isActive ? " · você" : ""}</span></div>
-              <span className="text-xs tabular-nums text-white/65">{entry.rank ? entry.rank.totalEarned.toLocaleString("pt-BR") : "—"}</span>
-              {entry.rank ? <span className="flex items-center justify-end gap-1.5 text-[10px] font-semibold" style={{ color: tc.text }}><RankEmblem tier={entry.rank.tier} division={entry.rank.division} size={25} />{tierLabel(entry.rank)}</span> : <span className="text-right text-[10px] text-white/30">Sem rank</span>}
-            </div>;
-          })}
-        </div>
-      </div>
-      <div className="mt-3 flex items-center justify-between text-[9px] text-white/30"><span>Classificação local</span><button onClick={() => setTick((t) => t + 1)} className="inline-flex items-center gap-1 hover:text-white/65"><RefreshCw className="h-3 w-3" /> Atualizar</button></div>
-    </div>
-  );
+  return <div>
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_auto] gap-2 border-b border-white/[0.09] pb-2 text-[8px] font-bold uppercase tracking-[0.13em] text-white/30"><span>#</span><span>Jogador</span><span className="text-right">Liga / LP</span></div>
+    {entries.map((entry, index) => {
+      const tier = entry.rank?.tier ?? "iron";
+      return <div key={entry.profileId} className={`grid grid-cols-[24px_minmax(0,1fr)_auto] items-center gap-2 border-b border-white/[0.06] py-2 ${entry.isActive ? "bg-white/[0.035]" : ""}`}>
+        <span className={`text-[10px] font-bold tabular-nums ${index === 0 ? "text-[#d7b879]" : "text-white/30"}`}>{entry.rank ? index + 1 : "—"}</span>
+        <div className="flex min-w-0 items-center gap-2"><span className="h-6 w-6 shrink-0 rounded-full border border-white/10" style={{ backgroundImage: entry.gradient }} /><span className="truncate text-[10px] font-semibold text-white/80">{entry.name}{entry.isActive ? <span className="ml-1 text-[8px] text-[#d7b879]">VOCÊ</span> : null}</span></div>
+        {entry.rank ? <span className="flex items-center gap-1.5 text-[9px] font-semibold" style={{ color: TIER_COLORS[tier].text }}><RankEmblem tier={tier} division={entry.rank.division} size={25} /><span className="whitespace-nowrap">{tierLabel(entry.rank)} · {entry.rank.lp} LP</span></span> : <span className="text-[9px] text-white/25">Sem rank</span>}
+      </div>;
+    })}
+    <div className="flex justify-end pt-2"><button onClick={() => setTick((value) => value + 1)} className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-[0.12em] text-white/30 transition hover:text-white/70"><RefreshCw className="h-2.5 w-2.5" /> Atualizar</button></div>
+  </div>;
 }
