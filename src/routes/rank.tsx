@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Trophy, TrendingUp, Sparkles, Lock, Check, Info, Users, RefreshCw, Share2 } from "lucide-react";
+import { ArrowLeft, Trophy, TrendingUp, Sparkles, Info, Users, RefreshCw, Share2 } from "lucide-react";
 import {
   useRank,
   tierLabel,
@@ -9,7 +9,6 @@ import {
   TIER_LABEL,
   DIVISION_ROMAN,
   isElite,
-  lpToReachTier,
   readRankForProfile,
   subscribeAllRanks,
   type Tier,
@@ -77,7 +76,7 @@ function RankPage() {
   }, [rank.totalEarned, rank.totalLost]);
 
   return (
-    <main className="relative mx-auto max-w-4xl px-[clamp(0.75rem,4vw,1.5rem)] py-6 before:pointer-events-none before:absolute before:inset-x-8 before:top-20 before:-z-10 before:h-72 before:rounded-full before:bg-primary/[0.07] before:blur-[100px]">
+    <main className="relative mx-auto max-w-5xl px-3 py-4 sm:px-5 sm:py-6">
       <Link
         to="/"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
@@ -88,16 +87,16 @@ function RankPage() {
 
       {/* Hero do rank */}
       <section
-        className={`${GLASS} border-white/[0.14] p-6 sm:p-8`}
+        className={`${GLASS} border-white/[0.12] p-4 sm:p-6`}
         style={{
           backgroundImage: `radial-gradient(90% 110% at 85% 0%, ${colors.glow}, transparent 58%), linear-gradient(135deg, rgba(255,255,255,0.035), transparent 55%)`,
         }}
       >
-        <div className="absolute right-5 top-5 rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.24em] text-white/45">Competitive season</div>
+        
         <div className="flex flex-col items-center gap-4 pt-5 sm:flex-row sm:items-center sm:gap-7 sm:pt-0">
           <div className="relative shrink-0">
             <div className="absolute inset-2 rounded-full blur-2xl" style={{ background: colors.glow }} />
-            <div className="relative drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]"><RankEmblem tier={rank.tier} division={rank.division} size={144} /></div>
+            <div className="relative drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]"><RankEmblem tier={rank.tier} division={rank.division} size={112} /></div>
           </div>
           <div className="flex-1 text-center sm:text-left">
             <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground sm:justify-start">
@@ -168,12 +167,12 @@ function RankPage() {
         </div>
       </section>
 
-      <div className="mt-4 grid items-start gap-4 xl:grid-cols-[1.08fr_0.92fr]">
+      <div className="mt-4 grid items-start gap-5 lg:grid-cols-[1.08fr_0.92fr]">
         <div className="min-w-0">
           <ProfilesLeaderboard glass={GLASS} />
         </div>
 
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-5">
           {/* Trilha de progressão */}
           <section className={`${GLASS} p-5`}>
             <div className="mb-4 flex items-center justify-between gap-2">
@@ -226,9 +225,9 @@ function RankPage() {
           </section>
 
           {/* Estatísticas */}
-          <section className={`${GLASS} p-5`}>
-            <h2 className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-foreground">Estatísticas gerais</h2>
-            <div className="grid grid-cols-2 gap-2">
+          <section className="border-y border-white/[0.09] py-3">
+            <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">Temporada</h2>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <StatCard label="LP ganhos" value={rank.totalEarned.toLocaleString("pt-BR")} accent={colors.ring} />
               <StatCard label="LP perdidos" value={rank.totalLost.toLocaleString("pt-BR")} accent="#fb7185" />
               <StatCard label="Taxa de acerto" value={`${winRate}%`} accent="#34d399" />
@@ -237,22 +236,22 @@ function RankPage() {
           </section>
 
           {/* Atividade recente */}
-          <section className={`${GLASS} p-5`}>
-            <div className="mb-3 flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-primary" />
-              <h2 className="text-xs font-black uppercase tracking-[0.16em] text-foreground">Atividade recente</h2>
+          <section className="border-t border-white/[0.09] pt-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Trophy className="h-3.5 w-3.5 text-primary" />
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">Últimas partidas</h2>
             </div>
             {rank.history.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhum evento ainda. Comece a revisar cartas para ganhar LP.</p>
             ) : (
               <ul className="divide-y divide-white/[0.07]">
-                {rank.history.slice(0, 5).map((event, i) => (
-                  <li key={i} className="flex items-center justify-between gap-3 py-2.5">
+                {rank.history.slice(0, 4).map((event, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3 border-b border-white/[0.055] py-2">
                     <div className="flex min-w-0 items-center gap-2.5">
-                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><Sparkles className="h-4 w-4" /></span>
+                      
                       <div className="min-w-0">
                         <p className="truncate text-xs font-semibold text-foreground">{reasonLabel(event.reason)}</p>
-                        <p className="text-[10px] text-muted-foreground">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                        <p className="text-[9px] text-white/35">{new Date(event.at).toLocaleString("pt-BR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
                       </div>
                     </div>
                     <span className={`shrink-0 text-xs font-black tabular-nums ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-muted-foreground"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span>
@@ -263,51 +262,6 @@ function RankPage() {
           </section>
         </div>
       </div>
-
-      {/* Sobre o sistema de rank e regras de LP */}
-      <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-3 flex items-center gap-2">
-          <Info className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Como funciona o rank</h2>
-        </div>
-        <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          Seu rank transforma o estudo em uma jornada competitiva. Você ganha LP ao acertar cartas, derrotar inimigos e manter a constância; erros e abandono podem reduzir sua pontuação.
-        </p>
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <div>
-            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-emerald-400">Como ganhar LP</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-              {[
-                ["Acerto fácil", "+3"], ["Acerto médio", "+2"], ["Acerto difícil", "+1"],
-                ["Derrotar inimigo", "+8"], ["Aula de gramática", "até +10"],
-                ["Redação ≥ 70", "+15"], ["Redação ≥ 90", "+30"],
-                ["Prova mensal (aprovado)", "+25 a +123"], ["Bônus diário de streak", "+2 a +12"],
-              ].map(([label, val]) => (
-                <div key={label} className="flex items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-2.5 py-2">
-                  <span className="text-muted-foreground">{label}</span><span className="font-bold text-emerald-400">{val}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-rose-400">Como perder LP</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
-              {[
-                ["Errar carta", "−4"], ["Carta virou inimiga", "−12"],
-                ["Prova mensal reprovado (<50%)", "−25"], ["Streak quebrado (1–2 dias)", "−10"],
-                ["Streak quebrado (3–6 dias)", "−20"], ["Streak quebrado (7+ dias)", "−35"],
-                ["Inimigo ignorado (>24h)", "−3 cada · cap −15/dia"],
-                ["Inatividade (a partir do Ouro)", "−2/dia após 3 dias · cap −12/dia"],
-              ].map(([label, val]) => (
-                <div key={label} className="flex items-center justify-between gap-2 rounded-lg border border-rose-500/15 bg-rose-500/[0.05] px-2.5 py-2">
-                  <span className="text-muted-foreground">{label}</span><span className="font-bold text-rose-400">{val}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        <p className="mt-4 text-[10px] text-muted-foreground">Cada divisão custa 100 LP e a promoção exige 3 vitórias com no máximo 2 derrotas.</p>
-      </section>
 
       {currentProfile && (
         <ShareAchievement
@@ -326,12 +280,9 @@ function RankPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: string | number; accent: string }) {
   return (
-    <div className={`${GLASS} group p-3.5 transition duration-200 hover:-translate-y-0.5 hover:border-white/20 sm:p-4`}>
-      <div className="mb-2 h-0.5 w-7 rounded-full" style={{ background: accent, boxShadow: `0 0 12px ${accent}` }} />
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
-      <p className="mt-1 text-xl font-black tabular-nums tracking-tight sm:text-2xl" style={{ color: accent }}>
-        {value}
-      </p>
+    <div className="min-w-0 border-l border-white/[0.12] pl-3 first:border-0 first:pl-0">
+      <p className="truncate text-[9px] font-semibold uppercase tracking-[0.14em] text-white/40">{label}</p>
+      <p className="mt-1 truncate text-lg font-bold tabular-nums tracking-tight" style={{ color: accent }}>{value}</p>
     </div>
   );
 }
