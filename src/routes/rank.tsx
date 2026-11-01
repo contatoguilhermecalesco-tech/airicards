@@ -36,7 +36,7 @@ export const Route = createFileRoute("/rank")({
 });
 
 const GLASS =
-  "relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.045] backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.06)_inset,0_16px_40px_-24px_rgba(0,0,0,0.55)]";
+  "relative overflow-hidden rounded-2xl border border-white/[0.09] bg-[#10131b]/90 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.07)_inset,0_18px_50px_-28px_rgba(0,0,0,0.9)]";
 
 function reasonLabel(reason: string): string {
   const map: Record<string, string> = {
@@ -77,7 +77,7 @@ function RankPage() {
   }, [rank.totalEarned, rank.totalLost]);
 
   return (
-    <main className="mx-auto max-w-3xl px-[clamp(0.75rem,4vw,1.5rem)] py-6">
+    <main className="relative mx-auto max-w-4xl px-[clamp(0.75rem,4vw,1.5rem)] py-6 before:pointer-events-none before:absolute before:inset-x-8 before:top-20 before:-z-10 before:h-72 before:rounded-full before:bg-primary/[0.07] before:blur-[100px]">
       <Link
         to="/"
         className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
@@ -88,27 +88,29 @@ function RankPage() {
 
       {/* Hero do rank */}
       <section
-        className={`${GLASS} p-6 sm:p-8`}
+        className={`${GLASS} border-white/[0.14] p-6 sm:p-8`}
         style={{
-          backgroundImage: `radial-gradient(120% 100% at 50% -10%, ${colors.glow}, transparent 60%)`,
+          backgroundImage: `radial-gradient(90% 110% at 85% 0%, ${colors.glow}, transparent 58%), linear-gradient(135deg, rgba(255,255,255,0.035), transparent 55%)`,
         }}
       >
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
-          <div className="shrink-0">
-            <RankEmblem tier={rank.tier} division={rank.division} size={128} />
+        <div className="absolute right-5 top-5 rounded-full border border-white/10 bg-black/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.24em] text-white/45">Competitive season</div>
+        <div className="flex flex-col items-center gap-4 pt-5 sm:flex-row sm:items-center sm:gap-7 sm:pt-0">
+          <div className="relative shrink-0">
+            <div className="absolute inset-2 rounded-full blur-2xl" style={{ background: colors.glow }} />
+            <div className="relative drop-shadow-[0_12px_24px_rgba(0,0,0,0.55)]"><RankEmblem tier={rank.tier} division={rank.division} size={144} /></div>
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Seu rank atual
+            <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground sm:justify-start">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: colors.ring, boxShadow: `0 0 10px ${colors.glow}` }} /> Seu rank atual
             </p>
             <h1
-              className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl"
+              className="mt-1 text-4xl font-black uppercase italic tracking-tight sm:text-5xl"
               style={{ color: colors.text }}
             >
               {tierLabel(rank)}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {rank.lp} LP · {progress.label}
+            <p className="mt-1 text-sm font-medium text-white/65">
+              <span className="font-black tabular-nums text-foreground">{rank.lp} LP</span><span className="mx-2 text-white/20">/</span>{progress.label}
             </p>
 
             <div className="mt-3 flex justify-center sm:justify-start">
@@ -123,9 +125,9 @@ function RankPage() {
 
             {/* Barra de LP */}
             <div className="mt-4">
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <div className="h-3 w-full overflow-hidden rounded-full border border-white/[0.08] bg-black/50 p-[2px]">
                 <div
-                  className="h-full rounded-full transition-all"
+                  className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${progressPct}%`,
                     background: `linear-gradient(90deg, ${colors.from}, ${colors.ring})`,
@@ -202,7 +204,7 @@ function RankPage() {
       </section>
 
       {/* Estatísticas */}
-      <section className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         <StatCard label="LP ganho" value={rank.totalEarned} accent={colors.ring} />
         <StatCard label="LP perdido" value={rank.totalLost} accent="#c94a5a" />
         <StatCard label="Taxa de acerto" value={`${winRate}%`} accent={colors.ring} />
@@ -224,10 +226,10 @@ function RankPage() {
 
       {/* Divisões — trilha com LP necessário por tier */}
       <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="mb-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Trilha de rank</h2>
+            <h2 className="text-sm font-black uppercase italic tracking-[0.12em] text-foreground">Trilha de rank</h2>
           </div>
           <span className="text-[11px] text-muted-foreground">LP total acumulado</span>
         </div>
@@ -312,7 +314,7 @@ function RankPage() {
 
       {/* Histórico */}
       <section className={`${GLASS} mt-4 p-5`}>
-        <div className="mb-3 flex items-center gap-2">
+        <div className="mb-4 flex items-center gap-2">
           <Trophy className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-sm font-semibold text-foreground">Histórico recente</h2>
         </div>
@@ -417,9 +419,10 @@ function RankPage() {
 
 function StatCard({ label, value, accent }: { label: string; value: string | number; accent: string }) {
   return (
-    <div className={`${GLASS} p-4`}>
-      <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums" style={{ color: accent }}>
+    <div className={`${GLASS} group p-3.5 transition duration-200 hover:-translate-y-0.5 hover:border-white/20 sm:p-4`}>
+      <div className="mb-2 h-0.5 w-7 rounded-full" style={{ background: accent, boxShadow: `0 0 12px ${accent}` }} />
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-xl font-black tabular-nums tracking-tight sm:text-2xl" style={{ color: accent }}>
         {value}
       </p>
     </div>
@@ -463,10 +466,10 @@ function ProfilesLeaderboard({ glass }: { glass: string }) {
 
   return (
     <section className={`${glass} mt-4 p-5`}>
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <h2 className="text-sm font-black uppercase italic tracking-[0.16em] text-foreground">
             Ranking dos perfis
           </h2>
         </div>
@@ -487,11 +490,11 @@ function ProfilesLeaderboard({ glass }: { glass: string }) {
           return (
             <li
               key={e.profileId}
-              className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-3 py-3"
+              className={`relative flex items-center gap-3 overflow-hidden rounded-xl border px-3 py-3 transition ${e.isActive ? "border-primary/35 bg-primary/[0.07] shadow-[0_0_24px_rgba(255,255,255,0.035)]" : "border-white/[0.07] bg-black/20 hover:border-white/15 hover:bg-white/[0.035]"}`}
             >
               <span
                 aria-hidden
-                className="w-6 text-center text-xs font-semibold tabular-nums text-muted-foreground"
+                className={`w-6 text-center text-sm font-black italic tabular-nums ${idx === 0 && rank ? "text-amber-300" : idx === 1 && rank ? "text-slate-300" : idx === 2 && rank ? "text-orange-300" : "text-muted-foreground"}`}
               >
                 {position}
               </span>
