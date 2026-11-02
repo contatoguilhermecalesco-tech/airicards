@@ -60,7 +60,7 @@
   --color-shop-ink: var(--shop-ink);
   --color-shop-panel: var(--shop-panel);
   --color-shop-parchment: var(--shop-parchment);
-  --font-shop: "Cinzel", "Times New Roman", serif;
+  --font-shop: "Cormorant Garamond", "Cinzel", "Times New Roman", serif;
   --shadow-shop-frame: 0 0 0 1px color-mix(in oklab, var(--shop-gold) 35%, transparent),
     0 24px 60px -30px oklch(0 0 0 / 0.8);
   --shadow-shop-gold: 0 8px 24px -10px color-mix(in oklab, var(--shop-gold) 70%, transparent);

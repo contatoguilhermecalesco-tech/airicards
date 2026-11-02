@@ -170,7 +170,7 @@ export function ShopHero({
               </span>
             </div>
 
-            <h2 className="shop-title mt-2.5 text-[22px] font-bold uppercase leading-tight text-shop-parchment sm:text-[40px]">
+            <h2 className="shop-title mt-2.5 text-[30px] font-semibold italic leading-none sm:leading-tight text-shop-parchment sm:text-[54px]">
               {item.name}
             </h2>
             {item.tagline && (
