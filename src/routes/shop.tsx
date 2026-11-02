@@ -526,44 +526,57 @@ function ShopPage() {
       </Link>
 
       {/* Top bar: title + balance + help */}
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-violet-200">
+      <header className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+        <div className="min-w-0">
+          <p className="inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-shop-gold">
             <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2.5} />
             Loja airi
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="shop-title mt-1 text-[28px] font-bold uppercase leading-none text-shop-parchment sm:text-4xl">
             Vitrine
           </h1>
-          <p className="mt-1 max-w-lg text-sm text-muted-foreground">
-            Coleções, cosméticos, power-ups e decks premium. Filtre, pesquise e escolha o seu.
-          </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 px-4 py-2.5 backdrop-blur">
-            <ArlysIcon className="h-5 w-5 text-violet-300" strokeWidth={2.25} />
-            <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Saldo
-              </p>
-              <p className="text-lg font-semibold tabular-nums">
-                {wallet.crystals}{" "}
-                <span className="text-[11px] font-medium text-muted-foreground">✦</span>
-              </p>
-            </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 border border-shop-gold/40 bg-shop-ink/80 px-3 py-2">
+            <ArlysIcon className="h-4 w-4 text-shop-gold-bright" strokeWidth={2.25} />
+            <span className="text-base font-bold tabular-nums text-shop-parchment">
+              {wallet.crystals}
+            </span>
+            <span className="text-[10px] font-medium text-shop-parchment/60">✦</span>
           </div>
           <button
             onClick={() => setHelpOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-foreground/90 backdrop-blur transition hover:bg-white/[0.09]"
+            aria-label="Como funciona"
+            className="grid h-9 w-9 place-items-center rounded-full border border-shop-gold/30 bg-shop-ink/60 text-shop-parchment/85 transition hover:border-shop-gold hover:text-shop-parchment sm:h-auto sm:w-auto sm:grid-flow-col sm:gap-1.5 sm:px-3 sm:py-2 sm:text-xs sm:font-semibold"
           >
-            <HelpCircle className="h-3.5 w-3.5" strokeWidth={2.5} />
-            Como funciona
+            <HelpCircle className="h-4 w-4" strokeWidth={2.25} />
+            <span className="hidden sm:inline">Como funciona</span>
           </button>
         </div>
       </header>
 
+      {/* Category tabs — estilo cliente de jogo */}
+      <nav className="mb-4 flex gap-0.5 overflow-x-auto border-b border-shop-gold/20">
+        {CATEGORIES.map((c) => {
+          const active = category === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setCategory(c.id)}
+              className={`shop-title relative shrink-0 px-3 py-2.5 text-[12px] font-bold uppercase transition ${
+                active
+                  ? "shop-tab-active text-shop-parchment"
+                  : "text-shop-parchment/50 hover:text-shop-parchment/85"
+              }`}
+            >
+              {c.label}
+            </button>
+          );
+        })}
+      </nav>
+
       {/* Vitrine hero */}
-      {!loading && featured.length > 0 && (
+      {!loading && featured.length > 0 && category === "all" && (
         <ShopHero
           featured={featured}
           wallet={wallet.crystals}
@@ -572,28 +585,6 @@ function ShopPage() {
           ownedIds={ownedIds}
         />
       )}
-
-      {/* Category chips */}
-      <div className="sticky top-14 z-10 -mx-2 mb-3 flex gap-1 overflow-x-auto rounded-full border border-white/10 bg-[oklch(0.14_0.02_285)]/85 p-1 backdrop-blur">
-        {CATEGORIES.map((c) => {
-          const Icon = c.icon;
-          const active = category === c.id;
-          return (
-            <button
-              key={c.id}
-              onClick={() => setCategory(c.id)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition ${
-                active
-                  ? "bg-primary text-primary-foreground shadow-glow"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
-              {c.label}
-            </button>
-          );
-        })}
-      </div>
 
       {/* Search + sort + view */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -719,7 +710,7 @@ function ShopPage() {
           <ul
             className={
               view === "vitrine"
-                ? "grid gap-4 sm:grid-cols-2"
+                ? "grid items-start gap-4 sm:grid-cols-2"
                 : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             }
           >
@@ -901,9 +892,7 @@ function UnifiedCard({
 
   return (
     <li
-      className={`relative isolate overflow-hidden rounded-3xl border ${
-        isPowerup ? "border-white/10" : rarity.border
-      } bg-[oklch(0.15_0.02_285)] transition-all hover:-translate-y-0.5`}
+      className="relative isolate overflow-hidden rounded-md border border-shop-gold/20 bg-shop-panel transition-all hover:-translate-y-0.5 hover:border-shop-gold/60"
       style={{
         boxShadow: isPowerup
           ? `0 20px 45px -30px ${puPal!.halo}`
@@ -961,7 +950,7 @@ function UnifiedCard({
         </div>
       ) : item.kind === "bundle" ? (
         <div
-          className={`relative w-full overflow-hidden ${isVitrine ? "h-40" : "h-32"}`}
+          className={`relative w-full overflow-hidden ${isVitrine ? "aspect-video" : "h-32"}`}
           style={{
             background: splashUrl || artUrl
               ? "#0b0616"
@@ -1087,7 +1076,7 @@ function UnifiedCard({
               {kindLabelBR(item.kind)}
               {item.owner ? ` · por ${item.owner}` : ""}
             </p>
-            <h3 className="mt-0.5 truncate text-[15px] font-semibold text-foreground">
+            <h3 className="mt-0.5 truncate shop-title text-[15px] font-bold uppercase text-shop-parchment">
               {item.name}
             </h3>
           </div>
@@ -1123,7 +1112,7 @@ function UnifiedCard({
               onClick={onBuy}
               disabled={busy || owned || (!isMineDeck && item.kind !== "bundle" && !canAfford)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition hover:opacity-95 disabled:opacity-40 ${
-                item.kind === 'powerup' && owned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-primary text-primary-foreground'
+                item.kind === 'powerup' && owned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'shop-gold-btn'
               }`}
             >
               {busy ? (
@@ -1263,7 +1252,7 @@ function SkeletonGrid({ view }: { view: ViewMode }) {
     );
   }
   return (
-    <ul className={view === "vitrine" ? "grid gap-4 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"}>
+    <ul className={view === "vitrine" ? "grid items-start gap-4 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"}>
       {Array.from({ length: 6 }).map((_, i) => (
         <li
           key={i}

@@ -1,6 +1,8 @@
-// Vitrine hero for the airi Shop — cinematic, Riot/LoL-store inspired.
-// Rotates through featured items automatically and on manual nav.
-import { useEffect, useState } from "react";
+// Vitrine hero for the airi Shop — game-client store layout.
+// Mobile: a arte aparece inteira (proporção original, sem corte nem texto por cima),
+// com o painel de compra abaixo e uma faixa de miniaturas dos destaques.
+// Desktop: a arte preenche a vitrine com o texto à esquerda e miniaturas à direita.
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
 import { RARITY_META, RarityChip, type Rarity } from "@/components/shop/shop-visuals";
@@ -36,15 +38,15 @@ export function ShopHero({
 }) {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const touchX = useRef<number | null>(null);
 
   useEffect(() => {
     if (paused || featured.length <= 1) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % featured.length), 6000);
+    const t = setInterval(() => setIdx((i) => (i + 1) % featured.length), 7000);
     return () => clearInterval(t);
   }, [paused, featured.length]);
 
   useEffect(() => {
-    // keep idx in range if the featured list shrinks
     if (idx >= featured.length) setIdx(0);
   }, [featured.length, idx]);
 
@@ -53,198 +55,227 @@ export function ShopHero({
   const rarity = RARITY_META[item.rarity];
   const owned = ownedIds.has(item.id);
   const canAfford = wallet >= item.price;
+  const many = featured.length > 1;
 
-  const advance = () => setIdx((i) => (i + 1) % featured.length);
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
+  const go = (d: number) => setIdx((i) => (i + d + featured.length) % featured.length);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setPaused(true);
+    touchX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchX.current;
+    touchX.current = null;
+    const end = e.changedTouches[0]?.clientX;
+    if (start == null || end == null || !many) return;
+    const dx = end - start;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+  };
+
+  const buyDisabled =
+    busyId === item.id ||
+    owned ||
+    (!canAfford && item.kind !== "deck" && item.kind !== "bundle");
+
+  const buyLabel =
+    busyId === item.id ? (
+      <>
+        <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
+        <span className="truncate">Adquirindo…</span>
+      </>
+    ) : owned ? (
+      <span className="truncate">Adquirido</span>
+    ) : item.kind === "bundle" ? (
+      <span className="truncate">Ver conteúdo</span>
+    ) : canAfford ? (
+      <span className="truncate">Comprar</span>
+    ) : (
+      <span className="truncate">Faltam {item.price - wallet} ✦</span>
+    );
+
+  const art = item.splashUrl || item.artUrl || null;
 
   return (
     <section
-      className={`relative isolate h-full min-h-[390px] overflow-hidden border border-[#8d7a45]/35 bg-[#07111b] shadow-[0_16px_40px_rgba(0,0,0,.35)] ${featured.length > 1 ? "cursor-pointer" : ""}`}
-      onClick={() => featured.length > 1 && advance()}
+      className="mb-6"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)}
     >
-
-      {/* Backdrop — admin splash art if present, else rarity gradient.
-          Mobile: splash inteira no topo (aspect 16/9, sem corte).
-          Desktop: splash preenche o hero (16/9) com o texto por cima. */}
-      {item.splashUrl ? (
-        <div className="relative w-full sm:absolute sm:inset-0 sm:z-0 sm:h-full">
-          <img
-            aria-hidden
-            src={item.splashUrl}
-            alt=""
-            className="block h-auto w-full object-contain object-center sm:h-full sm:object-cover"
-          />
-          {/* Mobile: fade curto só na base, para emendar com o bloco de texto */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 sm:hidden"
-            style={{
-              background:
-                "linear-gradient(180deg, transparent 0%, rgba(10,6,17,0.55) 55%, #0a0611 100%)",
-            }}
-          />
+      <div className="shop-frame relative isolate overflow-hidden bg-shop-ink">
+        {/* ---------- Arte ---------- */}
+        <div
+          className="relative sm:absolute sm:inset-0"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {art ? (
+            <img
+              key={item.id}
+              src={art}
+              alt={item.name}
+              draggable={false}
+              className="shop-art-in block h-auto w-full sm:h-full sm:object-cover sm:object-[70%_center]"
+            />
+          ) : (
+            <div
+              key={item.id}
+              className="shop-art-in aspect-video w-full sm:h-full sm:aspect-auto"
+              style={{ background: rarity.gradient }}
+            />
+          )}
+          {/* Desktop: sombra lateral para leitura do texto */}
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 hidden sm:block"
             style={{
               background:
-                "linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.12) 68%, transparent 100%)",
+                "linear-gradient(90deg, color-mix(in oklab, var(--shop-ink) 92%, transparent) 0%, color-mix(in oklab, var(--shop-ink) 55%, transparent) 36%, transparent 64%), linear-gradient(0deg, color-mix(in oklab, var(--shop-ink) 70%, transparent) 0%, transparent 35%)",
             }}
           />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-1/2 sm:block"
-            style={{
-              background:
-                "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.45) 100%)",
-            }}
-          />
-        </div>
-      ) : (
-        <>
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10 opacity-90"
-            style={{ background: rarity.gradient }}
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0 -z-10 opacity-60"
-            style={{
-              background:
-                "radial-gradient(circle at 85% 15%, rgba(255,255,255,0.18), transparent 45%), radial-gradient(circle at 15% 85%, rgba(0,0,0,0.45), transparent 50%)",
-            }}
-          />
-        </>
-      )}
-      {/* Grain-ish shimmer */}
-      <span
-        aria-hidden
-        className="cosmetic-shimmer pointer-events-none absolute inset-y-0 -left-1/3 z-10 w-1/3 opacity-40"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
-        }}
-      />
-
-      <div className="relative z-10 flex min-h-[390px] items-end p-5 pb-9 sm:min-h-[390px] sm:p-7 sm:pb-10">
-
-
-        <div className="min-w-0 self-center">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            <span className="inline-flex items-center gap-1.5 border border-[#d8bd76]/50 bg-black/45 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e7d49b] backdrop-blur">
-              <Sparkles className="h-3 w-3" strokeWidth={2.75} />
-              Em destaque
-            </span>
-            <RarityChip rarity={item.rarity} size="md" />
-            <span className="inline-flex items-center rounded-full border border-white/20 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/85 backdrop-blur">
-              {kindLabel(item.kind)}
-            </span>
-          </div>
-
-          <h2 className="mt-3 max-w-[560px] text-[22px] font-bold uppercase leading-tight tracking-[0.04em] text-white drop-shadow-md sm:text-4xl">
-            {item.name}
-          </h2>
-          {item.tagline && (
-            <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-white/70 sm:text-[13px]">
-              {item.tagline}
-            </p>
-          )}
-          <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-white/85 line-clamp-3 sm:line-clamp-none sm:text-sm">
-            {item.description || "Item exclusivo da loja airi."}
-          </p>
-
-
-          <div className="mt-4 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3">
-            <div className="inline-flex items-center gap-2 border border-white/25 bg-black/45 px-3 py-2 backdrop-blur sm:px-4 sm:py-2.5">
-              <ArlysIcon className="h-4 w-4 text-white sm:h-5 sm:w-5" strokeWidth={2.5} />
-              <span className="text-xl font-bold leading-none tabular-nums text-white sm:text-2xl">
-                {item.price}
-              </span>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-white/70">
-                Arlys ✦
-              </span>
-            </div>
-            <button
-              onClick={(e) => { e.stopPropagation(); onBuy(item); }}
-              disabled={busyId === item.id || owned || (!canAfford && item.kind !== "deck" && item.kind !== "bundle")}
-              className="inline-flex min-w-0 max-w-full items-center gap-2 border border-[#d7b96f] bg-[#c5a45b] px-4 py-2.5 text-[12px] font-bold uppercase tracking-wide text-[#11151b] shadow-xl transition hover:bg-[#e0c47b] disabled:opacity-50 disabled:hover:scale-100 sm:px-5 sm:text-sm"
-            >
-              {busyId === item.id ? (
-                <>
-                  <Sparkles className="h-4 w-4 shrink-0 animate-pulse" strokeWidth={2.5} />
-                  <span className="truncate">Adquirindo…</span>
-                </>
-              ) : owned ? (
-                <span className="truncate">Adquirido</span>
-              ) : item.kind === "bundle" ? (
-                <>
-                  <Sparkles className="h-4 w-4 shrink-0" strokeWidth={2.5} />
-                  <span className="truncate">Ver conteúdo</span>
-                </>
-              ) : canAfford ? (
-                <>
-                  <ArlysIcon className="h-4 w-4 shrink-0" strokeWidth={2.5} />
-                  <span className="truncate">
-                    <span className="hidden sm:inline">Comprar por </span>
-                    {item.price} ✦
-                  </span>
-                </>
-              ) : (
-                <span className="truncate">Faltam {item.price - wallet} ✦</span>
-              )}
-            </button>
-            {featured.length > 1 && (
+          {/* Mobile: setas e contador sobre a arte, sem cobrir o centro */}
+          {many && (
+            <>
               <button
-                aria-label="Próximo bundle"
-                onClick={(e) => { e.stopPropagation(); advance(); }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-4 sm:text-sm"
+                aria-label="Destaque anterior"
+                onClick={() => go(-1)}
+                className="absolute left-2 top-1/2 z-20 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border border-shop-gold/40 bg-shop-ink/60 text-shop-parchment backdrop-blur sm:hidden"
               >
-                <span className="whitespace-nowrap">Próximo</span>
+                <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
+              </button>
+              <button
+                aria-label="Próximo destaque"
+                onClick={() => go(1)}
+                className="absolute right-2 top-1/2 z-20 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full border border-shop-gold/40 bg-shop-ink/60 text-shop-parchment backdrop-blur sm:hidden"
+              >
                 <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
               </button>
+              <span className="absolute right-2 top-2 z-20 border border-shop-gold/40 bg-shop-ink/70 px-2 py-0.5 text-[10px] font-semibold tabular-nums tracking-widest text-shop-parchment backdrop-blur sm:hidden">
+                {idx + 1}/{featured.length}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* ---------- Painel de compra ---------- */}
+        <div className="relative z-10 border-t border-shop-gold/25 bg-shop-panel p-4 sm:flex sm:min-h-[440px] sm:items-end sm:border-t-0 sm:bg-transparent sm:p-8 sm:pb-24">
+          <div className="min-w-0 sm:max-w-[520px]">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 border border-shop-gold/50 bg-shop-ink/60 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-shop-gold-bright">
+                <Sparkles className="h-3 w-3" strokeWidth={2.75} />
+                Em destaque
+              </span>
+              <RarityChip rarity={item.rarity} />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-shop-parchment/70">
+                {kindLabel(item.kind)}
+              </span>
+            </div>
+
+            <h2 className="shop-title mt-2.5 text-[22px] font-bold uppercase leading-tight text-shop-parchment sm:text-[40px]">
+              {item.name}
+            </h2>
+            {item.tagline && (
+              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-shop-gold">
+                {item.tagline}
+              </p>
             )}
+            <p className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-shop-parchment/75 sm:line-clamp-4 sm:text-sm">
+              {item.description || "Item exclusivo da loja airi."}
+            </p>
+
+            <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] items-stretch gap-2 sm:flex sm:gap-3">
+              <div className="inline-flex items-center gap-2 border border-shop-gold/35 bg-shop-ink/70 px-3 py-2">
+                <ArlysIcon className="h-4 w-4 text-shop-gold-bright" strokeWidth={2.5} />
+                <span className="text-xl font-bold leading-none tabular-nums text-shop-parchment">
+                  {item.price}
+                </span>
+                <span className="text-[10px] font-semibold text-shop-parchment/60">✦</span>
+              </div>
+              <button
+                onClick={() => onBuy(item)}
+                disabled={buyDisabled}
+                className="shop-gold-btn shop-title inline-flex min-w-0 items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-bold uppercase transition disabled:opacity-50 sm:min-w-[200px]"
+              >
+                {buyLabel}
+              </button>
+            </div>
           </div>
         </div>
 
-      </div>
+        {/* Desktop: setas */}
+        {many && (
+          <>
+            <button
+              aria-label="Destaque anterior"
+              onClick={() => go(-1)}
+              className="absolute left-3 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-shop-gold/40 bg-shop-ink/50 text-shop-parchment backdrop-blur transition hover:border-shop-gold sm:grid"
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+            </button>
+            <button
+              aria-label="Próximo destaque"
+              onClick={() => go(1)}
+              className="absolute right-3 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 place-items-center rounded-full border border-shop-gold/40 bg-shop-ink/50 text-shop-parchment backdrop-blur transition hover:border-shop-gold sm:grid"
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+            </button>
+          </>
+        )}
 
-      {/* Controls */}
-      {featured.length > 1 && (
-        <>
-          <button
-            aria-label="Anterior"
-            onClick={(e) => { e.stopPropagation(); setIdx((i) => (i - 1 + featured.length) % featured.length); }}
-            className="absolute left-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
-          >
-            <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
-          </button>
-          <button
-            aria-label="Próximo"
-            onClick={(e) => { e.stopPropagation(); advance(); }}
-            className="absolute right-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/30 text-white/90 backdrop-blur transition hover:bg-black/50 sm:grid"
-          >
-            <ChevronRight className="h-4 w-4" strokeWidth={2.5} />
-          </button>
-          <div className="absolute inset-x-0 bottom-2.5 z-20 flex justify-center gap-1.5" onClick={stop}>
-            {featured.map((_, i) => (
-              <button
-                key={i}
-                aria-label={`Ir para destaque ${i + 1}`}
-                onClick={(e) => { e.stopPropagation(); setIdx(i); }}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === idx ? "w-6 bg-white" : "w-1.5 bg-white/40 hover:bg-white/70"
-                }`}
-              />
+        {/* Desktop: faixa de miniaturas sobre a arte */}
+        {many && (
+          <div className="absolute bottom-5 right-5 z-20 hidden max-w-[60%] gap-2 overflow-x-auto sm:flex">
+            {featured.map((f, i) => (
+              <Thumb key={f.id} item={f} active={i === idx} onClick={() => setIdx(i)} />
             ))}
           </div>
+        )}
+      </div>
 
-        </>
+      {/* Mobile: faixa de miniaturas abaixo */}
+      {many && (
+        <div className="-mx-1 mt-2 flex gap-2 overflow-x-auto px-1 pb-1 sm:hidden">
+          {featured.map((f, i) => (
+            <Thumb key={f.id} item={f} active={i === idx} onClick={() => setIdx(i)} />
+          ))}
+        </div>
       )}
     </section>
+  );
+}
+
+function Thumb({
+  item,
+  active,
+  onClick,
+}: {
+  item: FeaturedItem;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const art = item.splashUrl || item.artUrl;
+  return (
+    <button
+      onClick={onClick}
+      aria-label={`Ver ${item.name}`}
+      aria-current={active}
+      className={`relative w-[104px] shrink-0 overflow-hidden border text-left transition sm:w-[120px] ${
+        active
+          ? "border-shop-gold-bright shadow-shop-gold"
+          : "border-shop-gold/25 opacity-70 hover:opacity-100"
+      }`}
+    >
+      <div
+        className="aspect-video w-full bg-shop-ink"
+        style={art ? undefined : { background: RARITY_META[item.rarity].gradient }}
+      >
+        {art && (
+          <img src={art} alt="" loading="lazy" draggable={false} className="h-full w-full object-cover" />
+        )}
+      </div>
+      <span className="block truncate bg-shop-ink/90 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-shop-parchment/85">
+        {item.name}
+      </span>
+    </button>
   );
 }
 
