@@ -892,9 +892,7 @@ function UnifiedCard({
 
   return (
     <li
-      className={`relative isolate overflow-hidden rounded-3xl border ${
-        isPowerup ? "border-white/10" : rarity.border
-      } bg-[oklch(0.15_0.02_285)] transition-all hover:-translate-y-0.5`}
+      className="relative isolate overflow-hidden rounded-md border border-shop-gold/20 bg-shop-panel transition-all hover:-translate-y-0.5 hover:border-shop-gold/60"
       style={{
         boxShadow: isPowerup
           ? `0 20px 45px -30px ${puPal!.halo}`
@@ -952,7 +950,7 @@ function UnifiedCard({
         </div>
       ) : item.kind === "bundle" ? (
         <div
-          className={`relative w-full overflow-hidden ${isVitrine ? "h-40" : "h-32"}`}
+          className={`relative w-full overflow-hidden ${isVitrine ? "aspect-video" : "h-32"}`}
           style={{
             background: splashUrl || artUrl
               ? "#0b0616"
