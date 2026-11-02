@@ -1076,7 +1076,7 @@ function UnifiedCard({
               {kindLabelBR(item.kind)}
               {item.owner ? ` · por ${item.owner}` : ""}
             </p>
-            <h3 className="mt-0.5 truncate shop-title text-[15px] font-bold uppercase text-shop-parchment">
+            <h3 className="mt-0.5 truncate shop-title text-[19px] font-semibold text-shop-parchment">
               {item.name}
             </h3>
           </div>
