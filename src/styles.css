@@ -1292,3 +1292,48 @@
   animation: forge-anvil 5s ease-in-out infinite;
 }
 
+
+/* ---------- Loja: moldura dourada chanfrada ---------- */
+.shop-title {
+  font-family: var(--font-shop);
+  letter-spacing: 0.06em;
+}
+.shop-frame {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--shop-gold) 45%, transparent);
+  box-shadow: var(--shadow-shop-frame);
+}
+.shop-frame::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid color-mix(in oklab, var(--shop-gold) 14%, transparent);
+  pointer-events: none;
+  z-index: 30;
+}
+.shop-gold-btn {
+  background: linear-gradient(180deg, var(--shop-gold-bright), var(--shop-gold));
+  color: var(--shop-ink);
+  border: 1px solid var(--shop-gold-bright);
+  box-shadow: var(--shadow-shop-gold);
+}
+.shop-gold-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.shop-tab-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  height: 2px;
+  width: 70%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, var(--shop-gold-bright), transparent);
+}
+@keyframes shop-art-in {
+  from { opacity: 0; transform: scale(1.03); }
+  to { opacity: 1; transform: scale(1); }
+}
+.shop-art-in {
+  animation: shop-art-in 520ms ease-out both;
+}
