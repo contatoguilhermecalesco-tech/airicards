@@ -93,12 +93,12 @@
   --card-foreground: oklch(0.97 0.003 260);
 
   /* Loja — moldura dourada estilo cliente de jogo, sobre tinta azul-noite */
-  --shop-gold: oklch(0.74 0.08 85);
-  --shop-gold-bright: oklch(0.84 0.09 88);
-  --shop-gold-dim: oklch(0.48 0.06 75);
-  --shop-ink: oklch(0.13 0.02 255);
-  --shop-panel: oklch(0.17 0.02 260);
-  --shop-parchment: oklch(0.92 0.03 85);
+  --shop-gold: oklch(0.52 0.12 295);
+  --shop-gold-bright: oklch(0.64 0.12 298);
+  --shop-gold-dim: oklch(0.36 0.09 292);
+  --shop-ink: oklch(0.12 0.02 290);
+  --shop-panel: oklch(0.16 0.025 290);
+  --shop-parchment: oklch(0.95 0.015 300);
 
   --popover: oklch(0.22 0.002 260);
   --popover-foreground: oklch(0.97 0.003 260);
@@ -1313,7 +1313,7 @@
 }
 .shop-gold-btn {
   background: linear-gradient(180deg, var(--shop-gold-bright), var(--shop-gold));
-  color: var(--shop-ink);
+  color: var(--shop-parchment);
   border: 1px solid var(--shop-gold-bright);
   box-shadow: var(--shadow-shop-gold);
 }
