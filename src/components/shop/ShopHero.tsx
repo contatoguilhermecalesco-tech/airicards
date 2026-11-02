@@ -70,12 +70,12 @@ export function ShopHero({
           Mobile: splash inteira no topo (aspect 16/9, sem corte).
           Desktop: splash preenche o hero (16/9) com o texto por cima. */}
       {item.splashUrl ? (
-        <div className="relative w-full aspect-[16/9] sm:absolute sm:inset-0 sm:z-0 sm:aspect-auto sm:h-full">
+        <div className="relative w-full sm:absolute sm:inset-0 sm:z-0 sm:h-full">
           <img
             aria-hidden
             src={item.splashUrl}
             alt=""
-            className="h-full w-full object-cover object-center"
+            className="block h-auto w-full object-contain object-center sm:h-full sm:object-cover"
           />
           {/* Mobile: fade curto só na base, para emendar com o bloco de texto */}
           <div
