@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AtualizacoesRouteImport } from './routes/atualizacoes'
-import { Route as DesafiosRouteImport } from './routes/desafios'
 import { Route as ConquistasRouteImport } from './routes/conquistas'
+import { Route as DesafiosRouteImport } from './routes/desafios'
 import { Route as DuelRouteImport } from './routes/duel'
 import { Route as EnemiesRouteImport } from './routes/enemies'
 import { Route as ForjaRouteImport } from './routes/forja'
@@ -40,8 +40,8 @@ import { Route as PerfilIdRouteImport } from './routes/perfil_.$id'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as SocialStatsRouteImport } from './routes/social.stats'
 import { Route as StudyIndexRouteImport } from './routes/study.index'
-import { Route as StudyParabelRouteImport } from './routes/study.parabel'
 import { Route as StudyDesempenhoRouteImport } from './routes/study.desempenho'
+import { Route as StudyParabelRouteImport } from './routes/study.parabel'
 import { Route as DeckOwnerSlugRouteImport } from './routes/deck.$owner.$slug'
 import { Route as StudyGrammarIndexRouteImport } from './routes/study.grammar.index'
 import { Route as StudyListeningIndexRouteImport } from './routes/study.listening.index'
@@ -76,14 +76,14 @@ const AtualizacoesRoute = AtualizacoesRouteImport.update({
   path: '/atualizacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DesafiosRoute = DesafiosRouteImport.update({
-  id: '/desafios',
-  path: '/desafios',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConquistasRoute = ConquistasRouteImport.update({
   id: '/conquistas',
   path: '/conquistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesafiosRoute = DesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DuelRoute = DuelRouteImport.update({
@@ -216,14 +216,14 @@ const StudyIndexRoute = StudyIndexRouteImport.update({
   path: '/study/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudyParabelRoute = StudyParabelRouteImport.update({
-  id: '/study/parabel',
-  path: '/study/parabel',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StudyDesempenhoRoute = StudyDesempenhoRouteImport.update({
   id: '/study/desempenho',
   path: '/study/desempenho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudyParabelRoute = StudyParabelRouteImport.update({
+  id: '/study/parabel',
+  path: '/study/parabel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeckOwnerSlugRoute = DeckOwnerSlugRouteImport.update({
@@ -325,8 +325,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
-  '/desafios': typeof DesafiosRoute
   '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -348,13 +348,13 @@ export interface FileRoutesByFullPath {
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/exam/': typeof ExamIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
-  '/study/parabel': typeof StudyParabelRoute
-  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -378,8 +378,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
-  '/desafios': typeof DesafiosRoute
   '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -399,13 +399,13 @@ export interface FileRoutesByTo {
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/exam': typeof ExamIndexRoute
   '/library': typeof LibraryIndexRoute
   '/novidades': typeof NovidadesIndexRoute
   '/social': typeof SocialIndexRoute
   '/study': typeof StudyIndexRoute
-  '/study/parabel': typeof StudyParabelRoute
-  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/grammar': typeof StudyGrammarIndexRoute
   '/study/listening': typeof StudyListeningIndexRoute
@@ -426,8 +426,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/atualizacoes': typeof AtualizacoesRoute
-  '/desafios': typeof DesafiosRoute
   '/conquistas': typeof ConquistasRoute
+  '/desafios': typeof DesafiosRoute
   '/duel': typeof DuelRoute
   '/enemies': typeof EnemiesRoute
   '/forja': typeof ForjaRoute
@@ -449,13 +449,13 @@ export interface FileRoutesById {
   '/novidades/$id': typeof NovidadesIdRoute
   '/perfil_/$id': typeof PerfilIdRoute
   '/social/stats': typeof SocialStatsRoute
+  '/study/desempenho': typeof StudyDesempenhoRoute
+  '/study/parabel': typeof StudyParabelRoute
   '/exam/': typeof ExamIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/novidades/': typeof NovidadesIndexRoute
   '/social/': typeof SocialIndexRoute
   '/study/': typeof StudyIndexRoute
-  '/study/parabel': typeof StudyParabelRoute
-  '/study/desempenho': typeof StudyDesempenhoRoute
   '/deck/$owner/$slug': typeof DeckOwnerSlugRoute
   '/study/listening/history': typeof StudyListeningHistoryRouteWithChildren
   '/study/reading/history': typeof StudyReadingHistoryRouteWithChildren
@@ -481,8 +481,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/atualizacoes'
-    | '/desafios'
     | '/conquistas'
+    | '/desafios'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -504,12 +504,13 @@ export interface FileRouteTypes {
     | '/novidades/$id'
     | '/perfil/$id'
     | '/social/stats'
+    | '/study/desempenho'
+    | '/study/parabel'
     | '/exam/'
     | '/library/'
     | '/novidades/'
     | '/social/'
     | '/study/'
-    | '/study/desempenho'
     | '/deck/$owner/$slug'
     | '/study/listening/history'
     | '/study/reading/history'
@@ -533,8 +534,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/atualizacoes'
-    | '/desafios'
     | '/conquistas'
+    | '/desafios'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -554,12 +555,13 @@ export interface FileRouteTypes {
     | '/novidades/$id'
     | '/perfil/$id'
     | '/social/stats'
+    | '/study/desempenho'
+    | '/study/parabel'
     | '/exam'
     | '/library'
     | '/novidades'
     | '/social'
     | '/study'
-    | '/study/desempenho'
     | '/deck/$owner/$slug'
     | '/study/grammar'
     | '/study/listening'
@@ -579,8 +581,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/atualizacoes'
-    | '/desafios'
     | '/conquistas'
+    | '/desafios'
     | '/duel'
     | '/enemies'
     | '/forja'
@@ -602,6 +604,8 @@ export interface FileRouteTypes {
     | '/novidades/$id'
     | '/perfil_/$id'
     | '/social/stats'
+    | '/study/desempenho'
+    | '/study/parabel'
     | '/exam/'
     | '/library/'
     | '/novidades/'
@@ -631,8 +635,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AtualizacoesRoute: typeof AtualizacoesRoute
-  DesafiosRoute: typeof DesafiosRoute
   ConquistasRoute: typeof ConquistasRoute
+  DesafiosRoute: typeof DesafiosRoute
   DuelRoute: typeof DuelRoute
   EnemiesRoute: typeof EnemiesRoute
   ForjaRoute: typeof ForjaRoute
@@ -652,11 +656,11 @@ export interface RootRouteChildren {
   ExamHistoricoRoute: typeof ExamHistoricoRoute
   LibraryDeckIdRoute: typeof LibraryDeckIdRoute
   PerfilIdRoute: typeof PerfilIdRoute
+  StudyDesempenhoRoute: typeof StudyDesempenhoRoute
+  StudyParabelRoute: typeof StudyParabelRoute
   ExamIndexRoute: typeof ExamIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   StudyIndexRoute: typeof StudyIndexRoute
-  StudyParabelRoute: typeof StudyParabelRoute
-  StudyDesempenhoRoute: typeof StudyDesempenhoRoute
   DeckOwnerSlugRoute: typeof DeckOwnerSlugRoute
   StudyListeningHistoryRoute: typeof StudyListeningHistoryRouteWithChildren
   StudyReadingHistoryRoute: typeof StudyReadingHistoryRouteWithChildren
@@ -690,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/atualizacoes'
       fullPath: '/atualizacoes'
       preLoaderRoute: typeof AtualizacoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conquistas': {
+      id: '/conquistas'
+      path: '/conquistas'
+      fullPath: '/conquistas'
+      preLoaderRoute: typeof ConquistasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/desafios': {
@@ -874,11 +885,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialStatsRouteImport
       parentRoute: typeof SocialRoute
     }
-    '/study/parabel': {
-      id: '/study/parabel'
-      path: '/study/parabel'
-      fullPath: '/study/parabel'
-      preLoaderRoute: typeof StudyParabelRouteImport
+    '/study/': {
+      id: '/study/'
+      path: '/study'
+      fullPath: '/study/'
+      preLoaderRoute: typeof StudyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/study/desempenho': {
@@ -888,11 +899,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudyDesempenhoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/study/': {
-      id: '/study/'
-      path: '/study'
-      fullPath: '/study/'
-      preLoaderRoute: typeof StudyIndexRouteImport
+    '/study/parabel': {
+      id: '/study/parabel'
+      path: '/study/parabel'
+      fullPath: '/study/parabel'
+      preLoaderRoute: typeof StudyParabelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deck/$owner/$slug': {
@@ -1109,8 +1120,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AtualizacoesRoute: AtualizacoesRoute,
-  DesafiosRoute: DesafiosRoute,
   ConquistasRoute: ConquistasRoute,
+  DesafiosRoute: DesafiosRoute,
   DuelRoute: DuelRoute,
   EnemiesRoute: EnemiesRoute,
   ForjaRoute: ForjaRoute,
@@ -1130,11 +1141,11 @@ const rootRouteChildren: RootRouteChildren = {
   ExamHistoricoRoute: ExamHistoricoRoute,
   LibraryDeckIdRoute: LibraryDeckIdRoute,
   PerfilIdRoute: PerfilIdRoute,
+  StudyDesempenhoRoute: StudyDesempenhoRoute,
+  StudyParabelRoute: StudyParabelRoute,
   ExamIndexRoute: ExamIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   StudyIndexRoute: StudyIndexRoute,
-  StudyParabelRoute: StudyParabelRoute,
-  StudyDesempenhoRoute: StudyDesempenhoRoute,
   DeckOwnerSlugRoute: DeckOwnerSlugRoute,
   StudyListeningHistoryRoute: StudyListeningHistoryRouteWithChildren,
   StudyReadingHistoryRoute: StudyReadingHistoryRouteWithChildren,
