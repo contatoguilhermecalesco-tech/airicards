@@ -710,7 +710,7 @@ function ShopPage() {
           <ul
             className={
               view === "vitrine"
-                ? "grid gap-4 sm:grid-cols-2"
+                ? "grid items-start gap-4 sm:grid-cols-2"
                 : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
             }
           >
@@ -1252,7 +1252,7 @@ function SkeletonGrid({ view }: { view: ViewMode }) {
     );
   }
   return (
-    <ul className={view === "vitrine" ? "grid gap-4 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"}>
+    <ul className={view === "vitrine" ? "grid items-start gap-4 sm:grid-cols-2" : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"}>
       {Array.from({ length: 6 }).map((_, i) => (
         <li
           key={i}
