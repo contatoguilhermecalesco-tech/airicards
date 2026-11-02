@@ -92,6 +92,14 @@
   --card: oklch(0.20 0.002 260);
   --card-foreground: oklch(0.97 0.003 260);
 
+  /* Loja — moldura dourada estilo cliente de jogo, sobre tinta azul-noite */
+  --shop-gold: oklch(0.74 0.08 85);
+  --shop-gold-bright: oklch(0.84 0.09 88);
+  --shop-gold-dim: oklch(0.48 0.06 75);
+  --shop-ink: oklch(0.13 0.02 255);
+  --shop-panel: oklch(0.17 0.02 260);
+  --shop-parchment: oklch(0.92 0.03 85);
+
   --popover: oklch(0.22 0.002 260);
   --popover-foreground: oklch(0.97 0.003 260);
 
