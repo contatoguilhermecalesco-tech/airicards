@@ -1076,7 +1076,7 @@ function UnifiedCard({
               {kindLabelBR(item.kind)}
               {item.owner ? ` · por ${item.owner}` : ""}
             </p>
-            <h3 className="mt-0.5 truncate text-[15px] font-semibold text-foreground">
+            <h3 className="mt-0.5 truncate shop-title text-[15px] font-bold uppercase text-shop-parchment">
               {item.name}
             </h3>
           </div>
@@ -1112,7 +1112,7 @@ function UnifiedCard({
               onClick={onBuy}
               disabled={busy || owned || (!isMineDeck && item.kind !== "bundle" && !canAfford)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition hover:opacity-95 disabled:opacity-40 ${
-                item.kind === 'powerup' && owned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-primary text-primary-foreground'
+                item.kind === 'powerup' && owned ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'shop-gold-btn'
               }`}
             >
               {busy ? (
