@@ -46,10 +46,15 @@ export function ProfileGate({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// Roda direto do HTML do servidor: se o app não terminar de carregar
+// (arquivos antigos em cache após atualização), recarrega uma vez.
+const SPLASH_WATCHDOG = `(function(){try{setTimeout(function(){if(window.__airiAlive)return;var k='airi.splash.reload',t=+sessionStorage.getItem(k)||0;if(Date.now()-t<60000)return;sessionStorage.setItem(k,String(Date.now()));location.reload();},15000);}catch(e){}})();`;
+
 function WelcomeSplash() {
   const [message, setMessage] = useState("Preparando seu espaço de estudos");
 
   useEffect(() => {
+    (window as unknown as { __airiAlive?: boolean }).__airiAlive = true;
     const a = window.setTimeout(() => setMessage("Organizando sua experiência"), 850);
     const b = window.setTimeout(() => setMessage("Tudo pronto para começar"), 1650);
     return () => { window.clearTimeout(a); window.clearTimeout(b); };
@@ -73,6 +78,7 @@ function WelcomeSplash() {
         <p className="mt-4 text-[9px] font-medium uppercase tracking-[0.2em] text-white/20">Um momento</p>
       </div>
       <style>{`@keyframes airi-progress{to{transform:scaleX(1)}}@keyframes airi-glow{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(.94)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}@keyframes airi-ring{0%{transform:scale(.82);opacity:.65}75%,100%{transform:scale(1.28);opacity:0}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}`}</style>
+      <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: SPLASH_WATCHDOG }} />
     </main>
   );
 }
