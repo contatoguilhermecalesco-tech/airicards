@@ -18,7 +18,7 @@ const SLIDES = [
     title: "Prazer, eu sou a Airi!",
     message: (name: string) =>
       `Oi, ${name}! Eu sou a Airi. Vou cuidar para seu inglês nunca mais cair no esquecimento.`,
-    image: "/images/airi-onboarding/welcome.png",
+    image: welcomeArt.url,
     alt: "Airi acenando para dar as boas-vindas",
     fallback: Sparkles,
   },
@@ -27,7 +27,7 @@ const SLIDES = [
     title: "Aprender é melhor com estratégia.",
     message: (_name: string) =>
       "Revisões diárias inteligentes. Poucos minutos por dia, retenção máxima.",
-    image: "/images/airi-onboarding/method.png",
+    image: methodArt.url,
     alt: "Airi de óculos, apresentando o método de estudos",
     fallback: BookOpen,
   },
@@ -36,7 +36,7 @@ const SLIDES = [
     title: "Nossa chama não pode apagar!",
     message: (_name: string) =>
       "Estude todos os dias para manter nossa chama acesa e ganhar Arlys ✦. Preparado?",
-    image: "/images/airi-onboarding/flame.png",
+    image: flameArt.url,
     alt: "Airi apresentando uma chama roxa brilhante",
     fallback: Flame,
   },
