@@ -310,14 +310,21 @@ export async function consumePowerup(effect: string): Promise<boolean> {
   return true;
 }
 
-export async function activatePowerup(effect: string) {
-  if (!currentProfileId) return;
-  // O usuário não pode desequipar o power-up depois de ativado (decisão de design do airi).
-  // Não checamos estoque aqui pois o item já pode ter sido consumido segundos antes pela UI
-  // para garantir a transação atômica de "consumir -> ativar".
+export async function activatePowerup(effect: string): Promise<boolean> {
+  if (!currentProfileId || state.activePowerup) return false;
+  const available = state.powerups[effect] ?? 0;
+  if (available <= 0) return false;
+
+  // Consome uma unidade e ativa no mesmo update do inventário.
+  const nextPowerups = { ...state.powerups };
+  if (available === 1) delete nextPowerups[effect];
+  else nextPowerups[effect] = available - 1;
+
+  state.powerups = nextPowerups;
   state.activePowerup = effect;
   emit();
   await persist();
+  return true;
 }
 
 export async function deactivatePowerup() {
