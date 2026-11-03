@@ -82,29 +82,60 @@ async function fetchAdminFlag(): Promise<boolean> {
   return data === true;
 }
 
+const PROFILE_BOOTSTRAP_TIMEOUT_MS = 8_000;
+
+function withBootstrapTimeout<T>(task: Promise<T>): Promise<T> {
+  return Promise.race([
+    task,
+    new Promise<T>((_, reject) => {
+      window.setTimeout(
+        () => reject(new Error("Tempo limite ao restaurar a sessão do perfil.")),
+        PROFILE_BOOTSTRAP_TIMEOUT_MS,
+      );
+    }),
+  ]);
+}
+
 async function bootstrap(): Promise<void> {
   if (!isBrowser()) return;
-  const { data } = await supabase.auth.getSession();
-  if (!data.session) {
+
+  try {
+    const { data } = await withBootstrapTimeout(supabase.auth.getSession());
+    if (!data.session) {
+      currentProfile = null;
+      isAdminFlag = false;
+      writeCache(null);
+      return;
+    }
+
+    const [p, admin] = await withBootstrapTimeout(
+      Promise.all([fetchLinkedProfile(), fetchAdminFlag()]),
+    );
+    currentProfile = p;
+    isAdminFlag = admin;
+    writeCache(p);
+  } catch (error) {
+    // A indisponibilidade temporária do Supabase não pode prender o app
+    // indefinidamente na tela "Um momento". Libera a seleção de perfil;
+    // a autenticação poderá ser tentada novamente ao selecionar um perfil.
+    console.error("[AIRI] Falha ao restaurar sessão do perfil:", error);
     currentProfile = null;
     isAdminFlag = false;
     writeCache(null);
+  } finally {
     hydrated = true;
     emit();
-    return;
   }
-  const [p, admin] = await Promise.all([fetchLinkedProfile(), fetchAdminFlag()]);
-  currentProfile = p;
-  isAdminFlag = admin;
-  writeCache(p);
-  hydrated = true;
-  emit();
 }
 
 export function ensureBootstrap(): Promise<void> {
   if (!isBrowser()) return Promise.resolve();
   if (hydrated) return Promise.resolve();
-  if (!bootstrapping) bootstrapping = bootstrap();
+  if (!bootstrapping) {
+    bootstrapping = bootstrap().finally(() => {
+      bootstrapping = null;
+    });
+  }
   return bootstrapping;
 }
 
