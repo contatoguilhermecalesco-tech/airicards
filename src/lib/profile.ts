@@ -139,6 +139,31 @@ export function ensureBootstrap(): Promise<void> {
   return bootstrapping;
 }
 
+async function refreshSilently(): Promise<void> {
+  // Revalida o perfil sem voltar para a tela de abertura.
+  try {
+    const { data } = await withBootstrapTimeout(supabase.auth.getSession());
+    if (!data.session) {
+      currentProfile = null;
+      isAdminFlag = false;
+      writeCache(null);
+    } else {
+      const [p, admin] = await withBootstrapTimeout(
+        Promise.all([fetchLinkedProfile(), fetchAdminFlag()]),
+      );
+      currentProfile = p;
+      isAdminFlag = admin;
+      writeCache(p);
+    }
+  } catch (error) {
+    // Falha temporária: mantém o perfil atual em vez de derrubar a sessão.
+    console.error("[AIRI] Falha ao revalidar perfil:", error);
+  } finally {
+    hydrated = true;
+    emit();
+  }
+}
+
 if (isBrowser()) {
   // Cache leitura instantânea; ainda assim aguardamos o bootstrap real.
   currentProfile = readCache();
@@ -150,9 +175,13 @@ if (isBrowser()) {
       event === "USER_UPDATED" ||
       event === "TOKEN_REFRESHED"
     ) {
-      bootstrapping = null;
-      hydrated = false;
-      void ensureBootstrap();
+      // Chamar o Supabase dentro deste callback trava a sessão (lock interno);
+      // adiamos para o próximo ciclo. Enquanto o bootstrap inicial roda, ele
+      // mesmo já resolve o estado.
+      window.setTimeout(() => {
+        if (bootstrapping) return;
+        void refreshSilently();
+      }, 0);
     }
   });
 }
