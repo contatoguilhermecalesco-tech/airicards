@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useWallet, activatePowerup, consumePowerup, powerupName, powerupDesc } from "@/lib/wallet-store";
+import { useWallet, activatePowerup, powerupName, powerupDesc } from "@/lib/wallet-store";
 import { toast } from "sonner";
 
 export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> }) {
@@ -94,12 +94,15 @@ export function PowerupShelf({ wallet }: { wallet: ReturnType<typeof useWallet> 
                 const id = activating;
                 setActivating(null);
                 
-                const ok = await consumePowerup(id);
+                const ok = await activatePowerup(id);
                 if (ok) {
-                  await activatePowerup(id);
                   toast.success(`${powerupName(id)} ativado!`, {
-                    description: "O bônus será aplicado na sua próxima revisão.",
+                    description: "O bônus será aplicado à próxima sessão de estudos.",
                     icon: <Zap className="h-4 w-4 text-primary" />,
+                  });
+                } else {
+                  toast.error("Não foi possível ativar", {
+                    description: "Confira se ainda há unidades no inventário e se não existe outro Power-up ativo.",
                   });
                 }
                 setBusy(null);
