@@ -6,7 +6,7 @@ import { useCurrentProfile } from "@/lib/profile";
  * Apresentação oficial da Airi. A versão é vinculada ao perfil para que
  * cada perfil veja o tour uma vez, sem interferir nos demais.
  */
-const VERSION = "airi-mascot-tour-v2";
+const VERSION = "airi-mascot-tour-v3";
 const STORAGE_PREFIX = "airi.onboarded.";
 
 const SLIDES = [
@@ -14,7 +14,7 @@ const SLIDES = [
     eyebrow: "01 — BOAS-VINDAS",
     title: "Prazer, eu sou a Airi!",
     message: (name: string) =>
-      `Oi, ${name}! Eu sou a Airi. Vou cuidar para que seu inglês nunca mais caia no esquecimento.`,
+      `Oi, ${name}! Eu sou a Airi. Vou cuidar para seu inglês nunca mais cair no esquecimento.`,
     image: "/images/airi-onboarding/welcome.png",
     alt: "Airi acenando para dar as boas-vindas",
     fallback: Sparkles,
@@ -23,16 +23,16 @@ const SLIDES = [
     eyebrow: "02 — O MÉTODO",
     title: "Aprender é melhor com estratégia.",
     message: (_name: string) =>
-      "Revisões diárias inteligentes. Poucos minutos por dia, retenção máxima. Eu vou te ajudar a transformar pequenas sessões em conhecimento duradouro.",
+      "Revisões diárias inteligentes. Poucos minutos por dia, retenção máxima.",
     image: "/images/airi-onboarding/method.png",
-    alt: "Airi de óculos segurando uma prancheta e cartas de estudo",
+    alt: "Airi de óculos, apresentando o método de estudos",
     fallback: BookOpen,
   },
   {
     eyebrow: "03 — PACTO DE FOGO",
     title: "Nossa chama não pode apagar!",
     message: (_name: string) =>
-      "Estude todos os dias para manter nossa chama acesa, proteger sua sequência e ganhar Arlys ✦. Preparado?",
+      "Estude todos os dias para manter nossa chama acesa e ganhar Arlys ✦. Preparado?",
     image: "/images/airi-onboarding/flame.png",
     alt: "Airi apresentando uma chama roxa brilhante",
     fallback: Flame,
@@ -87,7 +87,11 @@ export function OnboardingTour() {
         <span
           key={item.eyebrow}
           className={`h-1 rounded-full transition-all duration-300 ${
-            index === step ? "w-8 bg-violet-300" : index < step ? "w-5 bg-violet-400/60" : "w-5 bg-white/15"
+            index === step
+              ? "w-8 bg-violet-300"
+              : index < step
+                ? "w-5 bg-violet-400/60"
+                : "w-5 bg-white/15"
           }`}
         />
       )),
@@ -104,12 +108,17 @@ export function OnboardingTour() {
       aria-label="Apresentação da Airi"
       onKeyDown={(event) => {
         if (event.key === "Escape") finish();
-        if (event.key === "ArrowRight" && step < total - 1) setStep((current) => current + 1);
-        if (event.key === "ArrowLeft" && step > 0) setStep((current) => current - 1);
+        if (event.key === "ArrowRight" && step < total - 1)
+          setStep((current) => current + 1);
+        if (event.key === "ArrowLeft" && step > 0)
+          setStep((current) => current - 1);
       }}
     >
       <div className="relative my-auto flex w-full max-w-[860px] flex-col overflow-hidden rounded-[28px] border border-violet-300/15 bg-[#100d18] shadow-[0_30px_120px_-35px_rgba(139,92,246,0.35)] sm:min-h-[520px] sm:flex-row">
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_22%_35%,rgba(139,92,246,0.18),transparent_48%)]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_22%_35%,rgba(139,92,246,0.18),transparent_48%)]"
+        />
 
         <button
           type="button"
@@ -121,17 +130,27 @@ export function OnboardingTour() {
         </button>
 
         <div className="relative flex min-h-[270px] items-center justify-center overflow-hidden px-5 pb-0 pt-8 sm:min-h-0 sm:w-[48%] sm:px-3 sm:pt-5">
-          <div aria-hidden className="absolute bottom-5 h-40 w-40 rounded-full bg-violet-500/20 blur-[70px]" />
+          <div
+            aria-hidden
+            className="absolute bottom-5 h-40 w-40 rounded-full bg-violet-500/20 blur-[70px]"
+          />
           {failedImages.includes(step) ? (
             <div className="relative grid aspect-square w-[72%] max-w-[310px] place-items-center rounded-full border border-violet-300/20 bg-violet-400/5">
-              <ImageFallback className="h-20 w-20 text-violet-200" strokeWidth={1.2} />
+              <ImageFallback
+                className="h-20 w-20 text-violet-200"
+                strokeWidth={1.2}
+              />
             </div>
           ) : (
             <img
               key={slide.image}
               src={slide.image}
               alt={slide.alt}
-              onError={() => setFailedImages((current) => current.includes(step) ? current : [...current, step])}
+              onError={() =>
+                setFailedImages((current) =>
+                  current.includes(step) ? current : [...current, step],
+                )
+              }
               className="relative z-10 max-h-[330px] w-full max-w-[390px] object-contain drop-shadow-[0_16px_40px_rgba(0,0,0,0.45)] sm:max-h-[470px]"
             />
           )}
@@ -140,7 +159,9 @@ export function OnboardingTour() {
         <div className="relative flex flex-1 flex-col justify-center px-6 pb-6 pt-2 sm:px-9 sm:py-12">
           <div className="mb-5 flex items-center gap-2">
             <span className="h-px w-6 bg-violet-300/70" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200/80">{slide.eyebrow}</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-violet-200/80">
+              {slide.eyebrow}
+            </span>
           </div>
 
           <h2 className="max-w-md font-[Sora] text-[25px] font-semibold leading-tight tracking-tight text-white sm:text-[32px]">
@@ -150,9 +171,14 @@ export function OnboardingTour() {
             {message}
           </p>
 
-          <div className="mt-8 flex items-center gap-2" aria-label={`Etapa ${step + 1} de ${total}`}>
+          <div
+            className="mt-8 flex items-center gap-2"
+            aria-label={`Etapa ${step + 1} de ${total}`}
+          >
             {progress}
-            <span className="ml-2 text-[10px] font-semibold tabular-nums tracking-wider text-white/35">0{step + 1} / 0{total}</span>
+            <span className="ml-2 text-[10px] font-semibold tabular-nums tracking-wider text-white/35">
+              0{step + 1} / 0{total}
+            </span>
           </div>
 
           <div className="mt-7 flex items-center gap-3">
@@ -167,7 +193,11 @@ export function OnboardingTour() {
             )}
             <button
               type="button"
-              onClick={() => step === total - 1 ? finish() : setStep((current) => current + 1)}
+              onClick={() =>
+                step === total - 1
+                  ? finish()
+                  : setStep((current) => current + 1)
+              }
               className="flex-1 rounded-xl bg-gradient-to-r from-[#a78bfa] to-[#8058d8] px-5 py-3.5 text-sm font-bold text-[#130d20] shadow-[0_8px_28px_-12px_rgba(167,139,250,0.8)] transition hover:brightness-110 active:scale-[0.99]"
             >
               {step === total - 1 ? "VAMOS COMEÇAR" : "CONTINUAR"}
