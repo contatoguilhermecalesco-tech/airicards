@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookOpen, Flame, Sparkles, X } from "lucide-react";
 import { useCurrentProfile } from "@/lib/profile";
+import welcomeArt from "@/assets/airi-onboarding/welcome.png.asset.json";
+import methodArt from "@/assets/airi-onboarding/method.png.asset.json";
+import flameArt from "@/assets/airi-onboarding/flame.png.asset.json";
 
 /**
  * Apresentação oficial da Airi. A versão é vinculada ao perfil para que
  * cada perfil veja o tour uma vez, sem interferir nos demais.
  */
-const VERSION = "airi-mascot-tour-v3";
+const VERSION = "airi-mascot-tour-v4";
 const STORAGE_PREFIX = "airi.onboarded.";
 
 const SLIDES = [
