@@ -22,7 +22,7 @@ const SLIDES = [
   {
     eyebrow: "02 — O MÉTODO",
     title: "Aprender é melhor com estratégia.",
-    message: () =>
+    message: (_name: string) =>
       "Revisões diárias inteligentes. Poucos minutos por dia, retenção máxima. Eu vou te ajudar a transformar pequenas sessões em conhecimento duradouro.",
     image: "/images/airi-onboarding/method.png",
     alt: "Airi de óculos segurando uma prancheta e cartas de estudo",
@@ -31,7 +31,7 @@ const SLIDES = [
   {
     eyebrow: "03 — PACTO DE FOGO",
     title: "Nossa chama não pode apagar!",
-    message: () =>
+    message: (_name: string) =>
       "Estude todos os dias para manter nossa chama acesa, proteger sua sequência e ganhar Arlys ✦. Preparado?",
     image: "/images/airi-onboarding/flame.png",
     alt: "Airi apresentando uma chama roxa brilhante",
