@@ -19,20 +19,32 @@ export function ProfileGate({ children }: { children: ReactNode }) {
   const hydrated = useProfileHydrated();
   const [loadingProfile, setLoadingProfile] = useState<Profile | null>(null);
   const [introComplete, setIntroComplete] = useState(false);
+  const [bootstrapTimedOut, setBootstrapTimedOut] = useState(false);
+
+  // A falha de inicialização não pode manter o usuário preso no splash.
+  // Após 12s, libera a seleção de perfil sem confiar no perfil apenas em cache.
+  useEffect(() => {
+    const watchdog = window.setTimeout(() => setBootstrapTimedOut(true), 12_000);
+    return () => window.clearTimeout(watchdog);
+  }, []);
 
   useEffect(() => {
-    if (!hydrated || profile) return;
+    if ((!hydrated && !bootstrapTimedOut) || (hydrated && profile)) return;
     const timeout = window.setTimeout(() => setIntroComplete(true), 2400);
     return () => window.clearTimeout(timeout);
-  }, [hydrated, profile]);
+  }, [hydrated, profile, bootstrapTimedOut]);
 
-  if (!hydrated || (!profile && !introComplete)) return <WelcomeSplash />;
+  if (!hydrated && !bootstrapTimedOut) return <WelcomeSplash />;
+  if (!introComplete && !profile) return <WelcomeSplash />;
+
+  // Perfil em cache só é aceito depois da validação da sessão.
+  const activeProfile = hydrated ? profile : null;
 
   if (loadingProfile) {
     return <ProfileLoading profile={loadingProfile} />;
   }
 
-  if (!profile) {
+  if (!activeProfile) {
     return (
       <ProfilePicker
         onLinked={(p) => {
