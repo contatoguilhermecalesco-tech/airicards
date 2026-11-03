@@ -234,6 +234,18 @@ function Review() {
     });
   }, [finished, deckName, focusCards, isEnemyRun]);
 
+  // Um Power-up é válido somente nesta sessão. A limpeza acontece também
+  // quando a última carta é respondida incorretamente.
+  useEffect(() => {
+    if (!finished || !wallet.activePowerup) return;
+    const name = powerupName(wallet.activePowerup);
+    toast.info(`${name} finalizado!`, {
+      description: "O bônus foi aplicado durante esta sessão.",
+      icon: <Check className="h-4 w-4 text-emerald-400" />,
+    });
+    void deactivatePowerup();
+  }, [finished, wallet.activePowerup]);
+
   const [askDifficulty, setAskDifficulty] = useState(false);
   const [notice, setNotice] = useState<
     | { kind: "enemy-born" | "enemy-defeated"; text: string }
@@ -370,16 +382,6 @@ function Review() {
         setIndex((i) => i + 1);
       }, 900);
       return;
-    }
-    if (finished || reviewed + 1 >= queue.length) {
-      if (wallet.activePowerup) {
-        const name = powerupName(wallet.activePowerup);
-        toast.info(`${name} finalizado!`, {
-          description: "O bônus foi aplicado a todas as cartas desta sessão.",
-          icon: <Check className="h-4 w-4 text-emerald-400" />,
-        });
-        void deactivatePowerup();
-      }
     }
     setIndex((i) => i + 1);
   }
@@ -528,6 +530,7 @@ function Review() {
               to="/enemies"
               className="grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground backdrop-blur-md transition hover:bg-white/[0.08] hover:text-foreground"
               aria-label="Sair da arena"
+              onClick={() => { if (wallet.activePowerup) void deactivatePowerup(); }}
             >
               <X className="h-4 w-4" strokeWidth={2.5} />
             </Link>
@@ -537,6 +540,7 @@ function Review() {
               params={{ deckId }}
               className="grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground backdrop-blur-md transition hover:bg-white/[0.08] hover:text-foreground"
               aria-label="Sair da sessão"
+              onClick={() => { if (wallet.activePowerup) void deactivatePowerup(); }}
             >
               <X className="h-4 w-4" strokeWidth={2.5} />
             </Link>
@@ -545,6 +549,7 @@ function Review() {
               to="/"
               className="grid h-10 w-10 place-items-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground backdrop-blur-md transition hover:bg-white/[0.08] hover:text-foreground"
               aria-label="Sair da sessão"
+              onClick={() => { if (wallet.activePowerup) void deactivatePowerup(); }}
             >
               <X className="h-4 w-4" strokeWidth={2.5} />
             </Link>
