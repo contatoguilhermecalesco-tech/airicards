@@ -10,6 +10,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, useState, useRef, Suspense, lazy, type ReactNode } from "react";
+import { useHideOnScroll } from "@/hooks/use-hide-on-scroll";
 import { createPortal } from "react-dom";
 import { Home, Library, LogOut, Shield, GraduationCap, Settings2, Swords, Target, Trophy, Users2, MoreHorizontal, Sparkles, X, ChevronRight, ChevronDown, ShoppingBag, UserRound, Package } from "lucide-react";
 import { useChangelogUnread, initChangelog } from "../lib/changelog-store";
@@ -646,6 +647,8 @@ function BottomBar() {
   const isReview = pathname.startsWith("/review");
   const [moreOpen, setMoreOpen] = useState(false);
   const unreadNews = useChangelogUnread();
+  const scrolledAway = useHideOnScroll({ disabled: moreOpen || isReview });
+  const navHidden = scrolledAway && !moreOpen;
   if (isReview) return null;
 
   const items: Array<{
@@ -668,7 +671,8 @@ function BottomBar() {
     <>
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md sm:hidden"
+        data-hidden={navHidden ? "true" : "false"}
+        className={`fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform sm:hidden ${navHidden ? "pointer-events-none translate-y-[calc(100%+2rem)] opacity-0" : "translate-y-0 opacity-100"}`}
       >
         <ul className="airi-mobile-nav grid grid-cols-5 items-center px-2">
           {items.map((item) => {
