@@ -377,11 +377,11 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   if (!open) return null;
   if (typeof document === "undefined") return null;
 
-  const onDragStart = (e: React.PointerEvent) => {
+  const onDragStart = (e: import("react").PointerEvent) => {
     dragStart.current = e.clientY;
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
   };
-  const onDragMove = (e: React.PointerEvent) => {
+  const onDragMove = (e: import("react").PointerEvent) => {
     if (dragStart.current == null) return;
     setDragY(Math.max(0, e.clientY - dragStart.current));
   };
