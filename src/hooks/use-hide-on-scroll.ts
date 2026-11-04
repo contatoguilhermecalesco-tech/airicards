@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 /**
  * Retorna `true` quando a barra deve ficar escondida:
- * some ao rolar para baixo e volta ao rolar para cima (ou perto do topo/fim).
+ * some ao rolar para baixo e volta ao rolar para cima (ou perto do topo).
  */
 export function useHideOnScroll({ threshold = 8, topOffset = 64, disabled = false } = {}) {
   const [hidden, setHidden] = useState(false);
@@ -20,12 +20,8 @@ export function useHideOnScroll({ threshold = 8, topOffset = 64, disabled = fals
       // Ignora enquanto a página está travada (ex.: painel aberto com body fixed).
       if (document.body.style.position === "fixed") return;
       const y = Math.max(0, window.scrollY);
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
       const delta = y - lastY;
       if (y < topOffset) {
-        setHidden(false);
-      } else if (y >= maxY - 4) {
-        // Chegou ao fim da página: mostra de novo para facilitar a navegação.
         setHidden(false);
       } else if (delta > threshold) {
         setHidden(true);
