@@ -331,6 +331,8 @@ function useMoreState() {
 
 function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const unreadNews = useChangelogUnread();
+  const [dragY, setDragY] = useState(0);
+  const dragStart = useRef<number | null>(null);
   useEffect(() => {
     if (open) void initChangelog();
   }, [open]);
@@ -342,11 +344,57 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+  // Trava a rolagem da página por baixo enquanto o painel está aberto (inclui iOS).
+  useEffect(() => {
+    if (!open || typeof document === "undefined") return;
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      htmlOverflow: html.style.overflow,
+    };
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    return () => {
+      body.style.position = prev.position;
+      body.style.top = prev.top;
+      body.style.width = prev.width;
+      body.style.overflow = prev.overflow;
+      html.style.overflow = prev.htmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+  useEffect(() => {
+    if (!open) setDragY(0);
+  }, [open]);
   if (!open) return null;
   if (typeof document === "undefined") return null;
+
+  const onDragStart = (e: React.PointerEvent) => {
+    dragStart.current = e.clientY;
+    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (dragStart.current == null) return;
+    setDragY(Math.max(0, e.clientY - dragStart.current));
+  };
+  const onDragEnd = () => {
+    if (dragStart.current == null) return;
+    dragStart.current = null;
+    if (dragY > 90) onClose();
+    else setDragY(0);
+  };
+
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
+      className="fixed inset-0 z-[60] flex items-end justify-center overscroll-none sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label="Mais opções"
@@ -354,84 +402,99 @@ function MoreSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
       <button
         aria-label="Fechar"
         onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-150"
+        className="absolute inset-0 touch-none bg-black/60 backdrop-blur-md animate-in fade-in duration-150"
       />
-      <div className="relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.09] bg-[hsl(var(--background))]/95 backdrop-blur-2xl shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.6)] sm:rounded-3xl sm:mx-4 sm:shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
-        {/* Grabber (mobile) */}
-        <div className="flex justify-center pt-2.5 sm:hidden">
-          <span className="h-1 w-9 rounded-full bg-white/15" />
-        </div>
-
-        <div className="flex items-center justify-between px-5 pt-4 pb-3 sm:pt-5">
-          <div>
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-primary/80">
-              airi
-            </p>
-            <h2 className="mt-0.5 text-[20px] font-semibold tracking-tight text-foreground">
-              Mais
-            </h2>
+      <div
+        className="relative z-10 flex max-h-[88dvh] w-full max-w-md flex-col rounded-t-3xl border border-white/[0.09] bg-[hsl(var(--background))]/95 backdrop-blur-2xl shadow-[0_-20px_60px_-20px_rgba(0,0,0,0.6)] sm:mx-4 sm:max-h-[80vh] sm:rounded-3xl sm:shadow-2xl animate-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200"
+        style={{
+          transform: dragY ? `translateY(${dragY}px)` : undefined,
+          transition: dragStart.current == null ? "transform 200ms ease" : "none",
+        }}
+      >
+        {/* Área de arrastar (grabber + título) — puxe para baixo para fechar */}
+        <div
+          className="shrink-0 touch-none select-none"
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
+        >
+          <div className="flex justify-center pt-2.5 sm:hidden">
+            <span className="h-1.5 w-10 rounded-full bg-white/20" />
           </div>
-          <button
-            onClick={onClose}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
-            aria-label="Fechar"
-          >
-            <X className="h-4 w-4" strokeWidth={2.5} />
-          </button>
+
+          <div className="flex items-center justify-between px-5 pt-3 pb-3 sm:pt-5">
+            <div>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-primary/80">
+                airi
+              </p>
+              <h2 className="mt-0.5 text-[20px] font-semibold tracking-tight text-foreground">
+                Mais
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-foreground/70 transition hover:bg-white/[0.08] hover:text-foreground"
+              aria-label="Fechar"
+            >
+              <X className="h-4 w-4" strokeWidth={2.5} />
+            </button>
+          </div>
         </div>
 
-        <div className="px-4 pb-5 pt-1 sm:px-5 sm:pb-6">
-          <ul className="flex flex-col gap-2">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4 pt-1 sm:px-5 sm:pb-6"
+          style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
+        >
+          <ul className="grid grid-cols-2 gap-2.5">
             {MORE_ITEMS.map(({ to, label, description, icon: Icon, color }) => {
               const isNews = to === "/novidades";
               const badge = isNews && unreadNews > 0 ? unreadNews : 0;
               return (
-                <li key={to}>
+                <li key={to} className="min-w-0">
                   <Link
                     to={to}
                     onClick={onClose}
-                    className="group relative flex items-center gap-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5 transition hover:-translate-y-px hover:border-white/[0.14] hover:bg-white/[0.06]"
+                    className="group relative flex h-full min-h-[104px] flex-col justify-between gap-2.5 rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3.5 transition active:scale-[0.97] active:bg-white/[0.08] hover:border-white/[0.14] hover:bg-white/[0.06]"
                   >
-                    <div
-                      className="relative grid h-11 w-11 shrink-0 place-items-center rounded-2xl border"
-                      style={{
-                        backgroundColor: `${color}1f`,
-                        borderColor: `${color}40`,
-                        color,
-                        boxShadow: `0 6px 20px -8px ${color}55`,
-                      }}
-                    >
-                      <Icon className="h-5 w-5" strokeWidth={2.25} />
+                    <div className="flex items-start justify-between">
+                      <div
+                        className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border"
+                        style={{
+                          backgroundColor: `${color}1f`,
+                          borderColor: `${color}40`,
+                          color,
+                          boxShadow: `0 6px 20px -8px ${color}55`,
+                        }}
+                      >
+                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.25} />
+                      </div>
+                      {badge > 0 && (
+                        <span
+                          className="inline-flex h-[20px] min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10.5px] font-bold text-primary-foreground"
+                          style={{ backgroundColor: color }}
+                        >
+                          {badge}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="min-w-0 flex-1">
-                      <p className="flex items-center gap-2 text-[15px] font-semibold text-foreground">
-                        <span className="truncate">{label}</span>
-                        {badge > 0 && (
-                          <span
-                            className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-primary-foreground"
-                            style={{ backgroundColor: color }}
-                          >
-                            {badge}
-                          </span>
-                        )}
+                    <div className="min-w-0">
+                      <p className="truncate text-[14.5px] font-semibold leading-tight text-foreground">
+                        {label}
                       </p>
-                      <p className="mt-0.5 truncate text-[12px] text-foreground/55">
+                      <p className="mt-0.5 line-clamp-2 text-[11.5px] leading-snug text-foreground/55">
                         {description}
                       </p>
                     </div>
-
-                    <ChevronRight
-                      className="h-4 w-4 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/70"
-                      strokeWidth={2.25}
-                    />
                   </Link>
                 </li>
               );
             })}
           </ul>
+          <div className="safe-bottom" />
         </div>
-        <div className="safe-bottom" />
       </div>
     </div>,
     document.body,
