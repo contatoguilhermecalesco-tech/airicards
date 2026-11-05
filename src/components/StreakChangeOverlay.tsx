@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Flame } from "lucide-react";
 import { onStreakChange, type StreakChangeEvent } from "@/lib/flashcards-store";
 import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito.png.asset.json";
 import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida.png.asset.json";
