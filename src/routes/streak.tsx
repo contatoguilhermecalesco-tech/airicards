@@ -15,6 +15,10 @@ import {
   Zap,
 } from "lucide-react";
 import { useCardsReviewedToday, useStreak } from "@/lib/flashcards-store";
+import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito.png.asset.json";
+import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida.png.asset.json";
+import airiCorreStreak from "@/assets/airi-emotes/airi-corre-streak.png.asset.json";
+import airiMeiaNoite from "@/assets/airi-emotes/airi-meia-noite.png.asset.json";
 
 export const Route = createFileRoute("/streak")({ component: StreakPage });
 
@@ -48,6 +52,42 @@ function startOfWeek(date: Date) {
   return result;
 }
 
+type AiriMood = "done" | "lost" | "urgent" | "pending";
+
+function resolveAiriMood(opts: { studiedToday: boolean; current: number; yesterdayDone: boolean; hour: number }): AiriMood {
+  if (opts.studiedToday) return "done";
+  if (opts.current === 0 && opts.yesterdayDone) return "lost";
+  if (opts.hour >= 20) return "urgent";
+  return "pending";
+}
+
+const AIRI_MOODS: Record<AiriMood, { img: string; title: string; detail: string; tone: string }> = {
+  done: {
+    img: airiEstudoFeito.url,
+    title: "Estudo do dia feito!",
+    detail: "Sua chama está protegida por hoje. A Airi aprova.",
+    tone: "text-emerald-300",
+  },
+  lost: {
+    img: airiStreakPerdida.url,
+    title: "A chama congelou…",
+    detail: "Sua sequência foi perdida, mas toda lenda recomeça. Estude hoje e acenda a chama de novo.",
+    tone: "text-sky-300",
+  },
+  urgent: {
+    img: airiMeiaNoite.url,
+    title: "Meia-noite se aproxima!",
+    detail: "Restam poucas horas para registrar o estudo de hoje e salvar sua sequência.",
+    tone: "text-rose-300",
+  },
+  pending: {
+    img: airiCorreStreak.url,
+    title: "Corra para não perder a streak!",
+    detail: "Ainda não há estudo registrado hoje. Uma revisão rápida já mantém a chama acesa.",
+    tone: "text-orange-300",
+  },
+};
+
 function StreakPage() {
   const streak = useStreak();
   const reviewedToday = useCardsReviewedToday();
@@ -55,6 +95,11 @@ function StreakPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayKey = dateKey(today);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayDone = history[dateKey(yesterday)] === "done";
+  const studiedToday = history[todayKey] === "done" || reviewedToday > 0;
+  const airiMood = AIRI_MOODS[resolveAiriMood({ studiedToday, current: streak.current, yesterdayDone, hour: new Date().getHours() })];
 
   const calendarStart = startOfWeek(today);
   calendarStart.setDate(calendarStart.getDate() - 51 * 7);
@@ -134,6 +179,20 @@ function StreakPage() {
           <Metric label="Dias estudados" value={studiedLast30} suffix="últimos 30 dias" />
           <Metric label="Dias sem estudo" value={missedLast30} suffix="últimos 30 dias" />
           <Metric label="Consistência" value={consistency} suffix="% nos últimos 30 dias" />
+        </div>
+
+        <div className="mt-6 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:gap-5 sm:p-5">
+          <img
+            src={airiMood.img}
+            alt="Airi"
+            className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-1 ring-white/10 sm:h-24 sm:w-24"
+            loading="lazy"
+          />
+          <div className="min-w-0">
+            <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${airiMood.tone}`}>Airi diz</p>
+            <p className="mt-1 text-base font-semibold tracking-tight sm:text-lg">{airiMood.title}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{airiMood.detail}</p>
+          </div>
         </div>
       </header>
 
