@@ -180,6 +180,20 @@ function StreakPage() {
           <Metric label="Dias sem estudo" value={missedLast30} suffix="últimos 30 dias" />
           <Metric label="Consistência" value={consistency} suffix="% nos últimos 30 dias" />
         </div>
+
+        <div className="mt-6 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:gap-5 sm:p-5">
+          <img
+            src={airiMood.img}
+            alt="Airi"
+            className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-1 ring-white/10 sm:h-24 sm:w-24"
+            loading="lazy"
+          />
+          <div className="min-w-0">
+            <p className={`text-[10px] font-semibold uppercase tracking-[0.2em] ${airiMood.tone}`}>Airi diz</p>
+            <p className="mt-1 text-base font-semibold tracking-tight sm:text-lg">{airiMood.title}</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">{airiMood.detail}</p>
+          </div>
+        </div>
       </header>
 
       <section className="grid gap-8 border-b border-white/10 pb-9 lg:grid-cols-[1.15fr_.85fr] lg:gap-14">
