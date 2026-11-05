@@ -38,6 +38,7 @@ import {
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinImpact } from "@/components/review/TableSkinImpact";
+import { AiriSpeech } from "@/components/AiriMascot";
 
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
@@ -1171,7 +1172,12 @@ function FinishedState({
 }) {
   const themed = !isDefaultTableSkin(skin) && !enemyRun;
   return (
-    <div className="mt-20 grid place-items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="mt-10 grid place-items-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {reviewed > 0 && (
+        <div className="mb-8 w-full max-w-md text-left">
+          <AiriSpeech mood="done" size="lg" title={`${reviewed} ${reviewed === 1 ? "carta concluída" : "cartas concluídas"}!`} detail="Sua sequência de hoje está salva. Mandou bem!" />
+        </div>
+      )}
       {themed && skin.crest ? (
         <div className="relative">
           <div
