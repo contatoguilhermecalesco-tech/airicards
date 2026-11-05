@@ -46,7 +46,7 @@ export function StreakChangeOverlay() {
           <img
             src={airiEstudoFeito.url}
             alt="Airi comemorando"
-            className="h-11 w-11 shrink-0 rounded-xl object-cover ring-1 ring-orange-300/30"
+            className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-orange-300/30"
           />
           <div className="min-w-0">
             <p className="text-[13px] font-semibold text-orange-100 leading-none">
@@ -81,7 +81,7 @@ export function StreakChangeOverlay() {
         <img
           src={airiStreakPerdida.url}
           alt="Airi congelada"
-          className="h-11 w-11 shrink-0 rounded-xl object-cover ring-1 ring-white/10"
+          className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-white/10"
         />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold text-muted-foreground leading-none">

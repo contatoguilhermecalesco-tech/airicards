@@ -17,11 +17,14 @@ import {
   useStreak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
+import { AiriSpeech, useAiriMood } from "@/components/AiriMascot";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
 
 
 
+
+const AIRI_DETAIL = { done: "Chama protegida hoje", lost: "Recomece hoje", urgent: "Poucas horas restantes", pending: "Uma revisão rápida mantém a chama" } as const;
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -71,6 +74,7 @@ function Home() {
   const cards = useStore((s) => s.cards);
   const reviewedToday = useCardsReviewedToday();
   const streak = useStreak();
+  const airiMood = useAiriMood();
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
     () => cards.filter((c) => c.dueAt <= now).length,
@@ -158,7 +162,11 @@ function Home() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <section className="animate-fade-in mt-5 flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-3">
+      <section className="animate-fade-in mt-5 rounded-[26px] border border-white/[0.08] bg-white/[0.03] px-3 pt-3 sm:px-4">
+        <AiriSpeech mood={airiMood} to={airiMood === "done" ? "/streak" : "/review"} detail={`${AIRI_DETAIL[airiMood]} · ${streak.current} ${streak.current === 1 ? "dia" : "dias"} seguidos`} />
+      </section>
+
+      <section className="animate-fade-in mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-3">
         <Link to="/streak" className="flex min-w-0 items-center gap-2.5"><Flame className="h-5 w-5 shrink-0 text-orange-300" /><span className="text-sm font-semibold tabular-nums text-foreground">{streak.current} {streak.current === 1 ? "dia" : "dias"}</span><span className="truncate text-xs text-muted-foreground">de sequência</span></Link>
         <span className="h-5 w-px bg-white/10" />
         <Link to="/rank" className="flex min-w-0 items-center gap-2 text-right"><Crown className="h-4 w-4 shrink-0" style={{ color: TIER_COLORS[rank.tier].glow }} /><span className="truncate text-xs font-medium text-foreground">{TIER_LABEL[rank.tier]} {!isElite(rank.tier) && DIVISION_ROMAN[rank.division as 1 | 2 | 3 | 4]}</span></Link>

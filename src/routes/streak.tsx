@@ -185,7 +185,7 @@ function StreakPage() {
           <img
             src={airiMood.img}
             alt="Airi"
-            className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-1 ring-white/10 sm:h-24 sm:w-24"
+            className="h-32 w-32 shrink-0 object-contain drop-shadow-[0_12px_24px_rgba(0,0,0,0.5)] sm:h-40 sm:w-40"
             loading="lazy"
           />
           <div className="min-w-0">
