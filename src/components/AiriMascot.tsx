@@ -64,8 +64,8 @@ export function AiriSpeech({ mood, title, detail, to, size = "md" }: { mood: Air
 }
 
 /** Banner temático reutilizável para as habilidades e missões. */
-export function AiriFocusBanner({ mood, title, detail, actionLabel = "Iniciar treino", compact = false }: {
-  mood: AiriFocusMood; title?: string; detail?: string; actionLabel?: string; compact?: boolean;
+export function AiriFocusBanner({ mood, title, detail, actionLabel = "Iniciar treino", compact = false, to }: {
+  mood: AiriFocusMood; title?: string; detail?: string; actionLabel?: string; compact?: boolean; to?: AiriRoute;
 }) {
   const config = AIRI_FOCUS_CONFIG[mood];
   return (
