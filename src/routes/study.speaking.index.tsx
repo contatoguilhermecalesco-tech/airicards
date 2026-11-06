@@ -25,6 +25,7 @@ import {
 import { speak, stopSpeaking, ttsAvailable, sttAvailable, startRecognition, type STTHandle } from "@/lib/speech";
 import { createCard, useStore } from "@/lib/flashcards-store";
 import { addStudyEntry } from "@/lib/study-history-store";
+import { AiriFocusSticker } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/study/speaking/")({
   head: () => ({
