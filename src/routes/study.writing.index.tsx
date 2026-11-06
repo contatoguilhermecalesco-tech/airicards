@@ -98,6 +98,7 @@ function WritingPage() {
 
       {!feedback && (
         <section className="glass-panel rounded-3xl border p-5">
+          {loading && <AiriFocusSticker mood="writing" caption="Airi está passando o pente fino na sua redação..." className="mb-4" />}
           <label className="block text-sm font-medium">Tema (opcional)</label>
           <input
             value={prompt}
