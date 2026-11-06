@@ -1,6 +1,27 @@
 import { useRef, useState } from "react";
 import { ImagePlus } from "lucide-react";
 import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
+
+/** Reduz a splash para JPEG ~1600px: carrega rápido e cabe na prévia do WhatsApp. */
+async function shrinkCover(file: File): Promise<File> {
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1600 / bmp.width);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    for (const q of [0.82, 0.7, 0.6]) {
+      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", q));
+      if (blob && (blob.size < 450_000 || q === 0.6)) {
+        return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+      }
+    }
+  } catch {
+    /* mantém original */
+  }
+  return file;
+}
 import { Loader2, Pencil, Send, Sparkles, Trash2, Wand2, Wrench, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -56,7 +77,7 @@ export function ChangelogSection() {
   async function onCover(f?: File) {
     if (!f) return;
     setCoverBusy(true);
-    try { setCoverUrl(await uploadConceptImage(f)); } catch (e) { setErr((e as Error).message); } finally { setCoverBusy(false); }
+    try { setCoverUrl(await uploadConceptImage(await shrinkCover(f))); } catch (e) { setErr((e as Error).message); } finally { setCoverBusy(false); }
   }
   const [genBusy, setGenBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
