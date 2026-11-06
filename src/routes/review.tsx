@@ -1172,6 +1172,46 @@ function EmptyState({ enemyRun }: { enemyRun: boolean }) {
   );
 }
 
+/* ------------------- Popup "Dever cumprido" da Airi ------------------- */
+
+function DutyDoneOverlay({ reviewed }: { reviewed: number }) {
+  return (
+    <div
+      className="fixed inset-0 z-[120] grid place-items-center bg-background/70 backdrop-blur-md animate-in fade-in duration-200"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="airi-duty-pop flex flex-col items-center px-6 text-center">
+        <div className="relative">
+          <div
+            aria-hidden
+            className="airi-duty-glow absolute -inset-10 rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--primary) / 0.35), transparent 70%)",
+            }}
+          />
+          <img
+            src={AIRI_MOODS.done.img}
+            alt="Airi comemorando"
+            className="relative h-44 w-44 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.55)] sm:h-56 sm:w-56"
+          />
+        </div>
+        <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+          Airi aprova
+        </p>
+        <h2 className="mt-1.5 text-3xl font-bold tracking-tight sm:text-4xl">
+          Dever cumprido!
+        </h2>
+        <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+          {reviewed} {reviewed === 1 ? "carta revisada" : "cartas revisadas"} —
+          sua chama está segura hoje.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function FinishedState({
   reviewed,
   deckId,
