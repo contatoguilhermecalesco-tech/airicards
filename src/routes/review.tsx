@@ -38,7 +38,7 @@ import {
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinImpact } from "@/components/review/TableSkinImpact";
-import { AiriSpeech } from "@/components/AiriMascot";
+import { AiriSpeech, AIRI_MOODS } from "@/components/AiriMascot";
 
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
