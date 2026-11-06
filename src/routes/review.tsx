@@ -465,6 +465,9 @@ function Review() {
       )}
 
 
+      {/* Popup "Dever cumprido" — Airi celebra por ~2,4s antes do resumo */}
+      {dutyPopup && <DutyDoneOverlay reviewed={reviewed} />}
+
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
 
