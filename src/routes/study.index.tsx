@@ -160,7 +160,7 @@ function StudyIndex() {
 
       <section aria-labelledby="today-title" className="mb-10">
         <p className="mb-2 px-1 text-xs font-semibold uppercase text-muted-foreground">Foco de hoje</p>
-        <AiriFocusBanner mood={focusMood} title={current ? undefined : "Fim de semana de imersão!"} detail={current ? undefined : "Escolha uma habilidade para revisar livremente ou pratique com seus flashcards."} actionLabel={current ? "Iniciar treino" : "Revisar agora"} />
+        <AiriFocusBanner mood={focusMood} to={current ? undefined : "/review"} title={current ? undefined : "Fim de semana de imersão!"} detail={current ? undefined : "Escolha uma habilidade para revisar livremente ou pratique com seus flashcards."} actionLabel={current ? "Iniciar treino" : "Revisar agora"} />
       </section>
 
 
