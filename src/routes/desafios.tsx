@@ -109,7 +109,9 @@ function DailyChallengesPage() {
         </p>
       </header>
 
-      <AiriFocusSticker mood={allClaimed ? "missions_done" : "missions_pending"} caption={allClaimed ? "Você completou as missões! A Airi está pronta para comemorar seu resgate." : "Escolha uma missão e avance um pouco mais no inglês hoje."} className="mb-5" />\n\n      <section className="mb-7 flex items-center gap-4 border-y border-white/[0.08] py-4">
+      <AiriFocusSticker mood={allClaimed ? "missions_done" : "missions_pending"} caption={allClaimed ? "Você completou as missões! A Airi está pronta para comemorar seu resgate." : "Escolha uma missão e avance um pouco mais no inglês hoje."} className="mb-5" />
+
+      <section className="mb-7 flex items-center gap-4 border-y border-white/[0.08] py-4">
         <div
           className="grid h-[62px] w-[62px] shrink-0 place-items-center rounded-full p-[5px]"
           style={{
@@ -169,7 +171,8 @@ function DailyChallengesPage() {
 
       {loaded && (
         <section className="mt-7 border-t border-white/[0.08] pt-5">
-          <div className="flex items-center gap-3">\n            {allClaimed && <AiriFocusSticker mood="missions_done" caption="Baú liberado! Resgate suas recompensas." className="flex-1 border-0 bg-transparent p-0" />}
+          <div className="flex items-center gap-3">
+            {allClaimed && <AiriFocusSticker mood="missions_done" caption="Baú liberado! Resgate suas recompensas." className="flex-1 border-0 bg-transparent p-0" />}
             <span
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
                 chestClaimed ? "bg-[#c8f36a]/15 text-[#c8f36a]" : "bg-white/[0.06] text-[#c8f36a]"
@@ -225,7 +228,8 @@ function MissionRow({
   busy: boolean;
   onClaim: () => void;
 }) {
-  const Icon = ICONS[mission.type];\n  const focusMood: AiriFocusMood = mission.type === "writing" ? "writing" : "missions_pending";
+  const Icon = ICONS[mission.type];
+  const focusMood: AiriFocusMood = mission.type === "writing" ? "writing" : "missions_pending";
   const ready = mission.progress >= mission.target && !mission.claimed;
   const pct = Math.min(100, Math.round((mission.progress / mission.target) * 100));
 
@@ -241,6 +245,7 @@ function MissionRow({
         >
           {mission.claimed ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" strokeWidth={1.9} />}
         </span>
+        <img src={AIRI_FOCUS_CONFIG[focusMood].img} alt="" aria-hidden="true" className="h-9 w-9 shrink-0 object-contain" loading="lazy" />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
