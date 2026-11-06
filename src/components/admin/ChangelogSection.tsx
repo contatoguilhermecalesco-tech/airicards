@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ImagePlus } from "lucide-react";
+import { uploadConceptImage } from "@/lib/bundle-concepts-upload";
 import { Loader2, Pencil, Send, Sparkles, Trash2, Wand2, Wrench, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -48,6 +50,14 @@ export function ChangelogSection() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [notes, setNotes] = useState("");
+  const [coverUrl, setCoverUrl] = useState("");
+  const [coverBusy, setCoverBusy] = useState(false);
+  const coverInput = useRef<HTMLInputElement>(null);
+  async function onCover(f?: File) {
+    if (!f) return;
+    setCoverBusy(true);
+    try { setCoverUrl(await uploadConceptImage(f)); } catch (e) { setErr((e as Error).message); } finally { setCoverBusy(false); }
+  }
   const [genBusy, setGenBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -60,6 +70,7 @@ export function ChangelogSection() {
     setTitle("");
     setBody("");
     setNotes("");
+    setCoverUrl("");
     setIdea("");
     setIconKey("");
     setEditingId(null);
@@ -71,6 +82,7 @@ export function ChangelogSection() {
     setTitle(entry.title);
     setBody(entry.body);
     setNotes(entry.notes ?? "");
+    setCoverUrl(entry.cover_url ?? "");
     setCategory(entry.category);
     setIconKey((entry.icon as NotificationIconKey | null) ?? "");
     setIdea("");
@@ -113,6 +125,7 @@ export function ChangelogSection() {
           notes: notes.trim() || null,
           category,
           icon: iconKey || null,
+          cover_url: coverUrl.trim() || null,
         });
         resetForm();
         setOk("Patch atualizado.");
@@ -123,6 +136,7 @@ export function ChangelogSection() {
           notes: notes.trim() || null,
           category,
           icon: iconKey || null,
+          cover_url: coverUrl.trim() || null,
         });
         resetForm();
         setOk("Novidade publicada.");
@@ -378,6 +392,25 @@ export function ChangelogSection() {
                 <code className="rounded bg-white/[0.06] px-1 py-[1px] text-foreground/80">[NOVO] [REMOVIDO] [BUG] [AJUSTE]</code>
               </li>
             </ul>
+          </div>
+
+          <div className="mb-4 rounded-2xl border border-white/10 bg-black/25 p-3">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/50">Splash art (capa)</p>
+            {coverUrl && (
+              <div className="relative mb-2 aspect-[16/9] overflow-hidden rounded-xl border border-white/10">
+                <img src={coverUrl} alt="Prévia da capa" className="h-full w-full object-cover" />
+                <button type="button" onClick={() => setCoverUrl("")} aria-label="Remover capa" className="absolute right-2 top-2 rounded-full bg-background/80 p-1.5 text-foreground/80"><X className="h-4 w-4" /></button>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <button type="button" disabled={coverBusy} onClick={() => coverInput.current?.click()} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[13px] font-semibold disabled:opacity-60">
+                {coverBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                {coverBusy ? "Enviando…" : coverUrl ? "Trocar imagem" : "Enviar imagem"}
+              </button>
+              <input value={coverUrl} onChange={(e) => setCoverUrl(e.target.value)} placeholder="ou cole uma URL https://..." className="min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[12px] outline-none focus:border-primary/60" />
+            </div>
+            <input ref={coverInput} type="file" accept="image/*" hidden onChange={(e) => { onCover(e.target.files?.[0]); e.target.value = ""; }} />
+            <p className="mt-1 text-[10px] text-foreground/40">Ideal 16:9 (ex: 1920×1080). Aparece no topo da nota.</p>
           </div>
 
           <textarea
