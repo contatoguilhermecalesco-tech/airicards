@@ -1,0 +1,1 @@
+GRANT SELECT ON public.changelog_entries TO anon;

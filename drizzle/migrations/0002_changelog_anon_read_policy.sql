@@ -1,0 +1,1 @@
+CREATE POLICY "changelog public read" ON public.changelog_entries FOR SELECT TO anon USING (true);
