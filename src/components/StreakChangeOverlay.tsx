@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { onStreakChange, type StreakChangeEvent } from "@/lib/flashcards-store";
-import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito.png.asset.json";
-import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida.png.asset.json";
+import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito-cut.png";
+import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida-cut.png";
 
 /**
  * Overlay global — dá feedback visual imediato ao GANHAR ou PERDER
@@ -44,7 +44,7 @@ export function StreakChangeOverlay() {
       >
         <div className="motion-safe:animate-[streakToast_1600ms_ease-out_forwards] flex items-center gap-3 px-4 py-3 rounded-2xl border border-orange-300/25 bg-gradient-to-b from-orange-500/15 to-rose-500/10 backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(251,146,60,0.5)]">
           <img
-            src={airiEstudoFeito.url}
+            src={airiEstudoFeito}
             alt="Airi comemorando"
             className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-orange-300/30"
           />
@@ -79,7 +79,7 @@ export function StreakChangeOverlay() {
     >
       <div className="motion-safe:animate-[streakToastLost_1800ms_ease-out_forwards] flex items-center gap-3 px-4 py-3 rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-lg">
         <img
-          src={airiStreakPerdida.url}
+          src={airiStreakPerdida}
           alt="Airi congelada"
           className="h-16 w-16 shrink-0 rounded-xl object-cover ring-1 ring-white/10"
         />
