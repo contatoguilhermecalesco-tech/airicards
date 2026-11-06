@@ -11,3 +11,6 @@
 - [x] Impedir que cartas e decks excluídos reapareçam após a sincronização
 - [x] Corrigir o compartilhamento das Patch Notes por link público
 - [x] Redesenhar e validar a aba Estudos na direção iOS grouped
+- [x] Recortar e integrar os cinco emotes de foco
+- [x] Criar lembrete diário da Airi com opção de pular
+- [ ] Validar emotes e lembrete com perfil ativo em desktop/mobile

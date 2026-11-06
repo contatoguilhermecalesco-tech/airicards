@@ -619,8 +619,8 @@ function ReadingPage() {
           </button>
 
           {grade && (
-        <AiriFocusSticker mood="missions_done" caption="Boa leitura! Você interpretou o texto e concluiu mais uma etapa." className="mb-4" />
             <div className="mt-5 space-y-3">
+              <AiriFocusSticker mood="missions_done" caption="Boa leitura! Você interpretou o texto e concluiu mais uma etapa." className="mb-4" />
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">
                   Correção
