@@ -19,8 +19,19 @@ import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito-cut.png";
 import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida-cut.png";
 import airiCorreStreak from "@/assets/airi-emotes/airi-corre-streak-cut.png";
 import airiMeiaNoite from "@/assets/airi-emotes/airi-meia-noite-cut.png";
+import { resolveAiriMood, type AiriMood } from "@/lib/airi-streak-mood";
 
-export const Route = createFileRoute("/streak")({ component: StreakPage });
+export const Route = createFileRoute("/streak")({
+  component: StreakPage,
+  head: () => ({ meta: [
+    { title: "Central de Streak | airi" },
+    { name: "description", content: "Acompanhe sua sequência de estudos e conquistas no airi." },
+    { property: "og:title", content: "Central de Streak | airi" },
+    { property: "og:description", content: "Acompanhe sua sequência de estudos e conquistas no airi." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+});
 
 const MILESTONES = [
   { days: 7, name: "Primeira chama", reward: "Badge Brasa Inicial", detail: "Seu primeiro símbolo de consistência.", icon: Flame },
@@ -50,15 +61,6 @@ function startOfWeek(date: Date) {
   result.setHours(0, 0, 0, 0);
   result.setDate(result.getDate() - ((result.getDay() + 6) % 7));
   return result;
-}
-
-type AiriMood = "done" | "lost" | "urgent" | "pending";
-
-function resolveAiriMood(opts: { studiedToday: boolean; current: number; yesterdayDone: boolean; hour: number }): AiriMood {
-  if (opts.studiedToday) return "done";
-  if (opts.current === 0 && opts.yesterdayDone) return "lost";
-  if (opts.hour >= 20) return "urgent";
-  return "pending";
 }
 
 const AIRI_MOODS: Record<AiriMood, { img: string; title: string; detail: string; tone: string }> = {
@@ -95,11 +97,8 @@ function StreakPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayKey = dateKey(today);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayDone = history[dateKey(yesterday)] === "done";
   const studiedToday = history[todayKey] === "done" || reviewedToday > 0;
-  const airiMood = AIRI_MOODS[resolveAiriMood({ studiedToday, current: streak.current, yesterdayDone, hour: new Date().getHours() })];
+  const airiMood = AIRI_MOODS[resolveAiriMood({ studiedToday, current: streak.current, hour: new Date().getHours() })];
 
   const calendarStart = startOfWeek(today);
   calendarStart.setDate(calendarStart.getDate() - 51 * 7);
