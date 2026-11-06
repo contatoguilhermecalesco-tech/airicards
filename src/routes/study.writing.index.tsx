@@ -182,6 +182,7 @@ function WritingPage() {
             setPrompt("");
           }}
         />
+        </>
       )}
     </main>
   );
