@@ -286,6 +286,8 @@ function SpeakingPage() {
         </div>
       </header>
 
+      <AiriFocusSticker mood="speaking" caption="Antes de começar, prepare a voz. Fale em inglês com calma e tente articular cada som." className="mb-4" pulse={listening} />
+
       {/* Config */}
       <section className="glass-panel rounded-3xl border p-5">
         <label className="block text-xs uppercase tracking-wider text-muted-foreground">
