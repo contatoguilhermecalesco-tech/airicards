@@ -242,7 +242,13 @@ function NovidadeDetailPage() {
               }}
             />
 
-            <div className="relative px-6 pb-8 pt-8 sm:px-10 sm:pb-10 sm:pt-12">
+            {entry.cover_url && (
+              <>
+                <img src={entry.cover_url} alt={`Splash art: ${entry.title}`} className="absolute inset-0 h-full w-full object-cover" />
+                <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(5,5,6,0.15) 0%, rgba(5,5,6,0.55) 55%, rgba(5,5,6,0.95) 100%)" }} />
+              </>
+            )}
+            <div className={`relative px-6 pb-8 sm:px-10 sm:pb-10 ${entry.cover_url ? "pt-48 sm:pt-72" : "pt-8 sm:pt-12"}`}>
               <div className="flex flex-wrap items-center gap-2">
                 <span
                   className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"

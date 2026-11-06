@@ -12,6 +12,7 @@ export type ChangelogEntry = {
   notes: string | null;
   category: ChangelogCategory;
   icon: string | null;
+  cover_url?: string | null;
   created_at: string;
 };
 
@@ -124,6 +125,7 @@ export async function createChangelogEntry(input: {
   notes?: string | null;
   category: ChangelogCategory;
   icon?: string | null;
+  cover_url?: string | null;
 }) {
   const { data, error } = await supabase
     .from("changelog_entries")
@@ -133,6 +135,7 @@ export async function createChangelogEntry(input: {
       notes: input.notes?.trim() || null,
       category: input.category,
       icon: input.icon ?? null,
+      cover_url: input.cover_url?.trim() || null,
     })
     .select("*")
     .single();
@@ -149,6 +152,7 @@ export async function updateChangelogEntry(
     notes?: string | null;
     category: ChangelogCategory;
     icon?: string | null;
+    cover_url?: string | null;
   },
 ) {
   const { data, error } = await supabase
@@ -159,6 +163,7 @@ export async function updateChangelogEntry(
       notes: input.notes?.trim() || null,
       category: input.category,
       icon: input.icon ?? null,
+      cover_url: input.cover_url?.trim() || null,
     })
     .eq("id", id)
     .select("*")
