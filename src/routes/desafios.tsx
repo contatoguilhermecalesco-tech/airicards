@@ -21,7 +21,7 @@ import {
   type DailyMission,
   type MissionType,
 } from "@/lib/daily-missions";
-import { AiriFocusSticker } from "@/components/AiriMascot";
+import { AIRI_FOCUS_CONFIG, AiriFocusSticker, type AiriFocusMood } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/desafios")({
   component: DailyChallengesPage,
@@ -169,7 +169,7 @@ function DailyChallengesPage() {
 
       {loaded && (
         <section className="mt-7 border-t border-white/[0.08] pt-5">
-          <div className="flex items-center gap-3">\n            {allClaimed && <img src="/assets/airi-emotes/airi-foco-desafios.png" alt="Airi comemorando as missões" className="h-16 w-16 shrink-0 object-contain" loading="lazy" />}
+          <div className="flex items-center gap-3">\n            {allClaimed && <AiriFocusSticker mood="missions_done" caption="Baú liberado! Resgate suas recompensas." className="flex-1 border-0 bg-transparent p-0" />}
             <span
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
                 chestClaimed ? "bg-[#c8f36a]/15 text-[#c8f36a]" : "bg-white/[0.06] text-[#c8f36a]"
@@ -225,7 +225,7 @@ function MissionRow({
   busy: boolean;
   onClaim: () => void;
 }) {
-  const Icon = ICONS[mission.type];
+  const Icon = ICONS[mission.type];\n  const focusMood: AiriFocusMood = mission.type === "writing" ? "writing" : "missions_pending";
   const ready = mission.progress >= mission.target && !mission.claimed;
   const pct = Math.min(100, Math.round((mission.progress / mission.target) * 100));
 
