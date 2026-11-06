@@ -59,6 +59,7 @@ import {
 } from "@/lib/featured-slots";
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
+import { AiriShopMascot, AIRI_SHOP_EMOTES } from "@/components/shop/AiriShopMascot";
 
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
@@ -555,6 +556,10 @@ function ShopPage() {
         </div>
       </header>
 
+      {profile && wallet.loaded && wallet.profileId === profile.id && (
+        <AiriShopMascot balance={wallet.crystals} />
+      )}
+
       {/* Category tabs — estilo cliente de jogo */}
       <nav className="mb-4 flex gap-0.5 overflow-x-auto border-b border-shop-gold/20">
         {CATEGORIES.map((c) => {
@@ -671,6 +676,9 @@ function ShopPage() {
               : "bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/30"
           }`}
         >
+          {flash.msg === "Arlys insuficientes." && (
+            <img src={AIRI_SHOP_EMOTES.broke} alt="Airi com os bolsos vazios" className="mx-auto h-24 w-24 object-contain" />
+          )}
           {flash.msg}
         </div>
       )}

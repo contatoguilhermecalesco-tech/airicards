@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Eye, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
+import { AiriShopFundsNotice } from "@/components/shop/AiriShopMascot";
 import { SakuraPetals } from "@/components/SakuraPetals";
 import {
   ICONS,
@@ -244,6 +245,7 @@ export function BundleDetailModal({
 
 
           {/* Footer — pricing + buy */}
+          {!allOwned && !canAfford && <AiriShopFundsNotice balance={wallet} price={bundle.price} />}
           <div className="border-t border-white/[0.06] bg-black/25 p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div className="min-w-0">
