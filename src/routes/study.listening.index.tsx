@@ -262,6 +262,7 @@ function ListeningPage() {
       {/* Player */}
       {passage && (
         <section className="glass-panel mt-4 rounded-3xl border p-5">
+          <AiriFocusSticker mood="listening" caption="Acompanhe o áudio com atenção. Primeiro entenda a ideia geral; depois, perceba os detalhes." className="mb-4" pulse={playing} />
           <div className="flex items-center justify-between">
             <div className="min-w-0">
               <p className="text-xs uppercase tracking-wider text-muted-foreground">Áudio</p>
