@@ -259,6 +259,7 @@ export type Database = {
         Row: {
           body: string
           category: string
+          cover_url: string | null
           created_at: string
           icon: string | null
           id: string
@@ -268,6 +269,7 @@ export type Database = {
         Insert: {
           body: string
           category?: string
+          cover_url?: string | null
           created_at?: string
           icon?: string | null
           id?: string
@@ -277,6 +279,7 @@ export type Database = {
         Update: {
           body?: string
           category?: string
+          cover_url?: string | null
           created_at?: string
           icon?: string | null
           id?: string
