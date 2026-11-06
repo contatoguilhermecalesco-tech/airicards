@@ -807,7 +807,8 @@ function SummaryView({
   return (
     <div className="mt-6 space-y-5">
       {completed && (
-        <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">\n          <AiriFocusSticker mood="missions_done" caption="Regra dominada! A prática está transformando conhecimento em habilidade." className="mb-4 text-left" />
+        <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
+          <AiriFocusSticker mood="missions_done" caption="Regra dominada! A prática está transformando conhecimento em habilidade." className="mb-4 text-left" />
           <Trophy className="mx-auto h-8 w-8 text-emerald-300" strokeWidth={2.25} />
           <p className="mt-3 text-lg font-semibold text-foreground">
             Aula concluída · {score}/{total} ({scorePct}%)
