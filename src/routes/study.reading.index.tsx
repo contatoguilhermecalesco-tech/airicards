@@ -360,6 +360,7 @@ function ReadingPage() {
       </header>
 
       {/* Config */}
+      <AiriFocusSticker mood="reading" caption="Leia sem pressa. Tente descobrir o sentido pelo contexto antes de consultar o glossário." className="mb-4" />
       <section className="glass-panel rounded-3xl border p-5">
         <label className="block text-xs uppercase tracking-wider text-muted-foreground">
           Nível
@@ -617,7 +618,8 @@ function ReadingPage() {
             )}
           </button>
 
-          {grade && (\n        <AiriFocusSticker mood="missions_done" caption="Boa leitura! Você interpretou o texto e concluiu mais uma etapa." className="mb-4" />
+          {grade && (
+        <AiriFocusSticker mood="missions_done" caption="Boa leitura! Você interpretou o texto e concluiu mais uma etapa." className="mb-4" />
             <div className="mt-5 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">
