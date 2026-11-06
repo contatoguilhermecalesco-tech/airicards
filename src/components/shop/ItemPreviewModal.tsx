@@ -21,7 +21,7 @@ import type { LucideProps } from "lucide-react";
 import { getBundleContents, type ShopItem } from "@/lib/shop";
 import { ArlysIcon } from "@/components/StatChip";
 import { AiriShopFundsNotice } from "@/components/shop/AiriShopMascot";
-import { slotOf } from "@/lib/wallet-store";
+import { slotOf, useWallet } from "@/lib/wallet-store";
 import { getShopAssetOverride, getEquippedArt } from "@/lib/shop-asset-overrides";
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
 import { RarityChip, rarityOfItem, RARITY_META, visualFor, DiscordAvatar } from "@/components/shop/shop-visuals";
@@ -125,6 +125,8 @@ export function ItemPreviewModal({
   /** Texto quando não há Arlys suficientes. */
   blockedLabel?: string;
 }) {
+
+  const wallet = useWallet();
 
   // Bundles: carrega tudo que vem dentro para o usuário poder provar item por item.
   const [contents, setContents] = useState<ShopItem[]>([]);
@@ -434,7 +436,7 @@ export function ItemPreviewModal({
 
         {/* Footer */}
         {!owned && !canAfford && !blockedLabel && (
-          <AiriShopFundsNotice balance={0} price={priceValue ?? item.price} />
+          <AiriShopFundsNotice balance={wallet.crystals} price={priceValue ?? item.price} />
         )}
         <div className="flex shrink-0 items-center justify-between gap-3 border-t border-white/[0.07] bg-black/35 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))]">
           <span className="inline-flex items-center gap-1.5 text-[15px] font-semibold text-white">
