@@ -200,6 +200,24 @@ function NovidadesPage() {
                         background: `radial-gradient(120% 90% at 85% 0%, ${featuredMeta.color}55 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, #6366f155 0%, transparent 60%), linear-gradient(180deg, #0a0a0f 0%, #050506 100%)`,
                       }}
                     />
+                    {featured.cover_url && (
+                      <>
+                        <img
+                          src={featured.cover_url}
+                          alt=""
+                          aria-hidden
+                          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                        />
+                        <div
+                          aria-hidden
+                          className="absolute inset-0"
+                          style={{
+                            background:
+                              "linear-gradient(90deg, rgba(5,5,6,0.92) 0%, rgba(5,5,6,0.6) 45%, rgba(5,5,6,0.15) 100%), linear-gradient(0deg, rgba(5,5,6,0.85) 0%, transparent 55%)",
+                          }}
+                        />
+                      </>
+                    )}
                     {/* Grid overlay */}
                     <div
                       aria-hidden

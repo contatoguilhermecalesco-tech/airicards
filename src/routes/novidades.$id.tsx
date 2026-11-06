@@ -22,26 +22,49 @@ import { Package } from "lucide-react";
 import { resolveNotificationIcon } from "@/lib/notification-icons";
 import { RiotPatchBody } from "@/lib/patch-notes";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const PUBLIC_APP_URL = "https://airicards.lovable.app";
 
 export const Route = createFileRoute("/novidades/$id")({
-  head: ({ params }) => ({
-    meta: [
-      { title: "Nota da atualização — airi" },
-      {
-        name: "description",
-        content: "Detalhes desta atualização do airi.",
-      },
-      { property: "og:title", content: `Nota da atualização · ${params.id}` },
-      {
-        property: "og:description",
-        content: "Confira o que mudou nesta versão do airi.",
-      },
-      { property: "og:type", content: "article" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
+  loader: async ({ params }) => {
+    if (params.id.startsWith("concept:")) return { share: null };
+    try {
+      const { data } = await supabase
+        .from("changelog_entries")
+        .select("title, body, cover_url")
+        .eq("id", params.id)
+        .maybeSingle();
+      return { share: data ?? null };
+    } catch {
+      return { share: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const s = loaderData?.share;
+    const title = s?.title ? `${s.title} — airi` : "Nota da atualização — airi";
+    const desc = s?.body?.slice(0, 160) || "Confira o que mudou nesta versão do airi.";
+    const url = `${PUBLIC_APP_URL}/novidades/${encodeURIComponent(params.id)}`;
+    const img = s?.cover_url && /^https:\/\//.test(s.cover_url) ? s.cover_url : null;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: s?.title ?? "Nota da atualização" },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { name: "twitter:card", content: img ? "summary_large_image" : "summary" },
+        ...(img
+          ? [
+              { property: "og:image", content: img },
+              { name: "twitter:image", content: img },
+            ]
+          : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: NovidadeDetailPage,
 });
 
