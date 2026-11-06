@@ -21,6 +21,7 @@ import {
   type DailyMission,
   type MissionType,
 } from "@/lib/daily-missions";
+import { AiriFocusSticker } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/desafios")({
   component: DailyChallengesPage,
@@ -108,7 +109,7 @@ function DailyChallengesPage() {
         </p>
       </header>
 
-      <section className="mb-7 flex items-center gap-4 border-y border-white/[0.08] py-4">
+      <AiriFocusSticker mood={allClaimed ? "missions_done" : "missions_pending"} caption={allClaimed ? "Você completou as missões! A Airi está pronta para comemorar seu resgate." : "Escolha uma missão e avance um pouco mais no inglês hoje."} className="mb-5" />\n\n      <section className="mb-7 flex items-center gap-4 border-y border-white/[0.08] py-4">
         <div
           className="grid h-[62px] w-[62px] shrink-0 place-items-center rounded-full p-[5px]"
           style={{
@@ -168,7 +169,7 @@ function DailyChallengesPage() {
 
       {loaded && (
         <section className="mt-7 border-t border-white/[0.08] pt-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">\n            {allClaimed && <img src="/assets/airi-emotes/airi-foco-desafios.png" alt="Airi comemorando as missões" className="h-16 w-16 shrink-0 object-contain" loading="lazy" />}
             <span
               className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${
                 chestClaimed ? "bg-[#c8f36a]/15 text-[#c8f36a]" : "bg-white/[0.06] text-[#c8f36a]"
