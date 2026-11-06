@@ -26,6 +26,7 @@ import {
 import { translateEnToPt } from "@/lib/translate.functions";
 import { createCard, useStore } from "@/lib/flashcards-store";
 import { addStudyEntry } from "@/lib/study-history-store";
+import { AiriFocusSticker } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/study/reading/")({
   head: () => ({
@@ -616,7 +617,7 @@ function ReadingPage() {
             )}
           </button>
 
-          {grade && (
+          {grade && (\n        <AiriFocusSticker mood="missions_done" caption="Boa leitura! Você interpretou o texto e concluiu mais uma etapa." className="mb-4" />
             <div className="mt-5 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">
