@@ -391,6 +391,16 @@ function Review() {
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
 
+  // -------- Popup "Dever cumprido" — celebração curta da Airi (~2,4s) --------
+  const [dutyPopup, setDutyPopup] = useState(false);
+  useEffect(() => {
+    if (!finished || reviewed === 0 || isEnemyRun) return;
+    setDutyPopup(true);
+    const t = setTimeout(() => setDutyPopup(false), 2400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
+
   // -------- Modo Foco (esconde chrome extra) --------
   const [focusMode, setFocusMode] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
