@@ -11,7 +11,8 @@ import airiWriting from "@/assets/airi-emotes/airi-focus-writing.png";
 
 import { useStreak, useCardsReviewedToday } from "@/lib/flashcards-store";
 
-export type AiriMood = "done" | "lost" | "urgent" | "pending";
+import { resolveAiriMood, type AiriMood } from "@/lib/airi-streak-mood";
+export type { AiriMood } from "@/lib/airi-streak-mood";
 export type StudySkill = "reading" | "listening" | "speaking" | "grammar" | "writing";
 export type AiriFocusMood = StudySkill | "missions_done" | "missions_pending";
 type AiriRoute = "/study/reading" | "/study/listening" | "/study/speaking" | "/study/grammar" | "/study/writing" | "/desafios" | "/review";
@@ -42,12 +43,11 @@ export function useAiriMood(): AiriMood {
   const reviewedToday = useCardsReviewedToday();
   const history = streak.history ?? {};
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  if (history[key(today)] === "done" || reviewedToday > 0) return "done";
-  if (streak.current === 0 && history[key(yesterday)] === "done") return "lost";
-  if (today.getHours() >= 20) return "urgent";
-  return "pending";
+  return resolveAiriMood({
+    current: streak.current,
+    studiedToday: history[key(today)] === "done" || reviewedToday > 0,
+    hour: today.getHours(),
+  });
 }
 
 /** Airi grande com balão de fala para os estados de streak/revisão. */
