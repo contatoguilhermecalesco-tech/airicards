@@ -3,6 +3,11 @@ import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito-cut.png";
 import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida-cut.png";
 import airiCorreStreak from "@/assets/airi-emotes/airi-corre-streak-cut.png";
 import airiMeiaNoite from "@/assets/airi-emotes/airi-meia-noite-cut.png";
+import airiReading from "@/assets/airi-emotes/airi-focus-reading.png";
+import airiListening from "@/assets/airi-emotes/airi-focus-listening.png";
+import airiSpeaking from "@/assets/airi-emotes/airi-focus-speaking.png";
+import airiGrammar from "@/assets/airi-emotes/airi-focus-grammar.png";
+import airiWriting from "@/assets/airi-emotes/airi-focus-writing.png";
 
 import { useStreak, useCardsReviewedToday } from "@/lib/flashcards-store";
 
@@ -19,11 +24,11 @@ export const AIRI_MOODS: Record<AiriMood, { img: string; title: string; detail: 
 };
 
 export const AIRI_FOCUS_CONFIG: Record<AiriFocusMood, { img: string; title: string; detail: string; route: AiriRoute; badgeColor: string }> = {
-  reading: { img: airiEstudoFeito, title: "Vamos mergulhar nessa leitura!", detail: "Leia com atenção, observe o contexto e descubra o sentido antes de consultar a tradução.", route: "/study/reading", badgeColor: "var(--study-reading)" },
-  listening: { img: airiCorreStreak, title: "Hora de afiar os ouvidos!", detail: "Escute primeiro a ideia geral. Depois, preste atenção nas palavras e expressões.", route: "/study/listening", badgeColor: "var(--study-listening)" },
-  speaking: { img: airiEstudoFeito, title: "Solta a voz!", detail: "Fale em voz alta, sem medo de errar. Clareza e fluência melhoram com prática.", route: "/study/speaking", badgeColor: "var(--study-speaking)" },
-  grammar: { img: airiEstudoFeito, title: "Vamos desvendar essa regra!", detail: "Observe a estrutura, compare exemplos e aplique a regra em frases próprias.", route: "/study/grammar", badgeColor: "var(--study-grammar)" },
-  writing: { img: airiCorreStreak, title: "Modo Hacker ativado!", detail: "Organize suas ideias em inglês. Escreva primeiro; depois revise estrutura e vocabulário.", route: "/study/writing", badgeColor: "var(--study-writing)" },
+  reading: { img: airiReading, title: "Vamos mergulhar nessa leitura!", detail: "Leia com atenção, observe o contexto e descubra o sentido antes de consultar a tradução.", route: "/study/reading", badgeColor: "var(--study-reading)" },
+  listening: { img: airiListening, title: "Hora de afiar os ouvidos!", detail: "Escute primeiro a ideia geral. Depois, preste atenção nas palavras e expressões.", route: "/study/listening", badgeColor: "var(--study-listening)" },
+  speaking: { img: airiSpeaking, title: "Solta a voz!", detail: "Fale em voz alta, sem medo de errar. Clareza e fluência melhoram com prática.", route: "/study/speaking", badgeColor: "var(--study-speaking)" },
+  grammar: { img: airiGrammar, title: "Vamos desvendar essa regra!", detail: "Observe a estrutura, compare exemplos e aplique a regra em frases próprias.", route: "/study/grammar", badgeColor: "var(--study-grammar)" },
+  writing: { img: airiWriting, title: "Modo Hacker ativado!", detail: "Organize suas ideias em inglês. Escreva primeiro; depois revise estrutura e vocabulário.", route: "/study/writing", badgeColor: "var(--study-writing)" },
   missions_done: { img: airiEstudoFeito, title: "Missões concluídas!", detail: "Você completou os desafios de hoje. Hora de resgatar suas recompensas.", route: "/desafios", badgeColor: "var(--primary)" },
   missions_pending: { img: airiCorreStreak, title: "Seu próximo desafio espera!", detail: "Entre em uma missão, pratique inglês e conquiste Arlys e LP.", route: "/desafios", badgeColor: "var(--primary)" },
 };
