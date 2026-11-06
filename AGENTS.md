@@ -13,3 +13,4 @@
 - Comentários sociais retornam a linha criada e atualizam o feed local imediatamente; o tempo real sincroniza os demais perfis.
 - Exclusões de cartas e decks mantêm marcadores sincronizados para impedir restauração por caches ou dispositivos desatualizados.
 - Links compartilhados de Patch Notes usam o domínio público estável para funcionar fora da prévia.
+- Focus emotes share AiriMascot configuration across study screens; daily briefings are Home-mounted, profile-scoped local reminders that wait for other dialogs, never changing study completion.

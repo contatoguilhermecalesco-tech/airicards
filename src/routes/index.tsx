@@ -18,6 +18,7 @@ import {
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { AiriFocusBanner, AiriSpeech, useAiriMood, type AiriFocusMood } from "@/components/AiriMascot";
+import { AiriDailyBriefing } from "@/components/AiriDailyBriefing";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
 
@@ -28,6 +29,14 @@ const AIRI_DETAIL = { done: "Chama protegida hoje", lost: "Recomece hoje", urgen
 
 export const Route = createFileRoute("/")({
   component: Home,
+  head: () => ({ meta: [
+    { title: "Seu inglês de hoje | airi" },
+    { name: "description", content: "Sua rotina de inglês com revisões, foco diário e a companhia da Airi." },
+    { property: "og:title", content: "Seu inglês de hoje | airi" },
+    { property: "og:description", content: "Revisões inteligentes e uma nova etapa de inglês a cada dia." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 type Greeting = { salute: string; icon: React.ReactNode; eyebrow: string };
@@ -103,6 +112,7 @@ function Home() {
 
   return (
     <main className="relative mx-auto max-w-md px-5 pb-28 pt-7 sm:max-w-xl sm:pt-10 lg:max-w-[1180px] lg:px-8 lg:pt-12">
+      <AiriDailyBriefing />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px]" style={{ background: "radial-gradient(60% 55% at 50% 0%, rgba(139,92,246,0.16), transparent 72%)" }} />
 
       <header className="animate-fade-in flex items-center justify-between gap-4">
