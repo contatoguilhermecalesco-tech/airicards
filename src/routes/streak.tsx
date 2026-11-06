@@ -15,10 +15,10 @@ import {
   Zap,
 } from "lucide-react";
 import { useCardsReviewedToday, useStreak } from "@/lib/flashcards-store";
-import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito.png.asset.json";
-import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida.png.asset.json";
-import airiCorreStreak from "@/assets/airi-emotes/airi-corre-streak.png.asset.json";
-import airiMeiaNoite from "@/assets/airi-emotes/airi-meia-noite.png.asset.json";
+import airiEstudoFeito from "@/assets/airi-emotes/airi-estudo-feito-cut.png";
+import airiStreakPerdida from "@/assets/airi-emotes/airi-streak-perdida-cut.png";
+import airiCorreStreak from "@/assets/airi-emotes/airi-corre-streak-cut.png";
+import airiMeiaNoite from "@/assets/airi-emotes/airi-meia-noite-cut.png";
 
 export const Route = createFileRoute("/streak")({ component: StreakPage });
 
@@ -63,25 +63,25 @@ function resolveAiriMood(opts: { studiedToday: boolean; current: number; yesterd
 
 const AIRI_MOODS: Record<AiriMood, { img: string; title: string; detail: string; tone: string }> = {
   done: {
-    img: airiEstudoFeito.url,
+    img: airiEstudoFeito,
     title: "Estudo do dia feito!",
     detail: "Sua chama está protegida por hoje. A Airi aprova.",
     tone: "text-emerald-300",
   },
   lost: {
-    img: airiStreakPerdida.url,
+    img: airiStreakPerdida,
     title: "A chama congelou…",
     detail: "Sua sequência foi perdida, mas toda lenda recomeça. Estude hoje e acenda a chama de novo.",
     tone: "text-sky-300",
   },
   urgent: {
-    img: airiMeiaNoite.url,
+    img: airiMeiaNoite,
     title: "Meia-noite se aproxima!",
     detail: "Restam poucas horas para registrar o estudo de hoje e salvar sua sequência.",
     tone: "text-rose-300",
   },
   pending: {
-    img: airiCorreStreak.url,
+    img: airiCorreStreak,
     title: "Corra para não perder a streak!",
     detail: "Ainda não há estudo registrado hoje. Uma revisão rápida já mantém a chama acesa.",
     tone: "text-orange-300",
