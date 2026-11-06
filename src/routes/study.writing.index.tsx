@@ -19,6 +19,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { correctWriting, type WritingFeedback } from "@/lib/writing.functions";
 import { addWriting } from "@/lib/writing-store";
 import { createCard, flushSave, useStore } from "@/lib/flashcards-store";
+import { AiriFocusSticker } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/study/writing/")({
   component: WritingPage,
