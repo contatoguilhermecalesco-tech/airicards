@@ -8,6 +8,13 @@
       "when": 1793972237600,
       "tag": "0000_changelog_cover",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793972935851,
+      "tag": "0001_changelog_public_read",
+      "breakpoints": true
     }
   ]
 }
