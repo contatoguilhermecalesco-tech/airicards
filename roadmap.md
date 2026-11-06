@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Integrar emotes transparentes da Airi na Loja e nos avisos de saldo
+- [ ] Adicionar Airi festeira à confirmação de compra e verificar desktop/mobile
+
 - [x] Criar estrutura segura para atualizações do sistema e leituras por perfil
 - [x] Criar central, ícone do topo e estado de leitura em tempo real
 - [x] Criar painel administrativo para publicar e excluir atualizações
