@@ -28,6 +28,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { AiriFocusSticker } from "@/components/AiriMascot";
 import { useCycleWeek, getGrammarForWeek } from "@/lib/cycle";
 import {
   generateGrammarLesson,
@@ -231,6 +232,8 @@ function GrammarPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Trilha de gramática</h1>
         </div>
       </header>
+
+      <AiriFocusSticker mood="grammar" caption="Airi preparou a lupa. Observe a regra, compare os exemplos e teste seu entendimento." className="mb-5" />
 
       <section className="mb-6">
         <p className="text-sm text-muted-foreground">
