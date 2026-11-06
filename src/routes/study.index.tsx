@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAppSettings } from "@/lib/app-settings";
+import { AiriFocusBanner, type AiriFocusMood } from "@/components/AiriMascot";
 
 export const Route = createFileRoute("/study/")({
   component: StudyIndex,
@@ -118,7 +119,8 @@ function formattedToday() {
 function StudyIndex() {
   const today = todayId();
   const { exam_visible } = useAppSettings();
-  const current = DAYS.find((day) => day.id === today) ?? DAYS[0];
+  const current = DAYS.find((day) => day.id === today);
+  const focusMood: AiriFocusMood = current ? ({ mon: "reading", tue: "listening", wed: "speaking", thu: "grammar", fri: "writing" } as const)[current.id as "mon" | "tue" | "wed" | "thu" | "fri"] : "missions_pending";
   const dates = weekDates();
 
   return (
@@ -158,21 +160,7 @@ function StudyIndex() {
 
       <section aria-labelledby="today-title" className="mb-10">
         <p className="mb-2 px-1 text-xs font-semibold uppercase text-muted-foreground">Foco de hoje</p>
-        <Link to={current.to} className="study-focus group block overflow-hidden rounded-2xl border bg-surface-elevated p-5 transition-colors hover:border-primary/30 sm:p-6">
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl sm:h-16 sm:w-16 ${current.tone}`}>
-              {current.icon}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-primary">{current.label}</p>
-              <h2 id="today-title" className="mt-0.5 text-xl font-semibold sm:text-2xl">{current.area}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{current.desc}</p>
-            </div>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform group-hover:translate-x-0.5" aria-hidden>
-              <ArrowRight className="h-5 w-5" />
-            </span>
-          </div>
-        </Link>
+        <AiriFocusBanner mood={focusMood} title={current ? undefined : "Fim de semana de imersão!"} detail={current ? undefined : "Escolha uma habilidade para revisar livremente ou pratique com seus flashcards."} actionLabel={current ? "Iniciar treino" : "Revisar agora"} />
       </section>
 
 
