@@ -167,7 +167,9 @@ function WritingPage() {
       )}
 
       {feedback && (
-        <FeedbackView
+        <>
+          <AiriFocusSticker mood="writing" caption="Relatório pronto! Vamos analisar sua evolução e os próximos passos." className="mb-4" />
+          <FeedbackView
           feedback={feedback}
           originalText={text}
           prompt={prompt}
