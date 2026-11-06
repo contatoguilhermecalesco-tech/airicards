@@ -38,7 +38,7 @@ import {
 import { tableSkinFromEquipped, isDefaultTableSkin, type TableSkin } from "@/lib/table-skins";
 import { TableSkinAmbient, TableSkinFlash } from "@/components/review/TableSkinAmbient";
 import { TableSkinImpact } from "@/components/review/TableSkinImpact";
-import { AiriSpeech } from "@/components/AiriMascot";
+import { AiriSpeech, AIRI_MOODS } from "@/components/AiriMascot";
 
 import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/TableSkinCardLayer";
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
@@ -391,6 +391,16 @@ function Review() {
   const progressPct =
     sessionCount === 0 ? 0 : Math.min(100, (reviewed / sessionCount) * 100);
 
+  // -------- Popup "Dever cumprido" — celebração curta da Airi (~2,4s) --------
+  const [dutyPopup, setDutyPopup] = useState(false);
+  useEffect(() => {
+    if (!finished || reviewed === 0 || isEnemyRun) return;
+    setDutyPopup(true);
+    const t = setTimeout(() => setDutyPopup(false), 2400);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
+
   // -------- Modo Foco (esconde chrome extra) --------
   const [focusMode, setFocusMode] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -454,6 +464,9 @@ function Review() {
         </div>
       )}
 
+
+      {/* Popup "Dever cumprido" — Airi celebra por ~2,4s antes do resumo */}
+      {dutyPopup && <DutyDoneOverlay reviewed={reviewed} />}
 
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
@@ -1155,6 +1168,46 @@ function EmptyState({ enemyRun }: { enemyRun: boolean }) {
       >
         {enemyRun ? "Voltar à arena" : "Voltar ao início"}
       </Link>
+    </div>
+  );
+}
+
+/* ------------------- Popup "Dever cumprido" da Airi ------------------- */
+
+function DutyDoneOverlay({ reviewed }: { reviewed: number }) {
+  return (
+    <div
+      className="fixed inset-0 z-[120] grid place-items-center bg-background/70 backdrop-blur-md animate-in fade-in duration-200"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="airi-duty-pop flex flex-col items-center px-6 text-center">
+        <div className="relative">
+          <div
+            aria-hidden
+            className="airi-duty-glow absolute -inset-10 rounded-full blur-3xl"
+            style={{
+              background:
+                "radial-gradient(closest-side, hsl(var(--primary) / 0.35), transparent 70%)",
+            }}
+          />
+          <img
+            src={AIRI_MOODS.done.img}
+            alt="Airi comemorando"
+            className="relative h-44 w-44 object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.55)] sm:h-56 sm:w-56"
+          />
+        </div>
+        <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+          Airi aprova
+        </p>
+        <h2 className="mt-1.5 text-3xl font-bold tracking-tight sm:text-4xl">
+          Dever cumprido!
+        </h2>
+        <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+          {reviewed} {reviewed === 1 ? "carta revisada" : "cartas revisadas"} —
+          sua chama está segura hoje.
+        </p>
+      </div>
     </div>
   );
 }
