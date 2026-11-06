@@ -17,7 +17,7 @@ import {
   useStreak,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
-import { AiriSpeech, useAiriMood } from "@/components/AiriMascot";
+import { AiriFocusBanner, AiriSpeech, useAiriMood, type AiriFocusMood } from "@/components/AiriMascot";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
 
@@ -163,7 +163,7 @@ function Home() {
       </AlertDialog>
 
       <section className="animate-fade-in mt-5 rounded-[26px] border border-white/[0.08] bg-white/[0.03] px-3 pt-3 sm:px-4">
-        <AiriSpeech mood={airiMood} to={airiMood === "done" ? "/streak" : "/review"} detail={`${AIRI_DETAIL[airiMood]} · ${streak.current} ${streak.current === 1 ? "dia" : "dias"} seguidos`} />
+        {airiMood === "pending" && hour >= 8 && hour < 18 && due === 0 && reviewedToday === 0 ? (\n          <AiriFocusBanner mood={({ 0: "missions_pending", 1: "reading", 2: "listening", 3: "speaking", 4: "grammar", 5: "writing", 6: "missions_pending" } as Record<number, AiriFocusMood>)[new Date().getDay()]} detail={undefined} />\n        ) : (\n          <AiriSpeech mood={airiMood} to={airiMood === "done" ? "/streak" : "/review"} detail={`${AIRI_DETAIL[airiMood]} · ${streak.current} ${streak.current === 1 ? "dia" : "dias"} seguidos`} />\n        )}
       </section>
 
       <section className="animate-fade-in mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.035] px-4 py-3">
