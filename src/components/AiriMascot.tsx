@@ -74,7 +74,7 @@ export function AiriFocusBanner({ mood, title, detail, actionLabel = "Iniciar tr
 }) {
   const config = AIRI_FOCUS_CONFIG[mood];
   return (
-    <Link to={config.route} className="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-3 transition hover:border-white/20 hover:bg-white/[0.07] sm:gap-4 sm:p-4">
+    <Link to={to ?? config.route} className="group relative flex items-center gap-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-3 transition hover:border-white/20 hover:bg-white/[0.07] sm:gap-4 sm:p-4">
       <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full opacity-15 blur-3xl" style={{ backgroundColor: config.badgeColor }} />
       <img src={config.img} alt={`Airi — ${mood}`} className={`${compact ? "h-20 w-20 sm:h-24 sm:w-24" : "h-28 w-28 sm:h-32 sm:w-32"} relative z-10 shrink-0 object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,.45)]`} loading="lazy" />
       <span className="relative z-10 min-w-0 flex-1">
