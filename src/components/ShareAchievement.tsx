@@ -9,6 +9,20 @@ import {
 } from "@/lib/rank-store";
 import type { Profile } from "@/lib/profile";
 import type { Streak } from "@/lib/flashcards-store";
+import airiRankImg from "@/assets/airi-emotes/airi-rank-flex.png";
+
+let airiImgPromise: Promise<HTMLImageElement | null> | null = null;
+function loadAiri(): Promise<HTMLImageElement | null> {
+  if (!airiImgPromise) {
+    airiImgPromise = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = airiRankImg;
+    });
+  }
+  return airiImgPromise;
+}
 
 type Props = {
   open: boolean;
@@ -41,7 +55,12 @@ export function ShareAchievement({
     if (!open) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    drawShareCard(canvas, { profile, rank, streak, cardsMastered, totalCards });
+    let alive = true;
+    drawShareCard(canvas, { profile, rank, streak, cardsMastered, totalCards, airi: null });
+    loadAiri().then((airi) => {
+      if (alive && airi) drawShareCard(canvas, { profile, rank, streak, cardsMastered, totalCards, airi });
+    });
+    return () => { alive = false; };
   }, [open, profile, rank, streak, cardsMastered, totalCards]);
 
   async function handleShare() {
@@ -155,6 +174,7 @@ function drawShareCard(
     streak: Streak;
     cardsMastered: number;
     totalCards: number;
+    airi: HTMLImageElement | null;
   },
 ) {
   const ctx = canvas.getContext("2d");
@@ -206,72 +226,81 @@ function drawShareCard(
   ctx.font = "500 34px Inter, system-ui, sans-serif";
   ctx.fillText(data.profile.name.toUpperCase(), W / 2, 340);
 
-  // Emblema circular estilizado (anel com tier)
+  // Airi protagonista — halo do tier atrás
   const cx = W / 2;
-  const cy = 620;
-  const r = 210;
-  // ring outer glow
-  const ringGlow = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, r * 1.5);
-  ringGlow.addColorStop(0, hexToRgba(colors.glow, 0.6));
-  ringGlow.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = ringGlow;
+  const cy = 700;
+  const aura = ctx.createRadialGradient(cx, cy, 40, cx, cy, 520);
+  aura.addColorStop(0, hexToRgba(colors.glow, 0.55));
+  aura.addColorStop(0.6, hexToRgba(colors.ring, 0.14));
+  aura.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = aura;
   ctx.beginPath();
-  ctx.arc(cx, cy, r * 1.5, 0, Math.PI * 2);
+  ctx.arc(cx, cy, 520, 0, Math.PI * 2);
   ctx.fill();
-
-  // ring
-  ctx.strokeStyle = colors.ring;
-  ctx.lineWidth = 6;
+  ctx.strokeStyle = hexToRgba(colors.ring, 0.55);
+  ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.arc(cx, cy, 360, 0, Math.PI * 2);
   ctx.stroke();
 
-  // inner fill
-  const inner = ctx.createRadialGradient(cx, cy - 40, 10, cx, cy, r);
-  inner.addColorStop(0, hexToRgba(colors.from, 0.5));
-  inner.addColorStop(1, "rgba(15,10,23,0.9)");
-  ctx.fillStyle = inner;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r - 6, 0, Math.PI * 2);
-  ctx.fill();
+  if (data.airi) {
+    const iw = 820;
+    const ih = (data.airi.height / data.airi.width) * iw;
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.55)";
+    ctx.shadowBlur = 40;
+    ctx.shadowOffsetY = 18;
+    ctx.drawImage(data.airi, cx - iw / 2, cy - ih / 2, iw, ih);
+    ctx.restore();
+  }
 
-  // Tier initial letter
-  ctx.fillStyle = colors.text;
-  ctx.font = "700 180px Inter, system-ui, sans-serif";
+  // Balão de fala
   ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(TIER_LABEL[data.rank.tier][0].toUpperCase(), cx, cy + 8);
-  ctx.textBaseline = "alphabetic";
+  ctx.font = "700 40px Inter, system-ui, sans-serif";
+  const quote = "GG fácil. Respeita o elo.";
+  const qw = ctx.measureText(quote).width + 80;
+  const qy = 1120;
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  roundRect(ctx, cx - qw / 2, qy - 50, qw, 80, 40);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cx - 20, qy - 50);
+  ctx.lineTo(cx, qy - 78);
+  ctx.lineTo(cx + 20, qy - 50);
+  ctx.fill();
+  ctx.fillStyle = "#1a1224";
+  ctx.fillText(quote, cx, qy + 4);
 
   // Tier label
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
-  ctx.font = "700 84px Inter, system-ui, sans-serif";
-  ctx.fillText(tierText(data.rank), W / 2, 990);
-
-  // LP
+  ctx.fillStyle = colors.text;
+  ctx.font = "700 30px Inter, system-ui, sans-serif";
+  ctx.fillText("RANK ATUAL", W / 2, 1210);
+  ctx.fillStyle = "rgba(255,255,255,0.97)";
+  ctx.font = "800 100px Inter, system-ui, sans-serif";
+  ctx.fillText(tierText(data.rank).toUpperCase(), W / 2, 1310);
   ctx.fillStyle = colors.text;
   ctx.font = "600 42px Inter, system-ui, sans-serif";
-  ctx.fillText(`${data.rank.lp} LP`, W / 2, 1055);
+  ctx.fillText(`${data.rank.lp} LP`, W / 2, 1370);
 
   // Divisor
   ctx.fillStyle = "rgba(255,255,255,0.08)";
-  ctx.fillRect(140, 1130, W - 280, 1);
+  ctx.fillRect(140, 1420, W - 280, 1);
 
   // Stat grid — 3 blocos
-  drawStat(ctx, W * 0.22, 1290, "STREAK", `${data.streak.current}`, "dias");
-  drawStat(ctx, W * 0.5, 1290, "DOMINADAS", `${data.cardsMastered}`, "cartas");
-  drawStat(ctx, W * 0.78, 1290, "TOTAL", `${data.totalCards}`, "no baralho");
+  drawStat(ctx, W * 0.22, 1560, "STREAK", `${data.streak.current}`, "dias");
+  drawStat(ctx, W * 0.5, 1560, "DOMINADAS", `${data.cardsMastered}`, "cartas");
+  drawStat(ctx, W * 0.78, 1560, "TOTAL", `${data.totalCards}`, "no baralho");
 
   // Frase de assinatura
   ctx.textAlign = "center";
   ctx.fillStyle = "rgba(255,255,255,0.5)";
   ctx.font = "500 32px Inter, system-ui, sans-serif";
-  ctx.fillText("Aprendendo inglês, um dia de cada vez.", W / 2, 1620);
+  ctx.fillText("Aprendendo inglês, um dia de cada vez.", W / 2, 1720);
 
   // Footer marca
   ctx.fillStyle = "rgba(255,255,255,0.35)";
   ctx.font = "600 30px Inter, system-ui, sans-serif";
-  ctx.fillText("airi · repetição espaçada", W / 2, 1800);
+  ctx.fillText("airi · repetição espaçada", W / 2, 1830);
 }
 
 function drawStat(
@@ -292,6 +321,16 @@ function drawStat(
   ctx.fillStyle = "rgba(255,255,255,0.4)";
   ctx.font = "500 24px Inter, system-ui, sans-serif";
   ctx.fillText(suffix, cx, cy + 74);
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
 }
 
 function hexToRgba(hex: string, alpha: number): string {
