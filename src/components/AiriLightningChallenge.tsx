@@ -1,0 +1,194 @@
+import { useEffect, useRef, useState } from "react";
+import { Timer, Zap, X } from "lucide-react";
+import { useStore } from "@/lib/flashcards-store";
+import { earn } from "@/lib/wallet-store";
+import { useCurrentProfile } from "@/lib/profile";
+import {
+  LIGHTNING_MIN_CARDS, LIGHTNING_REWARD, LIGHTNING_SECONDS, LIGHTNING_TARGET,
+  buildQuestion, lightningDay, lightningKey, resolveLightning, rewardFor,
+  type LightningResult, type QuizQuestion,
+} from "@/lib/lightning-challenge";
+import startImg from "@/assets/airi-emotes/airi-lightning-start.png";
+import winImg from "@/assets/airi-emotes/airi-lightning-win.png";
+import failImg from "@/assets/airi-emotes/airi-lightning-fail.png";
+
+type Phase = "intro" | "countdown" | "play" | LightningResult;
+
+export function AiriLightningCard() {
+  const profile = useCurrentProfile();
+  const cards = useStore((s) => s.cards);
+  const [playedToday, setPlayedToday] = useState<string | null>("loading");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+    try { setPlayedToday(localStorage.getItem(lightningKey(profile.id))); } catch { setPlayedToday(null); }
+  }, [profile]);
+
+  if (!profile || playedToday === "loading" || cards.length < LIGHTNING_MIN_CARDS) return null;
+  if (playedToday?.startsWith(lightningDay())) return null;
+
+  const markPlayed = (r: LightningResult) => {
+    const v = `${lightningDay()}:${r}`;
+    try { localStorage.setItem(lightningKey(profile.id), v); } catch { /* ignore */ }
+    setPlayedToday(v);
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="group relative mt-5 flex w-full items-center gap-4 overflow-hidden rounded-[22px] border border-primary/25 bg-card/70 p-4 text-left backdrop-blur-xl transition hover:border-primary/50"
+      >
+        <img src={startImg} alt="" className="h-20 w-20 shrink-0 object-contain drop-shadow-lg transition group-hover:scale-105" />
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+            <Zap className="h-3.5 w-3.5" /> Desafio Relâmpago
+          </div>
+          <p className="mt-1 text-[15px] font-semibold text-foreground">{LIGHTNING_TARGET} cartas em {LIGHTNING_SECONDS}s</p>
+          <p className="text-[13px] text-muted-foreground">Valendo +{LIGHTNING_REWARD} Arlys ✦ · topa ou vai arregar?</p>
+        </div>
+      </button>
+      {open && <LightningModal onClose={() => setOpen(false)} onFinish={markPlayed} />}
+    </>
+  );
+}
+
+function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: (r: LightningResult) => void }) {
+  const cards = useStore((s) => s.cards);
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [count, setCount] = useState(3);
+  const [left, setLeft] = useState(LIGHTNING_SECONDS);
+  const [correct, setCorrect] = useState(0);
+  const [q, setQ] = useState<QuizQuestion | null>(null);
+  const [flash, setFlash] = useState<"ok" | "bad" | null>(null);
+  const startedAt = useRef(0);
+  const done = useRef(false);
+
+  const next = () => setQ(buildQuestion(cards));
+
+  const finish = (r: LightningResult) => {
+    if (done.current) return;
+    done.current = true;
+    setPhase(r);
+    onFinish(r);
+    const amount = rewardFor(r);
+    if (amount > 0) void earn(amount, "Desafio Relâmpago");
+  };
+
+  useEffect(() => {
+    if (phase !== "countdown") return;
+    if (count === 0) { startedAt.current = Date.now(); next(); setPhase("play"); return; }
+    const t = window.setTimeout(() => setCount((c) => c - 1), 700);
+    return () => window.clearTimeout(t);
+  }, [phase, count]);
+
+  useEffect(() => {
+    if (phase !== "play") return;
+    const t = window.setInterval(() => {
+      const elapsed = (Date.now() - startedAt.current) / 1000;
+      const remaining = Math.max(0, LIGHTNING_SECONDS - elapsed);
+      setLeft(remaining);
+      if (remaining <= 0) finish("fail");
+    }, 100);
+    return () => window.clearInterval(t);
+  }, [phase]);
+
+  const answer = (opt: string) => {
+    if (!q || phase !== "play" || flash) return;
+    const ok = opt === q.answer;
+    setFlash(ok ? "ok" : "bad");
+    if (ok && navigator.vibrate) navigator.vibrate(20);
+    window.setTimeout(() => {
+      setFlash(null);
+      if (ok) {
+        const c = correct + 1;
+        setCorrect(c);
+        if (c >= LIGHTNING_TARGET) {
+          finish(resolveLightning(c, (Date.now() - startedAt.current) / 1000));
+          return;
+        }
+      }
+      next();
+    }, ok ? 180 : 420);
+  };
+
+  const pct = (left / LIGHTNING_SECONDS) * 100;
+  const danger = left <= 10;
+  const canClose = phase !== "play" && phase !== "countdown";
+
+  return (
+    <div className="fixed inset-0 z-[130] flex items-center justify-center bg-background/80 p-5 backdrop-blur-md animate-fade-in">
+      <div className="relative w-full max-w-sm rounded-[28px] border border-primary/25 bg-card/95 p-6 text-center shadow-2xl">
+        {canClose && (
+          <button onClick={onClose} aria-label="Fechar" className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+
+        {phase === "intro" && (
+          <>
+            <img src={startImg} alt="Airi cronometrista" className="mx-auto h-44 w-44 object-contain animate-[airi-duty-pop_0.6s_ease-out]" />
+            <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Desafio Relâmpago</p>
+            <h2 className="mt-1 text-xl font-semibold text-foreground">Acerte {LIGHTNING_TARGET} em {LIGHTNING_SECONDS} segundos</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Escolha a tradução certa. Errou, perde tempo. Venceu, leva +{LIGHTNING_REWARD} Arlys ✦.</p>
+            <button onClick={() => setPhase("countdown")} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-semibold text-primary-foreground">
+              <Timer className="h-4 w-4" /> Aceitar desafio
+            </button>
+            <button onClick={onClose} className="mt-2 w-full py-2 text-sm text-muted-foreground">Agora não</button>
+          </>
+        )}
+
+        {phase === "countdown" && (
+          <div className="py-16 text-7xl font-bold text-primary">{count === 0 ? "JÁ!" : count}</div>
+        )}
+
+        {phase === "play" && q && (
+          <>
+            <div className="flex items-center justify-between text-xs font-semibold">
+              <span className="text-muted-foreground">{correct}/{LIGHTNING_TARGET}</span>
+              <span className={danger ? "text-destructive animate-pulse" : "text-primary"}>{Math.ceil(left)}s</span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+              <div className={`h-full transition-[width] duration-100 ${danger ? "bg-destructive" : "bg-primary"}`} style={{ width: `${pct}%` }} />
+            </div>
+            <div className="mt-4 flex justify-center gap-1.5">
+              {Array.from({ length: LIGHTNING_TARGET }).map((_, i) => (
+                <span key={i} className={`h-2 w-2 rounded-full ${i < correct ? "bg-primary" : "bg-muted"}`} />
+              ))}
+            </div>
+            <p className={`mt-6 min-h-[64px] text-2xl font-semibold text-foreground transition ${flash === "bad" ? "text-destructive" : ""}`}>{q.prompt}</p>
+            <div className="mt-5 grid gap-2">
+              {q.options.map((o) => (
+                <button
+                  key={o}
+                  onClick={() => answer(o)}
+                  className={`rounded-2xl border px-4 py-3 text-[15px] font-medium transition ${
+                    flash && o === q.answer ? "border-primary bg-primary/20 text-foreground"
+                      : "border-border bg-muted/40 text-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {(phase === "win" || phase === "fail") && (
+          <>
+            <img src={phase === "win" ? winImg : failImg} alt="" className="mx-auto h-48 w-48 object-contain animate-[airi-duty-pop_0.6s_ease-out]" />
+            <h2 className="mt-2 text-xl font-semibold text-foreground">{phase === "win" ? "No bolso!" : "Tempo esgotado! Quase…"}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {phase === "win" ? `+${LIGHTNING_REWARD} Arlys ✦ foram para a sua carteira.` : `Você acertou ${correct}/${LIGHTNING_TARGET}. A Airi te espera amanhã.`}
+            </p>
+            <button onClick={onClose} autoFocus className="mt-5 w-full rounded-2xl bg-primary py-3 font-semibold text-primary-foreground">
+              {phase === "win" ? "Resgatar e concluir" : "Tentar amanhã"}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

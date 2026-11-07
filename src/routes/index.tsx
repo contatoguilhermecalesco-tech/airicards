@@ -19,6 +19,7 @@ import {
 import { useCurrentProfile } from "@/lib/profile";
 import { AiriFocusBanner, AiriSpeech, useAiriMood, type AiriFocusMood } from "@/components/AiriMascot";
 import { AiriDailyBriefing } from "@/components/AiriDailyBriefing";
+import { AiriLightningCard } from "@/components/AiriLightningChallenge";
 import { useCycleWeek, getTodayFocus } from "@/lib/cycle";
 import { useRank, TIER_COLORS, TIER_LABEL, DIVISION_ROMAN, isElite } from "@/lib/rank-store";
 
@@ -123,6 +124,7 @@ function Home() {
           <h1 className="mt-1 truncate text-[26px] font-semibold tracking-tight text-foreground sm:text-[32px]">{salute}{name ? `, ${name}` : ""}</h1>
         </div>
       </header>
+      <AiriLightningCard />
 
       <section className="animate-fade-in mt-7" style={{ animationDelay: "50ms", animationFillMode: "backwards" }}>
         <div className="mb-3 flex items-center justify-between">
