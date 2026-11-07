@@ -171,7 +171,7 @@ function PerfilViewer() {
         <div
           className={`relative h-40 overflow-hidden sm:h-44 ${showBanner ? "cosmetic-banner-animated" : ""}`}
           style={{
-            background: showBanner ? heroPalette.gradient : "linear-gradient(135deg,#2b2d31,#1e1f22)",
+            background: showBanner ? heroPalette.gradient : "linear-gradient(135deg,#3b0764,#831843)",
           }}
         >
           {effect && (
@@ -212,7 +212,7 @@ function PerfilViewer() {
         </div>
 
         <div className="relative px-5 pb-5">
-          <div className="-mt-12 flex items-end justify-between">
+          <div className="relative -mt-12 flex items-end justify-center">
             <div
               className={`relative grid place-items-center ${showDecoration ? "cosmetic-avatar-float" : ""}`}
               style={{ width: 88, height: 88 }}
@@ -267,7 +267,7 @@ function PerfilViewer() {
             </div>
 
             {companion && (
-              <div className="pointer-events-none relative -mb-2 h-[84px] w-[84px] sm:h-[96px] sm:w-[96px]" aria-hidden>
+              <div className="pointer-events-none absolute right-0 -mb-2 h-[84px] w-[84px] sm:h-[96px] sm:w-[96px]" aria-hidden>
                 <div
                   className="companion-glow absolute inset-0 rounded-full blur-2xl"
                   style={{ background: `radial-gradient(circle, ${companion.glow}80, transparent 70%)` }}
@@ -280,8 +280,8 @@ function PerfilViewer() {
           </div>
 
 
-          <div className="mt-3">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-3 text-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <h1 className="text-[22px] font-semibold text-white">{profile.name}</h1>
               {badge && (
                 <span
