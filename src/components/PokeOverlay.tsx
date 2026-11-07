@@ -1,17 +1,41 @@
-import { useEffect, useState } from "react";
-import { Hand } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
-import { ProfileAvatar } from "@/components/ProfileAvatar";
-import { profileMeta } from "@/lib/social-store";
-import { markPokeSeen, useIncomingPoke, usePokesSync } from "@/lib/pokes";
+import pokeCheek from "@/assets/airi-emotes/airi-poke-cheek.png";
+import pokeFlying from "@/assets/airi-emotes/airi-poke-flying.png";
+import { profileMeta, type ProfileId } from "@/lib/social-store";
+import { markPokeSeen, sendPoke, useIncomingPoke, usePokesSync } from "@/lib/pokes";
 import { isQuietNow, getPrefs } from "@/lib/notification-prefs";
 import { playChime, vibratePulse } from "@/lib/notification-sound";
 
-/** Aviso flutuante: "<nome> cutucou você". */
+const POKE_VARIANTS = [
+  {
+    img: pokeCheek,
+    title: "AI, MINHA BOCHECHA!",
+    text: (n: string) => `${n} te cutucou sem dó nem piedade. A Airi ficou até tonta com o impacto!`,
+    primary: "Cutucar de volta ⚡",
+    secondary: "Fingir demência",
+  },
+  {
+    img: pokeFlying,
+    title: "GOLPE CRÍTICO!",
+    text: (n: string) => `${n} acabou de te dar um empurrão daqueles! A Airi quase foi parar fora da tela.`,
+    primary: "Revidar agora 💥",
+    secondary: "Deixar passar",
+  },
+];
+
+/** Janela da Airi: "<nome> cutucou você" — sorteia um dos dois emotes. */
 export function PokeOverlay() {
   usePokesSync();
   const poke = useIncomingPoke();
   const [visible, setVisible] = useState(false);
+
+  const variant = useMemo(() => {
+    if (!poke) return POKE_VARIANTS[0];
+    const seed = [...poke.id].reduce((a, c) => a + c.charCodeAt(0), 0);
+    return POKE_VARIANTS[seed % POKE_VARIANTS.length];
+  }, [poke?.id]);
 
   useEffect(() => {
     if (!poke) {
@@ -24,50 +48,65 @@ export function PokeOverlay() {
       if (prefs.sound) playChime();
       if (prefs.vibration) vibratePulse();
     }
-    const hide = setTimeout(() => setVisible(false), 2600);
-    const ack = setTimeout(() => {
-      void markPokeSeen(poke.id);
-    }, 2900);
-    return () => {
-      clearTimeout(hide);
-      clearTimeout(ack);
-    };
   }, [poke?.id]);
 
   if (!poke) return null;
   const from = profileMeta(poke.fromProfile);
 
+  const close = () => {
+    setVisible(false);
+    void markPokeSeen(poke.id);
+  };
+
+  const pokeBack = async () => {
+    const res = await sendPoke(poke.toProfile as ProfileId, poke.fromProfile as ProfileId);
+    if (res.ok) toast.success(`Cutucada devolvida para ${from.name}!`);
+    else if (res.error === "cooldown") toast("Calma! Espere alguns segundos para cutucar de novo.");
+    else toast.error("Não deu para cutucar agora.");
+    close();
+  };
+
   return (
-    <div className="pointer-events-none fixed left-1/2 top-4 z-[90] w-[min(92vw,360px)] -translate-x-1/2">
-      <button
-        onClick={() => {
-          setVisible(false);
-          void markPokeSeen(poke.id);
-        }}
-        className={`pointer-events-auto flex w-full items-center gap-3 rounded-[22px] border border-white/[0.09] bg-[oklch(0.19_0.02_290/0.94)] px-3.5 py-3 text-left shadow-[0_22px_50px_-18px_rgba(0,0,0,0.75)] backdrop-blur-2xl transition-all duration-300 ${
-          visible ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
+    <div
+      className={`fixed inset-0 z-[130] grid place-items-center bg-background/70 px-5 backdrop-blur-md transition-opacity duration-300 ${
+        visible ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+      onClick={close}
+      role="dialog"
+      aria-label={`${from.name} cutucou você`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-[360px] rounded-[28px] border border-border/60 bg-card/95 p-5 pt-3 text-center shadow-2xl transition-transform duration-300 ${
+          visible ? "animate-[airi-duty-pop_0.55s_cubic-bezier(0.34,1.56,0.64,1)]" : "scale-95"
         }`}
       >
-        <div className="relative shrink-0">
-          <ProfileAvatar
-            profileId={poke.fromProfile}
-            initial={from.initial}
-            gradient={from.gradient}
-            size={40}
-          />
-          <span className="absolute -bottom-1 -right-1 grid h-[18px] w-[18px] place-items-center rounded-full bg-background ring-1 ring-white/10">
-            <Hand className="h-2.5 w-2.5 text-primary" strokeWidth={2.6} />
-          </span>
+        <img
+          src={variant.img}
+          alt="Airi levando uma cutucada"
+          className="mx-auto -mt-16 h-[190px] w-auto object-contain drop-shadow-2xl"
+        />
+        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+          {from.name} cutucou você
+        </p>
+        <h2 className="mt-1 text-[22px] font-bold tracking-tight text-foreground">{variant.title}</h2>
+        <p className="mt-2 text-[14px] leading-snug text-muted-foreground">{variant.text(from.name)}</p>
+        <div className="mt-5 flex flex-col gap-2">
+          <button
+            autoFocus
+            onClick={pokeBack}
+            className="h-12 rounded-2xl bg-primary text-[15px] font-semibold text-primary-foreground transition active:scale-[0.98]"
+          >
+            {variant.primary}
+          </button>
+          <button
+            onClick={close}
+            className="h-10 rounded-2xl text-[14px] font-medium text-muted-foreground hover:text-foreground"
+          >
+            {variant.secondary}
+          </button>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[14px] font-semibold tracking-tight text-foreground">
-            {from.name} cutucou você {poke.emoji}
-          </p>
-          <p className="mt-0.5 text-[11.5px] text-foreground/60">
-            Que tal responder a cutucada?
-          </p>
-        </div>
-      </button>
+      </div>
     </div>
   );
 }
