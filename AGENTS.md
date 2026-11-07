@@ -16,3 +16,4 @@
 - Focus emotes share AiriMascot configuration across study screens; daily briefings are Home-mounted, profile-scoped local reminders that wait for other dialogs, never changing study completion.
 - Home and Streak use the shared airi-streak-mood resolver to keep mascot state selection consistent.
 - Shop mascot balance states use a shared pure resolver; purchase celebrations appear only after confirmed success and never grant currency or items.
+- Desafio Relâmpago: regras puras em src/lib/lightning-challenge.ts; jogado 1x/dia por perfil via localStorage, prêmio só ao vencer.
