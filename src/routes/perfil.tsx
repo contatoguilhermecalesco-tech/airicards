@@ -521,7 +521,7 @@ function PerfilPage() {
             style={{
               background: showBanner
                 ? heroPalette.gradient
-                : "linear-gradient(135deg,#2b2d31 0%,#1e1f22 100%)",
+                : "linear-gradient(135deg,#3b0764,#831843)",
                transform: "scale(1.01)",
             }}
           />
@@ -618,7 +618,7 @@ function PerfilPage() {
         {/* Avatar + upload */}
         <div className="relative px-5 sm:px-6">
           <div
-             className={`group absolute -top-[52px] left-5 rounded-full sm:left-6 ${
+             className={`group absolute -top-[52px] left-0 right-0 mx-auto w-fit rounded-full ${
               showDecoration ? "cosmetic-avatar-float" : ""
             }`}
             style={{
@@ -725,7 +725,8 @@ function PerfilPage() {
         {/* Info */}
          <div className="px-5 pb-6 pt-12 sm:px-6 sm:pt-14">
            <div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="text-center">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <p className="text-[20px] font-bold leading-tight text-white sm:text-[22px]">
                 {profile?.name ?? "…"}
               </p>
@@ -765,6 +766,7 @@ function PerfilPage() {
                 <CosmeticTitle theme={cosmeticTitle} />
               </div>
             )}
+            </div>
 
             <div className="mt-4 h-px w-full bg-border" />
 
