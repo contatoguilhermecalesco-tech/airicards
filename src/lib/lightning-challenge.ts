@@ -25,6 +25,19 @@ export function resolveLightning(correct: number, elapsedSeconds: number): Light
   return correct >= LIGHTNING_TARGET && elapsedSeconds <= LIGHTNING_SECONDS ? "win" : "fail";
 }
 
+/** Morte súbita: qualquer erro encerra a partida como derrota. */
+export function resolveAnswer(isCorrect: boolean, correctSoFar: number, elapsedSeconds: number): LightningResult | "continue" {
+  if (!isCorrect) return "fail";
+  if (correctSoFar >= LIGHTNING_TARGET) return resolveLightning(correctSoFar, elapsedSeconds);
+  return "continue";
+}
+
+/** Milissegundos até a próxima meia-noite local (quando o desafio reabre). */
+export function msUntilNextChallenge(now = new Date()): number {
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  return next.getTime() - now.getTime();
+}
+
 export function rewardFor(result: LightningResult): number {
   return result === "win" ? LIGHTNING_REWARD : 0;
 }
