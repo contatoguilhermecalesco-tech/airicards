@@ -88,7 +88,7 @@ function Library() {
     return decks.map((d) => {
       const dCards = cards.filter((c) => c.deckId === d.id);
       const total = dCards.length;
-      const due = dCards.filter((c) => c.dueAt <= now).length;
+      const due = dCards.filter((c) => isDueForReview(c, now)).length;
       const enemies = dCards.filter(isEnemy).length;
       const studied = dCards.filter((c) => c.reps > 0).length;
       const progress = total === 0 ? 0 : Math.round((studied / total) * 100);
@@ -153,7 +153,7 @@ function Library() {
 
   const totalStats = useMemo(() => {
     const totalCards = cards.length;
-    const totalDue = cards.filter((c) => c.dueAt <= now).length;
+    const totalDue = cards.filter((c) => isDueForReview(c, now)).length;
     return { totalCards, totalDue };
   }, [cards, now]);
 
@@ -823,7 +823,7 @@ function DeckDetailedRow({
   const preview = useMemo(
     () =>
       [...cards]
-        .filter((c) => c.dueAt <= now)
+        .filter((c) => isDueForReview(c, now))
         .sort((a, b) => a.dueAt - b.dueAt)
         .slice(0, 3),
     [cards, now],

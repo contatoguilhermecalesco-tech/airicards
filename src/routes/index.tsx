@@ -87,7 +87,7 @@ function Home() {
   const airiMood = useAiriMood();
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
-    () => cards.filter((c) => c.dueAt <= now).length,
+    () => cards.filter((c) => isDueForReview(c, now)).length,
     [cards, now],
   );
   const nextDueInMs = useMemo(() => {

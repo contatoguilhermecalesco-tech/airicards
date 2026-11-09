@@ -171,7 +171,7 @@ function DeckDetail() {
     );
   }
 
-  const due = cards.filter((c) => c.dueAt <= Date.now()).length;
+  const due = cards.filter((c) => isDueForReview(c)).length;
   const enemies = cards.filter(isEnemy).length;
 
   return (

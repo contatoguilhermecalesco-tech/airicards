@@ -980,7 +980,7 @@ function runDailyPunishments() {
     const dayMs = 86_400_000;
     const cutoff = Date.now() - dayMs;
     const overdueEnemies = state.cards.filter(
-      (c) => isEnemy(c) && !isDefeated(c) && c.dueAt < cutoff,
+      (c) => isEnemy(c) && !isDefeated(c) && !isLearned(c) && c.dueAt < cutoff,
     ).length;
     if (overdueEnemies > 0) {
       const raw = overdueEnemies * LP.enemyIgnoredPerDay; // negativo
