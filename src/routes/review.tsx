@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect, useRef } from "react";
-import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles, Zap } from "lucide-react";
+import { X, Check, Swords, Trophy, Skull, Flame, Focus, Minimize2, Keyboard, CornerDownLeft, HelpCircle, Sparkles, Zap, GraduationCap } from "lucide-react";
 import {
   useStore,
   getDueCards,
+  setCardLearned,
   getEnemyCards,
   reviewCard,
   difficultyScore,
@@ -351,6 +352,21 @@ function Review() {
       });
     }
     setIndex((i) => i + 1);
+  }
+
+  function handleMarkLearned() {
+    if (!current) return;
+    const card = current;
+    setCardLearned(card.id, true);
+    setQueue((q) => q.filter((id) => id !== card.id));
+    setSessionCount((n) => Math.max(0, n - 1));
+    setShowBack(false);
+    setTyped("");
+    setVerdict(null);
+    toast("Carta aprendida — não aparece mais nas revisões", {
+      description: card.front,
+      action: { label: "Desfazer", onClick: () => setCardLearned(card.id, false) },
+    });
   }
 
   function handleDifficulty(g: "hard" | "good" | "easy") {
@@ -745,6 +761,19 @@ function Review() {
                 />
               )}
             </div>
+
+            {!isEnemyRun && (
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleMarkLearned}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-[12px] font-medium text-muted-foreground backdrop-blur transition hover:border-primary/50 hover:text-primary"
+                >
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  Já aprendi · ocultar das revisões
+                </button>
+              </div>
+            )}
 
 
             {/* Floating damage / heal numbers */}

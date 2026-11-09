@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   ArrowUpDown,
@@ -8,6 +9,8 @@ import {
   ChevronDown,
   Gift,
   Globe,
+  GraduationCap,
+  RotateCcw,
   LayoutGrid,
   List as ListIcon,
   Pencil,
@@ -652,6 +655,15 @@ function CardsPanel({
   const prefs = useCardPrefs(deckId);
   const [query, setQuery] = useState("");
   const now = Date.now();
+
+  const toggleLearned = (c: Card) => {
+    const learned = !isLearned(c);
+    setCardLearned(c.id, learned);
+    toast(learned ? "Carta aprendida — fora das revisões" : "Carta de volta às revisões", {
+      description: c.front,
+      action: { label: "Desfazer", onClick: () => setCardLearned(c.id, !learned) },
+    });
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
