@@ -28,7 +28,18 @@ export type Card = {
   mode?: CardMode;
   targetWord?: string;
   source?: CardSource;
+  /** Marcada como "já aprendida": fica oculta das revisões até ser restaurada. */
+  learnedAt?: number;
 };
+
+export function isLearned(card: Card): boolean {
+  return typeof card.learnedAt === "number";
+}
+
+/** Carta entra na fila de revisão: vencida e não marcada como aprendida. */
+export function isDueForReview(card: Card, at: number = Date.now()): boolean {
+  return !isLearned(card) && card.dueAt <= at;
+}
 
 export type Deck = {
   id: string;
@@ -680,6 +691,23 @@ export function updateCard(
   void flushSave();
 }
 
+/** Oculta (ou restaura) a carta das revisões sem perder o progresso dela. */
+export function setCardLearned(id: string, learned: boolean) {
+  state = {
+    ...state,
+    cards: state.cards.map((c) => {
+      if (c.id !== id) return c;
+      const next: Card = { ...c };
+      if (learned) next.learnedAt = Date.now();
+      else delete next.learnedAt;
+      return next;
+    }),
+  };
+  emit();
+  markItemPending(id);
+  void flushSave();
+}
+
 export type Grade = "again" | "hard" | "good" | "easy";
 
 export function autoClassify(card: Card): "hard" | "good" | "easy" {
@@ -1006,12 +1034,12 @@ export function useStreak(): Streak {
 
 
 export function getDueCards(deckId?: string, at: number = Date.now()): Card[] {
-  return state.cards.filter((c) => c.dueAt <= at && (deckId ? c.deckId === deckId : true));
+  return state.cards.filter((c) => isDueForReview(c, at) && (deckId ? c.deckId === deckId : true));
 }
 
 export function getEnemyCards(deckId?: string): Card[] {
   return state.cards.filter(
-    (c) => isEnemy(c) && (deckId ? c.deckId === deckId : true),
+    (c) => isEnemy(c) && !isLearned(c) && (deckId ? c.deckId === deckId : true),
   );
 }
 
