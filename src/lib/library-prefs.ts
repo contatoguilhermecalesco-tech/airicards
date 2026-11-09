@@ -25,7 +25,8 @@ export type CardFilter =
   | "new"
   | "learning"
   | "mastered"
-  | "enemies";
+  | "enemies"
+  | "learned";
 
 export type CardPrefs = {
   view: CardViewMode;
