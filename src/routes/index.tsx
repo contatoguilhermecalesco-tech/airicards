@@ -15,6 +15,7 @@ import {
   useStore,
   useCardsReviewedToday,
   useStreak,
+  isDueForReview,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { AiriFocusBanner, AiriSpeech, useAiriMood, type AiriFocusMood } from "@/components/AiriMascot";
@@ -87,7 +88,7 @@ function Home() {
   const airiMood = useAiriMood();
   const now = useMemo(() => Date.now(), [cards]);
   const due = useMemo(
-    () => cards.filter((c) => c.dueAt <= now).length,
+    () => cards.filter((c) => isDueForReview(c, now)).length,
     [cards, now],
   );
   const nextDueInMs = useMemo(() => {

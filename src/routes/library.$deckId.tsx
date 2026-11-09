@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   ArrowUpDown,
@@ -8,6 +9,8 @@ import {
   ChevronDown,
   Gift,
   Globe,
+  GraduationCap,
+  RotateCcw,
   LayoutGrid,
   List as ListIcon,
   Pencil,
@@ -30,6 +33,9 @@ import {
   isEnemy,
   type Card,
   type CardMode,
+  isDueForReview,
+  isLearned,
+  setCardLearned,
 } from "@/lib/flashcards-store";
 import { translateEnToPt } from "@/lib/translate.functions";
 import { buildShareUrl } from "@/lib/share";
@@ -171,7 +177,7 @@ function DeckDetail() {
     );
   }
 
-  const due = cards.filter((c) => c.dueAt <= Date.now()).length;
+  const due = cards.filter((c) => isDueForReview(c)).length;
   const enemies = cards.filter(isEnemy).length;
 
   return (
@@ -650,6 +656,15 @@ function CardsPanel({
   const [query, setQuery] = useState("");
   const now = Date.now();
 
+  const toggleLearned = (c: Card) => {
+    const learned = !isLearned(c);
+    setCardLearned(c.id, learned);
+    toast(learned ? "Carta aprendida — fora das revisões" : "Carta de volta às revisões", {
+      description: c.front,
+      action: { label: "Desfazer", onClick: () => setCardLearned(c.id, !learned) },
+    });
+  };
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = [...cards];
@@ -682,6 +697,9 @@ function CardsPanel({
         break;
       case "enemies":
         list = list.filter(isEnemy);
+        break;
+      case "learned":
+        list = list.filter(isLearned);
         break;
     }
     switch (prefs.sort) {
@@ -773,6 +791,7 @@ function CardsPanel({
               onEdit={() => onEdit(c)}
               onGift={() => onGift(c)}
               onDelete={() => onDelete(c.id)}
+              onToggleLearned={() => toggleLearned(c)}
             />
           ))}
         </ul>
@@ -785,6 +804,7 @@ function CardsPanel({
               onEdit={() => onEdit(c)}
               onGift={() => onGift(c)}
               onDelete={() => onDelete(c.id)}
+              onToggleLearned={() => toggleLearned(c)}
             />
           ))}
         </ul>
@@ -907,6 +927,7 @@ function CardFilterChips({
       learning: cards.filter((c) => (c.reps ?? 0) > 0 && (c.successes ?? 0) < 3).length,
       mastered: cards.filter((c) => (c.successes ?? 0) >= 3).length,
       enemies: cards.filter(isEnemy).length,
+      learned: cards.filter(isLearned).length,
     };
   }, [cards]);
 
@@ -916,6 +937,7 @@ function CardFilterChips({
     { id: "learning", label: "Aprendendo", count: counts.learning, tone: "rgb(251 191 36)" },
     { id: "mastered", label: "Dominadas", count: counts.mastered, tone: "rgb(52 211 153)" },
     { id: "enemies", label: "Inimigas", count: counts.enemies, tone: "rgb(248 113 113)" },
+    { id: "learned", label: "Aprendidas", count: counts.learned, tone: "rgb(196 181 253)" },
     { id: "word", label: "Palavras", count: counts.word },
     { id: "sentence", label: "Frases", count: counts.sentence },
     { id: "expression", label: "Expressões", count: counts.expression },
@@ -951,13 +973,16 @@ function CardListItem({
   onEdit,
   onGift,
   onDelete,
+  onToggleLearned,
 }: {
   card: Card;
   onEdit: () => void;
   onGift: () => void;
   onDelete: () => void;
+  onToggleLearned: () => void;
 }) {
   const enemy = isEnemy(c);
+  const learned = isLearned(c);
   const isNew = (c.reps ?? 0) === 0;
   const mastered = (c.successes ?? 0) >= 3;
   return (
@@ -992,6 +1017,11 @@ function CardListItem({
               dominada
             </span>
           )}
+          {learned && (
+            <span className="inline-flex shrink-0 items-center rounded-full bg-primary/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-primary">
+              aprendida
+            </span>
+          )}
           {enemy && (
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-destructive/15 px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-wider text-destructive">
               <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
@@ -1018,6 +1048,14 @@ function CardListItem({
           <Gift className="h-3.5 w-3.5" />
         </button>
         <button
+          onClick={onToggleLearned}
+          className={`grid h-8 w-8 place-items-center rounded-full transition hover:bg-primary/15 hover:text-primary ${learned ? "text-primary" : "text-muted-foreground"}`}
+          aria-label={learned ? "Voltar para as revisões" : "Marcar como aprendida"}
+          title={learned ? "Voltar para as revisões" : "Já aprendi — ocultar das revisões"}
+        >
+          {learned ? <RotateCcw className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
+        </button>
+        <button
           onClick={onDelete}
           className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground transition hover:bg-destructive/15 hover:text-destructive"
           aria-label="Excluir carta"
@@ -1035,16 +1073,19 @@ function CardGridItem({
   onEdit,
   onGift,
   onDelete,
+  onToggleLearned,
 }: {
   card: Card;
   deckColor?: string;
   onEdit: () => void;
   onGift: () => void;
   onDelete: () => void;
+  onToggleLearned: () => void;
 }) {
   const gradient = deckGradient(deckColor);
   const color = getDeckColor(deckColor);
   const enemy = isEnemy(c);
+  const learned = isLearned(c);
   return (
     <li
       className={`group relative overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl transition ${
@@ -1087,6 +1128,11 @@ function CardGridItem({
             dominada
           </span>
         )}
+        {learned && (
+          <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+            aprendida
+          </span>
+        )}
         {enemy && (
           <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-destructive">
             <Swords className="h-2.5 w-2.5" strokeWidth={2.5} />
@@ -1108,6 +1154,14 @@ function CardGridItem({
           aria-label="Enviar carta"
         >
           <Gift className="h-3.5 w-3.5" />
+        </button>
+        <button
+          onClick={onToggleLearned}
+          className={`grid h-8 w-8 place-items-center rounded-full transition hover:bg-primary/15 hover:text-primary ${learned ? "text-primary" : "text-muted-foreground"}`}
+          aria-label={learned ? "Voltar para as revisões" : "Marcar como aprendida"}
+          title={learned ? "Voltar para as revisões" : "Já aprendi — ocultar das revisões"}
+        >
+          {learned ? <RotateCcw className="h-3.5 w-3.5" /> : <GraduationCap className="h-3.5 w-3.5" />}
         </button>
         <button
           onClick={onDelete}
