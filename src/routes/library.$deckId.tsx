@@ -30,6 +30,9 @@ import {
   isEnemy,
   type Card,
   type CardMode,
+  isDueForReview,
+  isLearned,
+  setCardLearned,
 } from "@/lib/flashcards-store";
 import { translateEnToPt } from "@/lib/translate.functions";
 import { buildShareUrl } from "@/lib/share";

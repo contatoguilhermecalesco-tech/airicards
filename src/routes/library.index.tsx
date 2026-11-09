@@ -29,6 +29,7 @@ import {
   isEnemy,
   type Deck,
   type Card,
+  isDueForReview,
 } from "@/lib/flashcards-store";
 import { SyncDot } from "@/components/SyncIndicator";
 import {

@@ -15,6 +15,7 @@ import {
   useStore,
   useCardsReviewedToday,
   useStreak,
+  isDueForReview,
 } from "@/lib/flashcards-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { AiriFocusBanner, AiriSpeech, useAiriMood, type AiriFocusMood } from "@/components/AiriMascot";
