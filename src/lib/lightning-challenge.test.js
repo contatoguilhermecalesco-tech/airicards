@@ -23,3 +23,13 @@ test("pergunta tem 3 alternativas incluindo a certa", () => {
   expect(q.options).toContain(q.answer);
   expect(buildQuestion(pool.slice(0, 2))).toBe(null);
 });
+
+import { resolveAnswer, msUntilNextChallenge } from "./lightning-challenge";
+test("morte súbita: um erro perde na hora", () => {
+  expect(resolveAnswer(false, 4, 10)).toBe("fail");
+  expect(resolveAnswer(true, 3, 10)).toBe("continue");
+  expect(resolveAnswer(true, 5, 20)).toBe("win");
+});
+test("próximo desafio abre à meia-noite", () => {
+  expect(msUntilNextChallenge(new Date(2026, 10, 9, 23, 0, 0))).toBe(3600000);
+});
