@@ -7,8 +7,9 @@ import {
   deleteShopItem,
   type ShopItem,
 } from "@/lib/shop";
+import { readPromo, type PromoType } from "@/lib/shop-promo";
 
-const KINDS = ["all", "pack", "cosmetic", "powerup"] as const;
+const KINDS = ["all", "pack", "cosmetic", "powerup", "bundle"] as const;
 type KindFilter = (typeof KINDS)[number];
 
 export function ShopItemsSection() {
@@ -75,6 +76,33 @@ export function ShopItemsSection() {
       await updateShopItem(it.id, { price: Math.round(n) });
       setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, price: Math.round(n) } : x)));
       setEditing(null);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function setPromo(it: ShopItem, type: PromoType | null) {
+    let payload: Record<string, unknown> = { ...it.payload };
+    if (!type) {
+      delete payload.promo;
+    } else {
+      const current = readPromo(it.price, it.payload)?.price;
+      const raw = prompt(`Preço promocional (padrão ${it.price} ✦):`, String(current ?? Math.round(it.price * 0.7)));
+      if (raw === null) return;
+      const n = Math.round(Number(raw));
+      if (!Number.isFinite(n) || n < 0 || n >= it.price) {
+        setErr("O preço promocional precisa ser menor que o preço padrão.");
+        return;
+      }
+      payload = { ...payload, promo: { type, price: n } };
+    }
+    setBusy(it.id);
+    setErr(null);
+    try {
+      await updateShopItem(it.id, { payload });
+      setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, payload } : x)));
     } catch (e) {
       setErr((e as Error).message);
     } finally {
@@ -212,6 +240,27 @@ export function ShopItemsSection() {
                   {it.price} ✦
                 </button>
               )}
+
+              <div className="flex shrink-0 overflow-hidden rounded-full border border-white/10 text-[10px] font-semibold">
+                {([
+                  [null, "Normal"],
+                  ["discount", "Desconto"],
+                  ["black", "Black"],
+                ] as const).map(([t, label]) => {
+                  const active = (readPromo(it.price, it.payload)?.type ?? null) === t;
+                  return (
+                    <button
+                      key={label}
+                      disabled={busy === it.id}
+                      onClick={() => void setPromo(it, t)}
+                      className={`px-2 py-1 transition ${active ? "bg-primary/25 text-primary" : "text-foreground/55 hover:bg-white/[0.06]"}`}
+                    >
+                      {label}
+                      {active && t ? ` ${readPromo(it.price, it.payload)?.price}✦` : ""}
+                    </button>
+                  );
+                })}
+              </div>
 
               <button
                 onClick={() => void toggle(it)}
