@@ -17,6 +17,7 @@ import { RankEmblem } from "@/components/RankBadge";
 import { PROFILES, getCurrentProfile, useCurrentProfile } from "@/lib/profile";
 import { useStore, useStreak } from "@/lib/flashcards-store";
 import { ShareAchievement } from "@/components/ShareAchievement";
+import { SeasonPanel } from "@/components/rank/SeasonPanel";
 
 export const Route = createFileRoute("/rank")({
   component: RankPage,
@@ -78,6 +79,7 @@ function RankPage() {
           </nav>
           <button onClick={() => setShareOpen(true)} aria-label="Compartilhar rank" className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 bg-[#ff5a1f] px-2 text-[8px] font-black uppercase tracking-[0.08em] text-white transition hover:bg-[#ff713e] sm:px-4 sm:text-[9px] sm:tracking-[0.12em]"><Share2 className="h-3 w-3" /><span className="hidden sm:inline">Compartilhar</span><span className="sm:hidden">Share</span></button>
         </header>
+        <SeasonPanel />
 
         <div className="flex min-w-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-[#242426] px-3 sm:min-h-10 sm:px-6">
           <nav className="flex h-10 min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.08em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:text-[8px] sm:tracking-[0.12em]">
