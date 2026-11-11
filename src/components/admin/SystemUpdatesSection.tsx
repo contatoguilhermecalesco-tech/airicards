@@ -5,7 +5,8 @@ import {
   createSystemUpdate, deleteSystemUpdate, updateSystemUpdate, useSystemUpdates,
   type SystemUpdate, type SystemUpdateStatus,
 } from "@/lib/system-updates-store";
-import { NOTIFICATION_ROUTES } from "@/components/admin/NotificationsSection";
+import { IPhonePushPreview, NOTIFICATION_ROUTES } from "@/components/admin/NotificationsSection";
+import { notifyPhones } from "@/lib/push";
 
 const STATUSES: Array<{ key: SystemUpdateStatus; label: string; color: string; icon: NotificationIconKey }> = [
   { key: "maintenance", label: "Manutenção", color: "#f59e0b", icon: "clock" },
@@ -25,6 +26,13 @@ function dateLabel(value: string) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
 }
 
+const STATUS_EMOJI: Record<SystemUpdateStatus, string> = {
+  maintenance: "🛠️", offline: "⛔", degraded: "⚠️", info: "📣", resolved: "✅",
+};
+function pushTitle(status: SystemUpdateStatus, title: string) {
+  return `${STATUS_EMOJI[status] ?? "📣"} ${title}`;
+}
+
 export function SystemUpdatesSection() {
   const { updates, loading } = useSystemUpdates();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -40,6 +48,7 @@ export function SystemUpdatesSection() {
   const [actionRoute, setActionRoute] = useState("");
   const [relatedUpdateId, setRelatedUpdateId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pushPhones, setPushPhones] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "resolved">("all");
   const [search, setSearch] = useState("");
@@ -82,6 +91,14 @@ export function SystemUpdatesSection() {
       };
       if (editingId) await updateSystemUpdate(editingId, payload);
       else await createSystemUpdate(payload);
+      if (pushPhones) {
+        notifyPhones({
+          to: ["guilherme", "arlayne"],
+          title: pushTitle(status, payload.title),
+          body: payload.body,
+          url: actionRoute?.startsWith("/") ? actionRoute : "/atualizacoes",
+        });
+      }
       setMessage(editingId ? "Atualização editada." : "Atualização publicada para os perfis.");
       resetForm();
     } catch (error) {
@@ -121,6 +138,11 @@ export function SystemUpdatesSection() {
           <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Prévia para os usuários</p>
           <div className="flex gap-3"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border" style={{ color, borderColor: `${color}55`, backgroundColor: `${color}18` }}><AlertTriangle className="h-4 w-4" /></span><div className="min-w-0"><p className="text-sm font-semibold">{title || "Título do comunicado"}</p><p className="mt-1 text-xs text-muted-foreground">{body || "A descrição aparecerá aqui."}</p><p className="mt-1 text-[10px] font-medium" style={{ color }}>{selectedStatus.label}{affectedArea !== "Geral" ? ` · ${affectedArea}` : ""}{expectedReturnAt ? ` · Previsão: ${dateLabel(new Date(expectedReturnAt).toISOString())}` : ""}</p></div></div>
         </div>
+        <label className="flex items-center justify-between gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 text-sm">
+          <span>Avisar no celular<span className="block text-[11px] text-muted-foreground">Chega na tela de bloqueio do iPhone</span></span>
+          <input type="checkbox" checked={pushPhones} onChange={(e) => setPushPhones(e.target.checked)} className="h-5 w-5 accent-[var(--primary)]" />
+        </label>
+        {pushPhones && <IPhonePushPreview title={title.trim() ? pushTitle(status, title.trim()) : ""} body={body} />}
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p role="status" className="text-xs text-muted-foreground">{message}</p>
           <div className="flex gap-2">{editing && <button type="button" onClick={resetForm} className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-2 text-xs"><X className="h-3.5 w-3.5" /> Cancelar</button>}<button type="button" onClick={() => void publish()} disabled={busy || !title.trim() || !body.trim()} className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? <Check className="h-4 w-4" /> : <Send className="h-4 w-4" />}{editing ? "Salvar edição" : "Publicar"}</button></div>
