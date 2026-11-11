@@ -329,6 +329,41 @@ export type Database = {
           },
         ]
       }
+      duel_bets: {
+        Row: {
+          amount: number
+          created_at: string
+          duel_id: string
+          id: string
+          payout_claimed: boolean
+          profile_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          duel_id: string
+          id?: string
+          payout_claimed?: boolean
+          profile_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          duel_id?: string
+          id?: string
+          payout_claimed?: boolean
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "duel_bets_duel_id_fkey"
+            columns: ["duel_id"]
+            isOneToOne: false
+            referencedRelation: "duels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       duel_results: {
         Row: {
           accuracy: number
@@ -718,6 +753,45 @@ export type Database = {
           id?: string
           p256dh?: string
           profile_id?: string
+        }
+        Relationships: []
+      }
+      secret_cards: {
+        Row: {
+          answered_at: string | null
+          back: string
+          created_at: string
+          from_profile: string
+          front: string
+          id: string
+          reward: number
+          status: string
+          to_profile: string
+          week_key: string
+        }
+        Insert: {
+          answered_at?: string | null
+          back: string
+          created_at?: string
+          from_profile: string
+          front: string
+          id?: string
+          reward?: number
+          status?: string
+          to_profile: string
+          week_key: string
+        }
+        Update: {
+          answered_at?: string | null
+          back?: string
+          created_at?: string
+          from_profile?: string
+          front?: string
+          id?: string
+          reward?: number
+          status?: string
+          to_profile?: string
+          week_key?: string
         }
         Relationships: []
       }
