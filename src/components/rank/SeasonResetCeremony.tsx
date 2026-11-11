@@ -165,7 +165,7 @@ export function SeasonResetCeremony() {
                   className="season-ceremony-airi my-0 h-auto w-full max-w-[340px] object-contain"
                   draggable={false}
                 />
-                <h2 id="season-ceremony-title" className="-mt-2 font-display text-[28px] font-semibold leading-tight text-foreground">Mandou bem. De verdade.</h2>
+                <h2 id="season-ceremony-title" className="mt-1 font-display text-[28px] font-semibold leading-tight text-foreground">Mandou bem. De verdade.</h2>
                 <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">“Seu esforço virou Arlys. Gaste com sabedoria… ou não.”</p>
                 <div className="season-reward-chip mt-5 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2.5 text-lg font-bold text-foreground">
                   <Gift className="h-5 w-5 text-primary" />
