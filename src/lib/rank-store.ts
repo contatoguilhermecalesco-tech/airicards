@@ -655,9 +655,19 @@ export function claimSeasonReward(): number {
   return amount;
 }
 
+/** Dispensa a cerimônia sem apagar uma recompensa ainda não resgatada. */
+export function dismissSeasonTransition() {
+  if (!state.seasonTransition) return;
+  state = { ...state, seasonTransition: undefined };
+  persist();
+  emit();
+}
+
 /** Admin: força a virada como se fosse o próximo split. */
 export function simulateSeasonRollover() {
-  state = applySeason({ ...state, season: "0000-S1" });
+  const now = new Date();
+  const previous = seasonFor(new Date(now.getFullYear(), now.getMonth() - 3, 1)).id;
+  state = applySeason({ ...state, season: previous }, now);
   persist();
   emit();
 }

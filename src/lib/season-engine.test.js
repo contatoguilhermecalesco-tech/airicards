@@ -29,3 +29,13 @@ test("calibração não perde LP e ganha 1.5x", () => {
   expect(placementDelta(-20)).toBe(0);
   expect(placementDelta(20)).toBe(30);
 });
+
+test("cerimônia preserva elo anterior, recompensa e destino do soft reset", () => {
+  const from = { season: "2026-S4", tier: "diamond", division: 2, reward: 400 };
+  expect(createSeasonTransition(from, "2027-S1", { tier: "platinum", division: 4 })).toEqual({
+    from,
+    toSeason: "2027-S1",
+    toTier: "platinum",
+    toDivision: 4,
+  });
+});
