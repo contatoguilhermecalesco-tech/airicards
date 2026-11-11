@@ -20,12 +20,10 @@ self.addEventListener("push", (event) => {
     dir: "auto",
     timestamp: Date.now(),
     vibrate: [100, 50, 100],
+    tag: data.tag || undefined,
     renotify: false,
+    silent: false,
     data: { url: data.url || "/" },
-    actions: [
-      { action: "open", title: "Abrir AIRI" },
-      { action: "inbox", title: "Ver notificações" },
-    ],
   };
 
   const tasks = [self.registration.showNotification(title, notificationOptions)];

@@ -55,6 +55,7 @@ export function NotificationsSection() {
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const [relinkBusy, setRelinkBusy] = useState(false);
+  const [to, setTo] = useState<"both" | "guilherme" | "arlayne">("both");
 
   function showAdminActionError(error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
@@ -114,7 +115,7 @@ export function NotificationsSection() {
         action_label: actionLabel || null,
         action_route: actionRoute || null,
       });
-      notifyPhones({ to: ["guilherme", "arlayne"], title: title.trim(), body: body.trim(), url: actionRoute?.startsWith("/") ? actionRoute : "/notificacoes" });
+      notifyPhones({ to: to === "both" ? ["guilherme", "arlayne"] : [to], title: title.trim(), body: body.trim(), url: actionRoute?.startsWith("/") ? actionRoute : "/notificacoes" });
       setTitle("");
       setBody("");
       setIdea("");
@@ -173,6 +174,21 @@ export function NotificationsSection() {
         </div>
       </div>
 
+      <div className="mt-3">
+        <p className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Modelos prontos</p>
+        <div className="flex flex-wrap gap-1.5">
+          {PUSH_TEMPLATES.map((t) => (
+            <button
+              key={t.label}
+              onClick={() => { setTitle(t.title); setBody(t.body); setActionRoute(t.route); }}
+              className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground transition hover:border-primary/50 hover:text-foreground"
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-3 space-y-2">
         <input
           value={title}
@@ -187,6 +203,19 @@ export function NotificationsSection() {
           rows={3}
           className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary/60"
         />
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">Enviar para:</span>
+          {([["both", "Ambos"], ["guilherme", "Guilherme"], ["arlayne", "Arlayne"]] as const).map(([k, l]) => (
+            <button
+              key={k}
+              onClick={() => setTo(k)}
+              className={`rounded-full border px-2.5 py-1 text-xs transition ${to === k ? "border-primary/50 bg-primary/15 text-primary" : "border-border text-muted-foreground hover:text-foreground"}`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+        <IPhonePushPreview title={title} body={body} />
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted-foreground">Tag:</span>
           <button
@@ -392,5 +421,34 @@ export function NotificationsSection() {
         </>
       )}
     </section>
+  );
+}
+
+const PUSH_TEMPLATES = [
+  { label: "🔥 Streak em risco", title: "Sua chama tá quase apagando 🔥", body: "Faltam poucas horas. 5 cartinhas e ela continua viva.", route: "/review" },
+  { label: "🎧 Foco do dia", title: "Foco de hoje: Listening 🎧", body: "Seus 5 minutos te esperam. Coloca o fone e vem.", route: "/study" },
+  { label: "⚡ Duelo", title: "Duelo aberto ⚔️", body: "Tem alguém tentando passar você no placar. Vai deixar?", route: "/duel" },
+  { label: "📚 Revisão", title: "Cartas esperando por você 📚", body: "Uma revisão rapidinha agora e o dia tá ganho.", route: "/review" },
+  { label: "✨ Novidades", title: "Novidade no airi ✨", body: "Tem coisa nova te esperando. Abre pra ver.", route: "/novidades" },
+  { label: "💜 Recado", title: "Um recadinho pra você 💜", body: "Passando só pra dizer que você tá mandando bem.", route: "/" },
+];
+
+function IPhonePushPreview({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
+      <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Como chega no iPhone</p>
+      <div className="flex items-start gap-3 rounded-[22px] bg-muted/70 p-3 backdrop-blur">
+        <img src="/icons/airi-icon-192.png" alt="" className="h-9 w-9 shrink-0 rounded-[9px]" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="truncate text-[13px] font-semibold text-foreground">{title.trim() || "Título"}</p>
+            <span className="shrink-0 text-[11px] text-muted-foreground">agora</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground">from airi</p>
+          <p className="line-clamp-4 text-[13px] leading-snug text-foreground/90">{body.trim() || "Mensagem"}</p>
+        </div>
+      </div>
+      <p className="mt-1.5 text-[11px] text-muted-foreground">Dica: título e mensagem diferentes deixam com cara de app de verdade. O “from airi” é colocado pela Apple e não pode ser removido.</p>
+    </div>
   );
 }
