@@ -3,6 +3,30 @@
 import { useSyncExternalStore } from "react";
 import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
+import { seasonFor, softReset, seasonReward, placementDelta, PLACEMENT_EVENTS, type SeasonRecord } from "@/lib/season-engine";
+
+/** Aplica a virada de temporada se o estado for de um split anterior. */
+export function applySeason(s: RankState, now = new Date()): RankState {
+  const current = seasonFor(now).id;
+  if (!s.season) return { ...s, season: current, placementsLeft: s.placementsLeft ?? 0 };
+  if (s.season === current) return s;
+  const reward = seasonReward(s.peakTier);
+  const reset = softReset(s.peakTier);
+  const record: SeasonRecord = { season: s.season, tier: s.peakTier, division: s.peakDivision, reward };
+  return {
+    ...s,
+    tier: reset.tier,
+    division: reset.division,
+    lp: 0,
+    promo: null,
+    peakTier: reset.tier,
+    peakDivision: reset.division,
+    season: current,
+    placementsLeft: PLACEMENT_EVENTS,
+    seasonHistory: [record, ...(s.seasonHistory ?? [])].slice(0, 20),
+    pendingSeasonReward: (s.pendingSeasonReward ?? 0) + reward,
+  };
+}
 
 export type Tier =
   | "iron"
@@ -41,6 +65,10 @@ export type RankState = {
   totalLost: number;
   peakTier: Tier;
   peakDivision: Division;
+  season?: string;
+  placementsLeft?: number;
+  seasonHistory?: SeasonRecord[];
+  pendingSeasonReward?: number;
 };
 
 export const TIER_ORDER: Tier[] = [
@@ -128,7 +156,7 @@ function load(profileId: string): RankState {
     const raw = localStorage.getItem(keyFor(profileId));
     if (!raw) return INITIAL_RANK;
     const parsed = JSON.parse(raw) as RankState;
-    return { ...INITIAL_RANK, ...parsed };
+    return applySeason({ ...INITIAL_RANK, ...parsed });
   } catch {
     return INITIAL_RANK;
   }
@@ -221,7 +249,7 @@ async function pullFromCloud(profileId: string) {
     }
     return;
   }
-  const merged = pickCanonical(local, remote);
+  const merged = applySeason(pickCanonical(local, remote));
   state = merged;
   save(profileId, merged);
   remoteRanks.set(profileId, merged);
@@ -388,10 +416,13 @@ export function awardLp(delta: number, reason: string, multiplier = 1): {
   promoWon: boolean;
   promoLost: boolean;
 } {
-  const finalDelta = Math.round(delta * multiplier);
+  const calibrating = (state.placementsLeft ?? 0) > 0;
+  const raw = Math.round(delta * multiplier);
+  const finalDelta = calibrating ? placementDelta(raw) : raw;
   const before = state;
   let next: RankState = {
     ...state,
+    placementsLeft: calibrating && raw > 0 ? (state.placementsLeft ?? 1) - 1 : state.placementsLeft,
     history: [{ at: Date.now(), delta: finalDelta, reason }, ...state.history].slice(0, 60),
     totalEarned: finalDelta > 0 ? state.totalEarned + finalDelta : state.totalEarned,
     totalLost: finalDelta < 0 ? state.totalLost + Math.abs(finalDelta) : state.totalLost,
@@ -612,6 +643,23 @@ export function progressToNext(state: RankState): { value: number; max: number; 
 }
 
 /** Reseta rank do perfil ativo (usado pelo admin). */
+/** Entrega uma única vez as Arlys da temporada encerrada. */
+export function claimSeasonReward(): number {
+  const amount = state.pendingSeasonReward ?? 0;
+  if (amount <= 0) return 0;
+  state = { ...state, pendingSeasonReward: 0 };
+  persist();
+  emit();
+  return amount;
+}
+
+/** Admin: força a virada como se fosse o próximo split. */
+export function simulateSeasonRollover() {
+  state = applySeason({ ...state, season: "0000-S1" });
+  persist();
+  emit();
+}
+
 export function resetRank() {
   state = INITIAL_RANK;
   persist();

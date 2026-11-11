@@ -22,11 +22,12 @@ export function seasonLabel(id: string): string {
 }
 
 /** Soft reset: desce ~1 tier e sempre recomeça na divisão IV. */
+const RESET_TO: Record<Tier, Tier> = {
+  iron: "iron", bronze: "iron", silver: "iron", gold: "bronze", platinum: "silver",
+  emerald: "gold", diamond: "platinum", master: "diamond", grandmaster: "diamond", challenger: "diamond",
+};
 export function softReset(tier: Tier): { tier: Tier; division: Division } {
-  const idx = ORDER.indexOf(tier);
-  if (idx >= ORDER.indexOf("master")) return { tier: "diamond", division: 4 };
-  if (idx <= 1) return { tier: "iron", division: 4 };
-  return { tier: ORDER[idx - 2 < 0 ? 0 : idx - 1 - (idx >= 3 ? 1 : 0)], division: 4 };
+  return { tier: RESET_TO[tier] ?? "iron", division: 4 };
 }
 
 /** Recompensa pelo pico da temporada encerrada. */
