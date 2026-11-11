@@ -271,6 +271,13 @@ export async function linkProfile(
 }
 
 export async function signOutProfile(): Promise<void> {
+  // Remove apenas o vínculo deste dispositivo antes de encerrar a sessão.
+  // Mesmo se o RPC falhar, o logout local deve continuar disponível.
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (sessionData.session) {
+    const { error } = await supabase.rpc("unlink_current_session");
+    if (error) console.error("[AIRI] Não foi possível desvincular esta sessão:", error);
+  }
   await supabase.auth.signOut();
   currentProfile = null;
   isAdminFlag = false;

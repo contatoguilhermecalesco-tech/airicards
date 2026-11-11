@@ -572,3 +572,59 @@ export const adminSetAreaMaintenanceFn = createServerFn({ method: "POST" })
     if (!row) throw new Error("O Supabase não retornou a configuração salva. Tente novamente.");
     return row as AppAreaMaintenanceRow;
   });
+
+
+// ---------- Notificações administrativas ----------------------------------
+
+const adminNotificationSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  body: z.string().trim().min(1).max(2000),
+  tag_id: z.string().uuid().nullable(),
+  icon: z.string().max(64).nullable().optional(),
+  action_label: z.string().max(80).nullable().optional(),
+  action_route: z.string().max(500).nullable().optional(),
+});
+
+export const adminCreateNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => adminNotificationSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { data: notification, error } = await supabaseAdmin
+      .from("notifications")
+      .insert({
+        title: data.title,
+        body: data.body,
+        tag_id: data.tag_id,
+        icon: data.icon ?? null,
+        action_label: data.action_label?.trim() || null,
+        action_route: data.action_route?.trim() || null,
+      })
+      .select("*")
+      .single();
+    if (error) throw error;
+    return notification;
+  });
+
+const adminDeleteNotificationSchema = z.object({
+  id: z.string().uuid(),
+});
+
+export const adminDeleteNotificationFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => adminDeleteNotificationSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase);
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+    const { error } = await supabaseAdmin
+      .from("notifications")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw error;
+    return { ok: true as const };
+  });

@@ -3,6 +3,10 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentProfile } from "@/lib/profile";
+import {
+  adminCreateNotificationFn,
+  adminDeleteNotificationFn,
+} from "@/lib/admin.functions";
 
 export type NotificationTag = {
   id: string;
@@ -184,25 +188,21 @@ export async function createNotification(input: {
   action_label?: string | null;
   action_route?: string | null;
 }) {
-  const { data, error } = await supabase
-    .from("notifications")
-    .insert({
-      title: input.title.trim(),
-      body: input.body.trim(),
+  const data = await adminCreateNotificationFn({
+    data: {
+      title: input.title,
+      body: input.body,
       tag_id: input.tag_id,
       icon: input.icon ?? null,
-      action_label: input.action_label?.trim() || null,
-      action_route: input.action_route?.trim() || null,
-    })
-    .select("*")
-    .single();
-  if (error) throw error;
+      action_label: input.action_label ?? null,
+      action_route: input.action_route ?? null,
+    },
+  });
   await fetchAll();
   return data as Notification;
 }
 
 export async function deleteNotification(id: string) {
-  const { error } = await supabase.from("notifications").delete().eq("id", id);
-  if (error) throw error;
+  await adminDeleteNotificationFn({ data: { id } });
   await fetchAll();
 }

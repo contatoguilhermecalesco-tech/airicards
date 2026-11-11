@@ -1025,6 +1025,7 @@ export type Database = {
     }
     Functions: {
       current_profile_id: { Args: never; Returns: string }
+      unlink_current_session: { Args: never; Returns: undefined }
       get_public_profile_snapshot: {
         Args: { _profile_id: string }
         Returns: Json

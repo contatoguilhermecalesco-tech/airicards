@@ -8,6 +8,7 @@ import {
   useNotifications,
 } from "@/lib/notifications-store";
 import { generateNotification } from "@/lib/notifications-ai.functions";
+import { signOutProfile } from "@/lib/profile";
 import { NOTIFICATION_ICONS, resolveNotificationIcon, type NotificationIconKey } from "@/lib/notification-icons";
 
 export const NOTIFICATION_ROUTES: { path: string; label: string }[] = [
@@ -53,6 +54,35 @@ export function NotificationsSection() {
   const [sendBusy, setSendBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [relinkBusy, setRelinkBusy] = useState(false);
+
+  function showAdminActionError(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    const authProblem = /unauthorized|forbidden|jwt|token|session|sessão|admin/i.test(message);
+    setErr(
+      authProblem
+        ? "Sua sessão de administrador expirou. Digite seu PIN novamente para continuar."
+        : message,
+    );
+  }
+
+  async function handleRelink() {
+    setRelinkBusy(true);
+    try {
+      await signOutProfile();
+    } finally {
+      setRelinkBusy(false);
+    }
+  }
+
+  async function handleDeleteNotification(id: string) {
+    setErr(null);
+    try {
+      await deleteNotification(id);
+    } catch (error) {
+      showAdminActionError(error);
+    }
+  }
 
   async function handleGenerate() {
     if (!idea.trim()) return;
@@ -64,7 +94,7 @@ export function NotificationsSection() {
       setTitle(draft.title);
       setBody(draft.body);
     } catch (e) {
-      setErr((e as Error).message);
+      showAdminActionError(e);
     } finally {
       setGenBusy(false);
     }
@@ -284,7 +314,21 @@ export function NotificationsSection() {
             Enviar
           </button>
         </div>
-        {err && <p className="text-xs text-red-400">{err}</p>}
+        {err && (
+          <div className="space-y-2 rounded-xl border border-red-500/20 bg-red-500/5 p-3">
+            <p className="text-xs text-red-400">{err}</p>
+            {err.startsWith("Sua sessão de administrador expirou") && (
+              <button
+                type="button"
+                onClick={() => void handleRelink()}
+                disabled={relinkBusy}
+                className="rounded-full border border-primary/30 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary/10 disabled:opacity-50"
+              >
+                {relinkBusy ? "Saindo..." : "Vincular PIN novamente"}
+              </button>
+            )}
+          </div>
+        )}
         {ok && <p className="text-xs text-emerald-400">{ok}</p>}
       </div>
 
@@ -335,7 +379,7 @@ export function NotificationsSection() {
                     </p>
                   </div>
                   <button
-                    onClick={() => void deleteNotification(n.id)}
+                    onClick={() => void handleDeleteNotification(n.id)}
                     className="rounded-full p-1.5 text-muted-foreground opacity-70 transition hover:bg-accent hover:text-foreground hover:opacity-100"
                     aria-label="Excluir"
                   >
