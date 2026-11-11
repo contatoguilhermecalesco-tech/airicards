@@ -13,7 +13,7 @@ import {
 import { useRank, resetRank, simulateSeasonRollover, tierLabel, TIER_COLORS } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 
-export function RankAdminSection() {
+export function RankAdminSection({ onSeasonSimulated }: { onSeasonSimulated?: () => void }) {
   const rank = useRank();
   const [confirm, setConfirm] = useState(false);
   const colors = TIER_COLORS[rank.tier];

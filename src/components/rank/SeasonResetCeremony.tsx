@@ -94,7 +94,7 @@ export function SeasonResetCeremony() {
           ref={closeRef}
           type="button"
           onClick={dismissSeasonTransition}
-          className="season-ceremony-close absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-20 inline-flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-border bg-surface/80 text-muted-foreground backdrop-blur-xl transition hover:bg-accent hover:text-foreground"
+          className="season-ceremony-close absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(1rem,env(safe-area-inset-top))] z-20 inline-flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-border bg-surface/80 text-muted-foreground backdrop-blur-xl transition hover:bg-accent hover:text-foreground"
           aria-label="Fechar cerimônia de temporada"
         >
           <X className="h-5 w-5" />
