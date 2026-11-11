@@ -1354,3 +1354,30 @@
 .shop-art-in {
   animation: shop-art-in 520ms ease-out both;
 }
+
+/* iPhone/touch ergonomics: close buttons ≥44px, modals respect notch + home indicator */
+@media (pointer: coarse) {
+  button[aria-label="Fechar"],
+  button[aria-label="Close"],
+  [role="dialog"] > button:has(> .sr-only) {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+[role="dialog"],
+[role="alertdialog"] {
+  -webkit-overflow-scrolling: touch;
+}
+@media (max-width: 639px) {
+  [role="dialog"].fixed.top-1\/2,
+  [role="alertdialog"].fixed.top-1\/2 {
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 1.5rem) !important;
+    margin-top: calc((env(safe-area-inset-top) - env(safe-area-inset-bottom)) / 2);
+  }
+  .fixed.inset-0.z-\[130\],
+  .fixed.inset-0.z-\[70\] {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

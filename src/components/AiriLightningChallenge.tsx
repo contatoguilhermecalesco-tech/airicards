@@ -158,7 +158,7 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
     <div className="fixed inset-0 z-[130] flex items-center justify-center bg-background/80 p-5 backdrop-blur-md animate-fade-in">
       <div className="relative w-full max-w-sm rounded-[28px] border border-primary/25 bg-card/95 p-6 text-center shadow-2xl">
         {canClose && (
-          <button onClick={onClose} aria-label="Fechar" className="absolute right-4 top-4 rounded-full p-1.5 text-muted-foreground hover:bg-muted">
+          <button onClick={onClose} aria-label="Fechar" className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-muted">
             <X className="h-4 w-4" />
           </button>
         )}
