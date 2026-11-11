@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { enablePush, disablePush, getPushState, type PushState } from "@/lib/push";
+import type { ProfileId } from "@/lib/social-store";
 import { ChevronLeft, Volume2, Smartphone, Star, Moon, Bell, Play, Sparkles, ChevronRight } from "lucide-react";
 import {
   DEFAULT_PREFS,
@@ -161,6 +163,8 @@ function SettingsPage() {
         </div>
       </div>
 
+      <PhonePushCard profileId={profile?.id as ProfileId | undefined} />
+
       {/* Alerts */}
       <Group label="Alertas">
         <Row
@@ -271,6 +275,57 @@ function SettingsPage() {
           Restaurar padrões
         </button>
       </div>
+    </div>
+  );
+}
+
+const PUSH_COPY: Record<PushState, { title: string; sub: string; cta?: string }> = {
+  unsupported: { title: "Notificações no celular indisponíveis", sub: "Este navegador não aceita avisos fora do app." },
+  "needs-install": {
+    title: "Instale o airi no iPhone",
+    sub: "No Safari, toque em Compartilhar → “Adicionar à Tela de Início”. Depois abra pelo ícone da Airi e volte aqui.",
+  },
+  denied: { title: "Avisos bloqueados", sub: "Libere em Ajustes do iPhone → Notificações → airi." },
+  off: { title: "Avisos no celular", sub: "Receba cutucadas e lembretes na tela de bloqueio.", cta: "Ativar" },
+  on: { title: "Avisos no celular ativos", sub: "Cutucadas e avisos chegam mesmo com o app fechado.", cta: "Desativar" },
+};
+
+function PhonePushCard({ profileId }: { profileId?: ProfileId }) {
+  const [state, setState] = useState<PushState | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    void getPushState().then(setState);
+  }, []);
+  if (!state) return null;
+  const c = PUSH_COPY[state];
+  const act = async () => {
+    if (!profileId) return;
+    setBusy(true);
+    try {
+      setState(state === "on" ? await disablePush() : await enablePush(profileId));
+    } catch (e) {
+      console.error(e);
+      setState(await getPushState());
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="mb-6 flex items-center gap-3 rounded-3xl border border-white/[0.06] bg-white/[0.03] p-4">
+      <img src="/icons/airi-icon-180.png" alt="" className="h-12 w-12 shrink-0 rounded-[14px]" />
+      <div className="min-w-0 flex-1">
+        <p className="text-[14px] font-semibold text-foreground">{c.title}</p>
+        <p className="mt-0.5 text-[12px] leading-snug text-foreground/60">{c.sub}</p>
+      </div>
+      {c.cta && (
+        <button
+          onClick={act}
+          disabled={busy || !profileId}
+          className={`h-9 shrink-0 rounded-full px-4 text-[12px] font-semibold transition disabled:opacity-50 ${state === "on" ? "bg-white/[0.06] text-foreground/85" : "bg-primary text-primary-foreground"}`}
+        >
+          {busy ? "…" : c.cta}
+        </button>
+      )}
     </div>
   );
 }

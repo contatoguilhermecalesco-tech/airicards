@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { VAPID_PUBLIC_KEY } from "./push-config";
 import { sendPush } from "./push.functions";
-import type { ProfileId } from "./profile";
+import type { ProfileId } from "./social-store";
 
 const SW_URL = "/push-sw.js";
 
