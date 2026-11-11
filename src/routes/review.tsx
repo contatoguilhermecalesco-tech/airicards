@@ -555,7 +555,7 @@ function Review() {
         />
       )}
 
-      <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 pt-5 pb-8 sm:px-6">
+      <div className="relative z-30 mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 pt-[max(1.25rem,calc(env(safe-area-inset-top)+0.5rem))] pb-8 sm:px-6">
 
 
         {/* Top bar */}

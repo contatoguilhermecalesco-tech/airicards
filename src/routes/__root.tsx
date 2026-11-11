@@ -546,7 +546,7 @@ function TopBar() {
 
   return (
     <header className="relative z-40 w-full sm:sticky sm:top-0">
-      <div className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-6 sm:pt-4">
+      <div className="mx-auto w-full max-w-7xl px-3 pt-[max(0.75rem,calc(env(safe-area-inset-top)+0.5rem))] sm:px-6 sm:pt-[max(1rem,calc(env(safe-area-inset-top)+0.5rem))]">
         <nav className="airi-desktop-nav relative grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 rounded-3xl px-3 py-2 sm:rounded-full sm:px-4 sm:py-2 md:px-5">
 
           {/* Esquerda: logo */}
