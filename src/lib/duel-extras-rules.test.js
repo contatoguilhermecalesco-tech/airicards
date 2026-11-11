@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { betPayout, isValidBet, resolveDuelMood, headToHead } from "./duel-extras-rules";
 
 const bets = [
-  { profileId: "guilherme" as const, amount: 50, payoutClaimed: false },
-  { profileId: "arlayne" as const, amount: 30, payoutClaimed: false },
+  { profileId: "guilherme", amount: 50, payoutClaimed: false },
+  { profileId: "arlayne", amount: 30, payoutClaimed: false },
 ];
 describe("aposta", () => {
   it("vencedor leva o pote inteiro", () => expect(betPayout("guilherme", "guilherme", bets)).toBe(80));
