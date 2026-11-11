@@ -157,8 +157,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: airiLogo.url },
-      { rel: "icon", type: "image/png", href: airiLogo.url },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/airi-icon-180.png" },
+      {
+        rel: "apple-touch-startup-image",
+        href: "/icons/splash-iphone11.png",
+        media: "(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)",
+      },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
       {
         rel: "preconnect",
         href: "https://fonts.googleapis.com",
