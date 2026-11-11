@@ -115,7 +115,7 @@ export function ShareAchievement({
           <h2 className="text-base font-semibold text-foreground">Compartilhar conquista</h2>
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.1] hover:text-foreground"
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-muted-foreground transition hover:bg-white/[0.1] hover:text-foreground"
             aria-label="Fechar"
           >
             <X className="h-4 w-4" strokeWidth={2.5} />

@@ -288,7 +288,7 @@ export function ItemPreviewModal({
 
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 z-30 grid h-8 w-8 place-items-center rounded-full border border-white/10 bg-black/55 text-white/85 backdrop-blur transition hover:bg-black/75"
+          className="absolute right-3 top-3 z-30 grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-black/55 text-white/85 backdrop-blur transition hover:bg-black/75"
           aria-label="Fechar"
         >
           <X className="h-4 w-4" strokeWidth={2.5} />
