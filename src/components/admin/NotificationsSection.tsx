@@ -1,3 +1,4 @@
+import { notifyPhones } from "@/lib/push";
 import { useState } from "react";
 import { Bell, Loader2, Send, Sparkles, Trash2 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
@@ -83,6 +84,7 @@ export function NotificationsSection() {
         action_label: actionLabel || null,
         action_route: actionRoute || null,
       });
+      notifyPhones({ to: ["guilherme", "arlayne"], title: title.trim(), body: body.trim(), url: actionRoute?.startsWith("/") ? actionRoute : "/notificacoes" });
       setTitle("");
       setBody("");
       setIdea("");
