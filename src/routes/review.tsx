@@ -45,6 +45,9 @@ import { TableSkinCardLayer, tableSkinCardStyle } from "@/components/review/Tabl
 import { enemySealFromEquipped } from "@/lib/eclipse-cosmetics";
 import { EnemySealSigil, EnemySealStamp } from "@/components/review/EnemySeal";
 import { rollShard, type ShardDrop } from "@/lib/relic-hunt";
+import { SecretCardDrop } from "@/components/duel/DuelExtras";
+import { SECRET_CARD_AFTER } from "@/lib/duel-extras-rules";
+import { useCurrentProfile as useSecretProfile } from "@/lib/profile";
 import { ShardDropOverlay } from "@/components/hunt/ShardDropOverlay";
 
 
@@ -100,6 +103,7 @@ function Review() {
   const [showBack, setShowBack] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [reviewed, setReviewed] = useState(0);
+  const secretMe = useSecretProfile();
   const sessionStartedAt = useRef(Date.now());
   const sessionCorrect = useRef(0);
   const sessionWrong = useRef(0);
@@ -483,6 +487,7 @@ function Review() {
 
       {/* Popup "Dever cumprido" — Airi celebra por ~2,4s antes do resumo */}
       {dutyPopup && <DutyDoneOverlay reviewed={reviewed} />}
+      {secretMe && !isEnemyRun && <SecretCardDrop meId={secretMe.id} reviewed={reviewed} after={SECRET_CARD_AFTER} />}
 
       {/* Mesa de revisão equipada — ambiente temático */}
       <TableSkinAmbient skin={skin} />
