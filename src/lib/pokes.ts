@@ -1,3 +1,4 @@
+import { notifyPhones } from "./push";
 // Cutucadas ("pokes") entre os dois perfis — realtime + estado em módulo.
 import { useEffect, useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +110,8 @@ export async function sendPoke(
     console.error("sendPoke", error);
     return { ok: false, error: "unknown" };
   }
+  const fromName = from === "guilherme" ? "Guilherme" : "Arlayne";
+  notifyPhones({ to: [to], title: `${fromName} te cutucou! ${emoji}`, body: "Abre o airi pra revidar.", url: "/" });
   await fetchPokes();
   return { ok: true };
 }

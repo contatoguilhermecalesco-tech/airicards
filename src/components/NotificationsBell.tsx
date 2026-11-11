@@ -1,3 +1,4 @@
+import { setIconBadge } from "@/lib/push";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bell,
@@ -70,6 +71,7 @@ export function NotificationsBell() {
   }, [notifications, prefs.essentialOnly, tagMap]);
 
   const unread = useMemo(() => visible.filter((n) => !readIds.has(n.id)).length, [visible, readIds]);
+  useEffect(() => setIconBadge(unread), [unread]);
 
   const { news, older } = useMemo(() => {
     const news: Notification[] = [];
