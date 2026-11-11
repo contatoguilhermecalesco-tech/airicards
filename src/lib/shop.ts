@@ -242,6 +242,8 @@ export async function updateShopBundle(
     rarity?: string | null;
     /** payload atual, para preservar chaves extras ao regravar */
     basePayload?: Record<string, unknown>;
+    /** payload completo (ex.: promoções) */
+    payload?: Record<string, unknown>;
   },
 ): Promise<void> {
   const row: Record<string, unknown> = {};
@@ -260,6 +262,10 @@ export async function updateShopBundle(
       else delete payload.rarity;
     }
     row.payload = payload;
+  }
+  if (patch.payload !== undefined) {
+    const { promoResolved: _r, ...clean } = patch.payload as Record<string, unknown>;
+    row.payload = clean;
   }
   const { error } = await supabase.from("shop_items").update(row as never).eq("id", id);
   if (error) throw error;
