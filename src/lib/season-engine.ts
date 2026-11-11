@@ -6,6 +6,22 @@ export const PLACEMENT_MULTIPLIER = 1.5;
 
 export type SeasonRecord = { season: string; tier: Tier; division: Division; reward: number };
 
+export type SeasonTransition = {
+  from: SeasonRecord;
+  toSeason: string;
+  toTier: Tier;
+  toDivision: Division;
+};
+
+/** Dados imutáveis exibidos pela cerimônia de virada. */
+export function createSeasonTransition(
+  from: SeasonRecord,
+  toSeason: string,
+  reset: { tier: Tier; division: Division },
+): SeasonTransition {
+  return { from, toSeason, toTier: reset.tier, toDivision: reset.division };
+}
+
 const ORDER: Tier[] = ["iron","bronze","silver","gold","platinum","emerald","diamond","master","grandmaster","challenger"];
 
 export function seasonFor(date: Date): { id: string; year: number; split: 1 | 2 | 3 | 4; start: Date; end: Date } {

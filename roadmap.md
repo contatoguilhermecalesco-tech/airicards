@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Recortar o emote de cerimônia da Airi
+- [x] Criar animação de reset de elo com recompensa e nova temporada
+- [x] Validar fluxo automático e simulação pelo Admin
+
 - [x] Integrar emotes transparentes da Airi na Loja e nos avisos de saldo
 - [x] Adicionar Airi festeira à confirmação de compra e verificar desktop/mobile (prévia isolada, sem gastar Arlys)
 

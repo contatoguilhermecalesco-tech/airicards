@@ -310,7 +310,7 @@ function AdminPage() {
                     gradientFor={gradientFor}
                   />
                 )}
-                {openPanel === "rank-self" && <RankAdminSection />}
+                {openPanel === "rank-self" && <RankAdminSection onSeasonSimulated={() => setOpenPanel(null)} />}
                 {openPanel === "rank-all" && <ProfilesRankOverview />}
                 {openPanel === "exam" && <ExamAdminSection />}
                 {openPanel === "arlys" && <ArlysAdminSection />}

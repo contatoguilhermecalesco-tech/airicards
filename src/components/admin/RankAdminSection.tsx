@@ -13,7 +13,7 @@ import {
 import { useRank, resetRank, simulateSeasonRollover, tierLabel, TIER_COLORS } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
 
-export function RankAdminSection() {
+export function RankAdminSection({ onSeasonSimulated }: { onSeasonSimulated?: () => void }) {
   const rank = useRank();
   const [confirm, setConfirm] = useState(false);
   const colors = TIER_COLORS[rank.tier];
@@ -52,7 +52,10 @@ export function RankAdminSection() {
         </button>
       </div>
       <button
-        onClick={simulateSeasonRollover}
+        onClick={() => {
+          simulateSeasonRollover();
+          onSeasonSimulated?.();
+        }}
         className="mt-3 w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-medium text-muted-foreground transition hover:text-foreground"
       >
         Simular virada de temporada (soft reset + recompensa)

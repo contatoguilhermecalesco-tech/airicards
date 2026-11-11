@@ -40,6 +40,9 @@ import "@/lib/presence";
 const RankPromotionOverlay = lazy(() =>
   import("../components/RankPromotionOverlay").then((m) => ({ default: m.RankPromotionOverlay })),
 );
+const SeasonResetCeremony = lazy(() =>
+  import("../components/rank/SeasonResetCeremony").then((m) => ({ default: m.SeasonResetCeremony })),
+);
 const StreakMilestoneOverlay = lazy(() =>
   import("../components/StreakMilestoneOverlay").then((m) => ({ default: m.StreakMilestoneOverlay })),
 );
@@ -932,6 +935,7 @@ function RootComponent() {
           <MaintenanceGate><Outlet /></MaintenanceGate>
           <BottomBar />
           <Suspense fallback={null}>
+            <SeasonResetCeremony />
             <RankPromotionOverlay />
             <StreakMilestoneOverlay />
             <StreakChangeOverlay />

@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
-import { seasonFor, softReset, seasonReward, placementDelta, PLACEMENT_EVENTS, type SeasonRecord } from "@/lib/season-engine";
+import { seasonFor, softReset, seasonReward, placementDelta, createSeasonTransition, PLACEMENT_EVENTS, type SeasonRecord, type SeasonTransition } from "@/lib/season-engine";
 
 /** Aplica a virada de temporada se o estado for de um split anterior. */
 export function applySeason(s: RankState, now = new Date()): RankState {
@@ -25,6 +25,7 @@ export function applySeason(s: RankState, now = new Date()): RankState {
     placementsLeft: PLACEMENT_EVENTS,
     seasonHistory: [record, ...(s.seasonHistory ?? [])].slice(0, 20),
     pendingSeasonReward: (s.pendingSeasonReward ?? 0) + reward,
+    seasonTransition: createSeasonTransition(record, current, reset),
   };
 }
 
@@ -69,6 +70,7 @@ export type RankState = {
   placementsLeft?: number;
   seasonHistory?: SeasonRecord[];
   pendingSeasonReward?: number;
+  seasonTransition?: SeasonTransition;
 };
 
 export const TIER_ORDER: Tier[] = [
@@ -653,9 +655,19 @@ export function claimSeasonReward(): number {
   return amount;
 }
 
+/** Dispensa a cerimônia sem apagar uma recompensa ainda não resgatada. */
+export function dismissSeasonTransition() {
+  if (!state.seasonTransition) return;
+  state = { ...state, seasonTransition: undefined };
+  persist();
+  emit();
+}
+
 /** Admin: força a virada como se fosse o próximo split. */
 export function simulateSeasonRollover() {
-  state = applySeason({ ...state, season: "0000-S1" });
+  const now = new Date();
+  const previous = seasonFor(new Date(now.getFullYear(), now.getMonth() - 3, 1)).id;
+  state = applySeason({ ...state, season: previous }, now);
   persist();
   emit();
 }
