@@ -575,6 +575,35 @@ export type Database = {
           },
         ]
       }
+      profile_auth_sessions: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          last_seen_at: string
+          profile_id: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          last_seen_at?: string
+          profile_id: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          last_seen_at?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_auth_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "app_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_data: {
         Row: {
           data: Json
@@ -1025,7 +1054,6 @@ export type Database = {
     }
     Functions: {
       current_profile_id: { Args: never; Returns: string }
-      unlink_current_session: { Args: never; Returns: undefined }
       get_public_profile_snapshot: {
         Args: { _profile_id: string }
         Returns: Json
@@ -1057,6 +1085,7 @@ export type Database = {
         Args: { _new_pin: string; _profile_id: string }
         Returns: undefined
       }
+      unlink_current_session: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
