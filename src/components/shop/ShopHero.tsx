@@ -8,6 +8,8 @@ import { ArlysIcon } from "@/components/StatChip";
 import { RARITY_META, RarityChip, type Rarity } from "@/components/shop/shop-visuals";
 import type { ShopItem } from "@/lib/shop";
 import type { PublishedDeckRow } from "@/lib/marketplace";
+import type { ShopPromo } from "@/lib/shop-promo";
+import { PromoBadge, PromoStrike } from "@/components/shop/PromoBadge";
 
 export type FeaturedItem = {
   id: string;
@@ -56,6 +58,7 @@ export function ShopHero({
   const owned = ownedIds.has(item.id);
   const canAfford = wallet >= item.price;
   const many = featured.length > 1;
+  const promo = ((item.raw as { payload?: { promoResolved?: ShopPromo } })?.payload?.promoResolved) ?? null;
 
   const go = (d: number) => setIdx((i) => (i + d + featured.length) % featured.length);
 
@@ -132,6 +135,11 @@ export function ShopHero({
                 "linear-gradient(90deg, color-mix(in oklab, var(--shop-ink) 92%, transparent) 0%, color-mix(in oklab, var(--shop-ink) 55%, transparent) 36%, transparent 64%), linear-gradient(0deg, color-mix(in oklab, var(--shop-ink) 70%, transparent) 0%, transparent 35%)",
             }}
           />
+          {promo && (
+            <span className="absolute left-2 top-2 z-20 sm:left-auto sm:right-4 sm:top-4">
+              <PromoBadge promo={promo} />
+            </span>
+          )}
           {/* Mobile: setas e contador sobre a arte, sem cobrir o centro */}
           {many && (
             <>
@@ -164,6 +172,7 @@ export function ShopHero({
                 <Sparkles className="h-3 w-3" strokeWidth={2.75} />
                 Em destaque
               </span>
+              {promo && <PromoBadge promo={promo} />}
               <RarityChip rarity={item.rarity} />
               <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-shop-parchment/70">
                 {kindLabel(item.kind)}
@@ -185,6 +194,7 @@ export function ShopHero({
             <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] items-stretch gap-2 sm:flex sm:gap-3">
               <div className="inline-flex items-center gap-2 border border-shop-gold/35 bg-shop-ink/70 px-3 py-2">
                 <ArlysIcon className="h-4 w-4 text-shop-gold-bright" strokeWidth={2.5} />
+                {promo && <PromoStrike promo={promo} />}
                 <span className="text-xl font-bold leading-none tabular-nums text-shop-parchment">
                   {item.price}
                 </span>
