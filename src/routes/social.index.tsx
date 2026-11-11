@@ -14,6 +14,7 @@ import {
   Swords,
   X as XIcon,
 } from "lucide-react";
+import { DuelHallOfFame, DuelBetCard, SecretCardComposer } from "@/components/duel/DuelExtras";
 import { GiftInbox } from "@/components/GiftInbox";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { Button } from "@/components/ui/button";
@@ -207,7 +208,7 @@ function DuelSection({ meId, score, duel }: { meId: ProfileId; score: { g: numbe
   const friendId = otherProfile(meId);
   const mine = meId === "guilherme" ? score.g : score.a;
   const theirs = meId === "guilherme" ? score.a : score.g;
-  return <div><div className="mb-4"><h2 className="text-[17px] font-semibold text-foreground">Duelo semanal</h2></div><div className="border-y border-border/50 py-5"><div className="mx-auto flex max-w-md items-center justify-between"><DuelAvatarLarge id={meId} score={mine} label="Você" /><div className="text-center"><Swords className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">{duel?.status === "active" ? "Ao vivo" : "Semana"}</p></div><DuelAvatarLarge id={friendId} score={theirs} label={profileMeta(friendId).name} /></div></div><Button asChild className="mt-4 w-full"><Link to="/duel">{duel?.status === "active" ? "Continuar duelo" : duel ? "Ver resultado" : "Criar novo duelo"}<ChevronRight /></Link></Button></div>;
+  return <div><DuelHallOfFame meId={meId} /><div className="mb-4"><h2 className="text-[17px] font-semibold text-foreground">Duelo semanal</h2></div><div className="border-y border-border/50 py-5"><div className="mx-auto flex max-w-md items-center justify-between"><DuelAvatarLarge id={meId} score={mine} label="Você" /><div className="text-center"><Swords className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-[10px] font-semibold uppercase text-muted-foreground">{duel?.status === "active" ? "Ao vivo" : "Semana"}</p></div><DuelAvatarLarge id={friendId} score={theirs} label={profileMeta(friendId).name} /></div></div><Button asChild className="mt-4 w-full"><Link to="/duel">{duel?.status === "active" ? "Continuar duelo" : duel ? "Ver resultado" : "Criar novo duelo"}<ChevronRight /></Link></Button><div className="mt-5"><DuelBetCard meId={meId} /><SecretCardComposer meId={meId} /></div></div>;
 }
 
 function DuelAvatarLarge({ id, score, label }: { id: ProfileId; score: number; label: string }) { const p = profileMeta(id); return <div className="text-center"><ProfileAvatar profileId={id} initial={p.initial} gradient={p.gradient} size={58} className="mx-auto" /><p className="mt-2 text-[12px] font-medium text-foreground">{label}</p><p className="text-[24px] font-semibold tabular-nums text-foreground">{score}</p></div>; }
