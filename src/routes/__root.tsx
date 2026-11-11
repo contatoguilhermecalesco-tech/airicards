@@ -935,6 +935,7 @@ function RootComponent() {
           <MaintenanceGate><Outlet /></MaintenanceGate>
           <BottomBar />
           <Suspense fallback={null}>
+            <SeasonResetCeremony />
             <RankPromotionOverlay />
             <StreakMilestoneOverlay />
             <StreakChangeOverlay />

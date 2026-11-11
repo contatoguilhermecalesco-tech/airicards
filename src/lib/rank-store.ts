@@ -70,6 +70,7 @@ export type RankState = {
   placementsLeft?: number;
   seasonHistory?: SeasonRecord[];
   pendingSeasonReward?: number;
+  seasonTransition?: SeasonTransition;
 };
 
 export const TIER_ORDER: Tier[] = [

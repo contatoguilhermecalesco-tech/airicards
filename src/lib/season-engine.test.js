@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { seasonFor, softReset, seasonReward, placementDelta } from "./season-engine";
+import { seasonFor, softReset, seasonReward, placementDelta, createSeasonTransition } from "./season-engine";
 
 test("temporadas trimestrais começando em 1º de janeiro", () => {
   expect(seasonFor(new Date(2027, 0, 1)).id).toBe("2027-S1");
