@@ -52,7 +52,10 @@ export function RankAdminSection({ onSeasonSimulated }: { onSeasonSimulated?: ()
         </button>
       </div>
       <button
-        onClick={simulateSeasonRollover}
+        onClick={() => {
+          simulateSeasonRollover();
+          onSeasonSimulated?.();
+        }}
         className="mt-3 w-full rounded-2xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-medium text-muted-foreground transition hover:text-foreground"
       >
         Simular virada de temporada (soft reset + recompensa)

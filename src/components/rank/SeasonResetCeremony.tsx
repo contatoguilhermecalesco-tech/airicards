@@ -162,7 +162,7 @@ export function SeasonResetCeremony() {
                 <img
                   src={airiCeremony}
                   alt="Airi comemorando com uma taça cheia de Arlys"
-                  className="season-ceremony-airi -my-3 h-auto w-full max-w-[340px] object-contain"
+                  className="season-ceremony-airi my-0 h-auto w-full max-w-[340px] object-contain"
                   draggable={false}
                 />
                 <h2 id="season-ceremony-title" className="-mt-2 font-display text-[28px] font-semibold leading-tight text-foreground">Mandou bem. De verdade.</h2>
