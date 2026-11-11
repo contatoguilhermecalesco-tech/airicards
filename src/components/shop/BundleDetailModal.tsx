@@ -1,5 +1,7 @@
 // Bundle detail modal — Valorant/LoL-style. Lists everything inside a bundle,
 // shows individual total, savings and lets the user buy the whole set at once.
+import type { ShopPromo } from "@/lib/shop-promo";
+import { PromoBadge, PromoStrike } from "@/components/shop/PromoBadge";
 import { useEffect, useState } from "react";
 import { Check, Eye, Loader2, Share2, Sparkles, X } from "lucide-react";
 import { ArlysIcon } from "@/components/StatChip";
@@ -249,6 +251,12 @@ export function BundleDetailModal({
           <div className="border-t border-white/[0.06] bg-black/25 p-4 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
               <div className="min-w-0">
+                {(bundle.payload as { promoResolved?: ShopPromo })?.promoResolved && (
+                  <div className="mb-1 flex items-center gap-2">
+                    <PromoBadge promo={(bundle.payload as { promoResolved: ShopPromo }).promoResolved} />
+                    <PromoStrike promo={(bundle.payload as { promoResolved: ShopPromo }).promoResolved} />
+                  </div>
+                )}
                 {separately > 0 && savings > 0 && (
                   <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300/90">
                     Economize {savings} ✦ ({savingsPct}%)

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getWallet, spend, grantCosmetic, grantPowerup } from "@/lib/wallet-store";
 import { importPublishedDeck, type PublishedDeckRow } from "@/lib/marketplace";
 import { markFirstBundlePurchased } from "@/lib/daily-challenges";
+import { readPromo } from "@/lib/shop-promo";
 
 export type ShopKind = "pack" | "cosmetic" | "powerup" | "bundle";
 
@@ -28,7 +29,10 @@ export async function listShopItems(): Promise<ShopItem[]> {
     .or("active.eq.true,kind.eq.bundle")
     .order("sort_order", { ascending: true });
   if (error || !data) return [];
-  return data as unknown as ShopItem[];
+  return (data as unknown as ShopItem[]).map((it) => {
+    const promo = readPromo(it.price, it.payload);
+    return promo ? { ...it, price: promo.price, payload: { ...it.payload, promoResolved: promo } } : it;
+  });
 }
 
 // Admin-only: returns every item, active or not.

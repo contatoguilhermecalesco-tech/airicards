@@ -1,12 +1,25 @@
 import seller from "@/assets/airi-emotes/airi-shop-seller.png";
 import broke from "@/assets/airi-emotes/airi-shop-broke.png";
 import success from "@/assets/airi-emotes/airi-shop-success.png";
+import blackFridayArt from "@/assets/airi-emotes/airi-shop-blackfriday.png";
 import { missingArlys, resolveAiriShopMood } from "@/lib/airi-shop-mood";
 
 export const AIRI_SHOP_EMOTES = { seller, broke, success };
 
-export function AiriShopMascot({ balance }: { balance: number }) {
+export function AiriShopMascot({ balance, blackFriday = false }: { balance: number; blackFriday?: boolean }) {
   const mood = resolveAiriShopMood(balance);
+  if (blackFriday) {
+    return (
+      <section aria-label="Airi Black Friday" className="mb-4 flex min-w-0 items-center gap-3 border-y border-shop-gold/30 py-3 sm:gap-5">
+        <img src={blackFridayArt} alt="Airi com tesoura e sacolas de Black Friday" className="h-28 w-40 shrink-0 object-contain sm:h-36 sm:w-52" />
+        <div className="min-w-0 max-w-md">
+          <p className="text-xs font-semibold uppercase tracking-wider text-shop-gold-bright">Airi · Black Friday</p>
+          <p className="mt-1 text-base font-semibold leading-snug text-foreground sm:text-lg">Aproveita que eu tô generosa hoje…</p>
+          <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">Antes que eu mude de ideia e suba o preço.</p>
+        </div>
+      </section>
+    );
+  }
   return (
     <section aria-label="Airi vendedora" className="mb-4 flex min-w-0 items-center gap-3 border-y border-shop-gold/20 py-3 sm:gap-5">
       <img src={mood === "broke" ? broke : seller} alt={mood === "broke" ? "Airi mostrando os bolsos vazios" : "Airi vendedora com olhos de cristal"} className="h-28 w-28 shrink-0 object-contain sm:h-36 sm:w-36" />

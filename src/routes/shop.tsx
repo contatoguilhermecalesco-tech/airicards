@@ -1,4 +1,6 @@
 import { ArlysIcon } from "@/components/StatChip";
+import type { ShopPromo } from "@/lib/shop-promo";
+import { PromoBadge, PromoStrike } from "@/components/shop/PromoBadge";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -108,6 +110,7 @@ type UnifiedItem = {
   rarity: Rarity;
   createdAt: number;
   raw: ShopItem | PublishedDeckRow;
+  promo?: ShopPromo | null;
   bundleItems?: string[]; // for future bundle payloads
   owner?: string; // decks
   isBundled?: boolean; // Se pertence a algum bundle e deve ser omitido da listagem geral
@@ -218,6 +221,7 @@ function ShopPage() {
         rarity: rarityOfItem(it),
         createdAt: 0,
         raw: it,
+        promo: ((it.payload as { promoResolved?: ShopPromo })?.promoResolved) ?? null,
         bundleItems: Array.isArray((it.payload as { items?: unknown })?.items)
           ? ((it.payload as { items: string[] }).items ?? [])
           : undefined,
@@ -557,7 +561,7 @@ function ShopPage() {
       </header>
 
       {profile && wallet.loaded && wallet.profileId === profile.id && (
-        <AiriShopMascot balance={wallet.crystals} />
+        <AiriShopMascot balance={wallet.crystals} blackFriday={unified.some((u) => u.promo?.type === "black")} />
       )}
 
       {/* Category tabs — estilo cliente de jogo */}
@@ -1103,8 +1107,10 @@ function UnifiedCard({
         <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/5 pt-3">
           <span className="inline-flex items-center gap-1 text-sm font-semibold">
             <ArlysIcon className="h-3.5 w-3.5 text-violet-300" strokeWidth={2.5} />
+            {item.promo && <PromoStrike promo={item.promo} />}
             {item.price}
             <span className="text-[10px] font-medium text-muted-foreground">✦</span>
+            {item.promo && <PromoBadge promo={item.promo} />}
           </span>
           <div className="flex items-center gap-1.5">
             {onPreview && (
@@ -1223,7 +1229,9 @@ function ListRow({
       </div>
       <div className="hidden shrink-0 items-center gap-1 text-sm font-semibold sm:inline-flex">
         <ArlysIcon className="h-3.5 w-3.5 text-violet-300" strokeWidth={2.5} />
+        {item.promo && <PromoStrike promo={item.promo} />}
         {item.price}
+        {item.promo && <PromoBadge promo={item.promo} />}
       </div>
       {onPreview && (
         <button
