@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
-import { seasonFor, softReset, seasonReward, placementDelta, PLACEMENT_EVENTS, type SeasonRecord } from "@/lib/season-engine";
+import { seasonFor, softReset, seasonReward, placementDelta, createSeasonTransition, PLACEMENT_EVENTS, type SeasonRecord, type SeasonTransition } from "@/lib/season-engine";
 
 /** Aplica a virada de temporada se o estado for de um split anterior. */
 export function applySeason(s: RankState, now = new Date()): RankState {
@@ -25,6 +25,7 @@ export function applySeason(s: RankState, now = new Date()): RankState {
     placementsLeft: PLACEMENT_EVENTS,
     seasonHistory: [record, ...(s.seasonHistory ?? [])].slice(0, 20),
     pendingSeasonReward: (s.pendingSeasonReward ?? 0) + reward,
+    seasonTransition: createSeasonTransition(record, current, reset),
   };
 }
 
