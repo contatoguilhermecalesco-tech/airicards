@@ -433,7 +433,7 @@ const PUSH_TEMPLATES = [
   { label: "💜 Recado", title: "Um recadinho pra você 💜", body: "Passando só pra dizer que você tá mandando bem.", route: "/" },
 ];
 
-function IPhonePushPreview({ title, body }: { title: string; body: string }) {
+export function IPhonePushPreview({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-3">
       <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Como chega no iPhone</p>
