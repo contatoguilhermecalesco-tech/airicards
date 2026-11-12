@@ -95,7 +95,16 @@ async function pull(profileId: string) {
   }
   if (data && activeProfile === profileId) {
     const remote = (data as { exams?: ExamState }).exams;
-    state = remote && typeof remote === "object" ? { ...defaultState(), ...remote } : defaultState();
+    const next: ExamState =
+      remote && typeof remote === "object" ? { ...defaultState(), ...remote } : defaultState();
+    // A prova em andamento neste aparelho é a fonte de verdade: o eco do
+    // tempo real nunca pode voltar a questão nem apagar respostas locais.
+    const local = state.current;
+    const finishedRemotely = local && next.history.some((h) => h.startedAt === local.startedAt);
+    if (local && !finishedRemotely && (!next.current || next.current.startedAt <= local.startedAt)) {
+      next.current = local;
+    }
+    state = next;
     saveCache(profileId, state);
     emit();
   }

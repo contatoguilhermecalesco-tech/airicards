@@ -300,10 +300,6 @@ function ExamRunner({ onFinish, onCancel }: { onFinish: () => void; onCancel: ()
   const selected = q ? current.answers[q.id] : undefined;
 
   useEffect(() => {
-    if (current.currentIndex !== index) goToIndex(index);
-  }, [current.currentIndex, index]);
-
-  useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [index]);
 
