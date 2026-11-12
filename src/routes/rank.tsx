@@ -95,7 +95,7 @@ function RankPage() {
             ))}
           </nav>
           </div>
-        <SeasonPeakBar tier={rank.peakTier} division={rank.peakDivision} />
+        <SeasonPeakBar tier={rank.peakTier} division={rank.peakDivision} history={rank.seasonHistory ?? []} />
 
         {activeSection === "liga" && (
         <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
@@ -214,20 +214,58 @@ function ProfilesLeaderboard() {
   </div>;
 }
 
-function SeasonPeakBar({ tier, division }: { tier: Tier; division: number | null }) {
+function seasonYear(id: string): number {
+  if (id === "S0") return 2026;
+  const y = Number(id.split("-S")[0]);
+  return Number.isFinite(y) ? y : 2026;
+}
+
+function peakText(tier: Tier, division: number | null) {
+  return isElite(tier) ? TIER_LABEL[tier] : `${TIER_LABEL[tier]} ${DIVISION_ROMAN[(division ?? 4) as 1 | 2 | 3 | 4]}`;
+}
+
+function SeasonPeakBar({ tier, division, history }: { tier: Tier; division: number | null; history: { season: string; tier: Tier; division: number | null }[] }) {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => setNow(new Date()), []);
   if (!now) return null;
   const season = seasonFor(now);
-  const peak = isElite(tier) ? TIER_LABEL[tier] : `${TIER_LABEL[tier]} ${DIVISION_ROMAN[(division ?? 4) as 1 | 2 | 3 | 4]}`;
+  const c = TIER_COLORS[tier];
+  const emblemDiv = (t: Tier, d: number | null) => (isElite(t) ? null : ((d ?? 4) as 1 | 2 | 3 | 4));
+  const seasons = [
+    { key: "current", label: `${seasonLabel(season.id)} (${season.year})`, tier, division, current: true },
+    ...history.map((h, i) => ({ key: `${h.season}-${i}`, label: `${seasonLabel(h.season)} (${seasonYear(h.season)})`, tier: h.tier, division: h.division, current: false })),
+  ];
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-white/[0.07] bg-[#1e1e20] px-3 py-2 text-[9px] font-black uppercase tracking-[0.12em] sm:px-6 sm:text-[10px]">
-      <span className="text-white/85">{seasonLabel(season.id)} ({season.year})</span>
-      <span className="text-white/25">·</span>
-      <span className="flex items-center gap-1.5 text-white/45">Peak rank =
-        <RankEmblem tier={tier} division={isElite(tier) ? null : ((division ?? 4) as 1 | 2 | 3 | 4)} size={18} />
-        <span style={{ color: TIER_COLORS[tier].text }}>{peak}</span>
-      </span>
-    </div>
+    <section className="border-b border-white/[0.08] bg-[#151517]">
+      <div className="relative overflow-hidden px-4 py-5 sm:px-7 sm:py-6" style={{ background: `radial-gradient(120% 140% at 0% 50%, ${c.glow} 0%, transparent 55%), linear-gradient(90deg, #1d1d20, #151517)` }}>
+        <div className="absolute inset-x-0 bottom-0 h-px" style={{ background: `linear-gradient(90deg, ${c.ring}, transparent)` }} />
+        <div className="relative flex items-center gap-4 sm:gap-6">
+          <div className="relative shrink-0">
+            <div className="absolute inset-0 scale-150 rounded-full blur-2xl opacity-80" style={{ background: c.glow }} />
+            <RankEmblem tier={tier} division={emblemDiv(tier, division)} size={84} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#ff5a1f] sm:text-xs">{seasonLabel(season.id)} ({season.year})</p>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">Peak rank da temporada</p>
+            <p className="mt-0.5 truncate text-2xl font-black uppercase tracking-wide sm:text-4xl" style={{ color: c.text, textShadow: `0 0 24px ${c.glow}` }}>{peakText(tier, division)}</p>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 py-3 sm:px-7">
+        <p className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-white/55"><Trophy className="h-3 w-3 text-[#c5a46b]" /> Peak rank por temporada</p>
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {seasons.map((s) => (
+            <div key={s.key} className={`flex shrink-0 items-center gap-2.5 border px-3 py-2 ${s.current ? "border-[#ff5a1f]/60 bg-[#ff5a1f]/[0.07]" : "border-white/[0.08] bg-white/[0.03]"}`}>
+              <RankEmblem tier={s.tier} division={emblemDiv(s.tier, s.division)} size={34} />
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-white/70">{s.label}</p>
+                <p className="text-xs font-black uppercase" style={{ color: TIER_COLORS[s.tier].text }}>{peakText(s.tier, s.division)}</p>
+                <p className="text-[8px] uppercase tracking-[0.12em] text-white/30">{s.current ? "Em andamento" : "Encerrada"}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
