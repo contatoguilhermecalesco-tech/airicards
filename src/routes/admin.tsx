@@ -138,7 +138,7 @@ type PanelDef = {
 const ADMIN_PANELS: PanelDef[] = [
   { key: "sessions", label: "Sessões", hint: "Zerar contadores por perfil", Icon: Users, color: "#a78bfa" },
   { key: "rank-self", label: "Meu rank", hint: "Ver / zerar o seu progresso", Icon: Crown, color: "#f5b301" },
-  { key: "rank-all", label: "Ranks", hint: "Overview de todos os perfis", Icon: Trophy, color: "#fb923c" },
+  { key: "rank-all", label: "Ranks", hint: "Ver e definir o elo de cada perfil", Icon: Trophy, color: "#fb923c" },
   { key: "exam", label: "Provas", hint: "Habilitar e resetar prova mensal", Icon: GraduationCap, color: "#22d3ee" },
   { key: "arlys", label: "Arlys ✦", hint: "Conceder / ajustar saldo", Icon: Coins, color: "#e879f9" },
   { key: "duels", label: "Duelos", hint: "Encerrar por WO / cancelar", Icon: Swords, color: "#f87171", wide: true },

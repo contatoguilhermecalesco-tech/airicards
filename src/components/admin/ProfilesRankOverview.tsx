@@ -3,6 +3,7 @@ import { RefreshCw } from "lucide-react";
 import { PROFILES, getCurrentProfile } from "@/lib/profile";
 import { TIER_COLORS, tierLabel, readRankForProfile, subscribeAllRanks, type RankState } from "@/lib/rank-store";
 import { RankEmblem } from "@/components/RankBadge";
+import { AdminSetRankEditor } from "@/components/admin/AdminSetRankEditor";
 
 export function ProfilesRankOverview() {
   const [tick, setTick] = useState(0);
@@ -40,6 +41,7 @@ export function ProfilesRankOverview() {
   void tick;
 
   return (
+    <>
     <section className="ios-card rounded-3xl p-4 sm:p-5">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
@@ -47,7 +49,7 @@ export function ProfilesRankOverview() {
             Elo dos usuários
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Ranking atual de cada perfil cadastrado neste dispositivo.
+            Ranking atual de cada perfil, sincronizado na nuvem.
           </p>
         </div>
         <button
@@ -116,9 +118,10 @@ export function ProfilesRankOverview() {
       </ol>
 
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        O rank é salvo localmente por perfil. Perfis que ainda não estudaram
-        neste navegador aparecem sem histórico.
+        Perfis que ainda não estudaram aparecem sem histórico.
       </p>
     </section>
+    <AdminSetRankEditor />
+    </>
   );
 }

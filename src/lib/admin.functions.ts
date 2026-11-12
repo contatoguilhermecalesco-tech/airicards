@@ -628,3 +628,45 @@ export const adminDeleteNotificationFn = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true as const };
   });
+
+const TIER_VALUES = [
+  "iron", "bronze", "silver", "gold", "platinum", "emerald", "diamond", "master", "grandmaster", "challenger",
+] as const;
+
+const setRankSchema = z.object({
+  profileId: z.string().min(1).max(64),
+  tier: z.enum(TIER_VALUES),
+  division: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.null()]),
+  lp: z.number().int().gte(0).lte(99_999),
+  label: z.string().min(1).max(60),
+});
+
+/** Admin: define manualmente o elo (tier/divisão/LP) de qualquer perfil. */
+export const adminSetRankFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => setRankSchema.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context.supabase);
+    const { buildAdminRank } = await import("@/lib/rank-override");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: existing, error: readError } = await supabaseAdmin
+      .from("profile_data")
+      .select("rank")
+      .eq("profile_id", data.profileId)
+      .maybeSingle();
+    if (readError) throw readError;
+    const current = (existing as { rank?: unknown } | null)?.rank;
+    const next = buildAdminRank(
+      current && typeof current === "object" ? (current as never) : null,
+      { tier: data.tier, division: data.division, lp: data.lp },
+      data.label,
+    );
+    const { error } = await supabaseAdmin
+      .from("profile_data")
+      .upsert(
+        { profile_id: data.profileId, rank: next as never, updated_at: new Date().toISOString() } as never,
+        { onConflict: "profile_id" },
+      );
+    if (error) throw error;
+    return { ok: true };
+  });

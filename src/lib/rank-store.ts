@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
+import { pickCanonicalRank } from "@/lib/rank-override";
 import { seasonFor, softReset, seasonReward, placementDelta, createSeasonTransition, PLACEMENT_EVENTS, type SeasonRecord, type SeasonTransition } from "@/lib/season-engine";
 
 /** Aplica a virada de temporada se o estado for de um split anterior. */
@@ -71,6 +72,8 @@ export type RankState = {
   seasonHistory?: SeasonRecord[];
   pendingSeasonReward?: number;
   seasonTransition?: SeasonTransition;
+  /** Momento do último ajuste manual feito pelo admin (vence caches antigos). */
+  adminOverrideAt?: number;
 };
 
 export const TIER_ORDER: Tier[] = [
@@ -222,11 +225,7 @@ function isValidRank(r: unknown): r is RankState {
 }
 
 function pickCanonical(a: RankState, b: RankState): RankState {
-  // Mescla conservadora: mantém o estado com maior LP total ganho.
-  // Assim, se um dispositivo estava atrasado, ele adota o mais avançado.
-  const aScore = a.totalEarned ?? 0;
-  const bScore = b.totalEarned ?? 0;
-  return bScore > aScore ? b : a;
+  return pickCanonicalRank(a, b);
 }
 
 async function pullFromCloud(profileId: string) {
@@ -670,6 +669,12 @@ export function simulateSeasonRollover() {
   state = applySeason({ ...state, season: previous }, now);
   persist();
   emit();
+}
+
+/** Recarrega o rank de todos os perfis da nuvem (usado após ajuste do admin). */
+export async function refreshAllRanks() {
+  await fetchAllRemoteRanks();
+  if (activeProfile) await pullFromCloud(activeProfile);
 }
 
 export function resetRank() {
