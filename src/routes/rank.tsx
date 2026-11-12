@@ -1,3 +1,4 @@
+import { seasonFor, seasonLabel } from "@/lib/season-engine";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, RefreshCw, Share2, Trophy } from "lucide-react";
@@ -93,8 +94,8 @@ function RankPage() {
               </button>
             ))}
           </nav>
-          <span className="hidden shrink-0 text-[8px] uppercase tracking-[0.12em] text-white/30 sm:inline">Temporada atual</span>
-        </div>
+          </div>
+        <SeasonPeakBar tier={rank.peakTier} division={rank.peakDivision} />
 
         {activeSection === "liga" && (
         <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
@@ -211,4 +212,22 @@ function ProfilesLeaderboard() {
     })}
     <div className="flex justify-end pt-2"><button onClick={() => setTick((value) => value + 1)} className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-[0.12em] text-white/30 transition hover:text-white/70"><RefreshCw className="h-2.5 w-2.5" /> Atualizar</button></div>
   </div>;
+}
+
+function SeasonPeakBar({ tier, division }: { tier: Tier; division: number | null }) {
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => setNow(new Date()), []);
+  if (!now) return null;
+  const season = seasonFor(now);
+  const peak = isElite(tier) ? TIER_LABEL[tier] : `${TIER_LABEL[tier]} ${DIVISION_ROMAN[(division ?? 4) as 1 | 2 | 3 | 4]}`;
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-white/[0.07] bg-[#1e1e20] px-3 py-2 text-[9px] font-black uppercase tracking-[0.12em] sm:px-6 sm:text-[10px]">
+      <span className="text-white/85">{seasonLabel(season.id)} ({season.year})</span>
+      <span className="text-white/25">·</span>
+      <span className="flex items-center gap-1.5 text-white/45">Peak rank =
+        <RankEmblem tier={tier} division={isElite(tier) ? null : ((division ?? 4) as 1 | 2 | 3 | 4)} size={18} />
+        <span style={{ color: TIER_COLORS[tier].text }}>{peak}</span>
+      </span>
+    </div>
+  );
 }
