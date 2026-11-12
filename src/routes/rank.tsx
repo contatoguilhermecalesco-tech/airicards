@@ -80,18 +80,13 @@ function RankPage() {
           </nav>
           <button onClick={() => setShareOpen(true)} aria-label="Compartilhar rank" className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 bg-[#ff5a1f] px-2 text-[8px] font-black uppercase tracking-[0.08em] text-white transition hover:bg-[#ff713e] sm:px-4 sm:text-[9px] sm:tracking-[0.12em]"><Share2 className="h-3 w-3" /><span className="hidden sm:inline">Compartilhar</span><span className="sm:hidden">Share</span></button>
         </header>
-        <SeasonPanel />
-
         <div className="flex min-w-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-[#242426] px-3 sm:min-h-10 sm:px-6">
           <nav className="flex h-10 min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.08em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:text-[8px] sm:tracking-[0.12em]">
             {([["liga", "Visão geral"], ["ladder", "Atividades"], ["temporada", "Temporada"]] as const).map(([id, label]) => (
               <button
                 key={id}
                 type="button"
-                onClick={() => {
-                  setActiveSection(id);
-                  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
+                onClick={() => setActiveSection(id)}
                 className={`flex h-full shrink-0 touch-manipulation items-center border-b uppercase transition ${activeSection === id ? "border-[#ff5a1f] text-white" : "border-transparent text-white/40 hover:text-white"}`}
               >
                 {label}
@@ -101,7 +96,8 @@ function RankPage() {
           <span className="hidden shrink-0 text-[8px] uppercase tracking-[0.12em] text-white/30 sm:inline">Temporada atual</span>
         </div>
 
-        <section id="liga" className="scroll-mt-4 px-4 pb-6 pt-6 sm:px-6 lg:px-7">
+        {activeSection === "liga" && (
+        <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
           <p className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/75">Sua liga</p>
           <div className="grid overflow-hidden bg-[#151517] lg:grid-cols-[156px_minmax(210px,1fr)_minmax(245px,1.15fr)]">
             <div className="flex flex-col items-center justify-center border-b border-white/[0.07] bg-[#111113] px-3 py-5 text-center lg:border-b-0 lg:border-r lg:border-white/[0.06]">
@@ -127,8 +123,10 @@ function RankPage() {
             </div>
           </div>
         </section>
+        )}
 
-        <section id="ladder" className="scroll-mt-4 px-4 pb-6 sm:px-6 lg:px-7">
+        {activeSection === "ladder" && (
+        <section id="ladder" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
           <div className="mb-3 flex items-center justify-between"><h2 className="text-[10px] font-black uppercase tracking-[0.16em] text-white/75">Atividades em destaque</h2><span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Continue evoluindo</span></div>
           <div className="grid gap-2.5 md:grid-cols-3">
             <ActivityBanner to="/study" eyebrow="Treino diário" title="SESSÃO DE ESTUDO" subtitle="Revise cartas e ganhe LP" tone="green" />
@@ -136,8 +134,12 @@ function RankPage() {
             <ActivityBanner to="/conquistas" eyebrow="Progresso" title="CONQUISTAS" subtitle="Veja tudo que já desbloqueou" tone="violet" />
           </div>
         </section>
+        )}
 
-        <section id="temporada" className="scroll-mt-4 grid gap-6 border-t border-white/[0.08] bg-[#171719] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-7">
+        {activeSection === "temporada" && (
+        <>
+        <SeasonPanel />
+        <section id="temporada" className="grid gap-6 border-t border-white/[0.08] bg-[#171719] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-7">
           <div>
             <div className="mb-3 flex items-center justify-between"><h2 className="text-[9px] font-black uppercase tracking-[0.16em] text-white/60">Caminho dos elos</h2><span className="text-[8px] text-white/30">{progress.label}</span></div>
             <div className="grid grid-cols-5 gap-y-3 sm:grid-cols-10">
@@ -159,6 +161,8 @@ function RankPage() {
             </div>
           </div>
         </section>
+        </>
+        )}
       </div>
       {currentProfile && <ShareAchievement open={shareOpen} onClose={() => setShareOpen(false)} profile={currentProfile} rank={rank} streak={streak} cardsMastered={cardsMastered} totalCards={cards.length} />}
     </main>

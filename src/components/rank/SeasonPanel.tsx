@@ -41,8 +41,8 @@ export function SeasonPanel() {
 
       {history.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {history.map((h) => (
-            <span key={h.season} className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] text-muted-foreground">
+          {history.map((h, hIndex) => (
+            <span key={`${h.season}-${hIndex}`} className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] text-muted-foreground">
               {h.season.replace("-", " ")} · {TIER_LABEL[h.tier]}{h.division ? ` ${DIVISION_ROMAN[h.division]}` : ""}
             </span>
           ))}
