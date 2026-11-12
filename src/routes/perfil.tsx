@@ -521,7 +521,7 @@ function PerfilPage() {
             style={{
               background: showBanner
                 ? heroPalette.gradient
-                : "linear-gradient(135deg,#3b0764,#831843)",
+                : "linear-gradient(135deg,#16121d 0%,#0d0a12 100%)",
                transform: "scale(1.01)",
             }}
           />

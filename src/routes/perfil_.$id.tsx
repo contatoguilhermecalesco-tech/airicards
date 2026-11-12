@@ -171,7 +171,7 @@ function PerfilViewer() {
         <div
           className={`relative h-40 overflow-hidden sm:h-44 ${showBanner ? "cosmetic-banner-animated" : ""}`}
           style={{
-            background: showBanner ? heroPalette.gradient : "linear-gradient(135deg,#3b0764,#831843)",
+            background: showBanner ? heroPalette.gradient : "linear-gradient(135deg,#16121d 0%,#0d0a12 100%)",
           }}
         >
           {effect && (
