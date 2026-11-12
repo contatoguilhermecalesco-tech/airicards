@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { CalendarClock, Gift, ShieldCheck } from "lucide-react";
-import { toast } from "sonner";
-import { useRank, claimSeasonReward, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
-import { seasonFor, seasonLabel, PLACEMENT_EVENTS } from "@/lib/season-engine";
-import { earn } from "@/lib/wallet-store";
+import { useRank, TIER_LABEL, DIVISION_ROMAN } from "@/lib/rank-store";
+import { seasonReward, seasonFor, seasonLabel, PLACEMENT_EVENTS } from "@/lib/season-engine";
 
 export function SeasonPanel() {
   const rank = useRank();
@@ -13,16 +11,8 @@ export function SeasonPanel() {
   const season = seasonFor(now);
   const days = Math.max(0, Math.ceil((season.end.getTime() - now.getTime()) / 86400000));
   const left = rank.placementsLeft ?? 0;
-  const pending = rank.pendingSeasonReward ?? 0;
   const history = rank.seasonHistory ?? [];
 
-  const claim = async () => {
-    const amount = claimSeasonReward();
-    if (amount > 0) {
-      await earn(amount, "season.reward");
-      toast.success(`+${amount} ✦ de recompensa da temporada`);
-    }
-  };
 
   return (
     <section className="border-b border-border/60 bg-card/40 px-4 py-4 sm:px-6">
@@ -44,11 +34,10 @@ export function SeasonPanel() {
         </div>
       )}
 
-      {pending > 0 && (
-        <button onClick={claim} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-semibold text-primary-foreground">
-          <Gift className="h-4 w-4" /> Resgatar recompensa da temporada · {pending} ✦
-        </button>
-      )}
+      <div className="mt-3 flex items-center gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <Gift className="h-4 w-4 text-primary" />
+        Recompensa prevista pelo seu pico: <span className="font-semibold text-foreground">{seasonReward(rank.peakTier)} ✦</span> · liberada só no fim do split
+      </div>
 
       {history.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">

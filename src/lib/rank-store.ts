@@ -74,7 +74,19 @@ export type RankState = {
   seasonTransition?: SeasonTransition;
   /** Momento do último ajuste manual feito pelo admin (vence caches antigos). */
   adminOverrideAt?: number;
+  /** Splits cuja recompensa já foi resgatada (união entre aparelhos). */
+  rewardClaimedFor?: string[];
+  rewardsV2?: boolean;
 };
+
+/** Recompensa pendente = splits encerrados ainda não resgatados. Une resgates de dois aparelhos. */
+export function normalizeRewards(s: RankState, other?: RankState): RankState {
+  const history = s.seasonHistory ?? [];
+  let claimed = new Set([...(s.rewardClaimedFor ?? []), ...(other?.rewardClaimedFor ?? [])]);
+  if (!s.rewardsV2 && !(other?.rewardsV2)) claimed = new Set([...claimed, ...history.map((h) => h.season)]);
+  const pending = history.filter((h) => !claimed.has(h.season)).reduce((sum, h) => sum + h.reward, 0);
+  return { ...s, rewardClaimedFor: [...claimed], rewardsV2: true, pendingSeasonReward: pending };
+}
 
 export const TIER_ORDER: Tier[] = [
   "iron",
@@ -161,7 +173,7 @@ function load(profileId: string): RankState {
     const raw = localStorage.getItem(keyFor(profileId));
     if (!raw) return INITIAL_RANK;
     const parsed = JSON.parse(raw) as RankState;
-    return applySeason({ ...INITIAL_RANK, ...parsed });
+    return normalizeRewards(applySeason({ ...INITIAL_RANK, ...parsed }));
   } catch {
     return INITIAL_RANK;
   }
@@ -250,7 +262,8 @@ async function pullFromCloud(profileId: string) {
     }
     return;
   }
-  const merged = applySeason(pickCanonical(local, remote));
+  const canonical = pickCanonical(local, remote);
+  const merged = normalizeRewards(applySeason(canonical), canonical === local ? remote : local);
   state = merged;
   save(profileId, merged);
   remoteRanks.set(profileId, merged);
@@ -648,7 +661,8 @@ export function progressToNext(state: RankState): { value: number; max: number; 
 export function claimSeasonReward(): number {
   const amount = state.pendingSeasonReward ?? 0;
   if (amount <= 0) return 0;
-  state = { ...state, pendingSeasonReward: 0 };
+  const seasons = (state.seasonHistory ?? []).map((h) => h.season);
+  state = { ...state, pendingSeasonReward: 0, rewardClaimedFor: [...new Set([...(state.rewardClaimedFor ?? []), ...seasons])], rewardsV2: true };
   persist();
   emit();
   return amount;
@@ -666,7 +680,7 @@ export function dismissSeasonTransition() {
 export function simulateSeasonRollover() {
   const now = new Date();
   const previous = seasonFor(new Date(now.getFullYear(), now.getMonth() - 3, 1)).id;
-  state = applySeason({ ...state, season: previous }, now);
+  state = normalizeRewards(applySeason({ ...state, season: previous }, now));
   persist();
   emit();
 }

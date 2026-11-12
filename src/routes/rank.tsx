@@ -62,6 +62,7 @@ function RankPage() {
     [cards],
   );
   const [shareOpen, setShareOpen] = useState(false);
+  const [tab, setTab] = useState<"liga" | "ladder" | "temporada">("liga");
   const winRate = useMemo(() => {
     const total = rank.totalEarned + rank.totalLost;
     return total === 0 ? 0 : Math.round((rank.totalEarned / total) * 100);
@@ -79,18 +80,17 @@ function RankPage() {
           </nav>
           <button onClick={() => setShareOpen(true)} aria-label="Compartilhar rank" className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 bg-[#ff5a1f] px-2 text-[8px] font-black uppercase tracking-[0.08em] text-white transition hover:bg-[#ff713e] sm:px-4 sm:text-[9px] sm:tracking-[0.12em]"><Share2 className="h-3 w-3" /><span className="hidden sm:inline">Compartilhar</span><span className="sm:hidden">Share</span></button>
         </header>
-        <SeasonPanel />
 
         <div className="flex min-w-0 items-center justify-between gap-3 border-b border-white/[0.07] bg-[#242426] px-3 sm:min-h-10 sm:px-6">
-          <nav className="flex h-10 min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.08em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8 sm:text-[8px] sm:tracking-[0.12em]">
-            <a href="#liga" className="flex h-full shrink-0 items-center border-b border-[#ff5a1f] text-white">Visão geral</a>
-            <a href="#ladder" className="shrink-0 text-white/40 transition hover:text-white">Atividades</a>
-            <a href="#temporada" className="shrink-0 text-white/40 transition hover:text-white">Temporada</a>
+          <nav role="tablist" className="flex h-10 min-w-0 flex-1 items-center gap-4 overflow-x-auto whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.12em] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-8">
+            {([["liga", "Visão geral"], ["ladder", "Atividades"], ["temporada", "Temporada"]] as const).map(([id, label]) => (
+              <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`flex h-full min-w-11 shrink-0 items-center border-b-2 transition ${tab === id ? "border-[#c8aa6e] text-[#f0e6d2]" : "border-transparent text-white/40 hover:text-white"}`}>{label}</button>
+            ))}
           </nav>
           <span className="hidden shrink-0 text-[8px] uppercase tracking-[0.12em] text-white/30 sm:inline">Temporada atual</span>
         </div>
 
-        <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
+        {tab === "liga" && <section id="liga" className="px-4 pb-6 pt-6 sm:px-6 lg:px-7">
           <p className="mb-3 text-[9px] font-black uppercase tracking-[0.18em] text-white/75">Sua liga</p>
           <div className="grid overflow-hidden bg-[#151517] lg:grid-cols-[156px_minmax(210px,1fr)_minmax(245px,1.15fr)]">
             <div className="flex flex-col items-center justify-center border-b border-white/[0.07] bg-[#111113] px-3 py-5 text-center lg:border-b-0 lg:border-r lg:border-white/[0.06]">
@@ -115,18 +115,21 @@ function RankPage() {
               <ProfilesLeaderboard />
             </div>
           </div>
-        </section>
+        </section>}
 
-        <section id="ladder" className="px-4 pb-6 sm:px-6 lg:px-7">
+        {tab === "ladder" && <section id="ladder" className="px-4 pb-6 sm:px-6 lg:px-7">
           <div className="mb-3 flex items-center justify-between"><h2 className="text-[10px] font-black uppercase tracking-[0.16em] text-white/75">Atividades em destaque</h2><span className="text-[8px] uppercase tracking-[0.12em] text-white/30">Continue evoluindo</span></div>
           <div className="grid gap-2.5 md:grid-cols-3">
             <ActivityBanner to="/study" eyebrow="Treino diário" title="SESSÃO DE ESTUDO" subtitle="Revise cartas e ganhe LP" tone="green" />
             <ActivityBanner to="/desafios" eyebrow="Desafios" title="DESAFIE-SE" subtitle="Complete metas e avance" tone="red" />
             <ActivityBanner to="/conquistas" eyebrow="Progresso" title="CONQUISTAS" subtitle="Veja tudo que já desbloqueou" tone="violet" />
           </div>
-        </section>
+                  <div className="mt-5"><h3 className="mb-2 text-[10px] font-black uppercase tracking-[0.16em] text-white/75">Histórico de partidas</h3>
+            {rank.history.length === 0 ? <p className="text-xs text-white/30">Nenhuma atividade registrada.</p> : <ul className="grid gap-1.5">{rank.history.slice(0, 20).map((event, index) => <li key={index} className={`flex items-center justify-between gap-3 border-l-4 bg-[#151517] px-3 py-2.5 ${event.delta > 0 ? "border-sky-500" : event.delta < 0 ? "border-rose-500" : "border-white/20"}`}><div className="min-w-0"><p className={`text-[9px] font-black uppercase tracking-[0.12em] ${event.delta > 0 ? "text-sky-400" : event.delta < 0 ? "text-rose-400" : "text-white/40"}`}>{event.delta > 0 ? "Vitória" : event.delta < 0 ? "Derrota" : "Ajuste"}</p><p className="truncate text-xs text-white/75">{reasonLabel(event.reason)}</p></div><div className="shrink-0 text-right"><p className={`text-sm font-bold tabular-nums ${event.delta > 0 ? "text-sky-300" : event.delta < 0 ? "text-rose-300" : "text-white/40"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</p><p className="text-[9px] text-white/30">{new Date(event.at).toLocaleDateString("pt-BR")}</p></div></li>)}</ul>}
+          </div>
+</section>}
 
-        <section id="temporada" className="grid gap-6 border-t border-white/[0.08] bg-[#171719] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-7">
+        {tab === "temporada" && <><SeasonPanel /><section id="temporada" className="grid gap-6 border-t border-white/[0.08] bg-[#171719] px-4 py-5 sm:px-6 lg:grid-cols-[1fr_1fr] lg:px-7">
           <div>
             <div className="mb-3 flex items-center justify-between"><h2 className="text-[9px] font-black uppercase tracking-[0.16em] text-white/60">Caminho dos elos</h2><span className="text-[8px] text-white/30">{progress.label}</span></div>
             <div className="grid grid-cols-5 gap-y-3 sm:grid-cols-10">
@@ -147,7 +150,7 @@ function RankPage() {
               {rank.history.length === 0 ? <p className="text-[10px] text-white/30">Nenhuma atividade registrada.</p> : <ul className="grid gap-x-5 sm:grid-cols-2">{rank.history.slice(0, 4).map((event, index) => <li key={index} className="flex items-center justify-between gap-2 border-b border-white/[0.05] py-1.5"><span className="truncate text-[9px] text-white/65">{reasonLabel(event.reason)}</span><span className={`shrink-0 text-[9px] font-bold ${event.delta > 0 ? "text-emerald-400" : event.delta < 0 ? "text-rose-400" : "text-white/35"}`}>{event.delta > 0 ? "+" : ""}{event.delta} LP</span></li>)}</ul>}
             </div>
           </div>
-        </section>
+        </section></>}
       </div>
       {currentProfile && <ShareAchievement open={shareOpen} onClose={() => setShareOpen(false)} profile={currentProfile} rank={rank} streak={streak} cardsMastered={cardsMastered} totalCards={cards.length} />}
     </main>
