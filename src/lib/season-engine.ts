@@ -24,7 +24,20 @@ export function createSeasonTransition(
 
 const ORDER: Tier[] = ["iron","bronze","silver","gold","platinum","emerald","diamond","master","grandmaster","challenger"];
 
-export function seasonFor(date: Date): { id: string; year: number; split: 1 | 2 | 3 | 4; start: Date; end: Date } {
+/** Temporada 1 começa em 1º/jan/2027; antes disso é a Temporada 0 (pré-temporada). */
+export const SEASON_ONE_START = new Date(2027, 0, 1);
+export const SEASON_ZERO_ID = "S0";
+
+export function isPreSeasonId(id: string): boolean {
+  if (id === SEASON_ZERO_ID) return true;
+  const y = Number(id.split("-S")[0]);
+  return Number.isFinite(y) && y < 2027;
+}
+
+export function seasonFor(date: Date): { id: string; year: number; split: 0 | 1 | 2 | 3 | 4; start: Date; end: Date } {
+  if (date < SEASON_ONE_START) {
+    return { id: SEASON_ZERO_ID, year: 2026, split: 0, start: new Date(2026, 0, 1), end: SEASON_ONE_START };
+  }
   const year = date.getFullYear();
   const split = (Math.floor(date.getMonth() / 3) + 1) as 1 | 2 | 3 | 4;
   const start = new Date(year, (split - 1) * 3, 1);
@@ -33,8 +46,9 @@ export function seasonFor(date: Date): { id: string; year: number; split: 1 | 2 
 }
 
 export function seasonLabel(id: string): string {
+  if (isPreSeasonId(id)) return "Temporada 0";
   const [y, s] = id.split("-S");
-  return `Temporada ${s} · ${y}`;
+  return `Temporada ${(Number(y) - 2027) * 4 + Number(s)}`;
 }
 
 /** Soft reset: desce ~1 tier e sempre recomeça na divisão IV. */

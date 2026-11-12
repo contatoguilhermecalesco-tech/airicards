@@ -5,7 +5,7 @@ test("temporadas trimestrais começando em 1º de janeiro", () => {
   expect(seasonFor(new Date(2027, 0, 1)).id).toBe("2027-S1");
   expect(seasonFor(new Date(2027, 2, 31)).id).toBe("2027-S1");
   expect(seasonFor(new Date(2027, 3, 1)).id).toBe("2027-S2");
-  expect(seasonFor(new Date(2026, 10, 11)).id).toBe("2026-S4");
+  expect(seasonFor(new Date(2026, 10, 11)).id).toBe("S0");
 });
 
 test("soft reset desce cerca de um tier", () => {

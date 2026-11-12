@@ -4,13 +4,15 @@ import { useSyncExternalStore } from "react";
 import { getCurrentProfile, subscribeProfile, PROFILES } from "@/lib/profile";
 import { supabase } from "@/integrations/supabase/client";
 import { pickCanonicalRank } from "@/lib/rank-override";
-import { seasonFor, softReset, seasonReward, placementDelta, createSeasonTransition, PLACEMENT_EVENTS, type SeasonRecord, type SeasonTransition } from "@/lib/season-engine";
+import { seasonFor, isPreSeasonId, softReset, seasonReward, placementDelta, createSeasonTransition, PLACEMENT_EVENTS, type SeasonRecord, type SeasonTransition } from "@/lib/season-engine";
 
 /** Aplica a virada de temporada se o estado for de um split anterior. */
-export function applySeason(s: RankState, now = new Date()): RankState {
+export function applySeason(s: RankState, now = new Date(), force = false): RankState {
   const current = seasonFor(now).id;
   if (!s.season) return { ...s, season: current, placementsLeft: s.placementsLeft ?? 0 };
-  if (s.season === current) return s;
+  if (s.season === current && !force) return s;
+  // Ids antigos de teste (antes de 2027) passam a ser a Temporada 0, sem reset.
+  if (!force && isPreSeasonId(s.season) && isPreSeasonId(current)) return { ...s, season: current };
   const reward = seasonReward(s.peakTier);
   const reset = softReset(s.peakTier);
   const record: SeasonRecord = { season: s.season, tier: s.peakTier, division: s.peakDivision, reward };
@@ -81,7 +83,9 @@ export type RankState = {
 
 /** Recompensa pendente = splits encerrados ainda não resgatados. Une resgates de dois aparelhos. */
 export function normalizeRewards(s: RankState, other?: RankState): RankState {
-  const history = s.seasonHistory ?? [];
+  // Registros de teste anteriores à Temporada 0 são descartados em todos os aparelhos.
+  const history = (s.seasonHistory ?? []).filter((h) => !(isPreSeasonId(h.season) && h.season !== "S0"));
+  s = { ...s, seasonHistory: history };
   let claimed = new Set([...(s.rewardClaimedFor ?? []), ...(other?.rewardClaimedFor ?? [])]);
   if (!s.rewardsV2 && !(other?.rewardsV2)) claimed = new Set([...claimed, ...history.map((h) => h.season)]);
   const pending = history.filter((h) => !claimed.has(h.season)).reduce((sum, h) => sum + h.reward, 0);
@@ -680,7 +684,7 @@ export function dismissSeasonTransition() {
 export function simulateSeasonRollover() {
   const now = new Date();
   const previous = seasonFor(new Date(now.getFullYear(), now.getMonth() - 3, 1)).id;
-  state = normalizeRewards(applySeason({ ...state, season: previous }, now));
+  state = normalizeRewards(applySeason({ ...state, season: previous }, now, previous === seasonFor(now).id));
   persist();
   emit();
 }
