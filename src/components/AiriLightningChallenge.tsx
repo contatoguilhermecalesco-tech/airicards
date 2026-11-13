@@ -4,10 +4,11 @@ import { useStore } from "@/lib/flashcards-store";
 import { earn } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
 import { useAppSettings } from "@/lib/app-settings";
+import { awardLp } from "@/lib/rank-store";
 import {
-  LIGHTNING_MIN_CARDS, LIGHTNING_REWARD, LIGHTNING_SECONDS, LIGHTNING_TARGET,
-  buildQuestion, lightningAccess, lightningDay, lightningKey, msUntilNextChallenge, resolveAnswer, rewardFor,
-  type LightningResult, type QuizQuestion,
+  LIGHTNING_MIN_CARDS, LIGHTNING_SECONDS, LIGHTNING_TARGET, GRADE_TABLE,
+  buildQuestion, comboMultiplier, gradeFor, lpFor, nextFastStreak, lightningAccess, lightningDay, lightningKey, msUntilNextChallenge, resolveAnswer, rewardFor,
+  type LightningGrade, type LightningResult, type QuizQuestion,
 } from "@/lib/lightning-challenge";
 import startImg from "@/assets/airi-emotes/airi-lightning-start.png";
 import winImg from "@/assets/airi-emotes/airi-lightning-win.png";
@@ -63,7 +64,7 @@ export function AiriLightningCard() {
               <Zap className="h-3.5 w-3.5" /> Desafio Relâmpago
             </div>
             <p className="mt-1 text-[15px] font-semibold text-foreground">{LIGHTNING_TARGET} cartas em {LIGHTNING_SECONDS}s</p>
-            <p className="text-[13px] text-muted-foreground">Valendo +{LIGHTNING_REWARD} Arlys ✦ · errou uma, acabou.</p>
+            <p className="text-[13px] text-muted-foreground">Até +{GRADE_TABLE.S.arlys} Arlys ✦ e +{GRADE_TABLE.S.lp} LP · errou uma, acabou.</p>
           </div>
         </button>
       )}
@@ -112,19 +113,33 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
   const [picked, setPicked] = useState<string | null>(null);
   const [reason, setReason] = useState<"wrong" | "time" | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [fastStreak, setFastStreak] = useState(0);
+  const [maxMult, setMaxMult] = useState(1);
+  const [score, setScore] = useState(0);
+  const [pulse, setPulse] = useState(0);
+  const [grade, setGrade] = useState<LightningGrade | null>(null);
+  const [lpGained, setLpGained] = useState(0);
+  const [arlysGained, setArlysGained] = useState(0);
   const startedAt = useRef(0);
+  const questionAt = useRef(0);
   const done = useRef(false);
 
-  const next = () => setQ(buildQuestion(cards));
+  const next = () => { setQ(buildQuestion(cards)); questionAt.current = Date.now(); };
 
   const finish = (r: LightningResult) => {
     if (done.current) return;
     done.current = true;
-    setElapsed((Date.now() - startedAt.current) / 1000);
+    const secs = (Date.now() - startedAt.current) / 1000;
+    setElapsed(secs);
     setPhase(r);
     onFinish(r);
-    const amount = rewardFor(r);
+    const amount = rewardFor(r, secs);
+    const lp = lpFor(r, secs);
+    setArlysGained(amount);
+    setLpGained(lp);
+    if (r === "win") setGrade(gradeFor(secs));
     if (amount > 0) void earn(amount, "Desafio Relâmpago");
+    if (lp > 0) awardLp(lp, "lightning.win");
   };
 
   useEffect(() => {
@@ -152,7 +167,15 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
     setFlash(ok ? "ok" : "bad");
     if (navigator.vibrate) navigator.vibrate(ok ? 20 : [60, 40, 60]);
     const c = ok ? correct + 1 : correct;
-    if (ok) setCorrect(c);
+    if (ok) {
+      setCorrect(c);
+      const fs = nextFastStreak(fastStreak, (Date.now() - questionAt.current) / 1000);
+      const mult = comboMultiplier(fs);
+      setFastStreak(fs);
+      setMaxMult((m) => Math.max(m, mult));
+      setScore((sc) => sc + Math.round(100 * mult));
+      if (mult > 1) setPulse((p) => p + 1);
+    }
     const outcome = resolveAnswer(ok, c, (Date.now() - startedAt.current) / 1000);
     if (outcome === "fail") {
       setReason("wrong");
@@ -181,7 +204,16 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
             <img src={startImg} alt="Airi cronometrista" className="mx-auto h-44 w-44 object-contain animate-[airi-duty-pop_0.6s_ease-out]" />
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Desafio Relâmpago</p>
             <h2 className="mt-1 text-xl font-semibold text-foreground">Acerte {LIGHTNING_TARGET} em {LIGHTNING_SECONDS} segundos</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Escolha a tradução certa. Errou uma, acabou. Venceu, leva +{LIGHTNING_REWARD} Arlys ✦.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Inglês ↔ português, 4 alternativas. Responda em menos de 3s para subir o combo. Errou uma, acabou.</p>
+            <div className="mt-3 grid grid-cols-3 gap-1.5 text-[11px]">
+              {(["S", "A", "B"] as const).map((g) => (
+                <div key={g} className="rounded-xl bg-muted/40 px-2 py-2">
+                  <p className="text-base font-bold text-foreground">{g}</p>
+                  <p className="text-muted-foreground">{GRADE_TABLE[g].label}</p>
+                  <p className="font-semibold text-primary">+{GRADE_TABLE[g].arlys} ✦ · +{GRADE_TABLE[g].lp} LP</p>
+                </div>
+              ))}
+            </div>
             <button onClick={() => setPhase("countdown")} className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-3 font-semibold text-primary-foreground">
               <Timer className="h-4 w-4" /> Aceitar desafio
             </button>
@@ -207,13 +239,29 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
                 <span key={i} className={`h-2 w-2 rounded-full ${i < correct ? "bg-primary" : "bg-muted"}`} />
               ))}
             </div>
-            <p className={`mt-6 min-h-[64px] text-2xl font-semibold text-foreground transition ${flash === "bad" ? "text-destructive" : ""}`}>{q.prompt}</p>
-            <div className="mt-5 grid gap-2">
+            <div className="mt-4 flex items-center justify-between">
+              <span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                {q.direction === "en-pt" ? "🇺🇸 ➔ 🇧🇷" : "🇧🇷 ➔ 🇺🇸"}
+              </span>
+              <span
+                key={pulse}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-bold tabular-nums transition ${
+                  comboMultiplier(fastStreak) > 1
+                    ? "bg-primary/25 text-primary shadow-[0_0_18px_color-mix(in_oklab,var(--primary)_55%,transparent)] animate-[lightning-combo_0.45s_ease-out]"
+                    : "bg-muted/40 text-muted-foreground"
+                }`}
+              >
+                <Zap className="mr-1 inline h-3 w-3" />
+                Combo {comboMultiplier(fastStreak)}x
+              </span>
+            </div>
+            <p className={`mt-4 min-h-[64px] text-2xl font-semibold text-foreground transition ${flash === "bad" ? "text-destructive" : ""}`}>{q.prompt}</p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
               {q.options.map((o) => (
                 <button
                   key={o}
                   onClick={() => answer(o)}
-                  className={`rounded-2xl border px-4 py-3 text-[15px] font-medium transition ${
+                  className={`min-h-[64px] break-words rounded-2xl border px-3 py-3 text-[14px] font-medium leading-snug transition active:scale-[0.97] ${
                     flash && o === q.answer ? "border-primary bg-primary/20 text-foreground"
                       : flash === "bad" && o === picked ? "border-destructive bg-destructive/20 text-destructive"
                       : "border-border bg-muted/40 text-foreground hover:border-primary/50"
@@ -232,15 +280,16 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
             <p className={`mt-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${phase === "win" ? "text-primary" : "text-destructive"}`}>
               {phase === "win" ? "Vitória" : reason === "wrong" ? "Morte súbita" : "Tempo esgotado"}
             </p>
+            {phase === "win" && grade && <GradeSeal grade={grade} />}
             <h2 className="mt-1 text-2xl font-semibold text-foreground">
-              {phase === "win" ? `No bolso! +${LIGHTNING_REWARD} Arlys ✦` : "Fim de jogo!"}
+              {phase === "win" ? `No bolso! +${arlysGained} Arlys ✦` : "Fim de jogo!"}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {phase === "win"
-                ? "Os cristais já estão na sua carteira."
+                ? `Grau ${grade} · +${lpGained} LP no seu rank da temporada.`
                 : reason === "wrong" ? "Errou uma tradução — a Airi apitou na hora." : "O cronômetro zerou antes das 5 cartas."}
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="mt-4 grid grid-cols-3 gap-2">
               <div className="rounded-2xl bg-muted/40 p-3">
                 <p className="text-lg font-semibold tabular-nums text-foreground">{correct}/{LIGHTNING_TARGET}</p>
                 <p className="text-[11px] text-muted-foreground">acertos</p>
@@ -249,13 +298,37 @@ function LightningModal({ onClose, onFinish }: { onClose: () => void; onFinish: 
                 <p className="text-lg font-semibold tabular-nums text-foreground">{Math.min(elapsed, LIGHTNING_SECONDS).toFixed(1)}s</p>
                 <p className="text-[11px] text-muted-foreground">tempo</p>
               </div>
+              <div className="rounded-2xl bg-muted/40 p-3">
+                <p className="text-lg font-semibold tabular-nums text-foreground">{maxMult}x</p>
+                <p className="text-[11px] text-muted-foreground">combo máx.</p>
+              </div>
             </div>
+            <p className="mt-2 text-[12px] tabular-nums text-muted-foreground">Pontuação: {score}</p>
             <button onClick={onClose} autoFocus className="mt-5 w-full rounded-2xl bg-primary py-3 font-semibold text-primary-foreground">
               {phase === "win" ? "Resgatar e concluir" : "Tentar amanhã"}
             </button>
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+function GradeSeal({ grade }: { grade: LightningGrade }) {
+  const style =
+    grade === "S"
+      ? "border-primary bg-gradient-to-br from-primary/40 to-accent/30 text-primary-foreground shadow-[0_0_32px_color-mix(in_oklab,var(--primary)_70%,transparent)]"
+      : grade === "A"
+        ? "border-foreground/40 bg-gradient-to-br from-foreground/25 to-muted/40 text-foreground shadow-[0_0_20px_color-mix(in_oklab,var(--foreground)_25%,transparent)]"
+        : "border-border bg-muted/50 text-foreground";
+  return (
+    <div className="relative mx-auto mt-3 grid h-16 w-16 place-items-center">
+      {grade === "S" && (
+        <span aria-hidden className="absolute inset-0 rounded-full border border-primary/60 animate-ping" />
+      )}
+      <span className={`grid h-16 w-16 place-items-center rounded-full border-2 text-3xl font-black animate-[airi-duty-pop_0.6s_ease-out] ${style}`}>
+        {grade}
+      </span>
     </div>
   );
 }
