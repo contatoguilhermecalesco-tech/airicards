@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Timer, Zap, X, Hourglass } from "lucide-react";
+import { Timer, Zap, X, Hourglass, Lock } from "lucide-react";
 import { useStore } from "@/lib/flashcards-store";
 import { earn } from "@/lib/wallet-store";
 import { useCurrentProfile } from "@/lib/profile";
+import { useAppSettings } from "@/lib/app-settings";
 import {
   LIGHTNING_MIN_CARDS, LIGHTNING_REWARD, LIGHTNING_SECONDS, LIGHTNING_TARGET,
-  buildQuestion, lightningDay, lightningKey, msUntilNextChallenge, resolveAnswer, rewardFor,
+  buildQuestion, lightningAccess, lightningDay, lightningKey, msUntilNextChallenge, resolveAnswer, rewardFor,
   type LightningResult, type QuizQuestion,
 } from "@/lib/lightning-challenge";
 import startImg from "@/assets/airi-emotes/airi-lightning-start.png";
@@ -19,6 +20,7 @@ export function AiriLightningCard() {
   const cards = useStore((s) => s.cards);
   const [playedToday, setPlayedToday] = useState<string | null>("loading");
   const [open, setOpen] = useState(false);
+  const { lightning } = useAppSettings();
 
   useEffect(() => {
     if (!profile) return;
@@ -26,17 +28,28 @@ export function AiriLightningCard() {
   }, [profile]);
 
   if (!profile || playedToday === "loading" || cards.length < LIGHTNING_MIN_CARDS) return null;
-  const played = !!playedToday?.startsWith(lightningDay());
+  const access = lightningAccess(lightning.mode, lightning.releasedAt, playedToday);
+  const played = access === "played";
 
   const markPlayed = (r: LightningResult) => {
-    const v = `${lightningDay()}:${r}`;
+    const v = `${lightningDay()}:${r}:${Date.now()}`;
     try { localStorage.setItem(lightningKey(profile.id), v); } catch { /* ignore */ }
     setPlayedToday(v);
   };
 
   return (
     <>
-      {played && !open ? (
+      {access === "closed" && !open ? (
+        <div className="mt-5 flex w-full items-center gap-4 rounded-[22px] border border-border/60 bg-card/50 p-4 backdrop-blur-xl">
+          <img src={startImg} alt="" className="h-16 w-16 shrink-0 object-contain opacity-50 grayscale" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <Lock className="h-3.5 w-3.5" /> Desafio Relâmpago fechado
+            </div>
+            <p className="mt-1 text-[14px] text-foreground">A Airi guardou o cronômetro por enquanto. Volte mais tarde!</p>
+          </div>
+        </div>
+      ) : played && !open ? (
         <LightningCooldown onReset={() => setPlayedToday(null)} />
       ) : (
         <button

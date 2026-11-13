@@ -21,6 +21,7 @@ import {
   Users,
   AlertTriangle,
   Wrench,
+  Zap,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -64,6 +65,7 @@ import { ChangelogSection } from "@/components/admin/ChangelogSection";
 import { BackupSection } from "@/components/admin/BackupSection";
 import { StreakAdminSection } from "@/components/admin/StreakAdminSection";
 import { MaintenanceAdminSection } from "@/components/admin/MaintenanceAdminSection";
+import { LightningAdminSection } from "@/components/admin/LightningAdminSection";
 
 import { ShopItemsSection } from "@/components/admin/ShopItemsSection";
 import { RefundsAdminSection } from "@/components/admin/RefundsAdminSection";
@@ -124,7 +126,8 @@ type PanelKey =
   | "shop-items"
   | "refunds"
   | "concepts"
-  | "maintenance";
+  | "maintenance"
+  | "lightning";
 
 type PanelDef = {
   key: PanelKey;
@@ -153,6 +156,7 @@ const ADMIN_PANELS: PanelDef[] = [
   { key: "refunds", label: "Reembolsos", hint: "Devolver Arlys e remover itens", Icon: Undo2, color: "#fb7185", wide: true },
   { key: "bundles", label: "Bundles", hint: "Pacotes + vitrine da loja (destaque)", Icon: Package, color: "#a855f7", wide: true },
   { key: "concepts", label: "Bundle concepts", hint: "Diário criativo dos bundles", Icon: ScrollText, color: "#e879f9", wide: true },
+  { key: "lightning", label: "Desafio Relâmpago", hint: "Abrir, fechar ou liberar nova rodada", Icon: Zap, color: "#c084fc" },
   { key: "maintenance", label: "Manutenção", hint: "Bloquear temporariamente áreas do app", Icon: Wrench, color: "#f59e0b", wide: true },
 ];
 
@@ -327,6 +331,7 @@ function AdminPage() {
                 {openPanel === "bundles" && <BundleBuilderSection />}
                 {openPanel === "concepts" && <BundleConceptsSection />}
                 {openPanel === "maintenance" && <MaintenanceAdminSection />}
+                {openPanel === "lightning" && <LightningAdminSection />}
               </div>
             </>
           )}

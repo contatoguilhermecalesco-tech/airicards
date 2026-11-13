@@ -4,10 +4,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type AppSettings = {
   exam_visible: boolean;
+  /** Controle admin do Desafio Relâmpago. */
+  lightning: LightningControl;
 };
+
+export type LightningMode = "auto" | "open" | "closed";
+export type LightningControl = { mode: LightningMode; releasedAt: number };
+const LIGHTNING_DEFAULT: LightningControl = { mode: "auto", releasedAt: 0 };
+
+function parseLightning(v: unknown): LightningControl {
+  if (!v || typeof v !== "object") return { ...LIGHTNING_DEFAULT };
+  const o = v as Record<string, unknown>;
+  const mode = o.mode === "open" || o.mode === "closed" ? o.mode : "auto";
+  const releasedAt = typeof o.releasedAt === "number" ? o.releasedAt : 0;
+  return { mode, releasedAt };
+}
 
 const DEFAULTS: AppSettings = {
   exam_visible: false,
+  lightning: { mode: "auto", releasedAt: 0 },
 };
 
 let state: AppSettings = { ...DEFAULTS };
@@ -27,6 +42,8 @@ async function fetchAll() {
   for (const row of data) {
     if (row.key === "exam_visible") {
       next.exam_visible = row.value === true || row.value === "true";
+    } else if (row.key === "lightning") {
+      next.lightning = parseLightning(row.value);
     }
   }
   state = next;

@@ -68,3 +68,26 @@ export function buildQuestion(pool: QuizCard[], rnd: () => number = Math.random)
     options: shuffle([target.back, ...distractors], rnd),
   };
 }
+
+export type LightningAccess = "available" | "played" | "closed";
+
+/**
+ * Decide se o desafio pode ser jogado agora.
+ * - closed: admin fechou, ninguém joga.
+ * - open: admin liberou, joga quantas vezes quiser.
+ * - auto: 1x por dia; uma "liberação" do admin (releasedAt) depois da última partida libera nova rodada.
+ * `played` é o valor salvo: "AAAA-MM-DD:resultado[:timestamp]".
+ */
+export function lightningAccess(
+  mode: "auto" | "open" | "closed",
+  releasedAt: number,
+  played: string | null,
+  now = new Date(),
+): LightningAccess {
+  if (mode === "closed") return "closed";
+  if (mode === "open" || !played) return "available";
+  if (!played.startsWith(lightningDay(now))) return "available";
+  const ts = Number(played.split(":")[2] ?? 0) || 0;
+  if (releasedAt > ts) return "available";
+  return "played";
+}
