@@ -24,6 +24,7 @@ async function shrinkCover(file: File): Promise<File> {
 }
 import { Loader2, Pencil, Send, Sparkles, Trash2, Wand2, Wrench, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
+import { notifyPhones } from "@/lib/push";
 import {
   createChangelogEntry,
   updateChangelogEntry,
@@ -96,6 +97,7 @@ export function ChangelogSection() {
   }
   const [genBusy, setGenBusy] = useState(false);
   const [sendBusy, setSendBusy] = useState(false);
+  const [pushPhones, setPushPhones] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -174,8 +176,16 @@ export function ChangelogSection() {
           icon: iconKey || null,
           cover_url: coverUrl.trim() || null,
         });
+        if (pushPhones) {
+          notifyPhones({
+            to: ["guilherme", "arlayne"],
+            title: "Novo patch no airi ✨",
+            body: title.trim(),
+            url: "/novidades",
+          });
+        }
         resetForm();
-        setOk("Novidade publicada.");
+        setOk(pushPhones ? "Novidade publicada e celulares avisados." : "Novidade publicada.");
       }
       setTimeout(() => setOk(null), 2000);
     } catch (e) {
@@ -538,6 +548,16 @@ export function ChangelogSection() {
             })}
           </div>
         </div>
+
+        {!isEditing && (
+          <label className="flex min-h-[44px] cursor-pointer items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/40 px-4 py-2.5">
+            <span className="text-[13px] text-foreground">
+              Avisar celulares ao publicar
+              <span className="block text-[11px] text-muted-foreground">Notificação abre direto em Novidades</span>
+            </span>
+            <input type="checkbox" checked={pushPhones} onChange={(e) => setPushPhones(e.target.checked)} className="h-5 w-5 accent-[var(--primary)]" />
+          </label>
+        )}
 
         <div className="flex items-center justify-between gap-3 pt-1">
           <div className="min-h-[16px] flex-1 text-[11px]">
