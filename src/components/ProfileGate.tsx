@@ -250,11 +250,14 @@ function PinPad({
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
+  // Teclado físico (desktop) sem abrir o teclado nativo do celular.
+  const keyRef = useRef<(e: KeyboardEvent) => void>(() => {});
   useEffect(() => {
-    inputRef.current?.focus();
-  }, [needsCreate]);
+    const h = (e: KeyboardEvent) => keyRef.current(e);
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, []);
 
   const stage: "create" | "confirm" | "enter" = needsCreate
     ? pin.length >= 4
@@ -277,7 +280,6 @@ function PinPad({
     else if (res.error === "invalid_pin")
       setError("Use 4 a 8 dígitos numéricos.");
     else setError("Não deu para entrar. Tente novamente.");
-    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function onChange(v: string) {
@@ -298,14 +300,13 @@ function PinPad({
     }
   }
 
-  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" && stage === "enter" && pin.length >= 4) {
-      e.preventDefault();
-      void submit(pin);
-    }
-  }
-
   const value = stage === "confirm" ? confirmPin : pin;
+  keyRef.current = (e: KeyboardEvent) => {
+    if (busy || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (/^[0-9]$/.test(e.key)) { e.preventDefault(); onChange(value + e.key); }
+    else if (e.key === "Backspace") { e.preventDefault(); onChange(value.slice(0, -1)); }
+    else if (e.key === "Enter" && stage === "enter" && pin.length >= 4) { e.preventDefault(); void submit(pin); }
+  };
   const title =
     stage === "enter"
       ? `Olá, ${profile.name}`
@@ -352,7 +353,7 @@ function PinPad({
 
       {/* PIN field with progress dots and quick submit */}
       <div className="mt-8 flex items-center gap-3 rounded-full border border-white/[0.07] bg-[#202020] p-2 pl-5 shadow-[inset_5px_5px_12px_rgba(0,0,0,0.24),inset_-4px_-4px_10px_rgba(255,255,255,0.018)]">
-        <div className="flex min-h-[34px] flex-1 items-center gap-2" onClick={() => inputRef.current?.focus()} role="presentation">
+        <div className="flex min-h-[34px] flex-1 items-center gap-2" role="presentation">
           {dots.map((i) => (
             <span key={i} className={"h-[9px] w-[9px] rounded-full transition-all duration-200 " + (i < filled ? "scale-110 bg-[#b69ae8] shadow-[0_0_10px_rgba(182,154,232,0.4)]" : "bg-white/15")} />
           ))}
@@ -372,21 +373,6 @@ function PinPad({
           </button>
         )}
       </div>
-      {/* Hidden input capturing keyboard */}
-      <input
-        ref={inputRef}
-        type="password"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        pattern="[0-9]*"
-        value={value}
-        maxLength={8}
-        disabled={busy}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={onKey}
-        aria-label="PIN"
-        className="sr-only"
-      />
 
       {error && (
         <p
