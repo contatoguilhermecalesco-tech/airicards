@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 /* ============================================================
    Riot-style patch notes renderer
@@ -19,7 +19,8 @@ type Block =
   | { type: "h2"; text: string }
   | { type: "h3"; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "hr" };
+  | { type: "hr" }
+  | { type: "img"; src: string; alt: string };
 
 function parseRiotBody(raw: string): Block[] {
   const lines = raw.replace(/\r\n/g, "\n").split("\n");
@@ -69,6 +70,13 @@ function parseRiotBody(raw: string): Block[] {
       flushList();
       sawHeading = true;
       blocks.push({ type: "h3", text: line.replace(/^###\s+/, "") });
+      continue;
+    }
+    const im = line.match(/^!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)$/);
+    if (im) {
+      flushPara();
+      flushList();
+      blocks.push({ type: "img", alt: im[1], src: im[2] });
       continue;
     }
     if (/^---+$/.test(line)) {
@@ -253,6 +261,9 @@ export function RiotPatchBody({
             </h3>
           );
         }
+        if (b.type === "img") {
+          return <PatchImage key={i} src={b.src} alt={b.alt} accent={accent} />;
+        }
         if (b.type === "hr") {
           return <hr key={i} className="border-white/10" />;
         }
@@ -315,3 +326,34 @@ Um parágrafo curto contextualizando o que vem por aí neste patch.
 ---
 
 Feche com uma linha celebrando a mudança ou agradecendo o feedback da galera.`;
+
+function PatchImage({ src, alt, accent }: { src: string; alt: string; accent: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <figure className="my-2">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Ampliar imagem"
+        className="block w-full overflow-hidden rounded-2xl border border-white/10 bg-black/30"
+        style={{ boxShadow: `0 10px 40px -18px ${accent}88` }}
+      >
+        <img src={src} alt={alt || "Imagem ilustrativa"} loading="lazy" className="mx-auto max-h-[480px] w-auto max-w-full object-contain" />
+      </button>
+      {alt && <figcaption className="mt-2 text-center text-[12px] text-foreground/50">{alt}</figcaption>}
+      {open && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/95 p-4 backdrop-blur-sm"
+          style={{ paddingTop: "max(1rem, env(safe-area-inset-top))", paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+        >
+          <button type="button" aria-label="Fechar" onClick={() => setOpen(false)} className="absolute right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-xl text-foreground" style={{ top: "max(0.75rem, env(safe-area-inset-top))" }}>×</button>
+          <img src={src} alt={alt} className="max-h-[85dvh] max-w-full rounded-xl object-contain" />
+          {alt && <p className="mt-3 text-center text-[13px] text-foreground/70">{alt}</p>}
+        </div>
+      )}
+    </figure>
+  );
+}

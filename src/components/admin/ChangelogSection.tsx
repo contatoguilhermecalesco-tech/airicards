@@ -74,6 +74,21 @@ export function ChangelogSection() {
   const [coverUrl, setCoverUrl] = useState("");
   const [coverBusy, setCoverBusy] = useState(false);
   const coverInput = useRef<HTMLInputElement>(null);
+  const notesRef = useRef<HTMLTextAreaElement>(null);
+  const inlineInput = useRef<HTMLInputElement>(null);
+  const [inlineBusy, setInlineBusy] = useState(false);
+  async function onInlineImage(f?: File) {
+    if (!f) return;
+    setInlineBusy(true);
+    try {
+      const url = await uploadConceptImage(await shrinkCover(f));
+      const caption = window.prompt("Legenda da imagem (opcional):", "") ?? "";
+      const el = notesRef.current;
+      const pos = el?.selectionStart ?? notes.length;
+      const snippet = `\n\n![${caption.replace(/[\[\]]/g, "")}](${url})\n\n`;
+      setNotes((n) => n.slice(0, pos) + snippet + n.slice(pos));
+    } catch (e) { setErr((e as Error).message); } finally { setInlineBusy(false); }
+  }
   async function onCover(f?: File) {
     if (!f) return;
     setCoverBusy(true);
@@ -434,7 +449,16 @@ export function ChangelogSection() {
             <p className="mt-1 text-[10px] text-foreground/40">Ideal 16:9 (ex: 1920×1080). Aparece no topo da nota.</p>
           </div>
 
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="text-[10px] text-foreground/40">Imagens no texto: posicione o cursor e insira.</span>
+            <button type="button" disabled={inlineBusy} onClick={() => inlineInput.current?.click()} className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-[12px] font-semibold disabled:opacity-60">
+              {inlineBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+              {inlineBusy ? "Enviando…" : "Inserir imagem"}
+            </button>
+            <input ref={inlineInput} type="file" accept="image/*" hidden onChange={(e) => { onInlineImage(e.target.files?.[0]); e.target.value = ""; }} />
+          </div>
           <textarea
+            ref={notesRef}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder={RIOT_NOTES_PLACEHOLDER}
