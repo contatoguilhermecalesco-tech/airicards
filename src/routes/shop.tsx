@@ -62,6 +62,8 @@ import {
 import { SHOP_ASSET_OVERRIDES } from "@/lib/shop-asset-overrides";
 import { ItemPreviewModal } from "@/components/shop/ItemPreviewModal";
 import { AiriShopMascot, AIRI_SHOP_EMOTES } from "@/components/shop/AiriShopMascot";
+import { resolveShopMascotVariant } from "@/lib/airi-shop-mood";
+import { useAppSettings } from "@/lib/app-settings";
 
 import { cosmeticArtFor } from "@/lib/cosmetic-art";
 
@@ -137,6 +139,7 @@ const SORTS: { id: SortMode; label: string }[] = [
 function ShopPage() {
   const profile = useCurrentProfile();
   const wallet = useWallet();
+  const appSettings = useAppSettings();
   const router = useRouter();
 
   const [items, setItems] = useState<ShopItem[] | null>(null);
@@ -561,7 +564,7 @@ function ShopPage() {
       </header>
 
       {profile && wallet.loaded && wallet.profileId === profile.id && (
-        <AiriShopMascot balance={wallet.crystals} blackFriday={unified.some((u) => u.promo?.type === "black")} />
+        <AiriShopMascot balance={wallet.crystals} blackFriday={resolveShopMascotVariant(appSettings.shop_mascot, unified.some((u) => u.promo?.type === "black")) === "black"} />
       )}
 
       {/* Category tabs — estilo cliente de jogo */}

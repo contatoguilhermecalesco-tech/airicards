@@ -6,7 +6,14 @@ export type AppSettings = {
   exam_visible: boolean;
   /** Controle admin do Desafio Relâmpago. */
   lightning: LightningControl;
+  /** Qual Airi aparece na Loja (admin). */
+  shop_mascot: ShopMascotMode;
 };
+
+export type ShopMascotMode = "auto" | "normal" | "black";
+function parseShopMascot(v: unknown): ShopMascotMode {
+  return v === "normal" || v === "black" ? v : "auto";
+}
 
 export type LightningMode = "auto" | "open" | "closed";
 export type LightningControl = { mode: LightningMode; releasedAt: number };
@@ -23,6 +30,7 @@ function parseLightning(v: unknown): LightningControl {
 const DEFAULTS: AppSettings = {
   exam_visible: false,
   lightning: { mode: "auto", releasedAt: 0 },
+  shop_mascot: "auto",
 };
 
 let state: AppSettings = { ...DEFAULTS };
@@ -44,6 +52,8 @@ async function fetchAll() {
       next.exam_visible = row.value === true || row.value === "true";
     } else if (row.key === "lightning") {
       next.lightning = parseLightning(row.value);
+    } else if (row.key === "shop_mascot") {
+      next.shop_mascot = parseShopMascot(row.value);
     }
   }
   state = next;
